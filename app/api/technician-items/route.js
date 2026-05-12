@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getTechnicianItems, upsertTechnicianItems } from '@/lib/db-gptmaker';
+import { getTechnicianItems } from '@/lib/databricks'; // Importando do arquivo databricks!
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -9,26 +9,15 @@ export async function GET(request) {
 
   const { searchParams } = new URL(request.url);
   const technicianId = searchParams.get('technicianId');
-  if (!technicianId) return NextResponse.json({ error: 'technicianId obrigatório' }, { status: 400 });
+  
+  if (!technicianId) return NextResponse.json({ error: 'TechnicianId obrigatório' }, { status: 400 });
 
-  const data = await getTechnicianItems(technicianId, false);
-  return NextResponse.json(data);
-}
-
-export async function POST(request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!['admin', 'supervisor'].includes(session.user.role)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  try {
+    // Esta função no lib/databricks.js já faz a query SQL direto no Warehouse
+    const data = await getTechnicianItems(technicianId);
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Erro ao buscar no Databricks:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  const body = await request.json();
-  const { technician_id, items } = body;
-
-  if (!technician_id || !Array.isArray(items) || items.length === 0) {
-    return NextResponse.json({ error: 'technician_id e items[] são obrigatórios' }, { status: 400 });
-  }
-
-  const data = await upsertTechnicianItems(technician_id, items);
-  return NextResponse.json(data, { status: 201 });
 }
