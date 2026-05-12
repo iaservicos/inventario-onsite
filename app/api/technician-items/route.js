@@ -1,7 +1,9 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getTechnicianItems } from '@/lib/databricks'; // PRECISA SER ESTA LINHA!
+import { getTechnicianItems } from '@/lib/databricks'; 
+
+
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
