@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authOptions } from @/app/api/auth/[...nextauth]/route;
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDivergences } from '@/lib/db';
 
 export async function GET(request) {
