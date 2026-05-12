@@ -15,6 +15,7 @@ export default function PecasPage() {
   const [newItem, setNewItem] = useState({ item_code: '', item_name: '', unit: 'un' });
   const [saving, setSaving] = useState(false);
   const fileRef = useRef();
+  
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -28,13 +29,29 @@ export default function PecasPage() {
     if (selectedTech) fetchItems();
   }, [selectedTech]);
 
-  async function fetchItems() {
-    setLoading(true);
-    const res = await fetch(`/api/technician-items?technicianId=${selectedTech}`);
-    const data = await res.json();
+async function fetchItems() {
+  if (!selectedTech) return; // Evita erro se não houver técnico selecionado
+  
+  setLoading(true);
+  try {
+    const tech = technicians.find(t => t.id === selectedTech);
+    
+    // Usamos o nome que o Databricks reconhece (geralmente databricks_name ou name)
+    // encodeURIComponent serve para lidar com espaços e acentos no nome
+    const ident = tech.databricks_name || tech.name;
+    const res = await fetch(`/api/technician-items?technicianId=${encodeURIComponent(ident)}`);
+    
+    const data = await res.json(); // Faltava esta linha!
+    
     setItems(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Erro ao buscar peças:", err);
+    setItems([]);
+  } finally {
     setLoading(false);
   }
+}
+
 
   async function handleAddItem(e) {
     e.preventDefault();
