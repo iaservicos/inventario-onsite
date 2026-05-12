@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authOptions } from ''@/app/api/auth/[...nextauth]/route'';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createTechnician } from '@/lib/db';
 import { createServiceClient } from '@/lib/supabase';
 
