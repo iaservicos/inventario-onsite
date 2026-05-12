@@ -20,8 +20,6 @@ export default function PecasPage() {
         const res = await fetch('/api/technicians');
         if (!res.ok) throw new Error('Falha ao carregar técnicos');
         const data = await res.json();
-        
-        // Filtra apenas os ativos que vieram do Supabase
         const activeTechs = Array.isArray(data) ? data.filter(t => t.active) : [];
         setTechnicians(activeTechs);
       } catch (error) {
@@ -46,7 +44,6 @@ export default function PecasPage() {
     setLoading(true);
     try {
       const tech = technicians.find(t => String(t.id) === String(techId));
-      // Usamos o databricks_name que foi sincronizado no Supabase
       const identifier = tech?.databricks_name || tech?.name;
 
       if (!identifier) {
@@ -67,7 +64,8 @@ export default function PecasPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    // MUDANÇA AQUI: Removi 'max-w-7xl' e 'mx-auto' para ocupar toda a largura
+    <div className="p-6 w-full space-y-6">
       <PageHeader 
         title="Consulta de Peças" 
         description="Dados sincronizados em tempo real com o Databricks."
@@ -102,7 +100,6 @@ export default function PecasPage() {
         )}
       </div>
 
-      {/* Tabela de Peças (Mantida igual a anterior) */}
       <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-[#2a2a2a] flex justify-between items-center">
           <h3 className="font-medium text-white">Peças no Databricks ({items.length})</h3>
