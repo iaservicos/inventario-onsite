@@ -29,28 +29,35 @@ export default function PecasPage() {
     if (selectedTech) fetchItems();
   }, [selectedTech]);
 
-async function fetchItems() {
-  if (!selectedTech) return; // Evita erro se não houver técnico selecionado
-  
-  setLoading(true);
-  try {
-    const tech = technicians.find(t => t.id === selectedTech);
+  async function fetchItems() {
+    if (!selectedTech) return;
     
-    // Usamos o nome que o Databricks reconhece (geralmente databricks_name ou name)
-    // encodeURIComponent serve para lidar com espaços e acentos no nome
-    const ident = tech.databricks_name || tech.name;
-    const res = await fetch(`/api/technician-items?technicianId=${encodeURIComponent(ident)}`);
-    
-    const data = await res.json(); // Faltava esta linha!
-    
-    setItems(Array.isArray(data) ? data : []);
-  } catch (err) {
-    console.error("Erro ao buscar peças:", err);
-    setItems([]);
-  } finally {
-    setLoading(false);
+    setLoading(true);
+    try {
+      const tech = technicians.find(t => t.id === selectedTech);
+      
+      // ADICIONE ESTA LINHA:
+      if (!tech) return; 
+
+      // Use o optional chaining (?.) para maior segurança
+      const identifier = tech?.databricks_name || tech?.name;
+      
+      if (!identifier) {
+        setItems([]);
+        return;
+      }
+
+      const res = await fetch(`/api/technician-items?technicianId=${encodeURIComponent(identifier)}`);
+      const data = await res.json();
+      
+      setItems(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Erro ao buscar peças:", error);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
 
   async function handleAddItem(e) {
