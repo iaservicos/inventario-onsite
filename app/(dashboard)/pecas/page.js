@@ -132,6 +132,8 @@ export default function PecasPage() {
                 <th className="px-6 py-3">Código</th>
                 <th className="px-6 py-3">Descrição</th>
                 <th className="px-6 py-3">Quantidade</th>
+                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3">Remessa</th>
               </tr>
             </thead>
 
@@ -148,11 +150,17 @@ export default function PecasPage() {
                     <td className="px-6 py-4 text-sm text-gray-300">
                       {item.item_quantity ?? 0}
                     </td>
+                    <td className="px-6 py-4 text-sm text-gray-400">
+                      {item.item_status || '—'}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-mono text-gray-400">
+                      {item.item_num_remessa || '—'}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="px-6 py-12 text-center text-gray-500 italic">
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500 italic">
                     {selectedTech
                       ? (loading ? 'Buscando dados...' : 'Sem dados para este técnico.')
                       : 'Aguardando seleção...'}
