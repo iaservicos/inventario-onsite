@@ -1,21 +1,18 @@
 /**
  * POST /api/webhook/dispatch-databricks
- * Versão aprimorada do dispatch que busca as peças diretamente do Databricks
- * em vez de usar a tabela technician_items do banco local.
+ * Versão aprimorada com seleção inteligente de peças por histórico de contagens.
  *
- * Fluxo:
- * 1. Recebe o schedule_id (agendamento do supervisor)
- * 2. Busca o técnico e seu nome no Databricks
- * 3. Seleciona N peças aleatórias do portfólio real em tempo real
- * 4. Cria o inventário com essas peças
- * 5. Cria sessão GPT Maker e envia primeira mensagem ao técnico
+ * Lógica de seleção das 10 peças:
+ * 1ª prioridade — peças que NUNCA foram contadas no sistema
+ * 2ª prioridade — peças contadas há mais tempo (mais antigas no histórico)
+ * 3ª prioridade — aleatório entre as restantes
  *
  * Autenticação: header x-dispatch-secret
  */
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getTechnicianItemsSample } from '@/lib/databricks';
+import { getTechnicianItems } from '@/lib/databricks';
 import crypto from 'crypto';
 
 const supabase = createClient(
@@ -32,6 +29,97 @@ function getWeekRef(date = new Date()) {
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+/**
+ * Seleção inteligente de peças com prioridade por histórico de contagens.
+ *
+ * @param {Array} allItems - Todas as peças do técnico vindas do Databricks
+ * @param {string} technicianId - ID do técnico no banco
+ * @param {number} count - Quantidade de peças a selecionar (padrão: 10)
+ * @returns {Array} Peças selecionadas com prioridade
+ */
+async function selectItemsWithPriority(allItems, technicianId, count = 10) {
+  // Busca histórico de contagens do técnico (últimos 6 meses)
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+  const { data: history } = await supabase
+    .from('inventory_items')
+    .select(`
+      item_code,
+      created_at,
+      inventories!inner (
+        technician_id,
+        status,
+        created_at
+      )
+    `)
+    .eq('inventories.technician_id', technicianId)
+    .in('inventories.status', ['completed', 'divergent'])
+    .gte('inventories.created_at', sixMonthsAgo.toISOString())
+    .order('created_at', { ascending: false });
+
+  // Monta mapa: item_code → data da última contagem
+  const lastCountedMap = {};
+  if (history && history.length > 0) {
+    for (const row of history) {
+      const code = row.item_code;
+      if (!lastCountedMap[code]) {
+        lastCountedMap[code] = row.created_at;
+      }
+    }
+  }
+
+  // Classifica cada peça
+  const neverCounted = [];   // Nunca contadas — máxima prioridade
+  const countedOld = [];     // Contadas há mais de 4 semanas
+  const countedRecent = [];  // Contadas recentemente (menos de 4 semanas)
+
+  const fourWeeksAgo = new Date();
+  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+
+  for (const item of allItems) {
+    const lastDate = lastCountedMap[item.item_code];
+
+    if (!lastDate) {
+      neverCounted.push(item);
+    } else if (new Date(lastDate) < fourWeeksAgo) {
+      countedOld.push({ ...item, last_counted: lastDate });
+    } else {
+      countedRecent.push({ ...item, last_counted: lastDate });
+    }
+  }
+
+  // Ordena as contadas antigas da mais antiga para a mais recente
+  countedOld.sort((a, b) => new Date(a.last_counted) - new Date(b.last_counted));
+
+  // Embaralha as nunca contadas para variedade
+  const shuffledNever = neverCounted.sort(() => Math.random() - 0.5);
+
+  // Monta a lista final com prioridade
+  const selected = [];
+
+  // 1ª: Nunca contadas (até completar `count`)
+  for (const item of shuffledNever) {
+    if (selected.length >= count) break;
+    selected.push({ ...item, selection_reason: 'never_counted' });
+  }
+
+  // 2ª: Contadas mais antigas
+  for (const item of countedOld) {
+    if (selected.length >= count) break;
+    selected.push({ ...item, selection_reason: 'oldest_count' });
+  }
+
+  // 3ª: Contadas recentemente (completar se necessário)
+  const shuffledRecent = countedRecent.sort(() => Math.random() - 0.5);
+  for (const item of shuffledRecent) {
+    if (selected.length >= count) break;
+    selected.push({ ...item, selection_reason: 'recent_random' });
+  }
+
+  return selected.slice(0, count);
 }
 
 export async function POST(request) {
@@ -102,15 +190,18 @@ export async function POST(request) {
     }, { status: 409 });
   }
 
-  // Busca peças em tempo real no Databricks
-  let items;
+  // Busca TODAS as peças do técnico no Databricks
+  let allItems;
   try {
-    items = await getTechnicianItemsSample(searchName, totalItems);
+    allItems = await getTechnicianItems(searchName);
   } catch (e) {
-    // Atualiza o agendamento com erro
     await supabase
       .from('inventory_schedules')
-      .update({ status: 'cancelled', notes: `Erro Databricks: ${e.message}`, updated_at: new Date().toISOString() })
+      .update({
+        status: 'cancelled',
+        notes: `Erro Databricks: ${e.message}`,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', schedule_id);
 
     return NextResponse.json({
@@ -120,10 +211,14 @@ export async function POST(request) {
     }, { status: 500 });
   }
 
-  if (!items || items.length === 0) {
+  if (!allItems || allItems.length === 0) {
     await supabase
       .from('inventory_schedules')
-      .update({ status: 'cancelled', notes: `Técnico "${searchName}" sem peças no Databricks`, updated_at: new Date().toISOString() })
+      .update({
+        status: 'cancelled',
+        notes: `Técnico "${searchName}" sem peças no Databricks`,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', schedule_id);
 
     return NextResponse.json({
@@ -131,6 +226,9 @@ export async function POST(request) {
       hint: 'Verifique se o nome do técnico no sistema corresponde exatamente ao nome no Data Lake'
     }, { status: 404 });
   }
+
+  // Seleção inteligente com prioridade por histórico
+  const items = await selectItemsWithPriority(allItems, technician.id, totalItems);
 
   // Cria o inventário
   const { data: inventory, error: invError } = await supabase
@@ -151,13 +249,13 @@ export async function POST(request) {
     return NextResponse.json({ error: invError.message }, { status: 500 });
   }
 
-  // Insere as peças no inventário
+  // Insere as peças selecionadas no inventário
   const inventoryItems = items.map((item, index) => ({
     inventory_id: inventory.id,
     item_code: item.item_code,
     item_name: item.item_name,
     unit: item.unit || 'UN',
-    expected_qty: item.expected_qty,
+    expected_qty: Number(item.item_quantity) || 0,
     counted_qty: null,
     status: 'pending',
     sort_order: index,
@@ -209,15 +307,16 @@ export async function POST(request) {
     console.error('[dispatch-databricks] Erro ao criar sessão:', sessionError.message);
   }
 
-  // Monta e envia a primeira mensagem
+  // Monta e envia a primeira mensagem via GPT Maker
+  const firstName = technician.name.split(' ')[0];
   const firstMessage =
-    `Olá, ${technician.name.split(' ')[0]}! 👋\n\n` +
+    `Olá, ${firstName}! 👋\n\n` +
     `É hora do inventário semanal — semana *${weekRef}*.\n\n` +
     `Vamos contar *${items.length} peça(s)*. Responda apenas com o número de cada uma.\n\n` +
     `📦 *Peça 1 de ${items.length}*\n` +
     `*${firstItem.item_name}*\n` +
-    `Código: ${firstItem.item_code}\n` +
-    `Quantidade esperada: ${firstItem.expected_qty}\n\n` +
+    `Código: \`${firstItem.item_code}\`\n` +
+    `Quantidade esperada: *${Number(firstItem.item_quantity) || 0}*\n\n` +
     `Quantas unidades você tem agora?`;
 
   let dispatched = false;
@@ -254,8 +353,14 @@ export async function POST(request) {
     technician: technician.name,
     databricks_name: searchName,
     week_ref: weekRef,
+    total_in_databricks: allItems.length,
     items_count: items.length,
-    items_sample: items.map((i) => ({ code: i.item_code, name: i.item_name, expected: i.expected_qty })),
+    items_selected: items.map(i => ({
+      code: i.item_code,
+      name: i.item_name,
+      expected: Number(i.item_quantity) || 0,
+      reason: i.selection_reason,
+    })),
     dispatched,
     dispatch_error: dispatchError,
   });
