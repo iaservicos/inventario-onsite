@@ -9,16 +9,13 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Edição ─────────────────────────────────────── */
-function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
+function ModalEdicao({ tecnico, onClose, onSaved }) {
   const [form, setForm] = useState({
     name:            tecnico?.name            || '',
     email:           tecnico?.email           || '',
     phone:           tecnico?.phone           || '',
     region:          tecnico?.region          || '',
     supervisor_name: tecnico?.supervisor_name || '',
-    databricks_name: tecnico?.databricks_name || '',
-    databricks_id:   tecnico?.databricks_id   || '',
-    active:          tecnico?.active          ?? true,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
@@ -52,7 +49,7 @@ function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#888888' }}>✕</button>
         </div>
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
-          {error && <div style={{ padding: '0.75rem', background: '#ffebee', color: '#b71c1c', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '700' }}>{error}</div>}
+          {error && <div style={{ padding: '0.75rem', background: '#f0f0f0', color: '#000000', border: '1px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '700' }}>{error}</div>}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Nome completo *">
@@ -78,24 +75,6 @@ function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
             <input name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" placeholder="Nome do supervisor" />
           </Field>
 
-          <div style={{ margin: '1.5rem 0 1rem', borderBottom: '1px solid #eeeeee', position: 'relative' }}>
-            <span style={{ position: 'absolute', top: '-10px', left: '10px', background: '#ffffff', padding: '0 10px', fontSize: '0.65rem', fontWeight: '800', color: '#888888', textTransform: 'uppercase' }}>Vínculo Databricks</span>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-            <Field label="Nome no Databricks">
-              <input name="databricks_name" value={form.databricks_name} onChange={set} className="input" placeholder="Nome exato no Data Lake" />
-            </Field>
-            <Field label="ID no Databricks">
-              <input name="databricks_id" type="number" value={form.databricks_id} onChange={set} className="input" placeholder="Ex: 17338" />
-            </Field>
-          </div>
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', marginTop: '1rem' }}>
-            <input name="active" type="checkbox" checked={form.active} onChange={set} />
-            Técnico ativo
-          </label>
-
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving}>Cancelar</button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
@@ -118,7 +97,6 @@ function ModalMassa({ selecionados, onClose, onSaved }) {
     if (!supervisor) return;
     setSaving(true);
     try {
-      // Atualiza um por um (simulando massa para simplificar a API atual)
       const promises = selecionados.map(id => 
         fetch(`/api/technicians/${id}`, {
           method: 'PATCH',
@@ -186,7 +164,6 @@ export default function CadastroTecnicosPage() {
     setTecnicos(Array.isArray(data) ? data : []);
     setLoading(false);
     
-    // Validação automática com Databricks
     if (Array.isArray(data)) {
       data.forEach(t => {
         if (t.databricks_name) checkDb(t.id);
@@ -200,6 +177,7 @@ export default function CadastroTecnicosPage() {
     try {
       const res = await fetch(`/api/technicians/${id}/sync-items`);
       const data = await res.json();
+      // Lógica Corrigida: OK se encontrado, NÃO OK se não encontrado
       setDbStatus(prev => ({ ...prev, [id]: data.found_in_databricks ? 'OK' : 'NOT_OK' }));
     } catch {
       setDbStatus(prev => ({ ...prev, [id]: 'ERROR' }));
@@ -298,7 +276,7 @@ export default function CadastroTecnicosPage() {
         </div>
       </div>
 
-      {editando && <ModalEdicao tecnico={editando} onClose={() => setEditando(null)} onSaved={() => { load(); setEditando(null); }} isAdmin={isAdmin} />}
+      {editando && <ModalEdicao tecnico={editando} onClose={() => setEditando(null)} onSaved={() => { load(); setEditando(null); }} />}
       {showMassa && <ModalMassa selecionados={selecionados} onClose={() => setShowMassa(false)} onSaved={() => { load(); setShowMassa(false); setSelecionados([]); }} />}
     </div>
   );
