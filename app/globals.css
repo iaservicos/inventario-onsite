@@ -333,3 +333,68 @@ tbody td { padding: 0.75rem 1rem; color: var(--text); vertical-align: middle; }
 }
 .login-btn:hover:not(:disabled) { background: #e5e5e5; }
 .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Cadastro de Técnicos ─────────────────────────────────── */
+.ct-pg { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+.ct-filters { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; }
+.ct-inp-filter { background: #1a1a1a; border: 1px solid #2a2a2a; color: #f0f0f0; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; outline: none; min-width: 140px; }
+.ct-inp-filter:focus { border-color: #525252; }
+.ct-inp-filter-wide { min-width: 220px; }
+.ct-chk-label { color: #a3a3a3; font-size: 0.875rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; white-space: nowrap; }
+.ct-empty { text-align: center; padding: 3rem; color: #525252; font-size: 0.9rem; }
+.ct-empty-sub { font-size: 0.8rem; color: #525252; margin-top: 0.4rem; }
+.ct-tbl-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #2a2a2a; }
+.ct-tbl { width: 100%; border-collapse: collapse; }
+.ct-tbl thead tr { background: #111111; border-bottom: 1px solid #2a2a2a; }
+.ct-tbl th { padding: 0.75rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 600; color: #525252; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+.ct-th-right { text-align: right; }
+.ct-tbl tbody tr { border-bottom: 1px solid #1a1a1a; transition: background 0.12s; }
+.ct-tbl tbody tr:last-child { border-bottom: none; }
+.ct-tbl tbody tr:hover { background: #141414; }
+.ct-tbl td { padding: 0.875rem 1rem; font-size: 0.875rem; color: #d4d4d4; vertical-align: middle; }
+.ct-td-name { font-weight: 500; color: #f0f0f0; }
+.ct-td-mono { font-family: monospace; font-size: 0.8rem; color: #a3a3a3; }
+.ct-td-muted { font-size: 0.8rem; color: #737373; }
+.ct-td-dim { font-size: 0.75rem; color: #525252; }
+.ct-tag { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 600; background: #222; color: #a3a3a3; border: 1px solid #2a2a2a; }
+.ct-tag-on  { background: #1a1a1a; color: #d4d4d4; border-color: #333; }
+.ct-tag-off { background: #111; color: #525252; border-color: #222; }
+.ct-tag-ok  { background: #1a1a1a; color: #a3a3a3; border-color: #2a2a2a; }
+.ct-tag-err { background: #1a1a1a; color: #737373; border-color: #2a2a2a; }
+.ct-btn-db { background: #1a1a1a; border: 1px solid #2a2a2a; color: #a3a3a3; padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: 600; transition: all 0.12s; }
+.ct-btn-db:hover { background: #222; color: #f0f0f0; }
+.ct-acts { display: flex; gap: 0.4rem; justify-content: flex-end; }
+.ct-btn-edit { background: #1a1a1a; border: 1px solid #2a2a2a; color: #d4d4d4; padding: 0.3rem 0.7rem; border-radius: 5px; font-size: 0.75rem; cursor: pointer; transition: all 0.12s; }
+.ct-btn-edit:hover { background: #222; color: #f0f0f0; border-color: #333; }
+.ct-btn-del-sm { background: #111; border: 1px solid #222; color: #525252; padding: 0.3rem 0.7rem; border-radius: 5px; font-size: 0.75rem; cursor: pointer; transition: all 0.12s; }
+.ct-btn-del-sm:hover { background: #1a1a1a; color: #a3a3a3; border-color: #2a2a2a; }
+.ct-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.ct-modal { background: #111111; border: 1px solid #2a2a2a; border-radius: 10px; width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; }
+.ct-modal-sm { max-width: 420px; }
+.ct-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid #1f1f1f; }
+.ct-modal-title { font-size: 0.95rem; font-weight: 600; color: #f0f0f0; }
+.ct-close-btn { background: none; border: none; color: #525252; font-size: 0.95rem; cursor: pointer; padding: 0.2rem; line-height: 1; }
+.ct-close-btn:hover { color: #f0f0f0; }
+.ct-modal-body { padding: 1.5rem; }
+.ct-modal-foot { display: flex; gap: 0.75rem; justify-content: flex-end; padding: 1rem 1.5rem; border-top: 1px solid #1f1f1f; }
+.ct-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.ct-field { margin-bottom: 1rem; }
+.ct-field-label { display: block; font-size: 0.78rem; font-weight: 500; color: #737373; margin-bottom: 0.35rem; }
+.ct-field-hint { font-size: 0.7rem; color: #525252; margin-top: 0.25rem; display: block; }
+.ct-inp { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; color: #f0f0f0; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; outline: none; box-sizing: border-box; }
+.ct-inp:focus { border-color: #525252; }
+.ct-chk { accent-color: #737373; width: 15px; height: 15px; }
+.ct-check-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #a3a3a3; cursor: pointer; margin-bottom: 1rem; }
+.ct-form-err { background: #1a1a1a; border: 1px solid #2a2a2a; color: #a3a3a3; padding: 0.6rem 0.75rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 1rem; }
+.ct-divider { display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0 1rem; }
+.ct-divider::before, .ct-divider::after { content: ''; flex: 1; height: 1px; background: #2a2a2a; }
+.ct-divider span { font-size: 0.7rem; color: #525252; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em; }
+.ct-btn-pri { background: #f0f0f0; color: #0a0a0a; border: none; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; }
+.ct-btn-pri:hover { opacity: 0.9; }
+.ct-btn-pri:disabled { opacity: 0.5; cursor: not-allowed; }
+.ct-btn-sec { background: #1a1a1a; color: #a3a3a3; border: 1px solid #2a2a2a; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.875rem; cursor: pointer; }
+.ct-btn-sec:hover { background: #222; color: #f0f0f0; }
+.ct-btn-del { background: #1a1a1a; color: #a3a3a3; border: 1px solid #333; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.875rem; cursor: pointer; }
+.ct-btn-del:hover { background: #222; color: #d4d4d4; }
+.ct-toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1a1a1a; border: 1px solid #2a2a2a; color: #d4d4d4; padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.875rem; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.5); animation: fadeUp 0.2s ease; }
+@media (max-width: 640px) { .ct-row2 { grid-template-columns: 1fr; } .ct-filters { flex-direction: column; } .ct-inp-filter { width: 100%; } }
