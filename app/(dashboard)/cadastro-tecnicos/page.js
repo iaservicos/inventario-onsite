@@ -158,7 +158,8 @@ export default function CadastroTecnicosPage() {
       const p = new URLSearchParams();
       if (search)       p.set('search', search);
       if (regionFlt)    p.set('region', regionFlt);
-      if (showInactive) p.set('active', 'false');
+      p.set('active', showInactive ? 'false' : 'true');
+      
       const res  = await fetch(`/api/technicians?${p}`);
       const data = await res.json();
       setTecnicos(Array.isArray(data) ? data : []);

@@ -20,13 +20,21 @@ export async function GET(request) {
       .select('*')
       .order('name');
 
-    // Filtros
+    // Filtro de Supervisor
     if (session.user.role === 'supervisor') {
       query = query.ilike('supervisor_name', session.user.name);
     }
 
-    if (active === 'true') query = query.eq('active', true);
-    if (active === 'false') query = query.eq('active', false);
+    // Filtro de Ativos/Inativos
+    if (active === 'true') {
+      query = query.eq('active', true);
+    } else if (active === 'false') {
+      query = query.eq('active', false);
+    } else {
+      // Por padrão, se não especificado, mostra apenas ativos
+      query = query.eq('active', true);
+    }
+
     if (search) query = query.ilike('name', `%${search}%`);
     if (region) query = query.eq('region', region);
 
@@ -34,13 +42,13 @@ export async function GET(request) {
     
     if (error) {
       console.error('Supabase Error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json([], { status: 200 }); // Retorna lista vazia em vez de erro para não quebrar o front
     }
 
     return NextResponse.json(data || []);
   } catch (err) {
     console.error('API Error:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json([], { status: 200 });
   }
 }
 
