@@ -122,17 +122,18 @@ export default function Sidebar({ user }) {
       top: 0, left: 0,
       width: '220px',
       height: '100vh',
-      background: '#111827',
-      borderRight: '1px solid #1e2a3a',
+      background: '#18181b',
+      borderRight: '1px solid #27272a',
       display: 'flex',
       flexDirection: 'column',
       zIndex: 100,
       overflowY: 'auto',
     }}>
 
+      {/* Logo */}
       <div style={{
         padding: '1rem 1rem 0.875rem',
-        borderBottom: '1px solid #1e2a3a',
+        borderBottom: '1px solid #27272a',
         display: 'flex',
         alignItems: 'center',
         gap: '0.625rem',
@@ -140,28 +141,29 @@ export default function Sidebar({ user }) {
         <div style={{
           width: '32px', height: '32px',
           borderRadius: '7px',
-          background: '#2563eb',
+          background: '#3f3f46',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
             <rect x="9" y="3" width="6" height="4" rx="2" />
             <path d="m9 12 2 2 4-4" />
           </svg>
         </div>
         <div>
-          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f1f5f9', lineHeight: 1.2 }}>
+          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f4f4f5', lineHeight: 1.2 }}>
             Inventario Onsite
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#475569', marginTop: '1px' }}>
+          <div style={{ fontSize: '0.65rem', color: '#52525b', marginTop: '1px' }}>
             IA Servicos
           </div>
         </div>
       </div>
 
+      {/* Nav */}
       <nav style={{ flex: 1, padding: '0.5rem' }}>
         <div>
           {NAV_ITEMS.map((item) => {
@@ -180,12 +182,12 @@ export default function Sidebar({ user }) {
                   textDecoration: 'none',
                   fontSize: '0.8125rem',
                   fontWeight: active ? '600' : '400',
-                  color: active ? '#ffffff' : '#94a3b8',
-                  background: active ? '#2563eb' : 'transparent',
+                  color: active ? '#ffffff' : '#a1a1aa',
+                  background: active ? '#3f3f46' : 'transparent',
                   transition: 'all 0.1s',
                 }}
               >
-                <span style={{ color: active ? '#ffffff' : '#64748b', flexShrink: 0 }}>
+                <span style={{ color: active ? '#d4d4d8' : '#71717a', flexShrink: 0 }}>
                   {item.icon}
                 </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
@@ -194,14 +196,14 @@ export default function Sidebar({ user }) {
           })}
         </div>
 
-        {(user?.role === 'admin') && (
+        {user?.role === 'admin' && (
           <div style={{ marginTop: '1.25rem' }}>
             <div style={{
               fontSize: '0.625rem',
               fontWeight: '600',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#334155',
+              color: '#3f3f46',
               padding: '0 0.625rem',
               marginBottom: '0.375rem',
             }}>
@@ -223,12 +225,12 @@ export default function Sidebar({ user }) {
                     textDecoration: 'none',
                     fontSize: '0.8125rem',
                     fontWeight: active ? '600' : '400',
-                    color: active ? '#ffffff' : '#94a3b8',
-                    background: active ? '#2563eb' : 'transparent',
+                    color: active ? '#ffffff' : '#a1a1aa',
+                    background: active ? '#3f3f46' : 'transparent',
                     transition: 'all 0.1s',
                   }}
                 >
-                  <span style={{ color: active ? '#ffffff' : '#64748b', flexShrink: 0 }}>
+                  <span style={{ color: active ? '#d4d4d8' : '#71717a', flexShrink: 0 }}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -239,19 +241,20 @@ export default function Sidebar({ user }) {
         )}
       </nav>
 
-      <div style={{ padding: '0.75rem 0.875rem', borderTop: '1px solid #1e2a3a' }}>
+      {/* User / Logout */}
+      <div style={{ padding: '0.75rem 0.875rem', borderTop: '1px solid #27272a' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <div style={{
             width: '28px', height: '28px',
             borderRadius: '50%',
-            background: '#1e2a3a',
-            border: '1px solid #2d3a50',
+            background: '#27272a',
+            border: '1px solid #3f3f46',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '0.75rem',
             fontWeight: '700',
-            color: '#94a3b8',
+            color: '#a1a1aa',
             flexShrink: 0,
           }}>
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -260,15 +263,15 @@ export default function Sidebar({ user }) {
             <div style={{
               fontSize: '0.78rem',
               fontWeight: '600',
-              color: '#f1f5f9',
+              color: '#f4f4f5',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}>
               {user?.name}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#475569' }}>
-              {ROLE_LABELS[user?.role] || user?.role}
+            <div style={{ fontSize: '0.68rem', color: '#52525b' }}>
+              {ROLE_LABELS?.[user?.role] || user?.role}
             </div>
           </div>
         </div>
@@ -284,14 +287,14 @@ export default function Sidebar({ user }) {
             borderRadius: '6px',
             border: 'none',
             background: 'transparent',
-            color: '#475569',
+            color: '#52525b',
             fontSize: '0.75rem',
             cursor: 'pointer',
             fontFamily: 'inherit',
             transition: 'all 0.1s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#1e2a3a'; e.currentTarget.style.color = '#94a3b8'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#475569'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#27272a'; e.currentTarget.style.color = '#a1a1aa'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#52525b'; }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

@@ -114,7 +114,7 @@ export default function TecnicosPage() {
       <div style={{ height: '1.25rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Carregando...</div>
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#52525b' }}>Carregando...</div>
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -124,19 +124,19 @@ export default function TecnicosPage() {
                   <div
                     style={{
                       width: '40px', height: '40px', borderRadius: '50%',
-                      background: '#f1f5f9',
+                      background: '#f4f4f5',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '1rem', fontWeight: '700', color: '#94a3b8',
-                      border: '1px solid #e2e8f0', flexShrink: 0,
+                      fontSize: '1rem', fontWeight: '700', color: '#a1a1aa',
+                      border: '1px solid #e4e4e7', flexShrink: 0,
                     }}
                   >
                     {t.name.charAt(0)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: '600', color: '#f1f5f9' }}>{t.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.region || '—'}</div>
+                    <div style={{ fontWeight: '600', color: '#f4f4f5' }}>{t.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#52525b' }}>{t.region || '—'}</div>
                     {dbStatus[t.id] && (
-                      <div style={{ fontSize: '0.7rem', marginTop: '2px', color: dbStatus[t.id].found_in_databricks ? '#94a3b8' : '#64748b' }}>
+                      <div style={{ fontSize: '0.7rem', marginTop: '2px', color: dbStatus[t.id].found_in_databricks ? '#a1a1aa' : '#71717a' }}>
                         {dbStatus[t.id].found_in_databricks
                           ? `Databricks: ${dbStatus[t.id].total_items} peças`
                           : 'Não encontrado no Databricks'}
@@ -157,13 +157,13 @@ export default function TecnicosPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '0.875rem' }}>
                   <Metric label="Inventários" value={t.invs.length} />
                   <Metric label="Concluídos" value={t.completed} />
-                  <Metric label="Divergências" value={t.totalDivergences} color={t.totalDivergences > 0 ? '#f1f5f9' : '#64748b'} />
+                  <Metric label="Divergências" value={t.totalDivergences} color={t.totalDivergences > 0 ? '#f4f4f5' : '#52525b'} />
                 </div>
 
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#71717a', marginBottom: '4px' }}>
                     <span>Taxa de conclusão</span>
-                    <span style={{ fontWeight: '600', color: '#f1f5f9' }}>
+                    <span style={{ fontWeight: '600', color: '#f4f4f5' }}>
                       {t.rate}%
                     </span>
                   </div>
@@ -193,30 +193,30 @@ export default function TecnicosPage() {
                 </thead>
                 <tbody>
                   {inventories.length === 0 ? (
-                    <tr><td colSpan={8} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>Nenhum inventário encontrado</td></tr>
+                    <tr><td colSpan={8} style={{ textAlign: 'center', color: '#52525b', padding: '2rem' }}>Nenhum inventário encontrado</td></tr>
                   ) : inventories.map((inv) => {
                     const pct = inv.total_items > 0 ? Math.round((inv.counted_items / inv.total_items) * 100) : 0;
                     return (
                       <tr key={inv.id}>
-                        <td style={{ fontWeight: '500', color: '#f1f5f9' }}>{inv.technicians?.name}</td>
-                        <td style={{ color: '#64748b' }}>{inv.technicians?.region || '—'}</td>
-                        <td style={{ color: '#64748b' }}>{inv.week_ref || '—'}</td>
+                        <td style={{ fontWeight: '500', color: '#f4f4f5' }}>{inv.technicians?.name}</td>
+                        <td style={{ color: '#71717a' }}>{inv.technicians?.region || '—'}</td>
+                        <td style={{ color: '#71717a' }}>{inv.week_ref || '—'}</td>
                         <td><StatusBadge status={inv.status} /></td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <div className="progress-bar" style={{ width: '70px' }}>
                               <div className="progress-fill" style={{ width: `${pct}%` }} />
                             </div>
-                            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{pct}%</span>
+                            <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{pct}%</span>
                           </div>
                         </td>
                         <td>
                           {inv.divergence_count > 0
-                            ? <span style={{ color: '#f1f5f9', fontWeight: '600' }}>{inv.divergence_count}</span>
-                            : <span style={{ color: '#64748b' }}>0</span>}
+                            ? <span style={{ color: '#f4f4f5', fontWeight: '600' }}>{inv.divergence_count}</span>
+                            : <span style={{ color: '#52525b' }}>0</span>}
                         </td>
-                        <td style={{ color: '#64748b', fontSize: '0.8rem' }}>{formatDuration(inv.started_at, inv.completed_at)}</td>
-                        <td style={{ color: '#64748b', fontSize: '0.8rem' }}>{formatDate(inv.started_at || inv.created_at)}</td>
+                        <td style={{ color: '#71717a', fontSize: '0.8rem' }}>{formatDuration(inv.started_at, inv.completed_at)}</td>
+                        <td style={{ color: '#71717a', fontSize: '0.8rem' }}>{formatDate(inv.started_at || inv.created_at)}</td>
                       </tr>
                     );
                   })}
@@ -232,9 +232,9 @@ export default function TecnicosPage() {
 
 function Metric({ label, value, color }) {
   return (
-    <div style={{ textAlign: 'center', padding: '0.5rem', background: '#f1f5f9', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-      <div style={{ fontSize: '1.25rem', fontWeight: '700', color: color || '#f1f5f9' }}>{value}</div>
-      <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+    <div style={{ textAlign: 'center', padding: '0.5rem', background: '#f4f4f5', borderRadius: '6px', border: '1px solid #e4e4e7' }}>
+      <div style={{ fontSize: '1.25rem', fontWeight: '700', color: color || '#f4f4f5' }}>{value}</div>
+      <div style={{ fontSize: '0.65rem', color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
     </div>
   );
 }

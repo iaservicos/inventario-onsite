@@ -114,7 +114,7 @@ export default function PecasPage() {
   }
 
   if (status === 'loading') {
-    return <div style={{ padding: '1.5rem', color: '#64748b' }}>Carregando...</div>;
+    return <div style={{ padding: '1.5rem', color: '#52525b' }}>Carregando...</div>;
   }
 
   const canManage = ['admin', 'supervisor'].includes(session?.user?.role);
@@ -132,10 +132,10 @@ export default function PecasPage() {
         <div style={{
           marginBottom: '1rem',
           padding: '0.75rem 1rem',
-          background: '#f1f5f9',
-          border: '1px solid #e2e8f0',
+          background: '#f4f4f5',
+          border: '1px solid #e4e4e7',
           borderRadius: '8px',
-          color: '#e2e8f0',
+          color: '#e4e4e7',
           fontSize: '0.875rem',
         }}>
           {msg}
@@ -163,10 +163,10 @@ export default function PecasPage() {
                 + Adicionar Peça
               </button>
               <label style={{
-                background: '#f8fafc',
-                border: '1px solid #e2e8f0',
+                background: '#fafafa',
+                border: '1px solid #e4e4e7',
                 borderRadius: '6px',
-                color: '#94a3b8',
+                color: '#a1a1aa',
                 fontSize: '0.8rem',
                 padding: '0.5rem 0.875rem',
                 cursor: 'pointer',
@@ -184,8 +184,8 @@ export default function PecasPage() {
         </div>
 
         {selectedTech && canManage && (
-          <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#64748b' }}>
-            Formato do CSV para importação: <code style={{ background: '#f1f5f9', padding: '1px 6px', borderRadius: '3px' }}>código;nome;unidade</code> — uma peça por linha, sem cabeçalho.
+          <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#52525b' }}>
+            Formato do CSV para importação: <code style={{ background: '#f4f4f5', padding: '1px 6px', borderRadius: '3px' }}>código;nome;unidade</code> — uma peça por linha, sem cabeçalho.
           </div>
         )}
       </div>
@@ -248,14 +248,14 @@ export default function PecasPage() {
               Peças Ativas ({activeItems.length})
             </div>
             {inactiveItems.length > 0 && (
-              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+              <span style={{ fontSize: '0.75rem', color: '#52525b' }}>
                 {inactiveItems.length} inativa(s)
               </span>
             )}
           </div>
 
           {activeItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b', fontSize: '0.875rem' }}>
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#52525b', fontSize: '0.875rem' }}>
               Nenhuma peça ativa. Adicione peças manualmente ou importe um CSV.
             </div>
           ) : (
@@ -273,21 +273,21 @@ export default function PecasPage() {
                   {activeItems.map((item) => (
                     <tr key={item.id}>
                       <td>
-                        <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '3px', fontSize: '0.8rem', color: '#94a3b8' }}>
+                        <code style={{ background: '#f4f4f5', padding: '2px 6px', borderRadius: '3px', fontSize: '0.8rem', color: '#a1a1aa' }}>
                           {item.item_code}
                         </code>
                       </td>
-                      <td style={{ color: '#f1f5f9', fontWeight: '500' }}>{item.item_name}</td>
-                      <td style={{ color: '#64748b', fontSize: '0.85rem' }}>{item.unit}</td>
+                      <td style={{ color: '#f4f4f5', fontWeight: '500' }}>{item.item_name}</td>
+                      <td style={{ color: '#71717a', fontSize: '0.85rem' }}>{item.unit}</td>
                       {canManage && (
                         <td>
                           <button
                             onClick={() => handleToggleActive(item)}
                             style={{
-                              background: '#f8fafc',
-                              border: '1px solid #e2e8f0',
+                              background: '#fafafa',
+                              border: '1px solid #e4e4e7',
                               borderRadius: '5px',
-                              color: '#64748b',
+                              color: '#52525b',
                               fontSize: '0.75rem',
                               padding: '3px 10px',
                               cursor: 'pointer',
@@ -306,7 +306,7 @@ export default function PecasPage() {
 
           {inactiveItems.length > 0 && (
             <details style={{ marginTop: '1.5rem' }}>
-              <summary style={{ cursor: 'pointer', fontSize: '0.8rem', color: '#64748b', userSelect: 'none' }}>
+              <summary style={{ cursor: 'pointer', fontSize: '0.8rem', color: '#52525b', userSelect: 'none' }}>
                 Ver peças inativas ({inactiveItems.length})
               </summary>
               <table className="table" style={{ marginTop: '0.75rem', opacity: 0.6 }}>
@@ -321,18 +321,18 @@ export default function PecasPage() {
                 <tbody>
                   {inactiveItems.map((item) => (
                     <tr key={item.id}>
-                      <td><code style={{ fontSize: '0.8rem', color: '#64748b' }}>{item.item_code}</code></td>
-                      <td style={{ color: '#64748b' }}>{item.item_name}</td>
-                      <td style={{ color: '#64748b', fontSize: '0.85rem' }}>{item.unit}</td>
+                      <td><code style={{ fontSize: '0.8rem', color: '#52525b' }}>{item.item_code}</code></td>
+                      <td style={{ color: '#52525b' }}>{item.item_name}</td>
+                      <td style={{ color: '#52525b', fontSize: '0.85rem' }}>{item.unit}</td>
                       {canManage && (
                         <td>
                           <button
                             onClick={() => handleToggleActive(item)}
                             style={{
-                              background: '#f8fafc',
-                              border: '1px solid #e2e8f0',
+                              background: '#fafafa',
+                              border: '1px solid #e4e4e7',
                               borderRadius: '5px',
-                              color: '#94a3b8',
+                              color: '#a1a1aa',
                               fontSize: '0.75rem',
                               padding: '3px 10px',
                               cursor: 'pointer',
@@ -352,11 +352,11 @@ export default function PecasPage() {
       )}
 
       {selectedTech && loading && (
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Carregando peças...</div>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#52525b' }}>Carregando peças...</div>
       )}
 
       {!selectedTech && (
-        <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.875rem' }}>
+        <div style={{ padding: '3rem', textAlign: 'center', color: '#52525b', fontSize: '0.875rem' }}>
           Selecione um técnico acima para visualizar e gerenciar suas peças.
         </div>
       )}
@@ -368,7 +368,7 @@ const labelStyle = {
   display: 'block',
   fontSize: '0.8rem',
   fontWeight: '500',
-  color: '#64748b',
+  color: '#52525b',
   marginBottom: '0.375rem',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',

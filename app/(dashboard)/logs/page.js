@@ -23,10 +23,10 @@ const LEVEL_OPTIONS = [
 ];
 
 const SOURCE_COLORS = {
-  power_automate: '#94a3b8',
-  dispara_ai: '#64748b',
-  system: '#94a3b8',
-  user: '#64748b',
+  power_automate: '#71717a',
+  dispara_ai: '#52525b',
+  system: '#a1a1aa',
+  user: '#71717a',
 };
 
 const SOURCE_LABELS = {
@@ -118,11 +118,11 @@ export default function LogsPage() {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Carregando...</div>
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#52525b' }}>Carregando...</div>
       ) : (
         <div className="card" style={{ padding: 0 }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Nenhum log encontrado</div>
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#52525b' }}>Nenhum log encontrado</div>
           ) : (
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
               {filtered.map((log, i) => (
@@ -133,13 +133,13 @@ export default function LogsPage() {
                     alignItems: 'flex-start',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
-                    borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none',
+                    borderBottom: i < filtered.length - 1 ? '1px solid #f4f4f5' : 'none',
                     transition: 'background 0.15s',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#f4f4f5'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: { info: '#64748b', success: '#94a3b8', warning: '#64748b', error: '#f1f5f9' }[log.level] || '#64748b', marginTop: '6px', flexShrink: 0 }} />
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: { info: '#52525b', success: '#a1a1aa', warning: '#71717a', error: '#f4f4f5' }[log.level] || '#52525b', marginTop: '6px', flexShrink: 0 }} />
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2px' }}>
@@ -147,25 +147,25 @@ export default function LogsPage() {
                         style={{
                           fontSize: '0.7rem',
                           fontWeight: '600',
-                          color: '#64748b',
-                          background: '#f1f5f9',
+                          color: '#71717a',
+                          background: '#f4f4f5',
                           padding: '1px 6px',
                           borderRadius: '4px',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid #e4e4e7',
                         }}
                       >
                         {SOURCE_LABELS[log.source] || log.source}
                       </span>
                       <StatusBadge status={log.level} size="xs" />
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'monospace' }}>{log.action}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#52525b', fontFamily: 'monospace' }}>{log.action}</span>
                     </div>
-                    <div style={{ fontSize: '0.875rem', color: '#f1f5f9' }}>{log.message}</div>
+                    <div style={{ fontSize: '0.875rem', color: '#f4f4f5' }}>{log.message}</div>
                     {log.technicians?.name && (
-                      <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>Técnico: {log.technicians.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#52525b', marginTop: '2px' }}>Técnico: {log.technicians.name}</div>
                     )}
                   </div>
 
-                  <div style={{ fontSize: '0.7rem', color: '#64748b', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  <div style={{ fontSize: '0.7rem', color: '#52525b', whiteSpace: 'nowrap', flexShrink: 0 }}>
                     {formatDate(log.created_at)}
                   </div>
                 </div>
@@ -180,9 +180,9 @@ export default function LogsPage() {
 
 function SummaryBadge({ label, value }) {
   return (
-    <div style={{ padding: '0.4rem 0.75rem', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-      <span style={{ fontWeight: '700', color: '#f1f5f9' }}>{value}</span>
-      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{label}</span>
+    <div style={{ padding: '0.4rem 0.75rem', background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+      <span style={{ fontWeight: '700', color: '#f4f4f5' }}>{value}</span>
+      <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{label}</span>
     </div>
   );
 }

@@ -12,10 +12,10 @@ const STATUS_LABEL = {
 };
 
 const STATUS_STYLE = {
-  pending: { background: '#f8fafc', color: '#94a3b8', border: '1px solid #e2e8f0' },
-  dispatched: { background: '#f8fafc', color: '#f1f5f9', border: '1px solid #cbd5e1' },
-  completed: { background: '#f1f5f9', color: '#e2e8f0', border: '1px solid #e2e8f0' },
-  cancelled: { background: '#f1f5f9', color: '#64748b', border: '1px solid #f1f5f9' },
+  pending: { background: '#fafafa', color: '#a1a1aa', border: '1px solid #e4e4e7' },
+  dispatched: { background: '#fafafa', color: '#f4f4f5', border: '1px solid #a1a1aa' },
+  completed: { background: '#f4f4f5', color: '#e4e4e7', border: '1px solid #e4e4e7' },
+  cancelled: { background: '#f4f4f5', color: '#52525b', border: '1px solid #f4f4f5' },
 };
 
 function getWeekRef(date) {
@@ -109,7 +109,7 @@ export default function AgendamentosPage() {
   }
 
   if (status === 'loading' || loading) {
-    return <div style={{ padding: '1.5rem', color: '#64748b' }}>Carregando...</div>;
+    return <div style={{ padding: '1.5rem', color: '#52525b' }}>Carregando...</div>;
   }
 
   const canManage = ['admin', 'supervisor'].includes(session?.user?.role);
@@ -133,10 +133,10 @@ export default function AgendamentosPage() {
         <div style={{
           marginBottom: '1rem',
           padding: '0.75rem 1rem',
-          background: '#f1f5f9',
-          border: '1px solid #e2e8f0',
+          background: '#f4f4f5',
+          border: '1px solid #e4e4e7',
           borderRadius: '8px',
-          color: '#e2e8f0',
+          color: '#e4e4e7',
           fontSize: '0.875rem',
         }}>
           {msg}
@@ -210,7 +210,7 @@ export default function AgendamentosPage() {
           Agendamentos ({schedules.length})
         </div>
         {schedules.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b', fontSize: '0.875rem' }}>
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#52525b', fontSize: '0.875rem' }}>
             Nenhum agendamento encontrado. Crie o primeiro agendamento acima.
           </div>
         ) : (
@@ -230,15 +230,15 @@ export default function AgendamentosPage() {
               <tbody>
                 {schedules.map((s) => (
                   <tr key={s.id}>
-                    <td style={{ fontWeight: '500', color: '#f1f5f9' }}>
+                    <td style={{ fontWeight: '500', color: '#f4f4f5' }}>
                       {s.technicians?.name || '—'}
                     </td>
-                    <td style={{ color: '#64748b' }}>{s.technicians?.region || '—'}</td>
-                    <td style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                    <td style={{ color: '#71717a' }}>{s.technicians?.region || '—'}</td>
+                    <td style={{ color: '#a1a1aa', fontSize: '0.85rem' }}>
                       {new Date(s.scheduled_at).toLocaleString('pt-BR')}
                     </td>
-                    <td style={{ color: '#64748b', fontSize: '0.85rem' }}>{s.week_ref}</td>
-                    <td style={{ color: '#94a3b8' }}>{s.items_count}</td>
+                    <td style={{ color: '#71717a', fontSize: '0.85rem' }}>{s.week_ref}</td>
+                    <td style={{ color: '#a1a1aa' }}>{s.items_count}</td>
                     <td>
                       <span style={{
                         fontSize: '0.75rem', fontWeight: '500',
@@ -262,7 +262,7 @@ export default function AgendamentosPage() {
                               </button>
                               <button
                                 onClick={() => handleCancel(s.id)}
-                                style={{ ...actionBtnStyle, color: '#64748b' }}
+                                style={{ ...actionBtnStyle, color: '#52525b' }}
                                 title="Cancelar"
                               >
                                 Cancelar
@@ -287,17 +287,17 @@ const labelStyle = {
   display: 'block',
   fontSize: '0.8rem',
   fontWeight: '500',
-  color: '#64748b',
+  color: '#52525b',
   marginBottom: '0.375rem',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 };
 
 const actionBtnStyle = {
-  background: '#f8fafc',
-  border: '1px solid #e2e8f0',
+  background: '#fafafa',
+  border: '1px solid #e4e4e7',
   borderRadius: '5px',
-  color: '#e2e8f0',
+  color: '#e4e4e7',
   fontSize: '0.75rem',
   padding: '3px 10px',
   cursor: 'pointer',

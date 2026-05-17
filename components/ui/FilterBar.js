@@ -15,7 +15,7 @@ export default function FilterBar({ filters, onChange, technicians = [], statusO
 
   return (
     <div className="filter-bar">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
       </svg>
 
@@ -26,7 +26,7 @@ export default function FilterBar({ filters, onChange, technicians = [], statusO
         value={filters.from || ''}
         onChange={(e) => onChange({ ...filters, from: e.target.value })}
       />
-      <span style={{ fontSize: '0.75rem', color: '#94a3b8', flexShrink: 0 }}>ate</span>
+      <span style={{ fontSize: '0.75rem', color: '#a1a1aa', flexShrink: 0 }}>ate</span>
       <input
         type="date"
         className="input"

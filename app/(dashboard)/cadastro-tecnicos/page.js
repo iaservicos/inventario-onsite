@@ -119,9 +119,9 @@ function ModalDelete({ tecnico, onClose, onConfirm, loading }) {
           <span className="modal-title">Excluir técnico</span>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
-        <div className="modal-body" style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.6 }}>
-          <p>Tem certeza que deseja excluir <strong style={{ color: '#f1f5f9' }}>{tecnico?.name}</strong>?</p>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#64748b' }}>
+        <div className="modal-body" style={{ color: '#a1a1aa', fontSize: '0.875rem', lineHeight: 1.6 }}>
+          <p>Tem certeza que deseja excluir <strong style={{ color: '#f4f4f5' }}>{tecnico?.name}</strong>?</p>
+          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#52525b' }}>
             Se o técnico possuir inventários vinculados, ele será <strong>inativado</strong> em vez de excluído para preservar o histórico.
           </p>
         </div>
