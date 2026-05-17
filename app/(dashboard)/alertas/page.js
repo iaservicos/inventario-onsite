@@ -16,10 +16,10 @@ const TYPE_LABELS = {
 };
 
 const SEVERITY_BORDER = {
-  low: '#d4d4d4',
-  medium: '#a3a3a3',
-  high: '#525252',
-  critical: '#171717',
+  low:      '#e2e8f0',
+  medium:   '#cbd5e1',
+  high:     '#64748b',
+  critical: '#94a3b8',
 };
 
 export default function AlertasPage() {
@@ -82,7 +82,7 @@ export default function AlertasPage() {
   const resolved = filtered.filter((a) => a.resolved);
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1200px' }}>
+    <div style={{ padding: '1.5rem 2rem', maxWidth: '1200px' }}>
       <PageHeader
         title="Alertas"
         subtitle="Monitoramento de abandonos, recontagens e erros críticos"
@@ -101,7 +101,7 @@ export default function AlertasPage() {
       <div style={{ height: '1.25rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#a3a3a3' }}>Carregando...</div>
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Carregando...</div>
       ) : (
         <>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
@@ -113,9 +113,9 @@ export default function AlertasPage() {
 
           {active.length === 0 && !showResolved ? (
             <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✓</div>
-              <div style={{ color: '#0a0a0a', fontWeight: '600' }}>Nenhum alerta ativo</div>
-              <div style={{ color: '#a3a3a3', fontSize: '0.875rem', marginTop: '0.25rem' }}>Todos os inventários estão dentro do esperado</div>
+              <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#cbd5e1' }}>✓</div>
+              <div style={{ color: '#f1f5f9', fontWeight: '600' }}>Nenhum alerta ativo</div>
+              <div style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Todos os inventários estão dentro do esperado</div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -134,19 +134,19 @@ export default function AlertasPage() {
 }
 
 function AlertCard({ alert: a, onResolve, resolving, resolved, getElapsed }) {
-  const borderColor = resolved ? '#e5e5e5' : SEVERITY_BORDER[a.severity] || '#e5e5e5';
+  const borderColor = resolved ? '#e2e8f0' : SEVERITY_BORDER[a.severity] || '#e2e8f0';
   const elapsed = Date.now() - new Date(a.created_at).getTime();
   const hours = elapsed / 3600000;
 
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: '#f1f5f9',
         border: `1px solid ${borderColor}`,
         borderLeft: `3px solid ${borderColor}`,
         borderRadius: '8px',
         padding: '1rem 1.25rem',
-        opacity: resolved ? 0.6 : 1,
+        opacity: resolved ? 0.5 : 1,
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
@@ -157,16 +157,16 @@ function AlertCard({ alert: a, onResolve, resolving, resolved, getElapsed }) {
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem', flexWrap: 'wrap' }}>
           <StatusBadge status={a.severity} />
-          <span style={{ fontSize: '0.75rem', color: '#737373', background: '#f5f5f5', padding: '2px 8px', borderRadius: '4px', border: '1px solid #e5e5e5' }}>
+          <span style={{ fontSize: '0.75rem', color: '#64748b', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
             {TYPE_LABELS[a.type] || a.type}
           </span>
           {!resolved && hours >= 4 && (
-            <span style={{ fontSize: '0.7rem', color: '#262626', fontWeight: '700', letterSpacing: '0.05em' }}>ESCALADO</span>
+            <span style={{ fontSize: '0.7rem', color: '#f1f5f9', fontWeight: '700', letterSpacing: '0.05em', background: '#e2e8f0', padding: '2px 6px', borderRadius: '3px' }}>ESCALADO</span>
           )}
         </div>
-        <div style={{ fontWeight: '600', color: '#0a0a0a', marginBottom: '0.25rem' }}>{a.title}</div>
-        {a.description && <div style={{ fontSize: '0.8rem', color: '#737373', marginBottom: '0.375rem' }}>{a.description}</div>}
-        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#a3a3a3', flexWrap: 'wrap' }}>
+        <div style={{ fontWeight: '600', color: '#f1f5f9', marginBottom: '0.25rem' }}>{a.title}</div>
+        {a.description && <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.375rem' }}>{a.description}</div>}
+        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#64748b', flexWrap: 'wrap' }}>
           {a.technicians?.name && <span>Técnico: {a.technicians.name}</span>}
           <span>{getElapsed(a.created_at)}</span>
           {resolved && a.resolved_by && <span>Resolvido por: {a.resolved_by}</span>}
@@ -195,13 +195,13 @@ function SummaryBadge({ label, value }) {
         alignItems: 'center',
         gap: '0.5rem',
         padding: '0.5rem 0.875rem',
-        background: '#ffffff',
-        border: '1px solid #e5e5e5',
+        background: '#f1f5f9',
+        border: '1px solid #e2e8f0',
         borderRadius: '8px',
       }}
     >
-      <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0a0a0a' }}>{value}</span>
-      <span style={{ fontSize: '0.75rem', color: '#737373' }}>{label}</span>
+      <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f1f5f9' }}>{value}</span>
+      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{label}</span>
     </div>
   );
 }

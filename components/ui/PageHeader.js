@@ -1,34 +1,24 @@
 export default function PageHeader({ title, subtitle, actions }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '1rem',
-        marginBottom: '1.5rem',
-      }}
-    >
+    <div style={{
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: '1rem',
+      marginBottom: '1.5rem',
+    }}>
       <div>
-        <h1
-          style={{
-            fontSize: '1.25rem',
-            fontWeight: '700',
-            color: '#0a0a0a',
-            letterSpacing: '-0.01em',
-          }}
-        >
+        <h1 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1e293b', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
           {title}
         </h1>
         {subtitle && (
-          <p style={{ color: '#737373', fontSize: '0.8125rem', marginTop: '0.25rem' }}>
+          <p style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: '0.25rem' }}>
             {subtitle}
           </p>
         )}
       </div>
       {actions && (
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
           {actions}
         </div>
       )}

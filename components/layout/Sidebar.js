@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/tecnicos',
-    label: 'Técnicos',
+    label: 'Tecnicos',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -42,7 +42,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/divergencias',
-    label: 'Divergências',
+    label: 'Divergencias',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -63,7 +63,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/pecas',
-    label: 'Peças',
+    label: 'Pecas',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -87,7 +87,7 @@ const NAV_ITEMS = [
 const ADMIN_ITEMS = [
   {
     href: '/usuarios',
-    label: 'Usuários',
+    label: 'Usuarios',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -97,7 +97,7 @@ const ADMIN_ITEMS = [
   },
   {
     href: '/cadastro-tecnicos',
-    label: 'Cadastro Técnicos',
+    label: 'Cadastro Tecnicos',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -122,48 +122,46 @@ export default function Sidebar({ user }) {
       top: 0, left: 0,
       width: '220px',
       height: '100vh',
-      background: '#111111',
-      borderRight: '1px solid #2a2a2a',
+      background: '#111827',
+      borderRight: '1px solid #1e2a3a',
       display: 'flex',
       flexDirection: 'column',
       zIndex: 100,
       overflowY: 'auto',
     }}>
 
-      {/* Logo */}
       <div style={{
         padding: '1rem 1rem 0.875rem',
-        borderBottom: '1px solid #2a2a2a',
+        borderBottom: '1px solid #1e2a3a',
         display: 'flex',
         alignItems: 'center',
         gap: '0.625rem',
       }}>
         <div style={{
-          width: '30px', height: '30px',
+          width: '32px', height: '32px',
           borderRadius: '7px',
-          background: '#f0f0f0',
+          background: '#2563eb',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
             <rect x="9" y="3" width="6" height="4" rx="2" />
             <path d="m9 12 2 2 4-4" />
           </svg>
         </div>
         <div>
-          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f0f0f0', lineHeight: 1.2 }}>
-            Inventário Onsite
+          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f1f5f9', lineHeight: 1.2 }}>
+            Inventario Onsite
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#525252', marginTop: '1px' }}>
-            Dashboard
+          <div style={{ fontSize: '0.65rem', color: '#475569', marginTop: '1px' }}>
+            IA Servicos
           </div>
         </div>
       </div>
 
-      {/* Nav */}
       <nav style={{ flex: 1, padding: '0.5rem' }}>
         <div>
           {NAV_ITEMS.map((item) => {
@@ -182,18 +180,15 @@ export default function Sidebar({ user }) {
                   textDecoration: 'none',
                   fontSize: '0.8125rem',
                   fontWeight: active ? '600' : '400',
-                  color: active ? '#f0f0f0' : '#737373',
-                  background: active ? '#222222' : 'transparent',
+                  color: active ? '#ffffff' : '#94a3b8',
+                  background: active ? '#2563eb' : 'transparent',
                   transition: 'all 0.1s',
                 }}
               >
-                <span style={{ color: active ? '#f0f0f0' : '#525252', flexShrink: 0 }}>
+                <span style={{ color: active ? '#ffffff' : '#64748b', flexShrink: 0 }}>
                   {item.icon}
                 </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
-                {active && (
-                  <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#f0f0f0', flexShrink: 0 }} />
-                )}
               </Link>
             );
           })}
@@ -206,11 +201,11 @@ export default function Sidebar({ user }) {
               fontWeight: '600',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#3a3a3a',
+              color: '#334155',
               padding: '0 0.625rem',
               marginBottom: '0.375rem',
             }}>
-              Administração
+              Administracao
             </div>
             {ADMIN_ITEMS.map((item) => {
               const active = isActive(item.href);
@@ -228,12 +223,12 @@ export default function Sidebar({ user }) {
                     textDecoration: 'none',
                     fontSize: '0.8125rem',
                     fontWeight: active ? '600' : '400',
-                    color: active ? '#f0f0f0' : '#737373',
-                    background: active ? '#222222' : 'transparent',
+                    color: active ? '#ffffff' : '#94a3b8',
+                    background: active ? '#2563eb' : 'transparent',
                     transition: 'all 0.1s',
                   }}
                 >
-                  <span style={{ color: active ? '#f0f0f0' : '#525252', flexShrink: 0 }}>
+                  <span style={{ color: active ? '#ffffff' : '#64748b', flexShrink: 0 }}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -244,20 +239,19 @@ export default function Sidebar({ user }) {
         )}
       </nav>
 
-      {/* User */}
-      <div style={{ padding: '0.75rem 0.875rem', borderTop: '1px solid #2a2a2a' }}>
+      <div style={{ padding: '0.75rem 0.875rem', borderTop: '1px solid #1e2a3a' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <div style={{
             width: '28px', height: '28px',
             borderRadius: '50%',
-            background: '#222222',
-            border: '1px solid #3a3a3a',
+            background: '#1e2a3a',
+            border: '1px solid #2d3a50',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '0.75rem',
             fontWeight: '700',
-            color: '#a3a3a3',
+            color: '#94a3b8',
             flexShrink: 0,
           }}>
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -266,14 +260,14 @@ export default function Sidebar({ user }) {
             <div style={{
               fontSize: '0.78rem',
               fontWeight: '600',
-              color: '#f0f0f0',
+              color: '#f1f5f9',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}>
               {user?.name}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#525252' }}>
+            <div style={{ fontSize: '0.68rem', color: '#475569' }}>
               {ROLE_LABELS[user?.role] || user?.role}
             </div>
           </div>
@@ -290,14 +284,14 @@ export default function Sidebar({ user }) {
             borderRadius: '6px',
             border: 'none',
             background: 'transparent',
-            color: '#525252',
+            color: '#475569',
             fontSize: '0.75rem',
             cursor: 'pointer',
             fontFamily: 'inherit',
             transition: 'all 0.1s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#222222'; e.currentTarget.style.color = '#a3a3a3'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#525252'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#1e2a3a'; e.currentTarget.style.color = '#94a3b8'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#475569'; }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

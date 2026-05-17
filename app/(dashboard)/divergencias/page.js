@@ -135,7 +135,7 @@ export default function DivergenciasPage() {
       <div style={{ height: '1.25rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#525252' }}>Carregando...</div>
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Carregando...</div>
       ) : (
         <>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
@@ -149,7 +149,7 @@ export default function DivergenciasPage() {
           <div className="card">
             <div className="table-wrapper">
               {divergences.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#525252' }}>Nenhuma divergência encontrada</div>
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Nenhuma divergência encontrada</div>
               ) : (
                 <table>
                   <thead>
@@ -169,18 +169,18 @@ export default function DivergenciasPage() {
                   <tbody>
                     {divergences.map((d) => {
                       const pct = Number(d.percentage_diff);
-                      const diffColor = pct >= 30 ? '#f0f0f0' : pct >= 10 ? '#a3a3a3' : '#525252';
+                      const diffColor = pct >= 30 ? '#f1f5f9' : pct >= 10 ? '#94a3b8' : '#64748b';
                       const inventoryId = d.inventories?.id || d.inventory_id;
                       const isRecounting = recounting === inventoryId;
                       return (
                         <tr key={d.id}>
-                          <td style={{ fontWeight: '500', color: '#f0f0f0' }}>{d.technicians?.name}</td>
-                          <td style={{ color: '#737373' }}>{d.inventories?.week_ref || '—'}</td>
-                          <td><code style={{ fontSize: '0.75rem', color: '#a3a3a3', background: '#222222', padding: '2px 6px', borderRadius: '4px' }}>{d.item_code}</code></td>
+                          <td style={{ fontWeight: '500', color: '#f1f5f9' }}>{d.technicians?.name}</td>
+                          <td style={{ color: '#64748b' }}>{d.inventories?.week_ref || '—'}</td>
+                          <td><code style={{ fontSize: '0.75rem', color: '#94a3b8', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{d.item_code}</code></td>
                           <td>{d.item_name}</td>
-                          <td style={{ textAlign: 'right', color: '#737373' }}>{d.system_qty}</td>
-                          <td style={{ textAlign: 'right', color: '#737373' }}>{d.physical_qty}</td>
-                          <td style={{ textAlign: 'right', fontWeight: '600', color: Number(d.difference) < 0 ? '#f0f0f0' : '#737373' }}>
+                          <td style={{ textAlign: 'right', color: '#64748b' }}>{d.system_qty}</td>
+                          <td style={{ textAlign: 'right', color: '#64748b' }}>{d.physical_qty}</td>
+                          <td style={{ textAlign: 'right', fontWeight: '600', color: Number(d.difference) < 0 ? '#f1f5f9' : '#64748b' }}>
                             {Number(d.difference) > 0 ? '+' : ''}{d.difference}
                           </td>
                           <td style={{ textAlign: 'right' }}>
@@ -202,7 +202,7 @@ export default function DivergenciasPage() {
                               {d.status === 'open' && inventoryId && (
                                 <button
                                   className="btn btn-secondary"
-                                  style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', color: '#f0f0f0', borderColor: '#3a3a3a' }}
+                                  style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', color: '#f1f5f9', borderColor: '#cbd5e1' }}
                                   disabled={isRecounting}
                                   onClick={() => triggerRecount(inventoryId, d.technicians?.name)}
                                 >
@@ -237,9 +237,9 @@ export default function DivergenciasPage() {
 
 function SummaryCard({ label, value }) {
   return (
-    <div style={{ padding: '0.75rem 1rem', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-      <span style={{ fontSize: '1.375rem', fontWeight: '700', color: '#f0f0f0' }}>{value}</span>
-      <span style={{ fontSize: '0.75rem', color: '#737373' }}>{label}</span>
+    <div style={{ padding: '0.75rem 1rem', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+      <span style={{ fontSize: '1.375rem', fontWeight: '700', color: '#f1f5f9' }}>{value}</span>
+      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{label}</span>
     </div>
   );
 }

@@ -64,7 +64,7 @@ export default function UsuariosPage() {
   }
 
   if (status === 'loading' || loading) {
-    return <div style={{ padding: '1.5rem', color: '#a3a3a3' }}>Carregando...</div>;
+    return <div style={{ padding: '1.5rem', color: '#64748b' }}>Carregando...</div>;
   }
 
   if (session?.user?.role !== 'admin') return null;
@@ -86,19 +86,19 @@ export default function UsuariosPage() {
           <div className="section-title" style={{ marginBottom: '1.25rem' }}>Novo Usuário</div>
           <form onSubmit={createUser} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#a3a3a3', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome</label>
               <input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nome completo" />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#a3a3a3', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>E-mail</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>E-mail</label>
               <input type="email" className="input" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@empresa.com" />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#a3a3a3', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Senha</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Senha</label>
               <input type="password" className="input" required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Mínimo 6 caracteres" />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#a3a3a3', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Perfil</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Perfil</label>
               <select className="input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
                 <option value="admin">Administrador</option>
                 <option value="supervisor">Supervisor</option>
@@ -128,27 +128,27 @@ export default function UsuariosPage() {
             </thead>
             <tbody>
               {users.length === 0 ? (
-                <tr><td colSpan={6} style={{ textAlign: 'center', color: '#a3a3a3', padding: '2rem' }}>Nenhum usuário encontrado</td></tr>
+                <tr><td colSpan={6} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>Nenhum usuário encontrado</td></tr>
               ) : users.map((u) => (
                 <tr key={u.id}>
-                  <td style={{ fontWeight: '500' }}>{u.name}</td>
-                  <td style={{ color: '#737373' }}>{u.email}</td>
+                  <td style={{ fontWeight: '500', color: '#f1f5f9' }}>{u.name}</td>
+                  <td style={{ color: '#64748b' }}>{u.email}</td>
                   <td>
                     <span style={{
                       fontSize: '0.75rem', fontWeight: '500', padding: '2px 8px', borderRadius: '4px',
-                      background: '#f5f5f5',
-                      color: '#525252',
-                      border: '1px solid #e5e5e5',
+                      background: '#f1f5f9',
+                      color: '#94a3b8',
+                      border: '1px solid #e2e8f0',
                     }}>
                       {ROLE_LABELS[u.role] || u.role}
                     </span>
                   </td>
                   <td>
-                    <span style={{ fontSize: '0.75rem', color: u.active ? '#404040' : '#a3a3a3' }}>
+                    <span style={{ fontSize: '0.75rem', color: u.active ? '#f1f5f9' : '#64748b' }}>
                       {u.active ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
-                  <td style={{ color: '#737373', fontSize: '0.8rem' }}>{formatDate(u.created_at)}</td>
+                  <td style={{ color: '#64748b', fontSize: '0.8rem' }}>{formatDate(u.created_at)}</td>
                   <td>
                     {u.id !== session.user.id && (
                       <button

@@ -45,70 +45,62 @@ function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
   };
 
   return (
-    <div className="ct-overlay" onClick={onClose}>
-      <div className="ct-modal" onClick={e => e.stopPropagation()}>
-        <div className="ct-modal-head">
-          <span className="ct-modal-title">Editar Técnico</span>
-          <button className="ct-close-btn" onClick={onClose}>✕</button>
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <span className="modal-title">Editar Técnico</span>
+          <button className="close-btn" onClick={onClose}>✕</button>
         </div>
-        <form onSubmit={submit} className="ct-modal-body">
-          {error && <div className="ct-form-err">{error}</div>}
+        <form onSubmit={submit} className="modal-body">
+          {error && <div className="form-err">{error}</div>}
 
-          <div className="ct-row2">
-            <div className="ct-field">
-              <label className="ct-field-label">Nome completo *</label>
-              <input name="name" value={form.name} onChange={set} required className="ct-inp" />
-            </div>
-            <div className="ct-field">
-              <label className="ct-field-label">E-mail</label>
-              <input name="email" type="email" value={form.email} onChange={set} className="ct-inp" placeholder="email@positivo.com.br" />
-            </div>
+          <div className="row2">
+            <Field label="Nome completo *">
+              <input name="name" value={form.name} onChange={set} required className="inp" />
+            </Field>
+            <Field label="E-mail">
+              <input name="email" type="email" value={form.email} onChange={set} className="inp" placeholder="email@positivo.com.br" />
+            </Field>
           </div>
-          <div className="ct-row2">
-            <div className="ct-field">
-              <label className="ct-field-label">Telefone (WhatsApp)</label>
-              <input name="phone" value={form.phone} onChange={set} className="ct-inp" placeholder="5541999999999" />
-              <span className="ct-field-hint">Formato: 55 + DDD + número</span>
-            </div>
-            <div className="ct-field">
-              <label className="ct-field-label">Estado</label>
-              <select name="region" value={form.region} onChange={set} className="ct-inp">
+          <div className="row2">
+            <Field label="Telefone (WhatsApp)" hint="Formato: 55 + DDD + número">
+              <input name="phone" value={form.phone} onChange={set} className="inp" placeholder="5541999999999" />
+            </Field>
+            <Field label="Estado">
+              <select name="region" value={form.region} onChange={set} className="inp">
                 <option value="">Selecione</option>
                 {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
               </select>
-            </div>
+            </Field>
           </div>
 
           {isAdmin && (
             <>
-              <div className="ct-field">
-                <label className="ct-field-label">Supervisor</label>
-                <input name="supervisor_name" value={form.supervisor_name} onChange={set} className="ct-inp" placeholder="Nome do supervisor" />
+              <Field label="Supervisor">
+                <input name="supervisor_name" value={form.supervisor_name} onChange={set} className="inp" placeholder="Nome do supervisor" />
+              </Field>
+
+              <div className="divider"><span>Vínculo Databricks</span></div>
+
+              <div className="row2">
+                <Field label="Nome no Databricks">
+                  <input name="databricks_name" value={form.databricks_name} onChange={set} className="inp" placeholder="Nome exato no Data Lake" />
+                </Field>
+                <Field label="ID no Databricks">
+                  <input name="databricks_id" type="number" value={form.databricks_id} onChange={set} className="inp" placeholder="Ex: 17338" />
+                </Field>
               </div>
 
-              <div className="ct-divider"><span>Vínculo Databricks</span></div>
-
-              <div className="ct-row2">
-                <div className="ct-field">
-                  <label className="ct-field-label">Nome no Databricks</label>
-                  <input name="databricks_name" value={form.databricks_name} onChange={set} className="ct-inp" placeholder="Nome exato no Data Lake" />
-                </div>
-                <div className="ct-field">
-                  <label className="ct-field-label">ID no Databricks</label>
-                  <input name="databricks_id" type="number" value={form.databricks_id} onChange={set} className="ct-inp" placeholder="Ex: 17338" />
-                </div>
-              </div>
-
-              <label className="ct-check-label">
-                <input name="active" type="checkbox" checked={form.active} onChange={set} className="ct-chk" />
+              <label className="check-label">
+                <input name="active" type="checkbox" checked={form.active} onChange={set} className="chk" />
                 Técnico ativo
               </label>
             </>
           )}
 
-          <div className="ct-modal-foot">
-            <button type="button" className="ct-btn-sec" onClick={onClose} disabled={saving}>Cancelar</button>
-            <button type="submit" className="ct-btn-pri" disabled={saving}>
+          <div className="modal-foot">
+            <button type="button" className="btn-sec" onClick={onClose} disabled={saving}>Cancelar</button>
+            <button type="submit" className="btn-pri" disabled={saving}>
               {saving ? 'Salvando...' : 'Salvar alterações'}
             </button>
           </div>
@@ -121,25 +113,36 @@ function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
 /* ─── Modal Confirmar Exclusão ────────────────────────────── */
 function ModalDelete({ tecnico, onClose, onConfirm, loading }) {
   return (
-    <div className="ct-overlay" onClick={onClose}>
-      <div className="ct-modal ct-modal-sm" onClick={e => e.stopPropagation()}>
-        <div className="ct-modal-head">
-          <span className="ct-modal-title">Excluir técnico</span>
-          <button className="ct-close-btn" onClick={onClose}>✕</button>
+    <div className="overlay" onClick={onClose}>
+      <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <span className="modal-title">Excluir técnico</span>
+          <button className="close-btn" onClick={onClose}>✕</button>
         </div>
-        <div className="ct-modal-body" style={{ color: '#a3a3a3', fontSize: '0.875rem', lineHeight: 1.6 }}>
-          <p>Tem certeza que deseja excluir <strong style={{ color: '#f0f0f0' }}>{tecnico?.name}</strong>?</p>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#525252' }}>
+        <div className="modal-body" style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.6 }}>
+          <p>Tem certeza que deseja excluir <strong style={{ color: '#f1f5f9' }}>{tecnico?.name}</strong>?</p>
+          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#64748b' }}>
             Se o técnico possuir inventários vinculados, ele será <strong>inativado</strong> em vez de excluído para preservar o histórico.
           </p>
         </div>
-        <div className="ct-modal-foot">
-          <button className="ct-btn-sec" onClick={onClose} disabled={loading}>Cancelar</button>
-          <button className="ct-btn-del" onClick={onConfirm} disabled={loading}>
+        <div className="modal-foot">
+          <button className="btn-sec" onClick={onClose} disabled={loading}>Cancelar</button>
+          <button className="btn-del" onClick={onConfirm} disabled={loading}>
             {loading ? 'Excluindo...' : 'Confirmar exclusão'}
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ─── Componente auxiliar Field ───────────────────────────── */
+function Field({ label, hint, children }) {
+  return (
+    <div className="field">
+      <label className="field-label">{label}</label>
+      {children}
+      {hint && <span className="field-hint">{hint}</span>}
     </div>
   );
 }
@@ -225,7 +228,7 @@ export default function CadastroTecnicosPage() {
   };
 
   return (
-    <div className="ct-pg">
+    <div className="pg">
       <PageHeader
         title="Cadastro de Técnicos"
         subtitle={isAdmin
@@ -234,20 +237,21 @@ export default function CadastroTecnicosPage() {
       />
 
       {/* Filtros */}
-      <div className="ct-filters">
+      <div className="filters">
         <input
           type="text"
           placeholder="Buscar por nome..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="ct-inp-filter ct-inp-filter-wide"
+          className="inp-filter"
+          style={{ flex: 2 }}
         />
-        <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="ct-inp-filter">
+        <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="inp-filter">
           <option value="">Todos os estados</option>
           {regioes.map(r => <option key={r} value={r}>{r}</option>)}
         </select>
         {isAdmin && (
-          <label className="ct-chk-label">
+          <label className="chk-label">
             <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
             Mostrar inativos
           </label>
@@ -256,15 +260,15 @@ export default function CadastroTecnicosPage() {
 
       {/* Conteúdo */}
       {loading ? (
-        <div className="ct-empty">Carregando técnicos...</div>
+        <div className="empty">Carregando técnicos...</div>
       ) : tecnicos.length === 0 ? (
-        <div className="ct-empty">
+        <div className="empty">
           <p>Nenhum técnico encontrado.</p>
-          {!isAdmin && <p className="ct-empty-sub">Você visualiza apenas os técnicos vinculados ao seu perfil de supervisor.</p>}
+          {!isAdmin && <p className="empty-sub">Você visualiza apenas os técnicos vinculados ao seu perfil de supervisor.</p>}
         </div>
       ) : (
-        <div className="ct-tbl-wrap">
-          <table className="ct-tbl">
+        <div className="tbl-wrap">
+          <table className="tbl">
             <thead>
               <tr>
                 <th>Nome</th>
@@ -274,7 +278,7 @@ export default function CadastroTecnicosPage() {
                 {isAdmin && <th>Supervisor</th>}
                 <th>Databricks</th>
                 <th>Status</th>
-                <th className="ct-th-right">Ações</th>
+                <th className="th-right">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -282,34 +286,34 @@ export default function CadastroTecnicosPage() {
                 const db = dbCheck[t.id];
                 return (
                   <tr key={t.id} style={{ opacity: t.active ? 1 : 0.45 }}>
-                    <td className="ct-td-name">{t.name}</td>
-                    <td><span className="ct-tag">{t.region || '—'}</span></td>
-                    <td className="ct-td-mono">{formatPhone(t.phone)}</td>
-                    <td className="ct-td-muted">{t.email || '—'}</td>
-                    {isAdmin && <td className="ct-td-muted">{t.supervisor_name || '—'}</td>}
+                    <td className="td-name">{t.name}</td>
+                    <td><span className="tag">{t.region || '—'}</span></td>
+                    <td className="td-mono">{formatPhone(t.phone)}</td>
+                    <td className="td-muted">{t.email || '—'}</td>
+                    {isAdmin && <td className="td-muted">{t.supervisor_name || '—'}</td>}
                     <td>
                       {db ? (
                         db.error
-                          ? <span className="ct-tag ct-tag-err" title={db.error}>Erro</span>
-                          : <span className="ct-tag ct-tag-ok">{db.total_items ?? 0} peças</span>
+                          ? <span className="tag tag-err" title={db.error}>Erro</span>
+                          : <span className="tag tag-ok">{db.total_items ?? 0} peças</span>
                       ) : t.databricks_name ? (
-                        <button className="ct-btn-db" onClick={() => checkDb(t)} disabled={dbLoading[t.id]}>
+                        <button className="btn-db" onClick={() => checkDb(t)} disabled={dbLoading[t.id]}>
                           {dbLoading[t.id] ? '...' : 'Verificar'}
                         </button>
                       ) : (
-                        <span className="ct-td-dim">Sem vínculo</span>
+                        <span className="td-dim">Sem vínculo</span>
                       )}
                     </td>
                     <td>
-                      <span className={`ct-tag ${t.active ? 'ct-tag-on' : 'ct-tag-off'}`}>
+                      <span className={`tag ${t.active ? 'tag-on' : 'tag-off'}`}>
                         {t.active ? 'Ativo' : 'Inativo'}
                       </span>
                     </td>
                     <td>
-                      <div className="ct-acts">
-                        <button className="ct-btn-edit" onClick={() => setEditando(t)}>Editar</button>
+                      <div className="acts">
+                        <button className="btn-edit" onClick={() => setEditando(t)}>Editar</button>
                         {isAdmin && (
-                          <button className="ct-btn-del-sm" onClick={() => setDeletando(t)}>Excluir</button>
+                          <button className="btn-del-sm" onClick={() => setDeletando(t)}>Excluir</button>
                         )}
                       </div>
                     </td>
@@ -324,7 +328,9 @@ export default function CadastroTecnicosPage() {
       {editando  && <ModalEdicao tecnico={editando} onClose={() => setEditando(null)} onSaved={onSaved} isAdmin={isAdmin} />}
       {deletando && <ModalDelete tecnico={deletando} onClose={() => setDeletando(null)} onConfirm={onDelete} loading={delLoading} />}
 
-      {toast && <div className="ct-toast">{toast}</div>}
+      {toast && <div className="toast">{toast}</div>}
+
+      
     </div>
   );
 }

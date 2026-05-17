@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import PageHeader from '@/components/ui/PageHeader';
 
@@ -10,167 +10,366 @@ export default function PecasPage() {
   const [selectedTech, setSelectedTech] = useState('');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingTechs, setLoadingTechs] = useState(true);
+  const [msg, setMsg] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newItem, setNewItem] = useState({ item_code: '', item_name: '', unit: 'un' });
+  const [saving, setSaving] = useState(false);
+  const fileRef = useRef();
 
   useEffect(() => {
-    async function loadTechnicians() {
-      try {
-        setLoadingTechs(true);
-        const res = await fetch('/api/technicians');
-        if (!res.ok) throw new Error('Falha ao carregar técnicos');
-        const data = await res.json();
-        const activeTechs = Array.isArray(data) ? data.filter(t => t.active) : [];
-        setTechnicians(activeTechs);
-      } catch (error) {
-        console.error('Erro ao carregar lista de técnicos:', error);
-      } finally {
-        setLoadingTechs(false);
-      }
-    }
-
     if (status === 'authenticated') {
-      loadTechnicians();
+      fetch('/api/technicians')
+        .then((r) => r.json())
+        .then((d) => setTechnicians(Array.isArray(d) ? d.filter((t) => t.active) : []));
     }
   }, [status]);
 
-  async function fetchItems(techId) {
-    if (!techId) {
-      setItems([]);
-      return;
-    }
+  useEffect(() => {
+    if (selectedTech) fetchItems();
+  }, [selectedTech]);
 
+  async function fetchItems() {
     setLoading(true);
-    try {
-      const tech = technicians.find(t => String(t.id) === String(techId));
-      const identifier = tech?.databricks_name || tech?.name;
-
-      if (!identifier) {
-        alert('Este técnico não possui um nome configurado para o Databricks.');
-        setItems([]);
-        return;
-      }
-
-      const res = await fetch(
-        `/api/technician-items?technicianId=${encodeURIComponent(identifier)}`
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || 'Erro ao buscar peças');
-      }
-
-      setItems(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Erro ao buscar peças no Databricks:', error);
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
+    const res = await fetch(`/api/technician-items?technicianId=${selectedTech}`);
+    const data = await res.json();
+    setItems(Array.isArray(data) ? data : []);
+    setLoading(false);
   }
 
+  async function handleAddItem(e) {
+    e.preventDefault();
+    setSaving(true);
+    setMsg('');
+    const res = await fetch('/api/technician-items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ technician_id: selectedTech, items: [newItem] }),
+    });
+    if (res.ok) {
+      setMsg('Peça adicionada.');
+      setNewItem({ item_code: '', item_name: '', unit: 'un' });
+      setShowAddForm(false);
+      fetchItems();
+    } else {
+      const err = await res.json();
+      setMsg(err.error || 'Erro ao adicionar');
+    }
+    setSaving(false);
+  }
+
+  async function handleToggleActive(item) {
+    await fetch(`/api/technician-items/${item.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: !item.active }),
+    });
+    fetchItems();
+  }
+
+  async function handleImportCSV(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setMsg('Importando...');
+    const text = await file.text();
+    const lines = text.split('\n').filter((l) => l.trim());
+    const parsed = [];
+    for (const line of lines) {
+      const cols = line.split(';').map((c) => c.trim().replace(/"/g, ''));
+      if (cols.length < 2) continue;
+      const [item_code, item_name, unit] = cols;
+      if (item_code && item_name) {
+        parsed.push({ item_code, item_name, unit: unit || 'un' });
+      }
+    }
+    if (parsed.length === 0) {
+      setMsg('Nenhuma peça válida encontrada no arquivo. Formato: código;nome;unidade');
+      return;
+    }
+    const res = await fetch('/api/technician-items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ technician_id: selectedTech, items: parsed }),
+    });
+    if (res.ok) {
+      setMsg(`${parsed.length} peça(s) importada(s) com sucesso.`);
+      fetchItems();
+    } else {
+      setMsg('Erro na importação.');
+    }
+    fileRef.current.value = '';
+  }
+
+  function handleExportCSV() {
+    const rows = [['Código', 'Nome', 'Unidade', 'Ativo']];
+    items.forEach((i) => rows.push([i.item_code, i.item_name, i.unit, i.active ? 'Sim' : 'Não']));
+    const csv = rows.map((r) => r.join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const tech = technicians.find((t) => String(t.id) === String(selectedTech));
+    a.download = `pecas_${tech?.name?.replace(/\s/g, '_') || selectedTech}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  if (status === 'loading') {
+    return <div style={{ padding: '1.5rem', color: '#64748b' }}>Carregando...</div>;
+  }
+
+  const canManage = ['admin', 'supervisor'].includes(session?.user?.role);
+  const activeItems = items.filter((i) => i.active);
+  const inactiveItems = items.filter((i) => !i.active);
+
   return (
-    <div className="p-6 w-full space-y-6">
+    <div style={{ padding: '1.5rem' }}>
       <PageHeader
-        title="Consulta de Peças"
-        description="Dados sincronizados em tempo real com o Databricks."
+        title="Peças por Técnico"
+        subtitle="Gerencie o portfólio de peças que cada técnico deve contar no inventário"
       />
 
-      <div className="bg-[#141414] border border-[#2a2a2a] p-6 rounded-xl shadow-sm">
-        <label className="block text-sm font-medium text-gray-400 mb-2">
-          SELECIONAR TÉCNICO{' '}
-          {loadingTechs && (
-            <span className="text-xs text-blue-400 ml-2">
-              (Carregando lista...)
-            </span>
+      {msg && (
+        <div style={{
+          marginBottom: '1rem',
+          padding: '0.75rem 1rem',
+          background: '#f1f5f9',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          color: '#e2e8f0',
+          fontSize: '0.875rem',
+        }}>
+          {msg}
+        </div>
+      )}
+
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1', minWidth: '200px' }}>
+            <label style={labelStyle}>Selecionar Técnico</label>
+            <select
+              className="input"
+              value={selectedTech}
+              onChange={(e) => setSelectedTech(e.target.value)}
+            >
+              <option value="">— Escolha um técnico —</option>
+              {technicians.map((t) => (
+                <option key={t.id} value={t.id}>{t.name} — {t.region}</option>
+              ))}
+            </select>
+          </div>
+          {selectedTech && canManage && (
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', paddingBottom: '0' }}>
+              <button className="btn-secondary" onClick={() => setShowAddForm(!showAddForm)}>
+                + Adicionar Peça
+              </button>
+              <label style={{
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                color: '#94a3b8',
+                fontSize: '0.8rem',
+                padding: '0.5rem 0.875rem',
+                cursor: 'pointer',
+              }}>
+                Importar CSV
+                <input ref={fileRef} type="file" accept=".csv,.txt" style={{ display: 'none' }} onChange={handleImportCSV} />
+              </label>
+              {items.length > 0 && (
+                <button className="btn-secondary" onClick={handleExportCSV}>
+                  Exportar CSV
+                </button>
+              )}
+            </div>
           )}
-        </label>
+        </div>
 
-        <select
-          value={selectedTech}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSelectedTech(value);
-            fetchItems(value);
-          }}
-          className="w-full max-w-md bg-[#0a0a0a] border border-[#2a2a2a] text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 outline-none"
-        >
-          <option value="">
-            {loadingTechs ? 'Carregando técnicos...' : 'Selecione um técnico...'}
-          </option>
-
-          {technicians.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-
-        {!loadingTechs && technicians.length === 0 && (
-          <p className="text-xs text-red-400 mt-2">
-            Nenhum técnico ativo encontrado no banco de dados.
-          </p>
+        {selectedTech && canManage && (
+          <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#64748b' }}>
+            Formato do CSV para importação: <code style={{ background: '#f1f5f9', padding: '1px 6px', borderRadius: '3px' }}>código;nome;unidade</code> — uma peça por linha, sem cabeçalho.
+          </div>
         )}
       </div>
 
-      <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#2a2a2a] flex justify-between items-center">
-          <h3 className="font-medium text-white">
-            Peças no Databricks ({items.length})
-          </h3>
-          {loading && (
-            <span className="text-sm text-blue-400 animate-pulse">
-              Consultando...
-            </span>
+      {showAddForm && selectedTech && (
+        <div className="card" style={{ marginBottom: '1.5rem' }}>
+          <div className="section-title" style={{ marginBottom: '1rem' }}>Nova Peça</div>
+          <form onSubmit={handleAddItem}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div>
+                <label style={labelStyle}>Código</label>
+                <input
+                  className="input"
+                  required
+                  value={newItem.item_code}
+                  onChange={(e) => setNewItem({ ...newItem, item_code: e.target.value })}
+                  placeholder="Ex: HD-001"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Nome da Peça</label>
+                <input
+                  className="input"
+                  required
+                  value={newItem.item_name}
+                  onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
+                  placeholder="Ex: HD 500GB SATA"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Unidade</label>
+                <select
+                  className="input"
+                  value={newItem.unit}
+                  onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
+                >
+                  <option value="un">un</option>
+                  <option value="pc">pc</option>
+                  <option value="cx">cx</option>
+                  <option value="kg">kg</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button type="submit" className="btn-primary" disabled={saving}>
+                {saving ? 'Salvando...' : 'Adicionar'}
+              </button>
+              <button type="button" className="btn-secondary" onClick={() => setShowAddForm(false)}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {selectedTech && !loading && (
+        <div className="card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div className="section-title">
+              Peças Ativas ({activeItems.length})
+            </div>
+            {inactiveItems.length > 0 && (
+              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                {inactiveItems.length} inativa(s)
+              </span>
+            )}
+          </div>
+
+          {activeItems.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b', fontSize: '0.875rem' }}>
+              Nenhuma peça ativa. Adicione peças manualmente ou importe um CSV.
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nome da Peça</th>
+                    <th>Unidade</th>
+                    {canManage && <th>Ações</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeItems.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '3px', fontSize: '0.8rem', color: '#94a3b8' }}>
+                          {item.item_code}
+                        </code>
+                      </td>
+                      <td style={{ color: '#f1f5f9', fontWeight: '500' }}>{item.item_name}</td>
+                      <td style={{ color: '#64748b', fontSize: '0.85rem' }}>{item.unit}</td>
+                      {canManage && (
+                        <td>
+                          <button
+                            onClick={() => handleToggleActive(item)}
+                            style={{
+                              background: '#f8fafc',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '5px',
+                              color: '#64748b',
+                              fontSize: '0.75rem',
+                              padding: '3px 10px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Desativar
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {inactiveItems.length > 0 && (
+            <details style={{ marginTop: '1.5rem' }}>
+              <summary style={{ cursor: 'pointer', fontSize: '0.8rem', color: '#64748b', userSelect: 'none' }}>
+                Ver peças inativas ({inactiveItems.length})
+              </summary>
+              <table className="table" style={{ marginTop: '0.75rem', opacity: 0.6 }}>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Unidade</th>
+                    {canManage && <th>Ações</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {inactiveItems.map((item) => (
+                    <tr key={item.id}>
+                      <td><code style={{ fontSize: '0.8rem', color: '#64748b' }}>{item.item_code}</code></td>
+                      <td style={{ color: '#64748b' }}>{item.item_name}</td>
+                      <td style={{ color: '#64748b', fontSize: '0.85rem' }}>{item.unit}</td>
+                      {canManage && (
+                        <td>
+                          <button
+                            onClick={() => handleToggleActive(item)}
+                            style={{
+                              background: '#f8fafc',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '5px',
+                              color: '#94a3b8',
+                              fontSize: '0.75rem',
+                              padding: '3px 10px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Reativar
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </details>
           )}
         </div>
+      )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#1a1a1a] text-xs uppercase text-gray-500">
-                <th className="px-6 py-3">Código</th>
-                <th className="px-6 py-3">Descrição</th>
-                <th className="px-6 py-3">Quantidade</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3">Remessa</th>
-              </tr>
-            </thead>
+      {selectedTech && loading && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Carregando peças...</div>
+      )}
 
-            <tbody className="divide-y divide-[#2a2a2a]">
-              {items.length > 0 ? (
-                items.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02]">
-                    <td className="px-6 py-4 text-sm font-mono text-blue-400">
-                      {item.item_code}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {item.item_name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {item.item_quantity ?? 0}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
-                      {item.item_status || '—'}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-400">
-                      {item.item_num_remessa || '—'}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500 italic">
-                    {selectedTech
-                      ? (loading ? 'Buscando dados...' : 'Sem dados para este técnico.')
-                      : 'Aguardando seleção...'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {!selectedTech && (
+        <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.875rem' }}>
+          Selecione um técnico acima para visualizar e gerenciar suas peças.
         </div>
-      </div>
+      )}
     </div>
   );
 }
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '0.8rem',
+  fontWeight: '500',
+  color: '#64748b',
+  marginBottom: '0.375rem',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+};
