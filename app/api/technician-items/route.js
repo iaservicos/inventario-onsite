@@ -5,15 +5,15 @@ import { getTechnicianItems } from '@/lib/databricks';
 import { createServiceClient } from '@/lib/supabase';
 
 export async function GET(request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const { searchParams } = new URL(request.url);
-  const technicianId = searchParams.get('technicianId'); 
-  
-  if (!technicianId) return NextResponse.json({ error: 'TechnicianId obrigatório' }, { status: 400 });
-
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { searchParams } = new URL(request.url);
+    const technicianId = searchParams.get('technicianId'); 
+    
+    if (!technicianId) return NextResponse.json({ error: 'TechnicianId obrigatório' }, { status: 400 });
+
     const supabase = createServiceClient();
     
     // 1. Buscar o técnico no banco local para pegar o databricks_name
