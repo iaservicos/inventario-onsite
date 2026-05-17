@@ -15,10 +15,10 @@ export async function GET(request) {
 
     const supabase = createServiceClient();
 
-    // Otimização: Selecionar apenas as colunas necessárias para a tabela
+    // Restaurando a busca completa (*) para garantir estabilidade
     let query = supabase
       .from('technicians')
-      .select('id, name, email, phone, region, active, supervisor_name, datalake_status')
+      .select('*')
       .order('name');
 
     // Filtro de Supervisor
@@ -32,6 +32,7 @@ export async function GET(request) {
     } else if (active === 'false') {
       query = query.eq('active', false);
     } else {
+      // Por padrão, se não especificado, mostra apenas ativos
       query = query.eq('active', true);
     }
 
