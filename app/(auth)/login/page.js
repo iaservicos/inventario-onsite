@@ -3,7 +3,6 @@
 import { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 
 function LoginForm() {
   const router = useRouter();
@@ -21,7 +20,7 @@ function LoginForm() {
     setError('');
     const result = await signIn('credentials', { email, password, redirect: false });
     if (result?.error) {
-      setError('E-mail ou senha invalidos.');
+      setError('E-mail ou senha inválidos.');
       setLoading(false);
     } else {
       router.push(callbackUrl);
@@ -32,116 +31,131 @@ function LoginForm() {
     <div style={{
       display: 'flex',
       minHeight: '100vh',
+      width: '100%',
       fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-      background: '#f5f5f5',
+      background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
+      overflow: 'hidden',
     }}>
-      {/* Painel esquerdo — cinza escuro profissional */}
+      {/* Painel esquerdo — fundo escuro com logo */}
       <div style={{
-        flex: 0.4,
-        minWidth: '320px',
-        background: '#2d2d2d',
+        flex: 0.45,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '3rem 2.5rem',
+        padding: '3rem 2rem',
         position: 'relative',
-        overflow: 'hidden',
       }}>
-        {/* Grade sutil */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          zIndex: 0,
-        }} />
-
-        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: '300px' }}>
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: '340px' }}>
           {/* Logo Positivo */}
           <div style={{
             width: '100%',
-            height: '60px',
+            height: '80px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '2rem',
+            marginBottom: '2.5rem',
             background: '#ffffff',
-            borderRadius: '8px',
-            padding: '0.5rem',
+            borderRadius: '10px',
+            padding: '1rem',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
           }}>
             <img 
               src="/logo-positivo.png" 
               alt="Positivo Tecnologia" 
               style={{
-                maxWidth: '90%',
+                maxWidth: '95%',
                 maxHeight: '100%',
                 objectFit: 'contain',
               }}
             />
           </div>
 
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f5f5f5', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
+          <h2 style={{ 
+            fontSize: '1.5rem', 
+            fontWeight: '700', 
+            color: '#ffffff', 
+            letterSpacing: '-0.02em', 
+            marginBottom: '0.75rem',
+            lineHeight: 1.2,
+          }}>
             Inventário Onsite
           </h2>
-          <p style={{ fontSize: '0.8125rem', color: '#b9b9b9', lineHeight: 1.6 }}>
+          <p style={{ 
+            fontSize: '0.875rem', 
+            color: '#e0e0e0', 
+            lineHeight: 1.6,
+            marginBottom: '2rem',
+          }}>
             Sistema de inventário cíclico de peças técnicas
           </p>
 
           {/* Features */}
-          <div style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+          <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {[
               'Agendamento automático de inventários',
               'Integração com WhatsApp via GPT Maker',
               'Sincronização com Databricks em tempo real',
             ].map((text, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', textAlign: 'left' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem', textAlign: 'left' }}>
                 <span style={{
-                  fontSize: '0.625rem', fontWeight: '700', color: '#868e96',
-                  background: '#444444', padding: '0.2rem 0.4rem',
-                  borderRadius: '4px', flexShrink: 0, marginTop: '1px',
+                  fontSize: '0.7rem', 
+                  fontWeight: '700', 
+                  color: '#ffffff',
+                  background: '#444444', 
+                  padding: '0.3rem 0.5rem',
+                  borderRadius: '4px', 
+                  flexShrink: 0, 
+                  marginTop: '2px',
                   letterSpacing: '0.05em',
+                  minWidth: '24px',
+                  textAlign: 'center',
                 }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span style={{ fontSize: '0.8rem', color: '#b9b9b9', lineHeight: 1.5 }}>{text}</span>
+                <span style={{ fontSize: '0.8125rem', color: '#d0d0d0', lineHeight: 1.5 }}>{text}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Painel direito — claro */}
+      {/* Painel direito — formulário de login */}
       <div style={{
-        flex: 0.6,
+        flex: 0.55,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '2rem',
-        background: '#f5f5f5',
+        background: '#ffffff',
       }}>
         <div style={{
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: '460px',
           background: '#ffffff',
-          border: '1px solid #e9ecef',
           borderRadius: '12px',
-          padding: '2.5rem',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-          animation: 'fadeUp 0.3s ease forwards',
+          padding: '3rem',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.12)',
+          animation: 'fadeUp 0.4s ease forwards',
         }}>
-          <div style={{ marginBottom: '2rem' }}>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1a1a1a', letterSpacing: '-0.02em', marginBottom: '0.375rem' }}>
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h1 style={{ 
+              fontSize: '1.375rem', 
+              fontWeight: '700', 
+              color: '#000000', 
+              letterSpacing: '-0.02em', 
+              marginBottom: '0.5rem' 
+            }}>
               Entrar na sua conta
             </h1>
-            <p style={{ fontSize: '0.8125rem', color: '#5c5c5c' }}>
+            <p style={{ fontSize: '0.8125rem', color: '#666666' }}>
               Acesso restrito a usuários autorizados
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '500', color: '#444444' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#333333' }}>
                 E-mail
               </label>
               <input
@@ -155,8 +169,8 @@ function LoginForm() {
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '500', color: '#444444' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#333333' }}>
                 Senha
               </label>
               <div style={{ position: 'relative' }}>
@@ -174,19 +188,29 @@ function LoginForm() {
                   type="button"
                   onClick={() => setShowPass(!showPass)}
                   style={{
-                    position: 'absolute', right: '0.75rem', top: '50%',
-                    transform: 'translateY(-50%)', background: 'none', border: 'none',
-                    cursor: 'pointer', color: '#868e96', padding: 0,
-                    display: 'flex', alignItems: 'center',
+                    position: 'absolute', 
+                    right: '0.875rem', 
+                    top: '50%',
+                    transform: 'translateY(-50%)', 
+                    background: 'none', 
+                    border: 'none',
+                    cursor: 'pointer', 
+                    color: '#999999', 
+                    padding: 0,
+                    display: 'flex', 
+                    alignItems: 'center',
+                    transition: 'color 0.15s ease',
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#333333'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#999999'}
                 >
                   {showPass ? (
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                       <line x1="1" y1="1" x2="23" y2="23" />
                     </svg>
                   ) : (
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
@@ -197,17 +221,17 @@ function LoginForm() {
 
             {error && (
               <div style={{
-                padding: '0.75rem 0.875rem',
-                background: '#f5f5f5',
-                border: '1px solid #d1d1d1',
+                padding: '1rem',
+                background: '#ffebee',
+                border: '1px solid #ffcdd2',
                 borderRadius: '7px',
-                fontSize: '0.8rem',
-                color: '#1a1a1a',
+                fontSize: '0.8125rem',
+                color: '#b71c1c',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
+                gap: '0.75rem',
               }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <circle cx="12" cy="12" r="10" />
                   <line x1="12" y1="8" x2="12" y2="12" />
                   <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -218,7 +242,7 @@ function LoginForm() {
 
             <button type="submit" className="login-btn" disabled={loading} style={{ marginTop: '0.5rem' }}>
               {loading && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 0.8s linear infinite', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 0.8s linear infinite', flexShrink: 0 }}>
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
               )}
@@ -226,7 +250,7 @@ function LoginForm() {
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', fontSize: '0.7rem', color: '#868e96', marginTop: '1.75rem' }}>
+          <p style={{ textAlign: 'center', fontSize: '0.7rem', color: '#999999', marginTop: '2rem' }}>
             IA Serviços / Positivo Tecnologia
           </p>
         </div>
@@ -238,7 +262,15 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div style={{ color: '#5c5c5c', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <div style={{ 
+        color: '#ffffff', 
+        fontSize: '0.8rem', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
+      }}>
         Carregando...
       </div>
     }>

@@ -10,7 +10,7 @@ const NAV_ITEMS = [
     href: '/dashboard',
     label: 'Dashboard',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -22,7 +22,7 @@ const NAV_ITEMS = [
     href: '/tecnicos',
     label: 'Técnicos',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -34,7 +34,7 @@ const NAV_ITEMS = [
     href: '/alertas',
     label: 'Alertas',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
       </svg>
@@ -44,7 +44,7 @@ const NAV_ITEMS = [
     href: '/divergencias',
     label: 'Divergências',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
       </svg>
     ),
@@ -53,7 +53,7 @@ const NAV_ITEMS = [
     href: '/agendamentos',
     label: 'Agendamentos',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
@@ -65,7 +65,7 @@ const NAV_ITEMS = [
     href: '/pecas',
     label: 'Peças',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
       </svg>
     ),
@@ -74,7 +74,7 @@ const NAV_ITEMS = [
     href: '/logs',
     label: 'Logs',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
         <line x1="16" y1="13" x2="8" y2="13" />
@@ -89,7 +89,7 @@ const ADMIN_ITEMS = [
     href: '/usuarios',
     label: 'Usuários',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
         <circle cx="12" cy="7" r="4" />
       </svg>
@@ -99,7 +99,7 @@ const ADMIN_ITEMS = [
     href: '/cadastro-tecnicos',
     label: 'Cadastro Técnicos',
     icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <line x1="19" y1="8" x2="19" y2="14" />
@@ -119,11 +119,12 @@ export default function Sidebar({ user }) {
   return (
     <aside style={{
       position: 'fixed',
-      top: 0, left: 0,
-      width: '240px',
+      top: 0, 
+      left: 0,
+      width: '260px',
       height: '100vh',
-      background: '#2d2d2d',
-      borderRight: '1px solid #444444',
+      background: '#1a1a1a',
+      borderRight: '1px solid #333333',
       display: 'flex',
       flexDirection: 'column',
       zIndex: 100,
@@ -132,39 +133,40 @@ export default function Sidebar({ user }) {
 
       {/* Logo */}
       <div style={{
-        padding: '1.25rem 1rem',
-        borderBottom: '1px solid #444444',
+        padding: '1.5rem 1.25rem',
+        borderBottom: '1px solid #333333',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem',
+        gap: '0.875rem',
       }}>
         <div style={{
-          width: '36px', height: '36px',
+          width: '40px', 
+          height: '40px',
           borderRadius: '8px',
-          background: '#444444',
+          background: '#333333',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b9b9b9" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
             <rect x="9" y="3" width="6" height="4" rx="2" />
             <path d="m9 12 2 2 4-4" />
           </svg>
         </div>
         <div>
-          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f5f5f5', lineHeight: 1.2 }}>
+          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#ffffff', lineHeight: 1.2 }}>
             Inventário Onsite
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#868e96', marginTop: '2px' }}>
+          <div style={{ fontSize: '0.65rem', color: '#999999', marginTop: '3px' }}>
             IA Serviços
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '0.75rem' }}>
+      <nav style={{ flex: 1, padding: '0.875rem' }}>
         <div>
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
@@ -175,19 +177,19 @@ export default function Sidebar({ user }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.625rem',
-                  padding: '0.5rem 0.75rem',
+                  gap: '0.75rem',
+                  padding: '0.625rem 0.875rem',
                   borderRadius: '6px',
-                  marginBottom: '2px',
+                  marginBottom: '3px',
                   textDecoration: 'none',
                   fontSize: '0.8125rem',
                   fontWeight: active ? '600' : '400',
-                  color: active ? '#ffffff' : '#b9b9b9',
-                  background: active ? '#444444' : 'transparent',
+                  color: active ? '#ffffff' : '#cccccc',
+                  background: active ? '#333333' : 'transparent',
                   transition: 'all 0.15s ease',
                 }}
               >
-                <span style={{ color: active ? '#f5f5f5' : '#868e96', flexShrink: 0 }}>
+                <span style={{ color: active ? '#ffffff' : '#999999', flexShrink: 0 }}>
                   {item.icon}
                 </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
@@ -197,15 +199,15 @@ export default function Sidebar({ user }) {
         </div>
 
         {user?.role === 'admin' && (
-          <div style={{ marginTop: '1.5rem' }}>
+          <div style={{ marginTop: '1.75rem' }}>
             <div style={{
               fontSize: '0.625rem',
-              fontWeight: '600',
+              fontWeight: '700',
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#5c5c5c',
-              padding: '0 0.75rem',
-              marginBottom: '0.5rem',
+              letterSpacing: '0.1em',
+              color: '#666666',
+              padding: '0 0.875rem',
+              marginBottom: '0.625rem',
             }}>
               Administração
             </div>
@@ -218,19 +220,19 @@ export default function Sidebar({ user }) {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.625rem',
-                    padding: '0.5rem 0.75rem',
+                    gap: '0.75rem',
+                    padding: '0.625rem 0.875rem',
                     borderRadius: '6px',
-                    marginBottom: '2px',
+                    marginBottom: '3px',
                     textDecoration: 'none',
                     fontSize: '0.8125rem',
                     fontWeight: active ? '600' : '400',
-                    color: active ? '#ffffff' : '#b9b9b9',
-                    background: active ? '#444444' : 'transparent',
+                    color: active ? '#ffffff' : '#cccccc',
+                    background: active ? '#333333' : 'transparent',
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <span style={{ color: active ? '#f5f5f5' : '#868e96', flexShrink: 0 }}>
+                  <span style={{ color: active ? '#ffffff' : '#999999', flexShrink: 0 }}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -242,35 +244,36 @@ export default function Sidebar({ user }) {
       </nav>
 
       {/* User / Logout */}
-      <div style={{ padding: '1rem 0.875rem', borderTop: '1px solid #444444' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
+      <div style={{ padding: '1.25rem', borderTop: '1px solid #333333' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.875rem' }}>
           <div style={{
-            width: '32px', height: '32px',
+            width: '36px', 
+            height: '36px',
             borderRadius: '50%',
-            background: '#444444',
-            border: '1px solid #5c5c5c',
+            background: '#333333',
+            border: '1px solid #555555',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '0.8rem',
             fontWeight: '700',
-            color: '#b9b9b9',
+            color: '#ffffff',
             flexShrink: 0,
           }}>
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <div style={{ overflow: 'hidden', flex: 1 }}>
             <div style={{
-              fontSize: '0.78rem',
+              fontSize: '0.8rem',
               fontWeight: '600',
-              color: '#f5f5f5',
+              color: '#ffffff',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}>
               {user?.name}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#868e96' }}>
+            <div style={{ fontSize: '0.7rem', color: '#999999' }}>
               {ROLE_LABELS?.[user?.role] || user?.role}
             </div>
           </div>
@@ -282,22 +285,22 @@ export default function Sidebar({ user }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '0.375rem',
-            padding: '0.5rem 0.75rem',
+            gap: '0.5rem',
+            padding: '0.625rem 0.875rem',
             borderRadius: '6px',
             border: 'none',
             background: 'transparent',
-            color: '#868e96',
-            fontSize: '0.75rem',
-            fontWeight: '500',
+            color: '#999999',
+            fontSize: '0.8rem',
+            fontWeight: '600',
             cursor: 'pointer',
             fontFamily: 'inherit',
             transition: 'all 0.15s ease',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#444444'; e.currentTarget.style.color = '#f5f5f5'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#868e96'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#333333'; e.currentTarget.style.color = '#ffffff'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#999999'; }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
