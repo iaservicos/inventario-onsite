@@ -153,6 +153,20 @@ export default function CadastroTecnicosPage() {
   const [showMassa,     setShowMassa]     = useState(false);
   const [dbStatus,      setDbStatus]      = useState({});
 
+  const checkDb = useCallback(async (id) => {
+    try {
+      const res = await fetch(`/api/technicians/${id}/sync-items`);
+      if (!res.ok) {
+        setDbStatus(prev => ({ ...prev, [id]: 'NOT_OK' }));
+        return;
+      }
+      const data = await res.json();
+      setDbStatus(prev => ({ ...prev, [id]: data.found_in_databricks ? 'OK' : 'NOT_OK' }));
+    } catch {
+      setDbStatus(prev => ({ ...prev, [id]: 'NOT_OK' }));
+    }
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     const p = new URLSearchParams();
@@ -161,28 +175,17 @@ export default function CadastroTecnicosPage() {
     if (showInactive) p.set('active', 'false');
     const res  = await fetch(`/api/technicians?${p}`);
     const data = await res.json();
-    setTecnicos(Array.isArray(data) ? data : []);
+    const list = Array.isArray(data) ? data : [];
+    setTecnicos(list);
     setLoading(false);
     
-    if (Array.isArray(data)) {
-      data.forEach(t => {
-        if (t.databricks_name) checkDb(t.id);
-      });
-    }
-  }, [search, regionFlt, showInactive]);
+    // Dispara a verificação para todos os técnicos da lista
+    list.forEach(t => {
+      checkDb(t.id);
+    });
+  }, [search, regionFlt, showInactive, checkDb]);
 
   useEffect(() => { load(); }, [load]);
-
-  const checkDb = async (id) => {
-    try {
-      const res = await fetch(`/api/technicians/${id}/sync-items`);
-      const data = await res.json();
-      // Lógica Corrigida: OK se encontrado, NÃO OK se não encontrado
-      setDbStatus(prev => ({ ...prev, [id]: data.found_in_databricks ? 'OK' : 'NOT_OK' }));
-    } catch {
-      setDbStatus(prev => ({ ...prev, [id]: 'ERROR' }));
-    }
-  };
 
   const toggleSelect = (id) => {
     setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
