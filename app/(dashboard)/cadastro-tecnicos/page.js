@@ -169,20 +169,26 @@ export default function CadastroTecnicosPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const p = new URLSearchParams();
-    if (search)       p.set('search', search);
-    if (regionFlt)    p.set('region', regionFlt);
-    if (showInactive) p.set('active', 'false');
-    const res  = await fetch(`/api/technicians?${p}`);
-    const data = await res.json();
-    const list = Array.isArray(data) ? data : [];
-    setTecnicos(list);
-    setLoading(false);
-    
-    // Dispara a verificação para todos os técnicos da lista
-    list.forEach(t => {
-      checkDb(t.id);
-    });
+    try {
+      const p = new URLSearchParams();
+      if (search)       p.set('search', search);
+      if (regionFlt)    p.set('region', regionFlt);
+      if (showInactive) p.set('active', 'false');
+      const res  = await fetch(`/api/technicians?${p}`);
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : [];
+      setTecnicos(list);
+      
+      // Dispara a verificação para todos os técnicos da lista de forma independente
+      list.forEach(t => {
+        checkDb(t.id);
+      });
+    } catch (err) {
+      console.error('Erro ao carregar técnicos:', err);
+      setTecnicos([]);
+    } finally {
+      setLoading(false);
+    }
   }, [search, regionFlt, showInactive, checkDb]);
 
   useEffect(() => { load(); }, [load]);
