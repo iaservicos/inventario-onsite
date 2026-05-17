@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/tecnicos',
-    label: 'Tecnicos',
+    label: 'Técnicos',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -42,7 +42,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/divergencias',
-    label: 'Divergencias',
+    label: 'Divergências',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -63,7 +63,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/pecas',
-    label: 'Pecas',
+    label: 'Peças',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -87,7 +87,7 @@ const NAV_ITEMS = [
 const ADMIN_ITEMS = [
   {
     href: '/usuarios',
-    label: 'Usuarios',
+    label: 'Usuários',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -97,7 +97,7 @@ const ADMIN_ITEMS = [
   },
   {
     href: '/cadastro-tecnicos',
-    label: 'Cadastro Tecnicos',
+    label: 'Cadastro Técnicos',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -120,10 +120,10 @@ export default function Sidebar({ user }) {
     <aside style={{
       position: 'fixed',
       top: 0, left: 0,
-      width: '220px',
+      width: '240px',
       height: '100vh',
-      background: '#18181b',
-      borderRight: '1px solid #27272a',
+      background: '#2d2d2d',
+      borderRight: '1px solid #444444',
       display: 'flex',
       flexDirection: 'column',
       zIndex: 100,
@@ -132,39 +132,39 @@ export default function Sidebar({ user }) {
 
       {/* Logo */}
       <div style={{
-        padding: '1rem 1rem 0.875rem',
-        borderBottom: '1px solid #27272a',
+        padding: '1.25rem 1rem',
+        borderBottom: '1px solid #444444',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.625rem',
+        gap: '0.75rem',
       }}>
         <div style={{
-          width: '32px', height: '32px',
-          borderRadius: '7px',
-          background: '#3f3f46',
+          width: '36px', height: '36px',
+          borderRadius: '8px',
+          background: '#444444',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b9b9b9" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
             <rect x="9" y="3" width="6" height="4" rx="2" />
             <path d="m9 12 2 2 4-4" />
           </svg>
         </div>
         <div>
-          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f4f4f5', lineHeight: 1.2 }}>
-            Inventario Onsite
+          <div style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#f5f5f5', lineHeight: 1.2 }}>
+            Inventário Onsite
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#52525b', marginTop: '1px' }}>
-            IA Servicos
+          <div style={{ fontSize: '0.65rem', color: '#868e96', marginTop: '2px' }}>
+            IA Serviços
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '0.5rem' }}>
+      <nav style={{ flex: 1, padding: '0.75rem' }}>
         <div>
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
@@ -175,19 +175,19 @@ export default function Sidebar({ user }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.45rem 0.625rem',
+                  gap: '0.625rem',
+                  padding: '0.5rem 0.75rem',
                   borderRadius: '6px',
-                  marginBottom: '1px',
+                  marginBottom: '2px',
                   textDecoration: 'none',
                   fontSize: '0.8125rem',
                   fontWeight: active ? '600' : '400',
-                  color: active ? '#ffffff' : '#a1a1aa',
-                  background: active ? '#3f3f46' : 'transparent',
-                  transition: 'all 0.1s',
+                  color: active ? '#ffffff' : '#b9b9b9',
+                  background: active ? '#444444' : 'transparent',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                <span style={{ color: active ? '#d4d4d8' : '#71717a', flexShrink: 0 }}>
+                <span style={{ color: active ? '#f5f5f5' : '#868e96', flexShrink: 0 }}>
                   {item.icon}
                 </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
@@ -197,17 +197,17 @@ export default function Sidebar({ user }) {
         </div>
 
         {user?.role === 'admin' && (
-          <div style={{ marginTop: '1.25rem' }}>
+          <div style={{ marginTop: '1.5rem' }}>
             <div style={{
               fontSize: '0.625rem',
               fontWeight: '600',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#3f3f46',
-              padding: '0 0.625rem',
-              marginBottom: '0.375rem',
+              color: '#5c5c5c',
+              padding: '0 0.75rem',
+              marginBottom: '0.5rem',
             }}>
-              Administracao
+              Administração
             </div>
             {ADMIN_ITEMS.map((item) => {
               const active = isActive(item.href);
@@ -218,19 +218,19 @@ export default function Sidebar({ user }) {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.45rem 0.625rem',
+                    gap: '0.625rem',
+                    padding: '0.5rem 0.75rem',
                     borderRadius: '6px',
-                    marginBottom: '1px',
+                    marginBottom: '2px',
                     textDecoration: 'none',
                     fontSize: '0.8125rem',
                     fontWeight: active ? '600' : '400',
-                    color: active ? '#ffffff' : '#a1a1aa',
-                    background: active ? '#3f3f46' : 'transparent',
-                    transition: 'all 0.1s',
+                    color: active ? '#ffffff' : '#b9b9b9',
+                    background: active ? '#444444' : 'transparent',
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <span style={{ color: active ? '#d4d4d8' : '#71717a', flexShrink: 0 }}>
+                  <span style={{ color: active ? '#f5f5f5' : '#868e96', flexShrink: 0 }}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -242,19 +242,19 @@ export default function Sidebar({ user }) {
       </nav>
 
       {/* User / Logout */}
-      <div style={{ padding: '0.75rem 0.875rem', borderTop: '1px solid #27272a' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+      <div style={{ padding: '1rem 0.875rem', borderTop: '1px solid #444444' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
           <div style={{
-            width: '28px', height: '28px',
+            width: '32px', height: '32px',
             borderRadius: '50%',
-            background: '#27272a',
-            border: '1px solid #3f3f46',
+            background: '#444444',
+            border: '1px solid #5c5c5c',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '0.75rem',
+            fontSize: '0.8rem',
             fontWeight: '700',
-            color: '#a1a1aa',
+            color: '#b9b9b9',
             flexShrink: 0,
           }}>
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -263,14 +263,14 @@ export default function Sidebar({ user }) {
             <div style={{
               fontSize: '0.78rem',
               fontWeight: '600',
-              color: '#f4f4f5',
+              color: '#f5f5f5',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}>
               {user?.name}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#52525b' }}>
+            <div style={{ fontSize: '0.68rem', color: '#868e96' }}>
               {ROLE_LABELS?.[user?.role] || user?.role}
             </div>
           </div>
@@ -283,20 +283,21 @@ export default function Sidebar({ user }) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0.375rem',
-            padding: '0.375rem',
+            padding: '0.5rem 0.75rem',
             borderRadius: '6px',
             border: 'none',
             background: 'transparent',
-            color: '#52525b',
+            color: '#868e96',
             fontSize: '0.75rem',
+            fontWeight: '500',
             cursor: 'pointer',
             fontFamily: 'inherit',
-            transition: 'all 0.1s',
+            transition: 'all 0.15s ease',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#27272a'; e.currentTarget.style.color = '#a1a1aa'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#52525b'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#444444'; e.currentTarget.style.color = '#f5f5f5'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#868e96'; }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
