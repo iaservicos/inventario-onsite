@@ -29,7 +29,7 @@ export async function GET(request) {
 
     const searchName = technician.databricks_name || technician.name;
 
-    // 2. Buscar itens no Databricks usando a função original restaurada
+    // 2. Buscar itens no Databricks
     const data = await getTechnicianItems(searchName);
     
     // 3. Mapear os dados para o formato esperado pela UI
@@ -37,8 +37,8 @@ export async function GET(request) {
       id: `db-${index}-${item.item_code}`, 
       item_code: item.item_code,
       item_name: item.item_name,
-      item_quantity: item.item_quantity, // Campo original restaurado
-      unit: 'un', // Valor padrão já que não vem mais na query original
+      item_quantity: item.item_quantity,
+      item_num_remessa: item.item_num_remessa, // Campo de Remessa (Nota Fiscal)
       active: true, 
       from_databricks: true
     }));
