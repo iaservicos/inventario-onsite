@@ -1,49 +1,48 @@
-# Redesign Visual Profissional - Inventário Onsite (V3 - Contraste Máximo)
+# Redesign Visual Profissional - Inventário Onsite (V4 - Minimalista & Positivo)
 
-## Resumo das Melhorias de Legibilidade
+## Resumo das Melhorias de Design
 
-Este ajuste final foca em **contraste absoluto** e **legibilidade total**, eliminando qualquer dificuldade de leitura em monitores de diferentes qualidades.
-
----
-
-## 1. Contraste de Texto (Preto no Branco)
-- **Fim do Cinza Claro**: Todos os textos importantes foram alterados de cinza para **Preto Puro (#000000)** ou **Grafite Escuro (#333333)**.
-- **Peso da Fonte**: Aumentamos o `font-weight` em títulos e valores numéricos para que a informação seja absorvida instantaneamente.
-- **Métricas**: Os números nos cards agora usam fontes extra-bold e cores escuras sobre fundos levemente acinzentados para destaque máximo.
+Este ajuste final foca em um visual **minimalista, sofisticado e compacto**, integrando a identidade visual da **Positivo Tecnologia** em todo o sistema.
 
 ---
 
-## 2. Redesenho dos Cards
-- **Bordas Definidas**: Adicionamos bordas de 2px em elementos chave para separar claramente o conteúdo do fundo.
-- **Profundidade**: Cards agora possuem sombras sutis que aumentam ao passar o mouse (`hover`), criando uma hierarquia visual clara.
-- **Avatares**: Alterados para fundo preto com letras brancas, servindo como âncoras visuais fortes em cada card.
+## 1. Identidade Visual (Positivo)
+- **Sidebar**: A logo da Positivo Tecnologia foi integrada no topo da barra lateral, sobre um fundo branco para destaque máximo, acompanhada do título do sistema em tipografia minimalista.
+- **Consistência**: O esquema de cores preto e branco da Positivo agora dita o tom de toda a interface.
 
 ---
 
-## 3. Tabelas e Listas
-- **Cabeçalhos Fortes**: Cabeçalhos de tabela agora têm fundo cinza sólido e bordas pretas, com texto em caixa alta e negrito pesado.
-- **Linhas de Dados**: Informações de técnicos e status agora usam preto puro, eliminando o efeito "apagado" da versão anterior.
-- **Barras de Progresso**: Agora possuem bordas para delimitar o espaço e preenchimento em preto sólido para visualização rápida do status.
+## 2. Estilo Minimalista e Compacto
+- **Fontes Menores**: Reduzimos o tamanho base da fonte para um visual mais "clean" e profissional, típico de sistemas corporativos modernos.
+- **Espaçamento Refinado**: Ajustamos margens e paddings para que a informação respire melhor, sem parecer "pesada" ou "grande demais".
+- **Cards Compactos**: Os cards de técnicos e KPIs foram redesenhados para serem mais elegantes e ocuparem menos espaço vertical.
 
 ---
 
-## 4. Página de Peças e Datalake
-- **Status de Origem**: Badges de "Datalake" e "Manual" agora usam cores sólidas e textos em negrito.
-- **Leitura de Códigos**: Códigos de peças agora usam fundo cinza com texto preto em negrito, facilitando a conferência técnica.
+## 3. Legibilidade e Contraste
+- **Foco no Preto e Branco**: Mantivemos o alto contraste (preto puro sobre branco), mas com linhas mais finas e bordas mais sutis.
+- **Tabelas Elegantes**: As tabelas agora usam fontes menores e cabeçalhos discretos, focando 100% na clareza dos dados.
 
 ---
 
-## 5. Arquivos Modificados (V3)
+## 4. Página de Peças (Datalake)
+- **Simplificação Total**: Removidas funções manuais desnecessárias.
+- **Coluna de Remessa**: Restaurada a coluna de Nota Fiscal (Remessa) conforme solicitado.
+- **Exportação**: Botão de exportação Excel otimizado e minimalista.
 
-1.  `app/globals.css`: Definições globais de contraste e sombras.
-2.  `app/(dashboard)/tecnicos/page.js`: Redesenho completo dos cards de técnicos.
-3.  `app/(dashboard)/pecas/page.js`: Melhoria de contraste na listagem de peças.
-4.  `components/layout/Sidebar.js`: Ajuste de contraste nos itens de navegação.
+---
+
+## 5. Arquivos Modificados (V4)
+
+1.  `components/layout/Sidebar.js`: Nova sidebar com logo da Positivo e menu minimalista.
+2.  `app/globals.css`: Ajustes globais de tipografia e estilo compacto.
+3.  `app/(dashboard)/tecnicos/page.js`: Cards e tabelas refinados.
+4.  `app/(dashboard)/pecas/page.js`: Tabela de peças simplificada com coluna de remessa.
 
 ---
 
 ## Como Aplicar
-Substitua os arquivos e você notará imediatamente que o sistema "saltará" da tela, com uma leitura extremamente confortável e profissional.
+Substitua os arquivos e certifique-se de que a logo esteja em `public/logo-positivo.png`. O sistema agora terá um visual de produto premium, limpo e extremamente funcional.
 
 ---
-**Status**: Finalizado - Otimizado para Legibilidade Máxima.
+**Status**: Finalizado - Estilo Minimalista Positivo.
