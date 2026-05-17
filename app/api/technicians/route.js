@@ -15,9 +15,10 @@ export async function GET(request) {
 
     const supabase = createServiceClient();
 
+    // Otimização: Selecionar apenas as colunas necessárias para a tabela
     let query = supabase
       .from('technicians')
-      .select('*')
+      .select('id, name, email, phone, region, active, supervisor_name, datalake_status')
       .order('name');
 
     // Filtro de Supervisor
@@ -31,7 +32,6 @@ export async function GET(request) {
     } else if (active === 'false') {
       query = query.eq('active', false);
     } else {
-      // Por padrão, se não especificado, mostra apenas ativos
       query = query.eq('active', true);
     }
 
@@ -42,7 +42,7 @@ export async function GET(request) {
     
     if (error) {
       console.error('Supabase Error:', error);
-      return NextResponse.json([], { status: 200 }); // Retorna lista vazia em vez de erro para não quebrar o front
+      return NextResponse.json([], { status: 200 });
     }
 
     return NextResponse.json(data || []);
