@@ -7,13 +7,12 @@ import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { formatDate } from '@/lib/utils';
 
-// Paleta monocromatica — tons de cinza
 const STATUS_COLORS = {
-  completed:       '#27272a',
-  in_progress:     '#52525b',
-  abandoned:       '#18181b',
-  recount_pending: '#71717a',
-  pending:         '#a1a1aa',
+  completed:       '#000000',
+  in_progress:     '#333333',
+  abandoned:       '#666666',
+  recount_pending: '#999999',
+  pending:         '#cccccc',
 };
 
 export default function DashboardPage() {
@@ -55,160 +54,127 @@ export default function DashboardPage() {
   const completionRate = kpis.total > 0 ? Math.round((kpis.completed / kpis.total) * 100) : 0;
 
   return (
-    <div style={{ padding: '1.5rem 2rem', maxWidth: '1400px' }}>
+    <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
         title="Dashboard"
-        subtitle="Visao geral do inventario ciclico de tecnicos"
+        subtitle="Visão geral do inventário cíclico de técnicos"
       />
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
 
-      <div style={{ height: '1.25rem' }} />
+      <div style={{ height: '2rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#a1a1aa', fontSize: '0.875rem' }}>
-          Carregando...
-        </div>
+        <div style={{ textAlign: 'center', padding: '5rem', color: '#000000', fontWeight: '700' }}>Carregando dados...</div>
       ) : (
         <>
-          {/* KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-            <KpiCard label="Total"        value={kpis.total || 0}        sub="inventarios no periodo" />
-            <KpiCard label="Concluidos"   value={kpis.completed || 0}    sub={`${completionRate}% de conclusao`} />
-            <KpiCard label="Em Andamento" value={kpis.in_progress || 0}  sub="em execucao agora" />
-            <KpiCard label="Abandonados"  value={kpis.abandoned || 0}    sub="requerem atencao" />
-            <KpiCard label="Recontagem"   value={kpis.recount_pending || 0} sub="pendentes de revisao" />
+          {/* KPIs - Grid Fluido */}
+          <div className="grid-fluid" style={{ marginBottom: '2rem' }}>
+            <KpiCard label="Total Inventários" value={kpis.total || 0} sub="No período selecionado" />
+            <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}% de taxa de sucesso`} />
+            <KpiCard label="Em Andamento" value={kpis.in_progress || 0} sub="Execução em tempo real" />
+            <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Requerem atenção imediata" />
           </div>
 
-          {/* Graficos */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+          {/* Gráficos e Alertas - Grid Fluido */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
             <div className="card">
-              <div className="card-title" style={{ marginBottom: '1rem' }}>Distribuicao de Status</div>
-              {pieData.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={200}>
+              <div className="section-title" style={{ marginBottom: '1.5rem' }}>Distribuição de Status</div>
+              <div style={{ height: '250px', width: '100%' }}>
+                {pieData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
+                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
                         {pieData.map((entry, i) => (
                           <Cell key={i} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip
-                        contentStyle={{
-                          background: '#ffffff',
-                          border: '1px solid #e4e4e7',
-                          borderRadius: '6px',
-                          color: '#18181b',
-                          fontSize: '0.8rem',
-                        }}
-                        formatter={(v, n) => [v, n]}
+                        contentStyle={{ background: '#ffffff', border: '1px solid #000000', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    {pieData.map((d) => (
-                      <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: '#71717a' }}>
-                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, display: 'inline-block' }} />
-                        {d.name} ({d.value})
-                      </div>
-                    ))}
+                ) : (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888888', fontWeight: '600' }}>Sem dados para exibir</div>
+                )}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
+                {pieData.map((d) => (
+                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.7rem', fontWeight: '700', color: '#000000' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '2px', background: d.color }} />
+                    {d.name.toUpperCase()}
                   </div>
-                </>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#a1a1aa', fontSize: '0.875rem' }}>
-                  Sem dados
-                </div>
-              )}
+                ))}
+              </div>
             </div>
 
             <div className="card">
-              <div className="card-title" style={{ marginBottom: '1rem' }}>Alertas Ativos</div>
-              {alerts.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#a1a1aa', fontSize: '0.875rem' }}>
-                  Nenhum alerta ativo
-                </div>
-              ) : (
-                alerts.map((a) => (
-                  <div
-                    key={a.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '0.5rem',
-                      padding: '0.625rem',
-                      background: '#fafafa',
-                      border: '1px solid #e4e4e7',
-                      borderRadius: '6px',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#52525b', marginTop: '5px', flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontSize: '0.825rem', fontWeight: '600', color: '#18181b' }}>{a.title}</div>
-                      <div style={{ fontSize: '0.72rem', color: '#71717a', marginTop: '2px' }}>{a.description}</div>
-                      <div style={{ fontSize: '0.7rem', color: '#a1a1aa', marginTop: '2px' }}>{formatDate(a.created_at)}</div>
+              <div className="section-title" style={{ marginBottom: '1.5rem' }}>Alertas Críticos</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {alerts.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#888888', fontWeight: '600' }}>Nenhum alerta ativo</div>
+                ) : (
+                  alerts.map((a) => (
+                    <div key={a.id} style={{ padding: '1rem', background: '#f9f9f9', border: '1px solid #eeeeee', borderRadius: '6px' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#000000' }}>{a.title}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#444444', marginTop: '2px', fontWeight: '500' }}>{a.description}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#888888', marginTop: '6px', fontWeight: '700' }}>{formatDate(a.created_at)}</div>
                     </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Tabela recente */}
-          <div className="card">
-            <div className="card-title" style={{ marginBottom: '1rem' }}>Atividade Recente</div>
-            {recent.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#a1a1aa', fontSize: '0.875rem' }}>
-                Nenhum inventario encontrado
-              </div>
-            ) : (
-              <div className="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Tecnico</th>
-                      <th>Regiao</th>
-                      <th>Semana</th>
-                      <th>Status</th>
-                      <th>Progresso</th>
-                      <th>Divergencias</th>
-                      <th>Inicio</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recent.map((inv) => {
+          {/* Tabela Recente - Full Width */}
+          <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+            <div style={{ padding: '1.25rem 1.5rem', background: '#f0f0f0', borderBottom: '1px solid #000000' }}>
+              <div className="section-title">Atividade Recente</div>
+            </div>
+            <div className="table-wrapper" style={{ border: 'none' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Técnico</th>
+                    <th>Região</th>
+                    <th>Semana</th>
+                    <th>Status</th>
+                    <th>Progresso</th>
+                    <th>Divergências</th>
+                    <th>Início</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recent.length === 0 ? (
+                    <tr><td colSpan={7} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
+                  ) : (
+                    recent.map((inv) => {
                       const pct = inv.total_items > 0 ? Math.round((inv.counted_items / inv.total_items) * 100) : 0;
                       return (
                         <tr key={inv.id}>
-                          <td style={{ fontWeight: '500', color: '#18181b' }}>{inv.technicians?.name}</td>
-                          <td style={{ color: '#71717a' }}>{inv.technicians?.region || '—'}</td>
-                          <td style={{ color: '#71717a' }}>{inv.week_ref || '—'}</td>
+                          <td style={{ fontWeight: '800', color: '#000000' }}>{inv.technicians?.name}</td>
+                          <td style={{ fontWeight: '600' }}>{inv.technicians?.region || '—'}</td>
+                          <td style={{ fontWeight: '600' }}>{inv.week_ref || '—'}</td>
                           <td><StatusBadge status={inv.status} /></td>
                           <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                               <div className="progress-bar" style={{ width: '80px' }}>
                                 <div className="progress-fill" style={{ width: `${pct}%` }} />
                               </div>
-                              <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{pct}%</span>
+                              <span style={{ fontSize: '0.75rem', fontWeight: '800' }}>{pct}%</span>
                             </div>
                           </td>
-                          <td>
-                            {inv.divergence_count > 0 ? (
-                              <span style={{ fontWeight: '600', color: '#27272a' }}>{inv.divergence_count}</span>
-                            ) : (
-                              <span style={{ color: '#a1a1aa' }}>0</span>
-                            )}
+                          <td style={{ fontWeight: '900', color: inv.divergence_count > 0 ? '#000000' : '#888888' }}>
+                            {inv.divergence_count}
                           </td>
-                          <td style={{ color: '#71717a', fontSize: '0.8rem' }}>
-                            {formatDate(inv.started_at || inv.created_at)}
-                          </td>
+                          <td style={{ fontSize: '0.75rem', fontWeight: '600' }}>{formatDate(inv.started_at || inv.created_at)}</td>
                         </tr>
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}
@@ -218,10 +184,10 @@ export default function DashboardPage() {
 
 function KpiCard({ label, value, sub }) {
   return (
-    <div className="kpi-card">
-      <div className="kpi-label">{label}</div>
-      <div className="kpi-value">{value}</div>
-      {sub && <div className="kpi-sub">{sub}</div>}
+    <div className="card" style={{ border: '1px solid #000000', background: '#ffffff' }}>
+      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#333333', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{label}</div>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000', lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: '0.75rem', color: '#666666', fontWeight: '600', marginTop: '0.5rem' }}>{sub}</div>}
     </div>
   );
 }

@@ -45,62 +45,60 @@ function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
   };
 
   return (
-    <div className="overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-head">
-          <span className="modal-title">Editar Técnico</span>
-          <button className="close-btn" onClick={onClose}>✕</button>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
+      <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #eeeeee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#000000' }}>Editar Técnico</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#888888' }}>✕</button>
         </div>
-        <form onSubmit={submit} className="modal-body">
-          {error && <div className="form-err">{error}</div>}
+        <form onSubmit={submit} style={{ padding: '1.5rem' }}>
+          {error && <div style={{ padding: '0.75rem', background: '#ffebee', color: '#b71c1c', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '700' }}>{error}</div>}
 
-          <div className="row2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Nome completo *">
-              <input name="name" value={form.name} onChange={set} required className="inp" />
+              <input name="name" value={form.name} onChange={set} required className="input" />
             </Field>
             <Field label="E-mail">
-              <input name="email" type="email" value={form.email} onChange={set} className="inp" placeholder="email@positivo.com.br" />
+              <input name="email" type="email" value={form.email} onChange={set} className="input" placeholder="email@positivo.com.br" />
             </Field>
           </div>
-          <div className="row2">
-            <Field label="Telefone (WhatsApp)" hint="Formato: 55 + DDD + número">
-              <input name="phone" value={form.phone} onChange={set} className="inp" placeholder="5541999999999" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <Field label="Telefone (WhatsApp)">
+              <input name="phone" value={form.phone} onChange={set} className="input" placeholder="5541999999999" />
             </Field>
             <Field label="Estado">
-              <select name="region" value={form.region} onChange={set} className="inp">
+              <select name="region" value={form.region} onChange={set} className="input">
                 <option value="">Selecione</option>
                 {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
               </select>
             </Field>
           </div>
 
-          {isAdmin && (
-            <>
-              <Field label="Supervisor">
-                <input name="supervisor_name" value={form.supervisor_name} onChange={set} className="inp" placeholder="Nome do supervisor" />
-              </Field>
+          <Field label="Supervisor">
+            <input name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" placeholder="Nome do supervisor" />
+          </Field>
 
-              <div className="divider"><span>Vínculo Databricks</span></div>
+          <div style={{ margin: '1.5rem 0 1rem', borderBottom: '1px solid #eeeeee', position: 'relative' }}>
+            <span style={{ position: 'absolute', top: '-10px', left: '10px', background: '#ffffff', padding: '0 10px', fontSize: '0.65rem', fontWeight: '800', color: '#888888', textTransform: 'uppercase' }}>Vínculo Databricks</span>
+          </div>
 
-              <div className="row2">
-                <Field label="Nome no Databricks">
-                  <input name="databricks_name" value={form.databricks_name} onChange={set} className="inp" placeholder="Nome exato no Data Lake" />
-                </Field>
-                <Field label="ID no Databricks">
-                  <input name="databricks_id" type="number" value={form.databricks_id} onChange={set} className="inp" placeholder="Ex: 17338" />
-                </Field>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <Field label="Nome no Databricks">
+              <input name="databricks_name" value={form.databricks_name} onChange={set} className="input" placeholder="Nome exato no Data Lake" />
+            </Field>
+            <Field label="ID no Databricks">
+              <input name="databricks_id" type="number" value={form.databricks_id} onChange={set} className="input" placeholder="Ex: 17338" />
+            </Field>
+          </div>
 
-              <label className="check-label">
-                <input name="active" type="checkbox" checked={form.active} onChange={set} className="chk" />
-                Técnico ativo
-              </label>
-            </>
-          )}
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', marginTop: '1rem' }}>
+            <input name="active" type="checkbox" checked={form.active} onChange={set} />
+            Técnico ativo
+          </label>
 
-          <div className="modal-foot">
-            <button type="button" className="btn-sec" onClick={onClose} disabled={saving}>Cancelar</button>
-            <button type="submit" className="btn-pri" disabled={saving}>
+          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Salvando...' : 'Salvar alterações'}
             </button>
           </div>
@@ -110,44 +108,59 @@ function ModalEdicao({ tecnico, onClose, onSaved, isAdmin }) {
   );
 }
 
-/* ─── Modal Confirmar Exclusão ────────────────────────────── */
-function ModalDelete({ tecnico, onClose, onConfirm, loading }) {
+/* ─── Modal Edição em Massa ──────────────────────────────── */
+function ModalMassa({ selecionados, onClose, onSaved }) {
+  const [supervisor, setSupervisor] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!supervisor) return;
+    setSaving(true);
+    try {
+      // Atualiza um por um (simulando massa para simplificar a API atual)
+      const promises = selecionados.map(id => 
+        fetch(`/api/technicians/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ supervisor_name: supervisor }),
+        })
+      );
+      await Promise.all(promises);
+      onSaved();
+    } catch (err) { alert('Erro ao atualizar em massa'); }
+    finally { setSaving(false); }
+  };
+
   return (
-    <div className="overlay" onClick={onClose}>
-      <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
-        <div className="modal-head">
-          <span className="modal-title">Excluir técnico</span>
-          <button className="close-btn" onClick={onClose}>✕</button>
-        </div>
-        <div className="modal-body" style={{ color: '#a1a1aa', fontSize: '0.875rem', lineHeight: 1.6 }}>
-          <p>Tem certeza que deseja excluir <strong style={{ color: '#f4f4f5' }}>{tecnico?.name}</strong>?</p>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#52525b' }}>
-            Se o técnico possuir inventários vinculados, ele será <strong>inativado</strong> em vez de excluído para preservar o histórico.
-          </p>
-        </div>
-        <div className="modal-foot">
-          <button className="btn-sec" onClick={onClose} disabled={loading}>Cancelar</button>
-          <button className="btn-del" onClick={onConfirm} disabled={loading}>
-            {loading ? 'Excluindo...' : 'Confirmar exclusão'}
-          </button>
-        </div>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
+      <div style={{ background: '#ffffff', width: '100%', maxWidth: '400px', borderRadius: '8px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #eeeeee', fontWeight: '800' }}>Editar {selecionados.length} Técnicos</div>
+        <form onSubmit={submit} style={{ padding: '1.5rem' }}>
+          <Field label="Novo Supervisor">
+            <input value={supervisor} onChange={e => setSupervisor(e.target.value)} className="input" placeholder="Nome do novo supervisor" required />
+          </Field>
+          <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? 'Atualizando...' : 'Confirmar Alteração'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
 
-/* ─── Componente auxiliar Field ───────────────────────────── */
-function Field({ label, hint, children }) {
+function Field({ label, children }) {
   return (
-    <div className="field">
-      <label className="field-label">{label}</label>
+    <div style={{ marginBottom: '0.75rem' }}>
+      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#333333', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
       {children}
-      {hint && <span className="field-hint">{hint}</span>}
     </div>
   );
 }
 
-/* ─── Página principal ────────────────────────────────────── */
 export default function CadastroTecnicosPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin';
@@ -158,13 +171,9 @@ export default function CadastroTecnicosPage() {
   const [regionFlt,     setRegionFlt]     = useState('');
   const [showInactive,  setShowInactive]  = useState(false);
   const [editando,      setEditando]      = useState(null);
-  const [deletando,     setDeletando]     = useState(null);
-  const [delLoading,    setDelLoading]    = useState(false);
-  const [dbCheck,       setDbCheck]       = useState({});
-  const [dbLoading,     setDbLoading]     = useState({});
-  const [toast,         setToast]         = useState('');
-
-  const notify = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
+  const [selecionados,  setSelecionados]  = useState([]);
+  const [showMassa,     setShowMassa]     = useState(false);
+  const [dbStatus,      setDbStatus]      = useState({});
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -176,161 +185,121 @@ export default function CadastroTecnicosPage() {
     const data = await res.json();
     setTecnicos(Array.isArray(data) ? data : []);
     setLoading(false);
+    
+    // Validação automática com Databricks
+    if (Array.isArray(data)) {
+      data.forEach(t => {
+        if (t.databricks_name) checkDb(t.id);
+      });
+    }
   }, [search, regionFlt, showInactive]);
 
   useEffect(() => { load(); }, [load]);
 
-  const onSaved = (updated) => {
-    setTecnicos(prev => prev.map(t => t.id === updated.id ? updated : t));
-    setEditando(null);
-    notify('Técnico atualizado com sucesso.');
-  };
-
-  const onDelete = async () => {
-    if (!deletando) return;
-    setDelLoading(true);
+  const checkDb = async (id) => {
     try {
-      const res  = await fetch(`/api/technicians/${deletando.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/technicians/${id}/sync-items`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao excluir');
-      if (data._inactivated) {
-        setTecnicos(prev => prev.map(t => t.id === deletando.id ? { ...t, active: false } : t));
-        notify('Técnico inativado (possui inventários vinculados).');
-      } else {
-        setTecnicos(prev => prev.filter(t => t.id !== deletando.id));
-        notify('Técnico excluído com sucesso.');
-      }
-      setDeletando(null);
-    } catch (err) { notify(`Erro: ${err.message}`); }
-    finally { setDelLoading(false); }
-  };
-
-  const checkDb = async (t) => {
-    setDbLoading(prev => ({ ...prev, [t.id]: true }));
-    try {
-      const res  = await fetch(`/api/technicians/${t.id}/sync-items`);
-      const data = await res.json();
-      setDbCheck(prev => ({ ...prev, [t.id]: data }));
+      setDbStatus(prev => ({ ...prev, [id]: data.found_in_databricks ? 'OK' : 'NOT_OK' }));
     } catch {
-      setDbCheck(prev => ({ ...prev, [t.id]: { error: 'Falha' } }));
+      setDbStatus(prev => ({ ...prev, [id]: 'ERROR' }));
     }
-    setDbLoading(prev => ({ ...prev, [t.id]: false }));
+  };
+
+  const toggleSelect = (id) => {
+    setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const regioes = [...new Set(tecnicos.map(t => t.region).filter(Boolean))].sort();
 
-  const formatPhone = (p) => {
-    if (!p) return '—';
-    const d = p.replace(/\D/g, '');
-    if (d.length === 13) return `+${d.slice(0,2)} (${d.slice(2,4)}) ${d.slice(4,9)}-${d.slice(9)}`;
-    if (d.length === 12) return `+${d.slice(0,2)} (${d.slice(2,4)}) ${d.slice(4,8)}-${d.slice(8)}`;
-    return p;
-  };
-
   return (
-    <div className="pg">
+    <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
         title="Cadastro de Técnicos"
-        subtitle={isAdmin
-          ? `${tecnicos.length} técnico${tecnicos.length !== 1 ? 's' : ''} encontrado${tecnicos.length !== 1 ? 's' : ''}`
-          : `Seus técnicos — ${tecnicos.length} encontrado${tecnicos.length !== 1 ? 's' : ''}`}
+        subtitle="Gerenciamento e validação de técnicos com o Datalake"
+        actions={
+          selecionados.length > 0 && (
+            <button className="btn btn-primary" onClick={() => setShowMassa(true)}>
+              Editar {selecionados.length} em Massa
+            </button>
+          )
+        }
       />
 
-      {/* Filtros */}
-      <div className="filters">
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <input
           type="text"
           placeholder="Buscar por nome..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="inp-filter"
-          style={{ flex: 2 }}
+          className="input"
+          style={{ flex: 1 }}
         />
-        <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="inp-filter">
+        <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={{ width: '200px' }}>
           <option value="">Todos os estados</option>
           {regioes.map(r => <option key={r} value={r}>{r}</option>)}
         </select>
-        {isAdmin && (
-          <label className="chk-label">
-            <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
-            Mostrar inativos
-          </label>
-        )}
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: '700', whiteSpace: 'nowrap' }}>
+          <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
+          Mostrar inativos
+        </label>
       </div>
 
-      {/* Conteúdo */}
-      {loading ? (
-        <div className="empty">Carregando técnicos...</div>
-      ) : tecnicos.length === 0 ? (
-        <div className="empty">
-          <p>Nenhum técnico encontrado.</p>
-          {!isAdmin && <p className="empty-sub">Você visualiza apenas os técnicos vinculados ao seu perfil de supervisor.</p>}
-        </div>
-      ) : (
-        <div className="tbl-wrap">
-          <table className="tbl">
+      <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+        <div className="table-wrapper" style={{ border: 'none' }}>
+          <table>
             <thead>
               <tr>
+                <th style={{ width: '40px' }}>
+                  <input type="checkbox" onChange={e => setSelecionados(e.target.checked ? tecnicos.map(t => t.id) : [])} checked={selecionados.length === tecnicos.length && tecnicos.length > 0} />
+                </th>
                 <th>Nome</th>
                 <th>UF</th>
                 <th>Telefone</th>
                 <th>E-mail</th>
-                {isAdmin && <th>Supervisor</th>}
-                <th>Databricks</th>
+                <th>Supervisor</th>
+                <th>Datalake</th>
                 <th>Status</th>
-                <th className="th-right">Ações</th>
+                <th style={{ textAlign: 'right' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {tecnicos.map(t => {
-                const db = dbCheck[t.id];
-                return (
-                  <tr key={t.id} style={{ opacity: t.active ? 1 : 0.45 }}>
-                    <td className="td-name">{t.name}</td>
-                    <td><span className="tag">{t.region || '—'}</span></td>
-                    <td className="td-mono">{formatPhone(t.phone)}</td>
-                    <td className="td-muted">{t.email || '—'}</td>
-                    {isAdmin && <td className="td-muted">{t.supervisor_name || '—'}</td>}
+              {loading ? (
+                <tr><td colSpan={9} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando técnicos...</td></tr>
+              ) : tecnicos.length === 0 ? (
+                <tr><td colSpan={9} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Nenhum técnico encontrado</td></tr>
+              ) : (
+                tecnicos.map(t => (
+                  <tr key={t.id} style={{ opacity: t.active ? 1 : 0.5 }}>
+                    <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => toggleSelect(t.id)} /></td>
+                    <td style={{ fontWeight: '800', color: '#000000' }}>{t.name}</td>
+                    <td><span className="badge badge-info">{t.region || '—'}</span></td>
+                    <td style={{ fontWeight: '600' }}>{t.phone || '—'}</td>
+                    <td style={{ fontWeight: '600' }}>{t.email || '—'}</td>
+                    <td style={{ fontWeight: '700', color: '#000000' }}>{t.supervisor_name || '—'}</td>
                     <td>
-                      {db ? (
-                        db.error
-                          ? <span className="tag tag-err" title={db.error}>Erro</span>
-                          : <span className="tag tag-ok">{db.total_items ?? 0} peças</span>
-                      ) : t.databricks_name ? (
-                        <button className="btn-db" onClick={() => checkDb(t)} disabled={dbLoading[t.id]}>
-                          {dbLoading[t.id] ? '...' : 'Verificar'}
-                        </button>
-                      ) : (
-                        <span className="td-dim">Sem vínculo</span>
-                      )}
+                      {dbStatus[t.id] === 'OK' && <span className="badge badge-ok">OK</span>}
+                      {dbStatus[t.id] === 'NOT_OK' && <span className="badge badge-not-ok">NÃO OK</span>}
+                      {!dbStatus[t.id] && <span style={{ fontSize: '0.7rem', color: '#888888' }}>...</span>}
                     </td>
                     <td>
-                      <span className={`tag ${t.active ? 'tag-on' : 'tag-off'}`}>
+                      <span className={`badge ${t.active ? 'badge-success' : 'badge-info'}`}>
                         {t.active ? 'Ativo' : 'Inativo'}
                       </span>
                     </td>
-                    <td>
-                      <div className="acts">
-                        <button className="btn-edit" onClick={() => setEditando(t)}>Editar</button>
-                        {isAdmin && (
-                          <button className="btn-del-sm" onClick={() => setDeletando(t)}>Excluir</button>
-                        )}
-                      </div>
+                    <td style={{ textAlign: 'right' }}>
+                      <button className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem' }} onClick={() => setEditando(t)}>Editar</button>
                     </td>
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>
-      )}
+      </div>
 
-      {editando  && <ModalEdicao tecnico={editando} onClose={() => setEditando(null)} onSaved={onSaved} isAdmin={isAdmin} />}
-      {deletando && <ModalDelete tecnico={deletando} onClose={() => setDeletando(null)} onConfirm={onDelete} loading={delLoading} />}
-
-      {toast && <div className="toast">{toast}</div>}
-
-      
+      {editando && <ModalEdicao tecnico={editando} onClose={() => setEditando(null)} onSaved={() => { load(); setEditando(null); }} isAdmin={isAdmin} />}
+      {showMassa && <ModalMassa selecionados={selecionados} onClose={() => setShowMassa(false)} onSaved={() => { load(); setShowMassa(false); setSelecionados([]); }} />}
     </div>
   );
 }
