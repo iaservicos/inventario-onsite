@@ -151,21 +151,6 @@ export default function CadastroTecnicosPage() {
   const [editando,      setEditando]      = useState(null);
   const [selecionados,  setSelecionados]  = useState([]);
   const [showMassa,     setShowMassa]     = useState(false);
-  const [dbStatus,      setDbStatus]      = useState({});
-
-  const checkDb = useCallback(async (id) => {
-    try {
-      const res = await fetch(`/api/technicians/${id}/sync-items`);
-      if (!res.ok) {
-        setDbStatus(prev => ({ ...prev, [id]: 'NOT_OK' }));
-        return;
-      }
-      const data = await res.json();
-      setDbStatus(prev => ({ ...prev, [id]: data.found_in_databricks ? 'OK' : 'NOT_OK' }));
-    } catch {
-      setDbStatus(prev => ({ ...prev, [id]: 'NOT_OK' }));
-    }
-  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -176,20 +161,14 @@ export default function CadastroTecnicosPage() {
       if (showInactive) p.set('active', 'false');
       const res  = await fetch(`/api/technicians?${p}`);
       const data = await res.json();
-      const list = Array.isArray(data) ? data : [];
-      setTecnicos(list);
-      
-      // Dispara a verificação para todos os técnicos da lista de forma independente
-      list.forEach(t => {
-        checkDb(t.id);
-      });
+      setTecnicos(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Erro ao carregar técnicos:', err);
       setTecnicos([]);
     } finally {
       setLoading(false);
     }
-  }, [search, regionFlt, showInactive, checkDb]);
+  }, [search, regionFlt, showInactive]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -203,7 +182,7 @@ export default function CadastroTecnicosPage() {
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
         title="Cadastro de Técnicos"
-        subtitle="Gerenciamento e validação de técnicos com o Datalake"
+        subtitle="Gerenciamento de técnicos e status de sincronização com o Datalake"
         actions={
           selecionados.length > 0 && (
             <button className="btn btn-primary" onClick={() => setShowMassa(true)}>
@@ -265,9 +244,9 @@ export default function CadastroTecnicosPage() {
                     <td style={{ fontWeight: '600' }}>{t.email || '—'}</td>
                     <td style={{ fontWeight: '700', color: '#000000' }}>{t.supervisor_name || '—'}</td>
                     <td>
-                      {dbStatus[t.id] === 'OK' && <span className="badge badge-ok">OK</span>}
-                      {dbStatus[t.id] === 'NOT_OK' && <span className="badge badge-not-ok">NÃO OK</span>}
-                      {!dbStatus[t.id] && <span style={{ fontSize: '0.7rem', color: '#888888' }}>...</span>}
+                      {t.datalake_status === 'OK' && <span className="badge badge-ok">OK</span>}
+                      {t.datalake_status === 'NOT_OK' && <span className="badge badge-not-ok">NÃO OK</span>}
+                      {!t.datalake_status && <span style={{ fontSize: '0.7rem', color: '#888888' }}>Pendente</span>}
                     </td>
                     <td>
                       <span className={`badge ${t.active ? 'badge-success' : 'badge-info'}`}>
