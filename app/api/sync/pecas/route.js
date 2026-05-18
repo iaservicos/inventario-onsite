@@ -1,9 +1,9 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 4.0.0 (FULL REFRESH - Modo Blindado)
+ * VERSÃO: 5.0.0 (CLEAN & LOAD - Garantia Total)
  * 
- * Esta versão limpa as peças antigas ANTES de gravar as novas.
- * Isso resolve o problema de peças ficarem presas no status 'active=false'.
+ * Esta versão DELETA as peças antigas e INSERE as novas do zero.
+ * É a solução mais robusta para garantir que os dados ativos reflitam o Datalake.
  */
 
 import { NextResponse } from 'next/server';
@@ -32,10 +32,7 @@ export async function POST(request) {
   const batchId = `sync-${Date.now()}`;
   const syncedAt = new Date().toISOString();
 
-  // 1. Destrava logs antigos
-  await supabase.from('datalake_sync_log').update({ status: 'failed' }).eq('status', 'running');
-
-  // 2. Cria log inicial
+  // 1. Log inicial
   const { data: logRow } = await supabase.from('datalake_sync_log').insert({
     batch_id: batchId, status: 'running', started_at: syncedAt, triggered_by: triggeredBy
   }).select('id').single();
@@ -56,17 +53,20 @@ export async function POST(request) {
     const allItems = await getAllTechniciansItems(Object.keys(techMap));
     
     if (allItems.length === 0) {
-      throw new Error('Databricks retornou zero peças. Verifique os filtros.');
+      throw new Error('O Databricks não retornou nenhuma peça. Verifique os filtros no Datalake.');
     }
 
-    // C. MODO BLINDADO: Desativa TODAS as peças desses técnicos antes de começar
-    // Isso garante que só ficará ativo o que o Databricks enviar agora.
-    await supabase.from('technician_items')
-      .update({ active: false, updated_at: syncedAt })
+    // C. ESTRATÉGIA DE LIMPEZA (DELETE REAL)
+    // Removemos todas as peças atuais para garantir que não haja lixo ou status 'false' preso.
+    const { error: delError } = await supabase
+      .from('technician_items')
+      .delete()
       .in('technician_id', techIds);
 
-    // D. Prepara UPSERT em massa (Ativando as peças que vieram)
-    const upsertRows = allItems.map(item => {
+    if (delError) throw new Error(`Erro ao limpar banco: ${delError.message}`);
+
+    // D. CARGA TOTAL (INSERT)
+    const insertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
       if (!techId) return null;
       return {
@@ -75,27 +75,29 @@ export async function POST(request) {
         item_name: String(item.item_name).trim(),
         item_quantity: parseInt(item.item_quantity) || 0,
         item_num_remessa: String(item.item_num_remessa || '').trim(),
-        active: true, // Força ativo
+        active: true,
         synced_at: syncedAt, 
         sync_batch_id: batchId, 
-        updated_at: syncedAt
+        updated_at: syncedAt,
+        unit: 'un'
       };
     }).filter(Boolean);
 
-    // Salva em lotes de 500
-    for (let i = 0; i < upsertRows.length; i += 500) {
-      const chunk = upsertRows.slice(i, i + 500);
-      await supabase.from('technician_items').upsert(chunk, { onConflict: 'technician_id,item_code' });
+    // Insere em lotes de 500 para performance
+    for (let i = 0; i < insertRows.length; i += 500) {
+      const chunk = insertRows.slice(i, i + 500);
+      const { error: insError } = await supabase.from('technician_items').insert(chunk);
+      if (insError) throw new Error(`Erro ao inserir peças: ${insError.message}`);
     }
 
     // E. Finaliza log com sucesso
     await supabase.from('datalake_sync_log').update({
       status: 'success', finished_at: new Date().toISOString(),
-      technicians_total: techs.length, technicians_ok: techs.length, items_upserted: upsertRows.length
+      technicians_total: techs.length, technicians_ok: techs.length, items_upserted: insertRows.length
     }).eq('id', logRow.id);
 
     return NextResponse.json({ 
-      ok: true, status: 'success', items_upserted: upsertRows.length, batch_id: batchId 
+      ok: true, status: 'success', total_gravado: insertRows.length, batch_id: batchId 
     });
 
   } catch (err) {
