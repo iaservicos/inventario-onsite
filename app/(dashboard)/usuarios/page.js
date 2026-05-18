@@ -259,12 +259,12 @@ export default function UsuariosPage() {
                     <td style={{ fontWeight: '800', color: '#000000' }}>{u.name}</td>
                     <td style={{ fontWeight: '600' }}>{u.email}</td>
                     <td>
-                      <span className="badge badge-info" style={{ textTransform: 'uppercase' }}>
+                      <span className="badge" style={{ textTransform: 'uppercase', background: '#f4f4f5', color: '#000000', border: '1px solid #000000', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                         {ROLE_LABELS[u.role] || u.role}
                       </span>
                     </td>
                     <td>
-                      <span className={`badge ${u.active ? 'badge-ok' : 'badge-not-ok'}`}>
+                      <span className="badge" style={{ textTransform: 'uppercase', background: u.active ? '#000000' : '#ffffff', color: u.active ? '#ffffff' : '#000000', border: '1px solid #000000', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                         {u.active ? 'ATIVO' : 'INATIVO'}
                       </span>
                     </td>
@@ -272,7 +272,7 @@ export default function UsuariosPage() {
                     <td style={{ textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                       <button 
                         className="btn btn-secondary" 
-                        style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid #000000' }} 
+                        style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid #000000', background: '#ffffff', color: '#000000' }} 
                         onClick={() => setModal({ type: 'edit', data: u })}
                       >
                         EDITAR
@@ -284,8 +284,8 @@ export default function UsuariosPage() {
                             padding: '0.3rem 0.8rem', 
                             fontWeight: '800', 
                             border: '1px solid #000000',
-                            background: u.active ? '#fee2e2' : '#f4f4f5',
-                            color: u.active ? '#991b1b' : '#000000'
+                            background: '#ffffff',
+                            color: '#000000'
                           }} 
                           onClick={() => toggleActive(u)}
                         >
