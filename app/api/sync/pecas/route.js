@@ -1,9 +1,9 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 3.0.0 (SUPER TURBO - Sem limites)
+ * VERSÃO: 4.0.0 (FULL REFRESH - Modo Blindado)
  * 
- * Otimizada para garantir que o limite do Databricks não cause desativação 
- * acidental de peças no Supabase.
+ * Esta versão limpa as peças antigas ANTES de gravar as novas.
+ * Isso resolve o problema de peças ficarem presas no status 'active=false'.
  */
 
 import { NextResponse } from 'next/server';
@@ -32,18 +32,10 @@ export async function POST(request) {
   const batchId = `sync-${Date.now()}`;
   const syncedAt = new Date().toISOString();
 
-  // 1. Limpa processos antigos travados
-  const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-  await supabase.from('datalake_sync_log')
-    .update({ status: 'failed', error_message: 'Interrompido por nova execução' })
-    .eq('status', 'running')
-    .lt('started_at', tenMinAgo);
+  // 1. Destrava logs antigos
+  await supabase.from('datalake_sync_log').update({ status: 'failed' }).eq('status', 'running');
 
-  // 2. Verifica se já há um rodando
-  const { data: running } = await supabase.from('datalake_sync_log').select('id').eq('status', 'running').maybeSingle();
-  if (running) return NextResponse.json({ error: 'Sincronização em andamento' }, { status: 409 });
-
-  // 3. Cria log inicial
+  // 2. Cria log inicial
   const { data: logRow } = await supabase.from('datalake_sync_log').insert({
     batch_id: batchId, status: 'running', started_at: syncedAt, triggered_by: triggeredBy
   }).select('id').single();
@@ -54,19 +46,26 @@ export async function POST(request) {
     if (!techs?.length) throw new Error('Nenhum técnico ativo.');
 
     const techMap = {};
+    const techIds = techs.map(t => t.id);
     techs.forEach(t => {
       const name = (t.databricks_name || t.name).trim().toUpperCase();
       techMap[name] = t.id;
     });
 
-    // B. Busca TUDO no Databricks em blocos controlados (SUPER TURBO)
+    // B. Busca TUDO no Databricks (TURBO)
     const allItems = await getAllTechniciansItems(Object.keys(techMap));
     
     if (allItems.length === 0) {
-      throw new Error('Databricks não retornou nenhuma peça. Verifique os filtros ou conexão.');
+      throw new Error('Databricks retornou zero peças. Verifique os filtros.');
     }
 
-    // C. Prepara UPSERT em massa
+    // C. MODO BLINDADO: Desativa TODAS as peças desses técnicos antes de começar
+    // Isso garante que só ficará ativo o que o Databricks enviar agora.
+    await supabase.from('technician_items')
+      .update({ active: false, updated_at: syncedAt })
+      .in('technician_id', techIds);
+
+    // D. Prepara UPSERT em massa (Ativando as peças que vieram)
     const upsertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
       if (!techId) return null;
@@ -76,7 +75,10 @@ export async function POST(request) {
         item_name: String(item.item_name).trim(),
         item_quantity: parseInt(item.item_quantity) || 0,
         item_num_remessa: String(item.item_num_remessa || '').trim(),
-        active: true, synced_at: syncedAt, sync_batch_id: batchId, updated_at: syncedAt
+        active: true, // Força ativo
+        synced_at: syncedAt, 
+        sync_batch_id: batchId, 
+        updated_at: syncedAt
       };
     }).filter(Boolean);
 
@@ -86,21 +88,9 @@ export async function POST(request) {
       await supabase.from('technician_items').upsert(chunk, { onConflict: 'technician_id,item_code' });
     }
 
-    // D. Soft-delete SEGURO
-    // Só desativa peças se o Databricks realmente devolveu dados, 
-    // para evitar apagar tudo em caso de erro na consulta.
-    if (upsertRows.length > 100) { // Margem de segurança
-      await supabase.from('technician_items')
-        .update({ active: false, updated_at: syncedAt })
-        .eq('active', true)
-        .in('technician_id', techs.map(t => t.id))
-        .neq('sync_batch_id', batchId);
-    }
-
     // E. Finaliza log com sucesso
-    const finishedAt = new Date().toISOString();
     await supabase.from('datalake_sync_log').update({
-      status: 'success', finished_at: finishedAt,
+      status: 'success', finished_at: new Date().toISOString(),
       technicians_total: techs.length, technicians_ok: techs.length, items_upserted: upsertRows.length
     }).eq('id', logRow.id);
 
@@ -112,7 +102,6 @@ export async function POST(request) {
     await supabase.from('datalake_sync_log').update({
       status: 'failed', finished_at: new Date().toISOString(), error_message: err.message
     }).eq('id', logRow.id);
-
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
