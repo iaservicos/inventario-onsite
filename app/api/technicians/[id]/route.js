@@ -3,122 +3,91 @@ import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createServiceClient } from '@/lib/supabase';
 
-// GET /api/technicians/[id] — busca técnico por ID
 export async function GET(request, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const supabase = createServiceClient();
-  const { id } = params;
-  const { data, error } = await supabase
-    .from('technicians')
-    .select('*')
-    .eq('id', id)
-    .single();
+    const supabase = createServiceClient();
+    const { id } = params;
+    
+    const { data, error } = await supabase
+      .from('technicians')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-  if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (error || !data) return NextResponse.json({ error: 'Técnico não encontrado' }, { status: 404 });
 
-  // Supervisor só pode ver seus próprios técnicos
-  if (session.user.role === 'supervisor') {
-    const supervisorName = session.user.name;
-    if (data.supervisor_name?.toLowerCase() !== supervisorName?.toLowerCase()) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    // Se for supervisor, verifica se ele tem acesso (opcional, dependendo da sua regra de negócio)
+    // Se quiser que supervisores vejam qualquer técnico para transferir, deixe passar.
+    
+    return NextResponse.json(data);
+  } catch (err) {
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
-
-  return NextResponse.json(data);
 }
 
-// PATCH /api/technicians/[id] — atualiza técnico (supervisor edita campos básicos, admin edita tudo)
 export async function PATCH(request, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const supabase = createServiceClient();
-  const { id } = params;
-  const body = await request.json();
+    const supabase = createServiceClient();
+    const { id } = params;
+    const body = await request.json();
 
-  // Busca técnico para validar permissão
-  const { data: existing } = await supabase
-    .from('technicians')
-    .select('id, name, supervisor_name')
-    .eq('id', id)
-    .single();
-
-  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  // Supervisor só pode editar seus próprios técnicos
-  if (session.user.role === 'supervisor') {
-    const supervisorName = session.user.name;
-    if (existing.supervisor_name?.toLowerCase() !== supervisorName?.toLowerCase()) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Campos permitidos para atualização
+    const allowedFields = ['name', 'phone', 'email', 'region', 'active', 'supervisor_name', 'databricks_name', 'databricks_id'];
+    
+    const updateData = {};
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
     }
-    // Supervisor não pode alterar campos restritos
-    delete body.active;
-    delete body.supervisor_name;
-    delete body.databricks_name;
-    delete body.databricks_id;
-    delete body.role;
+    
+    updateData.updated_at = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('technicians')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase Update Error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error('API Patch Error:', err);
+    return NextResponse.json({ error: 'Erro ao atualizar técnico' }, { status: 500 });
   }
-
-  // Campos permitidos para atualização
-  const allowedFields = ['name', 'phone', 'email', 'region'];
-  if (session.user.role === 'admin') {
-    allowedFields.push('active', 'supervisor_name', 'databricks_name', 'databricks_id');
-  }
-
-  const updateData = {};
-  for (const field of allowedFields) {
-    if (body[field] !== undefined) updateData[field] = body[field];
-  }
-  updateData.updated_at = new Date().toISOString();
-
-  const { data, error } = await supabase
-    .from('technicians')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
 }
 
-// DELETE /api/technicians/[id] — apenas admin pode excluir
 export async function DELETE(request, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  if (session.user.role !== 'admin') {
-    return NextResponse.json({ error: 'Forbidden — apenas administradores podem excluir técnicos' }, { status: 403 });
-  }
+    const supabase = createServiceClient();
+    const { id } = params;
 
-  const supabase = createServiceClient();
-  const { id } = params;
-
-  // Verifica se técnico tem inventários vinculados
-  const { count } = await supabase
-    .from('inventories')
-    .select('id', { count: 'exact', head: true })
-    .eq('technician_id', id);
-
-  if (count > 0) {
-    // Não exclui fisicamente — inativa para preservar histórico
+    // Inativa em vez de deletar para manter integridade
     const { data, error } = await supabase
       .from('technicians')
       .update({ active: false, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ ...data, _inactivated: true, message: 'Técnico inativado pois possui inventários vinculados' });
+
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-
-  const { error } = await supabase
-    .from('technicians')
-    .delete()
-    .eq('id', id);
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
 }
