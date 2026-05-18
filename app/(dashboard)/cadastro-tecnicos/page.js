@@ -10,7 +10,7 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Cadastro/Edição ───────────────────────────── */
-function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
+function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
   const [form, setForm] = useState({
     name:            tecnico?.name            || '',
     email:           tecnico?.email           || '',
@@ -21,6 +21,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
+  const [newSupervisor, setNewSupervisor] = useState(false);
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
@@ -48,16 +49,14 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' }} onClick={e => e.stopPropagation()}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
-          <span style={{ fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>
-            {tecnico ? 'Editar Técnico' : 'Novo Cadastro de Técnico'}
-          </span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' }}>✕</button>
+    <div style={modalOverlayStyle} onClick={onClose}>
+      <div style={modalContentStyle} onClick={e => e.stopPropagation()}>
+        <div style={modalHeaderStyle}>
+          <span style={modalTitleStyle}>{tecnico ? 'Editar Técnico' : 'Novo Cadastro de Técnico'}</span>
+          <button onClick={onClose} style={closeBtnStyle}>✕</button>
         </div>
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
-          {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
+          {error && <div style={errorStyle}>{error}</div>}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Nome completo *">
@@ -81,15 +80,34 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Supervisor">
-              <input 
-                name="supervisor_name" 
-                value={form.supervisor_name} 
-                onChange={set} 
-                className="input" 
-                placeholder="Nome do supervisor" 
-                style={inputStyle}
-                disabled={!isAdmin} 
-              />
+              {!newSupervisor ? (
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select 
+                    name="supervisor_name" 
+                    value={form.supervisor_name} 
+                    onChange={set} 
+                    className="input" 
+                    style={inputStyle}
+                    disabled={!isAdmin}
+                  >
+                    <option value="">Selecione Supervisor</option>
+                    {supervisores.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  {isAdmin && <button type="button" onClick={() => setNewSupervisor(true)} style={miniBtnStyle}>NOVO</button>}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input 
+                    name="supervisor_name" 
+                    value={form.supervisor_name} 
+                    onChange={set} 
+                    className="input" 
+                    placeholder="Nome do novo supervisor" 
+                    style={inputStyle}
+                  />
+                  <button type="button" onClick={() => setNewSupervisor(false)} style={miniBtnStyle}>LISTA</button>
+                </div>
+              )}
             </Field>
             <Field label="Status do Técnico">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}>
@@ -109,9 +127,100 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
           </div>
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving}>CANCELAR</button>
             <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
-              {saving ? 'PROCESSANDO...' : tecnico ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR TÉCNICO'}
+              {saving ? 'PROCESSANDO...' : 'CONFIRMAR'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Modal Edição em Massa ──────────────────────────────── */
+function ModalMassa({ selecionados, onClose, onSaved, supervisores }) {
+  const [form, setForm] = useState({
+    supervisor_name: '',
+    active: 'keep', // 'keep', 'true', 'false'
+  });
+  const [saving, setSaving] = useState(false);
+  const [newSupervisor, setNewSupervisor] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const updateData = {};
+      if (form.supervisor_name) updateData.supervisor_name = form.supervisor_name;
+      if (form.active !== 'keep') updateData.active = form.active === 'true';
+
+      const promises = selecionados.map(id => 
+        fetch(`/api/technicians/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData),
+        })
+      );
+      await Promise.all(promises);
+      onSaved();
+    } catch (err) { alert('Erro ao atualizar em massa'); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div style={modalOverlayStyle} onClick={onClose}>
+      <div style={{ ...modalContentStyle, maxWidth: '450px' }} onClick={e => e.stopPropagation()}>
+        <div style={modalHeaderStyle}>
+          <span style={modalTitleStyle}>Editar {selecionados.length} Técnicos</span>
+          <button onClick={onClose} style={closeBtnStyle}>✕</button>
+        </div>
+        <form onSubmit={submit} style={{ padding: '1.5rem' }}>
+          <Field label="Alterar Supervisor">
+            {!newSupervisor ? (
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <select 
+                  value={form.supervisor_name} 
+                  onChange={e => setForm({...form, supervisor_name: e.target.value})} 
+                  className="input" 
+                  style={inputStyle}
+                >
+                  <option value="">Manter Atual</option>
+                  {supervisores.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <button type="button" onClick={() => setNewSupervisor(true)} style={miniBtnStyle}>NOVO</button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input 
+                  value={form.supervisor_name} 
+                  onChange={e => setForm({...form, supervisor_name: e.target.value})} 
+                  className="input" 
+                  placeholder="Nome do novo supervisor" 
+                  style={inputStyle}
+                />
+                <button type="button" onClick={() => setNewSupervisor(false)} style={miniBtnStyle}>LISTA</button>
+              </div>
+            )}
+          </Field>
+
+          <Field label="Alterar Status">
+            <select 
+              value={form.active} 
+              onChange={e => setForm({...form, active: e.target.value})} 
+              className="input" 
+              style={inputStyle}
+            >
+              <option value="keep">Manter Atual</option>
+              <option value="true">Ativar Todos</option>
+              <option value="false">Inativar Todos</option>
+            </select>
+          </Field>
+
+          <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>CANCELAR</button>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
+              {saving ? 'ATUALIZANDO...' : 'CONFIRMAR ALTERAÇÃO'}
             </button>
           </div>
         </form>
@@ -129,8 +238,6 @@ function Field({ label, children }) {
   );
 }
 
-const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeight: '600' };
-
 export default function CadastroTecnicosPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin';
@@ -141,7 +248,8 @@ export default function CadastroTecnicosPage() {
   const [regionFlt,     setRegionFlt]     = useState('');
   const [supervisorFlt, setSupervisorFlt] = useState('');
   const [showInactive,  setShowInactive]  = useState(false);
-  const [modal,         setModal]         = useState(null); // { type: 'edit'|'new', data: null|tecnico }
+  const [modal,         setModal]         = useState(null); 
+  const [showMassa,     setShowMassa]     = useState(false);
   const [selecionados,  setSelecionados]  = useState([]);
 
   const load = useCallback(async () => {
@@ -172,7 +280,6 @@ export default function CadastroTecnicosPage() {
   const regioes = [...new Set(tecnicos.map(t => t.region).filter(Boolean))].sort();
   const supervisores = [...new Set(tecnicos.map(t => t.supervisor_name).filter(Boolean))].sort();
 
-  // Filtro local por supervisor
   const filteredTecnicos = tecnicos.filter(t => {
     if (supervisorFlt && t.supervisor_name !== supervisorFlt) return false;
     return true;
@@ -186,7 +293,7 @@ export default function CadastroTecnicosPage() {
         actions={
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             {selecionados.length > 0 && isAdmin && (
-              <button className="btn btn-secondary" style={{ border: '1px solid #000000', fontWeight: '800' }}>
+              <button className="btn btn-secondary" onClick={() => setShowMassa(true)} style={{ border: '2px solid #000000', fontWeight: '900' }}>
                 EDITAR {selecionados.length} EM MASSA
               </button>
             )}
@@ -224,7 +331,7 @@ export default function CadastroTecnicosPage() {
           </select>
         </div>
         <div style={{ paddingTop: '1.2rem' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: '800', whiteSpace: 'nowrap', cursor: 'pointer' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: '900', whiteSpace: 'nowrap', cursor: 'pointer' }}>
             <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
             MOSTRAR INATIVOS
           </label>
@@ -237,7 +344,11 @@ export default function CadastroTecnicosPage() {
             <thead>
               <tr style={{ background: '#f4f4f5' }}>
                 <th style={{ width: '40px' }}>
-                  <input type="checkbox" onChange={e => setSelecionados(e.target.checked ? filteredTecnicos.map(t => t.id) : [])} checked={selecionados.length === filteredTecnicos.length && filteredTecnicos.length > 0} />
+                  <input 
+                    type="checkbox" 
+                    onChange={e => setSelecionados(e.target.checked ? filteredTecnicos.map(t => t.id) : [])} 
+                    checked={selecionados.length === filteredTecnicos.length && filteredTecnicos.length > 0} 
+                  />
                 </th>
                 <th>Nome</th>
                 <th>UF</th>
@@ -266,7 +377,7 @@ export default function CadastroTecnicosPage() {
                       </span>
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid #000000' }} onClick={() => setModal({ type: 'edit', data: t })}>EDITAR</button>
+                      <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontWeight: '900', border: '1px solid #000000' }} onClick={() => setModal({ type: 'edit', data: t })}>EDITAR</button>
                     </td>
                   </tr>
                 ))
@@ -280,8 +391,18 @@ export default function CadastroTecnicosPage() {
         <ModalTecnico 
           tecnico={modal.data} 
           isAdmin={isAdmin}
+          supervisores={supervisores}
           onClose={() => setModal(null)} 
           onSaved={() => { load(); setModal(null); }} 
+        />
+      )}
+
+      {showMassa && (
+        <ModalMassa 
+          selecionados={selecionados} 
+          supervisores={supervisores}
+          onClose={() => setShowMassa(false)} 
+          onSaved={() => { load(); setShowMassa(false); setSelecionados([]); }} 
         />
       )}
     </div>
@@ -289,3 +410,11 @@ export default function CadastroTecnicosPage() {
 }
 
 const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
+const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeight: '600' };
+const modalOverlayStyle = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' };
+const modalContentStyle = { background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' };
+const modalHeaderStyle = { padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' };
+const modalTitleStyle = { fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' };
+const closeBtnStyle = { background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' };
+const errorStyle = { padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' };
+const miniBtnStyle = { padding: '0.2rem 0.5rem', fontSize: '0.65rem', fontWeight: '900', background: '#f4f4f5', border: '1px solid #000000', borderRadius: '4px', cursor: 'pointer' };
