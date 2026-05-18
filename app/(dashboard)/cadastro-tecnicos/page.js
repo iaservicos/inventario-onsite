@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import PageHeader from '@/components/ui/PageHeader';
 import { toast } from 'sonner';
@@ -276,6 +276,25 @@ export default function CadastroTecnicosPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  // FILTROS DINÂMICOS: Gerar opções baseadas apenas nos técnicos que o usuário logado possui
+  const dynamicFilters = useMemo(() => {
+    const states = new Set();
+    const sups = new Set();
+    const coords = new Set();
+
+    tecnicos.forEach(t => {
+      if (t.region) states.add(t.region);
+      if (t.supervisor_name) sups.add(t.supervisor_name);
+      if (t.coordinator_name) coords.add(t.coordinator_name);
+    });
+
+    return {
+      states: Array.from(states).sort(),
+      supervisors: Array.from(sups).sort(),
+      coordinators: Array.from(coords).sort()
+    };
+  }, [tecnicos]);
+
   const filteredTecnicos = tecnicos.filter(t => {
     if (supervisorFlt && t.supervisor_name !== supervisorFlt) return false;
     if (coordinatorFlt && t.coordinator_name !== coordinatorFlt) return false;
@@ -285,11 +304,6 @@ export default function CadastroTecnicosPage() {
   if (status === 'loading') return null;
 
   const canEditAll = isAdmin || isSupervisor || isCoordinator;
-
-  // Lógica de exibição de filtros por perfil
-  const showRegionFilter = true; // Todos veem
-  const showSupervisorFilter = isAdmin || isCoordinator; // Admin e Coordenador veem
-  const showCoordinatorFilter = isAdmin; // Apenas Admin vê
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -316,17 +330,21 @@ export default function CadastroTecnicosPage() {
           <input type="text" placeholder="Nome ou e-mail..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
         </div>
         
-        {showRegionFilter && (
-          <div style={{ flex: 1 }}>
-            <label style={labelMiniStyle}>Região</label>
-            <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
-              <option value="">Todas</option>
-              {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
-            </select>
-          </div>
-        )}
+        {/* Filtro de Região (Sempre visível, mas agora dinâmico para Sup/Coord) */}
+        <div style={{ flex: 1 }}>
+          <label style={labelMiniStyle}>Região</label>
+          <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
+            <option value="">Todas</option>
+            {isAdmin ? (
+              ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)
+            ) : (
+              dynamicFilters.states.map(e => <option key={e} value={e}>{e}</option>)
+            )}
+          </select>
+        </div>
 
-        {showCoordinatorFilter && (
+        {/* Filtro de Coordenador (Apenas para Admin) */}
+        {isAdmin && (
           <div style={{ flex: 1 }}>
             <label style={labelMiniStyle}>Coordenador</label>
             <select value={coordinatorFlt} onChange={e => setCoordinatorFlt(e.target.value)} className="input" style={inputStyle}>
@@ -336,12 +354,17 @@ export default function CadastroTecnicosPage() {
           </div>
         )}
 
-        {showSupervisorFilter && (
+        {/* Filtro de Supervisor (Para Admin e Coordenador) */}
+        {(isAdmin || isCoordinator) && (
           <div style={{ flex: 1 }}>
             <label style={labelMiniStyle}>Supervisor</label>
             <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
               <option value="">Todos</option>
-              {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+              {isAdmin ? (
+                supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)
+              ) : (
+                dynamicFilters.supervisors.map(name => <option key={name} value={name}>{name}</option>)
+              )}
             </select>
           </div>
         )}
