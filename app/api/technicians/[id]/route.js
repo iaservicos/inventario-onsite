@@ -3,91 +3,86 @@ import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createServiceClient } from '@/lib/supabase';
 
-export async function GET(request, { params }) {
+export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search') || '';
+    const region = searchParams.get('region') || '';
+    const active = searchParams.get('active');
+
     const supabase = createServiceClient();
-    const { id } = params;
-    
-    const { data, error } = await supabase
+
+    let query = supabase
       .from('technicians')
       .select('*')
-      .eq('id', id)
-      .single();
+      .order('name');
 
-    if (error || !data) return NextResponse.json({ error: 'Técnico não encontrado' }, { status: 404 });
+    // Filtro de Supervisor (Apenas se não for admin)
+    if (session.user.role === 'supervisor') {
+      query = query.ilike('supervisor_name', session.user.name);
+    }
 
-    // Se for supervisor, verifica se ele tem acesso (opcional, dependendo da sua regra de negócio)
-    // Se quiser que supervisores vejam qualquer técnico para transferir, deixe passar.
+    // Filtro de Ativos/Inativos
+    if (active === 'true') {
+      query = query.eq('active', true);
+    } else if (active === 'false') {
+      query = query.eq('active', false);
+    } else {
+      query = query.eq('active', true);
+    }
+
+    if (search) query = query.ilike('name', `%${search}%`);
+    if (region) query = query.eq('region', region);
+
+    const { data, error } = await query;
     
-    return NextResponse.json(data);
+    if (error) {
+      console.error('Supabase Error:', error);
+      return NextResponse.json([], { status: 200 });
+    }
+
+    return NextResponse.json(data || []);
   } catch (err) {
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+    console.error('API Error:', err);
+    return NextResponse.json([], { status: 200 });
   }
 }
 
-export async function PATCH(request, { params }) {
+export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const supabase = createServiceClient();
-    const { id } = params;
     const body = await request.json();
-
-    // Campos permitidos para atualização
-    const allowedFields = ['name', 'phone', 'email', 'region', 'active', 'supervisor_name', 'databricks_name', 'databricks_id'];
+    const supabase = createServiceClient();
     
-    const updateData = {};
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) {
-        updateData[field] = body[field];
-      }
-    }
-    
-    updateData.updated_at = new Date().toISOString();
+    // Limpeza de dados para evitar erros de tipo no Postgres
+    const cleanData = {
+      name: body.name,
+      email: body.email || null,
+      phone: body.phone || null,
+      region: body.region || null,
+      supervisor_name: body.supervisor_name || session.user.name,
+      active: body.active !== undefined ? body.active : true
+    };
 
     const { data, error } = await supabase
       .from('technicians')
-      .update(updateData)
-      .eq('id', id)
+      .insert(cleanData)
       .select()
       .single();
 
     if (error) {
-      console.error('Supabase Update Error:', error);
+      console.error('Supabase Insert Error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, { status: 201 });
   } catch (err) {
-    console.error('API Patch Error:', err);
-    return NextResponse.json({ error: 'Erro ao atualizar técnico' }, { status: 500 });
-  }
-}
-
-export async function DELETE(request, { params }) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-    const supabase = createServiceClient();
-    const { id } = params;
-
-    // Inativa em vez de deletar para manter integridade
-    const { data, error } = await supabase
-      .from('technicians')
-      .update({ active: false, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return NextResponse.json(data);
-  } catch (err) {
+    console.error('API Post Error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
