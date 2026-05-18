@@ -24,7 +24,6 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
 
-  // Agora todos os perfis de gestão podem editar tudo
   const canEditAll = isAdmin || isSupervisor || isCoordinator;
 
   const set = (e) => {
@@ -218,7 +217,7 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coor
 function Field({ label, children }) {
   return (
     <div style={{ marginBottom: '0.75rem' }}>
-      <label style={{ block: 'block', fontSize: '0.7rem', fontWeight: '900', color: '#000000', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', color: '#000000', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
       {children}
     </div>
   );
@@ -287,6 +286,11 @@ export default function CadastroTecnicosPage() {
 
   const canEditAll = isAdmin || isSupervisor || isCoordinator;
 
+  // Lógica de exibição de filtros por perfil
+  const showRegionFilter = true; // Todos veem
+  const showSupervisorFilter = isAdmin || isCoordinator; // Admin e Coordenador veem
+  const showCoordinatorFilter = isAdmin; // Apenas Admin vê
+
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
@@ -306,32 +310,41 @@ export default function CadastroTecnicosPage() {
         }
       />
 
-      <div className="card" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '1rem', alignItems: 'flex-end', border: '1px solid #e4e4e7' }}>
-        <div>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'flex-end', border: '1px solid #e4e4e7' }}>
+        <div style={{ flex: 2 }}>
           <label style={labelMiniStyle}>Busca</label>
           <input type="text" placeholder="Nome ou e-mail..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
         </div>
-        <div>
-          <label style={labelMiniStyle}>Região</label>
-          <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todas</option>
-            {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
-          </select>
-        </div>
-        <div>
-          <label style={labelMiniStyle}>Coordenador</label>
-          <select value={coordinatorFlt} onChange={e => setCoordinatorFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todos</option>
-            {coordenadores.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-          </select>
-        </div>
-        <div>
-          <label style={labelMiniStyle}>Supervisor</label>
-          <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todos</option>
-            {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-          </select>
-        </div>
+        
+        {showRegionFilter && (
+          <div style={{ flex: 1 }}>
+            <label style={labelMiniStyle}>Região</label>
+            <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
+              <option value="">Todas</option>
+              {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
+            </select>
+          </div>
+        )}
+
+        {showCoordinatorFilter && (
+          <div style={{ flex: 1 }}>
+            <label style={labelMiniStyle}>Coordenador</label>
+            <select value={coordinatorFlt} onChange={e => setCoordinatorFlt(e.target.value)} className="input" style={inputStyle}>
+              <option value="">Todos</option>
+              {coordenadores.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+            </select>
+          </div>
+        )}
+
+        {showSupervisorFilter && (
+          <div style={{ flex: 1 }}>
+            <label style={labelMiniStyle}>Supervisor</label>
+            <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
+              <option value="">Todos</option>
+              {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid #e4e4e7' }}>
@@ -343,6 +356,7 @@ export default function CadastroTecnicosPage() {
                   <input type="checkbox" onChange={(e) => setSelecionados(e.target.checked ? filteredTecnicos.map(t => t.id) : [])} checked={selecionados.length === filteredTecnicos.length && filteredTecnicos.length > 0} />
                 </th>
                 <th>Técnico</th>
+                <th>Contato</th>
                 <th>Região</th>
                 <th>Coordenador</th>
                 <th>Supervisor</th>
@@ -352,20 +366,23 @@ export default function CadastroTecnicosPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
               ) : filteredTecnicos.length === 0 ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
               ) : (
                 filteredTecnicos.map(t => (
                   <tr key={t.id}>
                     <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => setSelecionados(prev => prev.includes(t.id) ? prev.filter(i => i !== t.id) : [...prev, t.id])} /></td>
                     <td>
                       <div style={{ fontWeight: '800', color: '#000000' }}>{t.name}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#71717a' }}>{t.email}</div>
+                    </td>
+                    <td>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#000000' }}>{t.phone || '-'}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#71717a' }}>{t.email || '-'}</div>
                     </td>
                     <td><span className="badge" style={{ background: '#f4f4f5', border: '1px solid #000000', color: '#000000', fontWeight: '800' }}>{t.region || 'N/A'}</span></td>
-                    <td style={{ fontWeight: '600' }}>{t.coordinator_name || '-'}</td>
-                    <td style={{ fontWeight: '600' }}>{t.supervisor_name || '-'}</td>
+                    <td style={{ fontWeight: '600', fontSize: '0.75rem' }}>{t.coordinator_name || '-'}</td>
+                    <td style={{ fontWeight: '600', fontSize: '0.75rem' }}>{t.supervisor_name || '-'}</td>
                     <td>
                       <span className="badge" style={{ background: t.active ? '#000000' : '#ffffff', color: t.active ? '#ffffff' : '#000000', border: '1px solid #000000', fontWeight: '800' }}>
                         {t.active ? 'ATIVO' : 'INATIVO'}
