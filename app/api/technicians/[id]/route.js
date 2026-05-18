@@ -8,14 +8,9 @@ export async function GET(request, context) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const params = await context.params;
-    // O id pode ser 'all' ou um ID específico, dependendo de como a rota é chamada
-    const { id } = params;
-
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const region = searchParams.get('region') || '';
-    const active = searchParams.get('active');
 
     const supabase = createServiceClient();
 
@@ -24,41 +19,29 @@ export async function GET(request, context) {
       .select('*')
       .order('name');
 
-    /* ─── Regra de Visibilidade ─────────────────────────────── */
+    /* ─── Regra de Visibilidade por Perfil ──────────────────── */
     
-    // 1. Se for Admin ou Coordenador, vê tudo (filtros normais se aplicam)
-    // 2. Se for Supervisor:
     if (session.user.role === 'supervisor') {
-      
-      // REGRA ESPECIAL SP: 
-      // Primeiro, verificamos se o supervisor logado pertence a SP.
-      // Como a sessão não tem 'region', buscamos no banco o perfil do técnico/usuário vinculado ou 
-      // assumimos que se ele filtrar por SP e houver uma regra de negócio, ele pode ver.
-      // MELHOR ABORDAGEM: Se o supervisor tentar ver SP, permitimos se ele for de SP.
-      // Mas para simplificar conforme sua regra: "Em SP, 1 supervisor consegue ver todos de SP"
-      
+      // REGRA ESPECIAL SP: Se o filtro for SP, permite ver todos de SP. 
+      // Caso contrário, vê apenas os seus.
       if (region === 'SP') {
-        // Se o filtro for SP, não filtramos por supervisor_name, permitindo ver todos de SP
         query = query.eq('region', 'SP');
       } else {
-        // Regra padrão para outras regiões: vê apenas os seus
         query = query.ilike('supervisor_name', session.user.name);
       }
     }
 
-    /* ─── Filtros Adicionais ────────────────────────────────── */
+    /* ─── Filtros de Busca e Região ─────────────────────────── */
 
-    // Filtro de Ativos/Inativos
-    if (active === 'true') {
-      query = query.eq('active', true);
-    } else if (active === 'false') {
-      query = query.eq('active', false);
-    } else {
-      query = query.eq('active', true);
+    if (search) {
+      // Busca por nome ou e-mail
+      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
     }
 
-    if (search) query = query.ilike('name', `%${search}%`);
-    if (region && region !== 'SP') query = query.eq('region', region); // SP já foi filtrado acima se for supervisor
+    if (region && region !== 'SP') {
+      // Se não for SP (que já tratamos na regra de supervisor), aplica o filtro de região
+      query = query.eq('region', region);
+    }
 
     const { data, error } = await query;
     
@@ -114,7 +97,6 @@ export async function PATCH(request, context) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     
-    // Admin e Coordenador podem editar tudo. Supervisor pode editar se for dele OU se for de SP.
     const isAdmin = session.user.role === 'admin';
     const isCoordinator = session.user.role === 'coordinator';
 
@@ -128,10 +110,9 @@ export async function PATCH(request, context) {
     const body = await request.json();
     const supabase = createServiceClient();
 
-    // Se for supervisor, precisamos validar se ele tem permissão para editar este técnico específico
+    // Validação de Permissão para Supervisor
     if (!isAdmin && !isCoordinator) {
       const { data: tech } = await supabase.from('technicians').select('supervisor_name, region').eq('id', id).single();
-      
       const isHisTech = tech?.supervisor_name === session.user.name;
       const isSPTech = tech?.region === 'SP';
 

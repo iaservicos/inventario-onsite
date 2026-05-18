@@ -84,7 +84,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isCoordinator, super
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Supervisor">
-              {isAdmin && supervisores.length > 0 ? (
+              {(isAdmin || isCoordinator) && supervisores.length > 0 ? (
                 <select 
                   name="supervisor_name" 
                   value={form.supervisor_name} 
@@ -105,7 +105,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isCoordinator, super
                   className="input" 
                   placeholder="Nome do supervisor" 
                   style={inputStyle}
-                  disabled={!isAdmin} 
+                  disabled={!isAdmin && !isCoordinator} 
                 />
               )}
             </Field>
@@ -150,7 +150,7 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAd
   const canEditStatus = isAdmin || isCoordinator;
 
   const set = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     if (name === 'active') {
       setForm(f => ({ ...f, [name]: e.target.dataset.value === 'true' ? true : e.target.dataset.value === 'false' ? false : null }));
     } else {
@@ -163,7 +163,7 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAd
     setSaving(true); setError('');
     try {
       const updates = {};
-      if (form.supervisor_name && isAdmin) updates.supervisor_name = form.supervisor_name;
+      if (form.supervisor_name && (isAdmin || isCoordinator)) updates.supervisor_name = form.supervisor_name;
       if (form.active !== null && canEditStatus) updates.active = form.active;
 
       if (Object.keys(updates).length === 0) {
@@ -197,7 +197,7 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAd
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
           {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
 
-          {isAdmin && (
+          {(isAdmin || isCoordinator) && (
             <Field label="Novo Supervisor">
               <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle}>
                 <option value="">Não alterar</option>
@@ -244,27 +244,26 @@ function Field({ label, children }) {
 }
 
 const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeight: '600' };
+const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
 
 export default function CadastroTecnicosPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin';
   const isCoordinator = session?.user?.role === 'coordinator';
-  const isSupervisor = session?.user?.role === 'supervisor';
 
   const [tecnicos,      setTecnicos]      = useState([]);
   const [supervisores,  setSupervisores]  = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [search,        setSearch]        = useState('');
   const [regionFlt,     setRegionFlt]     = useState('');
-  const [showInactive,  setShowInactive]  = useState(false);
+  const [supervisorFlt, setSupervisorFlt] = useState('');
   const [modal,         setModal]         = useState(null);
   const [selecionados,  setSelecionados]  = useState([]);
 
+  // Carregar lista de supervisores para os filtros e modais
   useEffect(() => {
-    if (isAdmin) {
-      fetch('/api/supervisors').then(r => r.json()).then(data => setSupervisores(data || []));
-    }
-  }, [isAdmin]);
+    fetch('/api/supervisors').then(r => r.json()).then(data => setSupervisores(data || []));
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -272,7 +271,7 @@ export default function CadastroTecnicosPage() {
       const p = new URLSearchParams();
       if (search) p.set('search', search);
       if (regionFlt) p.set('region', regionFlt);
-      p.set('active', showInactive ? 'false' : 'true');
+      // Sempre buscar ativos por padrão, mas a API agora cuida disso
       
       const res = await fetch(`/api/technicians?${p}`);
       const data = await res.json();
@@ -283,7 +282,7 @@ export default function CadastroTecnicosPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, regionFlt, showInactive]);
+  }, [search, regionFlt]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -291,15 +290,11 @@ export default function CadastroTecnicosPage() {
     setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const selectByRegion = () => {
-    if (!regionFlt) {
-      toast.error('Selecione uma região no filtro primeiro!');
-      return;
-    }
-    const ids = tecnicos.filter(t => t.region === regionFlt).map(t => t.id);
-    setSelecionados(ids);
-    toast.success(`${ids.length} técnicos de ${regionFlt} selecionados!`);
-  };
+  // Filtragem local para o Supervisor (já que a API retorna todos de SP, podemos filtrar na tela se necessário)
+  const filteredTecnicos = tecnicos.filter(t => {
+    if (supervisorFlt && t.supervisor_name !== supervisorFlt) return false;
+    return true;
+  });
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -322,23 +317,22 @@ export default function CadastroTecnicosPage() {
 
       <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'flex-end', border: '1px solid #e4e4e7' }}>
         <div style={{ flex: 2 }}>
-          <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Busca</label>
-          <input type="text" placeholder="Nome, e-mail ou telefone..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
+          <label style={labelMiniStyle}>Busca por Nome/E-mail</label>
+          <input type="text" placeholder="Digite para buscar..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
         </div>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Região (Estado)</label>
+          <label style={labelMiniStyle}>Região (Estado)</label>
           <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todas</option>
+            <option value="">Todas as Regiões</option>
             {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
           </select>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="btn btn-secondary" onClick={selectByRegion} disabled={!regionFlt} style={{ border: '1px solid #000000', fontWeight: '800', fontSize: '0.75rem' }}>
-            SELECIONAR {regionFlt || 'REGIÃO'}
-          </button>
-          <button className="btn btn-secondary" onClick={() => setShowInactive(!showInactive)} style={{ border: '1px solid #000000', fontWeight: '800', fontSize: '0.75rem', background: showInactive ? '#000000' : '#ffffff', color: showInactive ? '#ffffff' : '#000000' }}>
-            {showInactive ? 'VER ATIVOS' : 'VER INATIVOS'}
-          </button>
+        <div style={{ flex: 1 }}>
+          <label style={labelMiniStyle}>Filtrar por Supervisor</label>
+          <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
+            <option value="">Todos os Supervisores</option>
+            {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+          </select>
         </div>
       </div>
 
@@ -348,7 +342,7 @@ export default function CadastroTecnicosPage() {
             <thead>
               <tr style={{ background: '#f4f4f5' }}>
                 <th style={{ width: '40px' }}>
-                  <input type="checkbox" onChange={(e) => setSelecionados(e.target.checked ? tecnicos.map(t => t.id) : [])} checked={selecionados.length === tecnicos.length && tecnicos.length > 0} />
+                  <input type="checkbox" onChange={(e) => setSelecionados(e.target.checked ? filteredTecnicos.map(t => t.id) : [])} checked={selecionados.length === filteredTecnicos.length && filteredTecnicos.length > 0} />
                 </th>
                 <th>Técnico</th>
                 <th>Região</th>
@@ -360,10 +354,10 @@ export default function CadastroTecnicosPage() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
-              ) : tecnicos.length === 0 ? (
+              ) : filteredTecnicos.length === 0 ? (
                 <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
               ) : (
-                tecnicos.map(t => (
+                filteredTecnicos.map(t => (
                   <tr key={t.id}>
                     <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => toggleSelect(t.id)} /></td>
                     <td>
