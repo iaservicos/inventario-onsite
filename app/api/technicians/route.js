@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createServiceClient } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,10 +17,10 @@ export async function GET(request) {
 
     const supabase = createServiceClient();
 
-    // Restaurando a busca completa (*) para garantir estabilidade
+    // Otimização: Selecionar apenas as colunas necessárias para a tabela e limitar o resultado
     let query = supabase
       .from('technicians')
-      .select('*')
+      .select('id, name, email, phone, region, active, supervisor_name, datalake_status')
       .order('name');
 
     // Filtro de Supervisor
@@ -32,7 +34,6 @@ export async function GET(request) {
     } else if (active === 'false') {
       query = query.eq('active', false);
     } else {
-      // Por padrão, se não especificado, mostra apenas ativos
       query = query.eq('active', true);
     }
 
@@ -46,7 +47,14 @@ export async function GET(request) {
       return NextResponse.json([], { status: 200 });
     }
 
-    return NextResponse.json(data || []);
+    // Retorna os dados com cabeçalho de cache para o navegador
+    return new NextResponse(JSON.stringify(data || []), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'private, max-age=60, stale-while-revalidate=30',
+      },
+    });
   } catch (err) {
     console.error('API Error:', err);
     return NextResponse.json([], { status: 200 });
