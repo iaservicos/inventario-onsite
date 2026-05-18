@@ -8,10 +8,21 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const data = await getAllUsers();
-    return NextResponse.json(data || []);
+    const allUsers = await getAllUsers();
+    
+    // Se não for Admin, retorna apenas o necessário para os filtros (nome, id e role)
+    // Isso evita o erro 403 e protege dados sensíveis
+    if (session.user.role !== 'admin') {
+      const simplifiedUsers = allUsers.map(u => ({
+        id: u.id,
+        name: u.name,
+        role: u.role
+      }));
+      return NextResponse.json(simplifiedUsers);
+    }
+
+    return NextResponse.json(allUsers || []);
   } catch (err) {
     console.error('API Users GET Error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -11,19 +11,18 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Cadastro/Edição ───────────────────────────── */
-function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isCoordinator, supervisores }) {
+function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores, coordenadores }) {
   const [form, setForm] = useState({
-    name:            tecnico?.name            || '',
-    email:           tecnico?.email           || '',
-    phone:           tecnico?.phone           || '',
-    region:          tecnico?.region          || '',
-    supervisor_name: tecnico?.supervisor_name || '',
-    active:          tecnico?.active !== undefined ? tecnico.active : true,
+    name:             tecnico?.name             || '',
+    email:            tecnico?.email            || '',
+    phone:            tecnico?.phone            || '',
+    region:           tecnico?.region           || '',
+    supervisor_name:  tecnico?.supervisor_name  || '',
+    coordinator_name: tecnico?.coordinator_name || '',
+    active:           tecnico?.active !== undefined ? tecnico.active : true,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
-
-  const canEditStatus = isAdmin || isCoordinator;
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
@@ -83,42 +82,24 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isCoordinator, super
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-            <Field label="Supervisor">
-              {(isAdmin || isCoordinator) && supervisores.length > 0 ? (
-                <select 
-                  name="supervisor_name" 
-                  value={form.supervisor_name} 
-                  onChange={set} 
-                  className="input" 
-                  style={inputStyle}
-                >
-                  <option value="">Selecione um supervisor</option>
-                  {supervisores.map(sup => (
-                    <option key={sup.id} value={sup.name}>{sup.name}</option>
-                  ))}
-                </select>
-              ) : (
-                <input 
-                  name="supervisor_name" 
-                  value={form.supervisor_name} 
-                  onChange={set} 
-                  className="input" 
-                  placeholder="Nome do supervisor" 
-                  style={inputStyle}
-                  disabled={!isAdmin && !isCoordinator} 
-                />
-              )}
+            <Field label="Coordenador">
+              <select name="coordinator_name" value={form.coordinator_name} onChange={set} className="input" style={inputStyle} disabled={!isAdmin}>
+                <option value="">Selecione um coordenador</option>
+                {coordenadores.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+              </select>
             </Field>
+            <Field label="Supervisor">
+              <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle} disabled={!isAdmin}>
+                <option value="">Selecione um supervisor</option>
+                {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+              </select>
+            </Field>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
             <Field label="Status do Técnico">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}>
-                <input 
-                  type="checkbox" 
-                  name="active" 
-                  checked={form.active} 
-                  onChange={set} 
-                  id="active-check"
-                  disabled={!canEditStatus}
-                />
+                <input type="checkbox" name="active" checked={form.active} onChange={set} id="active-check" disabled={!isAdmin} />
                 <label htmlFor="active-check" style={{ fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
                   {form.active ? 'TÉCNICO ATIVO' : 'TÉCNICO INATIVO'}
                 </label>
@@ -139,15 +120,14 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isCoordinator, super
 }
 
 /* ─── Modal de Edição em Massa ───────────────────────────── */
-function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAdmin, isCoordinator }) {
+function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coordenadores, isAdmin }) {
   const [form, setForm] = useState({
     supervisor_name: '',
+    coordinator_name: '',
     active: null,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-
-  const canEditStatus = isAdmin || isCoordinator;
 
   const set = (e) => {
     const { name, value } = e.target;
@@ -163,14 +143,9 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAd
     setSaving(true); setError('');
     try {
       const updates = {};
-      if (form.supervisor_name && (isAdmin || isCoordinator)) updates.supervisor_name = form.supervisor_name;
-      if (form.active !== null && canEditStatus) updates.active = form.active;
-
-      if (Object.keys(updates).length === 0) {
-        setError('Selecione pelo menos um campo para atualizar');
-        setSaving(false);
-        return;
-      }
+      if (form.supervisor_name) updates.supervisor_name = form.supervisor_name;
+      if (form.coordinator_name) updates.coordinator_name = form.coordinator_name;
+      if (form.active !== null) updates.active = form.active;
 
       const res = await fetch('/api/technicians/bulk-update', {
         method: 'PATCH',
@@ -190,37 +165,40 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAd
       <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' }} onClick={e => e.stopPropagation()}>
         <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
           <span style={{ fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>
-            Editar {selecionados.length} Técnico{selecionados.length !== 1 ? 's' : ''}
+            Editar {selecionados.length} Técnicos
           </span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' }}>✕</button>
         </div>
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
           {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
 
-          {(isAdmin || isCoordinator) && (
-            <Field label="Novo Supervisor">
-              <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle}>
-                <option value="">Não alterar</option>
-                {supervisores.map(sup => <option key={sup.id} value={sup.name}>{sup.name}</option>)}
-              </select>
-            </Field>
-          )}
+          <Field label="Novo Coordenador">
+            <select name="coordinator_name" value={form.coordinator_name} onChange={set} className="input" style={inputStyle}>
+              <option value="">Não alterar</option>
+              {coordenadores.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+            </select>
+          </Field>
 
-          {canEditStatus && (
-            <Field label="Status do Técnico">
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
-                  <input type="radio" name="active" checked={form.active === null} onChange={set} data-value="null" /> Não alterar
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
-                  <input type="radio" name="active" checked={form.active === true} onChange={set} data-value="true" /> Ativar
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
-                  <input type="radio" name="active" checked={form.active === false} onChange={set} data-value="false" /> Desativar
-                </label>
-              </div>
-            </Field>
-          )}
+          <Field label="Novo Supervisor">
+            <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle}>
+              <option value="">Não alterar</option>
+              {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+            </select>
+          </Field>
+
+          <Field label="Status do Técnico">
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                <input type="radio" name="active" checked={form.active === null} onChange={set} data-value="null" /> Não alterar
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                <input type="radio" name="active" checked={form.active === true} onChange={set} data-value="true" /> Ativar
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                <input type="radio" name="active" checked={form.active === false} onChange={set} data-value="false" /> Desativar
+              </label>
+            </div>
+          </Field>
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
@@ -247,32 +225,40 @@ const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeigh
 const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
 
 export default function CadastroTecnicosPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const isAdmin = session?.user?.role === 'admin';
-  const isCoordinator = session?.user?.role === 'coordinator';
 
   const [tecnicos,      setTecnicos]      = useState([]);
   const [supervisores,  setSupervisores]  = useState([]);
+  const [coordenadores, setCoordenadores] = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [search,        setSearch]        = useState('');
   const [regionFlt,     setRegionFlt]     = useState('');
   const [supervisorFlt, setSupervisorFlt] = useState('');
+  const [coordinatorFlt, setCoordinatorFlt] = useState('');
   const [modal,         setModal]         = useState(null);
   const [selecionados,  setSelecionados]  = useState([]);
 
-  // Carregar lista de supervisores para os filtros e modais
   useEffect(() => {
-    fetch('/api/supervisors').then(r => r.json()).then(data => setSupervisores(data || []));
-  }, []);
+    if (status === 'authenticated') {
+      fetch('/api/users')
+        .then(r => r.json())
+        .then(data => {
+          const users = Array.isArray(data) ? data : [];
+          setSupervisores(users.filter(u => u.role === 'supervisor'));
+          setCoordenadores(users.filter(u => u.role === 'coordinator'));
+        })
+        .catch(err => console.error('Erro ao carregar usuários:', err));
+    }
+  }, [status]);
 
   const load = useCallback(async () => {
+    if (status !== 'authenticated') return;
     setLoading(true);
     try {
       const p = new URLSearchParams();
       if (search) p.set('search', search);
       if (regionFlt) p.set('region', regionFlt);
-      // Sempre buscar ativos por padrão, mas a API agora cuida disso
-      
       const res = await fetch(`/api/technicians?${p}`);
       const data = await res.json();
       setTecnicos(Array.isArray(data) ? data : []);
@@ -282,19 +268,17 @@ export default function CadastroTecnicosPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, regionFlt]);
+  }, [search, regionFlt, status]);
 
   useEffect(() => { load(); }, [load]);
 
-  const toggleSelect = (id) => {
-    setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
-
-  // Filtragem local para o Supervisor (já que a API retorna todos de SP, podemos filtrar na tela se necessário)
   const filteredTecnicos = tecnicos.filter(t => {
     if (supervisorFlt && t.supervisor_name !== supervisorFlt) return false;
+    if (coordinatorFlt && t.coordinator_name !== coordinatorFlt) return false;
     return true;
   });
+
+  if (status === 'loading') return null;
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -303,7 +287,7 @@ export default function CadastroTecnicosPage() {
         subtitle="Gerenciamento da base de técnicos e controle de acesso"
         actions={
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            {selecionados.length > 0 && (isAdmin || isCoordinator) && (
+            {selecionados.length > 0 && isAdmin && (
               <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk', data: null })} style={{ border: '2px solid #000000', fontWeight: '900' }}>
                 EDITAR {selecionados.length} SELECIONADOS
               </button>
@@ -315,22 +299,29 @@ export default function CadastroTecnicosPage() {
         }
       />
 
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'flex-end', border: '1px solid #e4e4e7' }}>
-        <div style={{ flex: 2 }}>
-          <label style={labelMiniStyle}>Busca por Nome/E-mail</label>
-          <input type="text" placeholder="Digite para buscar..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
+      <div className="card" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '1rem', alignItems: 'flex-end', border: '1px solid #e4e4e7' }}>
+        <div>
+          <label style={labelMiniStyle}>Busca</label>
+          <input type="text" placeholder="Nome ou e-mail..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
         </div>
-        <div style={{ flex: 1 }}>
-          <label style={labelMiniStyle}>Região (Estado)</label>
+        <div>
+          <label style={labelMiniStyle}>Região</label>
           <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todas as Regiões</option>
+            <option value="">Todas</option>
             {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
           </select>
         </div>
-        <div style={{ flex: 1 }}>
-          <label style={labelMiniStyle}>Filtrar por Supervisor</label>
+        <div>
+          <label style={labelMiniStyle}>Coordenador</label>
+          <select value={coordinatorFlt} onChange={e => setCoordinatorFlt(e.target.value)} className="input" style={inputStyle}>
+            <option value="">Todos</option>
+            {coordenadores.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={labelMiniStyle}>Supervisor</label>
           <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todos os Supervisores</option>
+            <option value="">Todos</option>
             {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
           </select>
         </div>
@@ -346,6 +337,7 @@ export default function CadastroTecnicosPage() {
                 </th>
                 <th>Técnico</th>
                 <th>Região</th>
+                <th>Coordenador</th>
                 <th>Supervisor</th>
                 <th>Status</th>
                 <th style={{ textAlign: 'right' }}>Ações</th>
@@ -353,18 +345,19 @@ export default function CadastroTecnicosPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
               ) : filteredTecnicos.length === 0 ? (
-                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
               ) : (
                 filteredTecnicos.map(t => (
                   <tr key={t.id}>
-                    <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => toggleSelect(t.id)} /></td>
+                    <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => setSelecionados(prev => prev.includes(t.id) ? prev.filter(i => i !== t.id) : [...prev, t.id])} /></td>
                     <td>
                       <div style={{ fontWeight: '800', color: '#000000' }}>{t.name}</div>
                       <div style={{ fontSize: '0.75rem', color: '#71717a' }}>{t.email}</div>
                     </td>
                     <td><span className="badge" style={{ background: '#f4f4f5', border: '1px solid #000000', color: '#000000', fontWeight: '800' }}>{t.region || 'N/A'}</span></td>
+                    <td style={{ fontWeight: '600' }}>{t.coordinator_name || '-'}</td>
                     <td style={{ fontWeight: '600' }}>{t.supervisor_name || '-'}</td>
                     <td>
                       <span className="badge" style={{ background: t.active ? '#000000' : '#ffffff', color: t.active ? '#ffffff' : '#000000', border: '1px solid #000000', fontWeight: '800' }}>
@@ -385,23 +378,9 @@ export default function CadastroTecnicosPage() {
       </div>
 
       {modal && modal.type === 'bulk' ? (
-        <ModalEdicaoEmMassa 
-          selecionados={selecionados} 
-          onClose={() => setModal(null)} 
-          onSaved={() => { setModal(null); setSelecionados([]); load(); }} 
-          supervisores={supervisores}
-          isAdmin={isAdmin}
-          isCoordinator={isCoordinator}
-        />
+        <ModalEdicaoEmMassa selecionados={selecionados} onClose={() => setModal(null)} onSaved={() => { setModal(null); setSelecionados([]); load(); }} supervisores={supervisores} coordenadores={coordenadores} isAdmin={isAdmin} />
       ) : modal && (
-        <ModalTecnico 
-          tecnico={modal.data} 
-          onClose={() => setModal(null)} 
-          onSaved={() => { setModal(null); load(); }} 
-          isAdmin={isAdmin}
-          isCoordinator={isCoordinator}
-          supervisores={supervisores}
-        />
+        <ModalTecnico tecnico={modal.data} onClose={() => setModal(null)} onSaved={() => { setModal(null); load(); }} isAdmin={isAdmin} supervisores={supervisores} coordenadores={coordenadores} />
       )}
     </div>
   );
