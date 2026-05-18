@@ -32,7 +32,6 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
     e.preventDefault();
     setSaving(true); setError('');
     try {
-      // Garantir que o ID existe na edição
       const url = tecnico?.id ? `/api/technicians/${tecnico.id}` : '/api/technicians';
       const method = tecnico?.id ? 'PATCH' : 'POST';
       
@@ -157,9 +156,8 @@ function ModalMassa({ selecionados, onClose, onSaved, supervisores }) {
       if (form.supervisor_name) updateData.supervisor_name = form.supervisor_name;
       if (form.active !== 'keep') updateData.active = form.active === 'true';
 
-      // Executa um por um para garantir que todos os IDs válidos sejam processados
       for (const id of selecionados) {
-        if (!id || id === 'undefined') continue;
+        if (!id) continue;
         await fetch(`/api/technicians/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -242,7 +240,7 @@ function Field({ label, children }) {
 }
 
 export default function CadastroTecnicosPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const isAdmin = session?.user?.role === 'admin';
 
   const [tecnicos,      setTecnicos]      = useState([]);
@@ -274,7 +272,9 @@ export default function CadastroTecnicosPage() {
     }
   }, [search, regionFlt, showInactive]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (status === 'authenticated') load();
+  }, [status, load]);
 
   const toggleSelect = (id) => {
     if (!id) return;
@@ -288,6 +288,10 @@ export default function CadastroTecnicosPage() {
     if (supervisorFlt && t.supervisor_name !== supervisorFlt) return false;
     return true;
   });
+
+  if (status === 'loading' || (status === 'authenticated' && loading && tecnicos.length === 0)) {
+    return <div style={{ padding: '3rem', textAlign: 'center', fontWeight: '900' }}>CARREGANDO...</div>;
+  }
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -363,9 +367,7 @@ export default function CadastroTecnicosPage() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '900' }}>CARREGANDO...</td></tr>
-              ) : filteredTecnicos.length === 0 ? (
+              {filteredTecnicos.length === 0 && !loading ? (
                 <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '900' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
               ) : (
                 filteredTecnicos.map(t => (
