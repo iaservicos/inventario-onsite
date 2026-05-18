@@ -20,6 +20,33 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
+
+// Carregar variáveis de ambiente do .env.local ou .env
+function loadEnv() {
+  const envPaths = [
+    path.join(process.cwd(), '.env.local'),
+    path.join(process.cwd(), '.env')
+  ];
+
+  for (const envPath of envPaths) {
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      content.split('\n').forEach(line => {
+        const [key, ...valueParts] = line.split('=');
+        if (key && valueParts.length > 0) {
+          const value = valueParts.join('=').trim().replace(/^["']|["']$/g, '');
+          process.env[key.trim()] = value;
+        }
+      });
+      console.log(`✅ Variáveis carregadas de: ${envPath}`);
+      return;
+    }
+  }
+}
+
+loadEnv();
 
 // Validar variáveis de ambiente
 const requiredEnvVars = [
