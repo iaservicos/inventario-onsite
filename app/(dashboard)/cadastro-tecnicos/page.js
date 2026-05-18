@@ -10,7 +10,7 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Cadastro/Edição ───────────────────────────── */
-function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
+function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
   const [form, setForm] = useState({
     name:            tecnico?.name            || '',
     email:           tecnico?.email           || '',
@@ -81,15 +81,30 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Supervisor">
-              <input 
-                name="supervisor_name" 
-                value={form.supervisor_name} 
-                onChange={set} 
-                className="input" 
-                placeholder="Nome do supervisor" 
-                style={inputStyle}
-                disabled={!isAdmin} 
-              />
+              {isAdmin && supervisores.length > 0 ? (
+                <select 
+                  name="supervisor_name" 
+                  value={form.supervisor_name} 
+                  onChange={set} 
+                  className="input" 
+                  style={inputStyle}
+                >
+                  <option value="">Selecione um supervisor</option>
+                  {supervisores.map(sup => (
+                    <option key={sup.id} value={sup.name}>{sup.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input 
+                  name="supervisor_name" 
+                  value={form.supervisor_name} 
+                  onChange={set} 
+                  className="input" 
+                  placeholder="Nome do supervisor" 
+                  style={inputStyle}
+                  disabled={!isAdmin} 
+                />
+              )}
             </Field>
             <Field label="Status do Técnico">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}>
@@ -120,6 +135,125 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin }) {
   );
 }
 
+/* ─── Modal de Edição em Massa ───────────────────────────── */
+function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores }) {
+  const [form, setForm] = useState({
+    supervisor_name: '',
+    active: null, // null significa "não alterar"
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const set = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (name === 'active') {
+      setForm(f => ({ ...f, [name]: e.target.dataset.value === 'true' ? true : e.target.dataset.value === 'false' ? false : null }));
+    } else {
+      setForm(f => ({ ...f, [name]: value }));
+    }
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setError('');
+    try {
+      const updates = {};
+      if (form.supervisor_name) updates.supervisor_name = form.supervisor_name;
+      if (form.active !== null) updates.active = form.active;
+
+      if (Object.keys(updates).length === 0) {
+        setError('Selecione pelo menos um campo para atualizar');
+        setSaving(false);
+        return;
+      }
+
+      const res = await fetch('/api/technicians/bulk-update', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selecionados, updates }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao processar');
+      onSaved(data);
+    } catch (err) { setError(err.message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
+      <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
+          <span style={{ fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>
+            Editar {selecionados.length} Técnico{selecionados.length !== 1 ? 's' : ''}
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' }}>✕</button>
+        </div>
+        <form onSubmit={submit} style={{ padding: '1.5rem' }}>
+          {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
+
+          <Field label="Novo Supervisor">
+            <select 
+              name="supervisor_name" 
+              value={form.supervisor_name} 
+              onChange={set} 
+              className="input" 
+              style={inputStyle}
+            >
+              <option value="">Não alterar</option>
+              {supervisores.map(sup => (
+                <option key={sup.id} value={sup.name}>{sup.name}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Status do Técnico">
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="active" 
+                  checked={form.active === null}
+                  onChange={set}
+                  data-value="null"
+                />
+                Não alterar
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="active" 
+                  checked={form.active === true}
+                  onChange={set}
+                  data-value="true"
+                />
+                Ativar
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="active" 
+                  checked={form.active === false}
+                  onChange={set}
+                  data-value="false"
+                />
+                Desativar
+              </label>
+            </div>
+          </Field>
+
+          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
+              {saving ? 'PROCESSANDO...' : 'ATUALIZAR EM MASSA'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function Field({ label, children }) {
   return (
     <div style={{ marginBottom: '0.75rem' }}>
@@ -136,13 +270,32 @@ export default function CadastroTecnicosPage() {
   const isAdmin = session?.user?.role === 'admin';
 
   const [tecnicos,      setTecnicos]      = useState([]);
+  const [supervisores,  setSupervisores]  = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [search,        setSearch]        = useState('');
   const [regionFlt,     setRegionFlt]     = useState('');
   const [supervisorFlt, setSupervisorFlt] = useState('');
   const [showInactive,  setShowInactive]  = useState(false);
-  const [modal,         setModal]         = useState(null); // { type: 'edit'|'new', data: null|tecnico }
+  const [modal,         setModal]         = useState(null); // { type: 'edit'|'new'|'bulk', data: null|tecnico }
   const [selecionados,  setSelecionados]  = useState([]);
+
+  // Carregar supervisores
+  useEffect(() => {
+    if (isAdmin) {
+      const loadSupervisores = async () => {
+        try {
+          const res = await fetch('/api/supervisors');
+          if (res.ok) {
+            const data = await res.json();
+            setSupervisores(data || []);
+          }
+        } catch (err) {
+          console.error('Erro ao carregar supervisores:', err);
+        }
+      };
+      loadSupervisores();
+    }
+  }, [isAdmin]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -170,7 +323,7 @@ export default function CadastroTecnicosPage() {
   };
 
   const regioes = [...new Set(tecnicos.map(t => t.region).filter(Boolean))].sort();
-  const supervisores = [...new Set(tecnicos.map(t => t.supervisor_name).filter(Boolean))].sort();
+  const supervisoresFromTable = [...new Set(tecnicos.map(t => t.supervisor_name).filter(Boolean))].sort();
 
   // Filtro local por supervisor
   const filteredTecnicos = tecnicos.filter(t => {
@@ -186,7 +339,11 @@ export default function CadastroTecnicosPage() {
         actions={
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             {selecionados.length > 0 && isAdmin && (
-              <button className="btn btn-secondary" style={{ border: '1px solid #000000', fontWeight: '800' }}>
+              <button 
+                className="btn btn-secondary" 
+                style={{ border: '1px solid #000000', fontWeight: '800' }}
+                onClick={() => setModal({ type: 'bulk', data: null })}
+              >
                 EDITAR {selecionados.length} EM MASSA
               </button>
             )}
@@ -220,7 +377,7 @@ export default function CadastroTecnicosPage() {
           <label style={labelMiniStyle}>Supervisor</label>
           <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
             <option value="">Todos os Supervisores</option>
-            {supervisores.map(s => <option key={s} value={s}>{s}</option>)}
+            {supervisoresFromTable.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div style={{ paddingTop: '1.2rem' }}>
@@ -276,12 +433,32 @@ export default function CadastroTecnicosPage() {
         </div>
       </div>
 
-      {modal && (
+      {modal?.type === 'edit' && (
         <ModalTecnico 
           tecnico={modal.data} 
           isAdmin={isAdmin}
+          supervisores={supervisores}
           onClose={() => setModal(null)} 
           onSaved={() => { load(); setModal(null); }} 
+        />
+      )}
+
+      {modal?.type === 'new' && (
+        <ModalTecnico 
+          tecnico={null} 
+          isAdmin={isAdmin}
+          supervisores={supervisores}
+          onClose={() => setModal(null)} 
+          onSaved={() => { load(); setSelecionados([]); setModal(null); }} 
+        />
+      )}
+
+      {modal?.type === 'bulk' && (
+        <ModalEdicaoEmMassa
+          selecionados={selecionados}
+          supervisores={supervisores}
+          onClose={() => setModal(null)}
+          onSaved={() => { load(); setSelecionados([]); setModal(null); }}
         />
       )}
     </div>
