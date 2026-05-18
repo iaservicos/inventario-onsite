@@ -11,7 +11,7 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Cadastro/Edição ───────────────────────────── */
-function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores, coordenadores }) {
+function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoordinator, supervisores, coordenadores }) {
   const [form, setForm] = useState({
     name:             tecnico?.name             || '',
     email:            tecnico?.email            || '',
@@ -23,6 +23,9 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores, coorde
   });
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
+
+  // Agora todos os perfis de gestão podem editar tudo
+  const canEditAll = isAdmin || isSupervisor || isCoordinator;
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
@@ -83,13 +86,13 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores, coorde
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Coordenador">
-              <select name="coordinator_name" value={form.coordinator_name} onChange={set} className="input" style={inputStyle} disabled={!isAdmin}>
+              <select name="coordinator_name" value={form.coordinator_name} onChange={set} className="input" style={inputStyle} disabled={!canEditAll}>
                 <option value="">Selecione um coordenador</option>
                 {coordenadores.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
               </select>
             </Field>
             <Field label="Supervisor">
-              <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle} disabled={!isAdmin}>
+              <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle} disabled={!canEditAll}>
                 <option value="">Selecione um supervisor</option>
                 {supervisores.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
               </select>
@@ -99,7 +102,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores, coorde
           <div style={{ marginBottom: '1rem' }}>
             <Field label="Status do Técnico">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}>
-                <input type="checkbox" name="active" checked={form.active} onChange={set} id="active-check" disabled={!isAdmin} />
+                <input type="checkbox" name="active" checked={form.active} onChange={set} id="active-check" disabled={!canEditAll} />
                 <label htmlFor="active-check" style={{ fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
                   {form.active ? 'TÉCNICO ATIVO' : 'TÉCNICO INATIVO'}
                 </label>
@@ -120,7 +123,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores, coorde
 }
 
 /* ─── Modal de Edição em Massa ───────────────────────────── */
-function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coordenadores, isAdmin }) {
+function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coordenadores, canEditAll }) {
   const [form, setForm] = useState({
     supervisor_name: '',
     coordinator_name: '',
@@ -215,7 +218,7 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coor
 function Field({ label, children }) {
   return (
     <div style={{ marginBottom: '0.75rem' }}>
-      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', color: '#000000', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
+      <label style={{ block: 'block', fontSize: '0.7rem', fontWeight: '900', color: '#000000', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
       {children}
     </div>
   );
@@ -227,6 +230,8 @@ const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900
 export default function CadastroTecnicosPage() {
   const { data: session, status } = useSession();
   const isAdmin = session?.user?.role === 'admin';
+  const isSupervisor = session?.user?.role === 'supervisor';
+  const isCoordinator = session?.user?.role === 'coordinator';
 
   const [tecnicos,      setTecnicos]      = useState([]);
   const [supervisores,  setSupervisores]  = useState([]);
@@ -280,6 +285,8 @@ export default function CadastroTecnicosPage() {
 
   if (status === 'loading') return null;
 
+  const canEditAll = isAdmin || isSupervisor || isCoordinator;
+
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
@@ -287,7 +294,7 @@ export default function CadastroTecnicosPage() {
         subtitle="Gerenciamento da base de técnicos e controle de acesso"
         actions={
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            {selecionados.length > 0 && isAdmin && (
+            {selecionados.length > 0 && canEditAll && (
               <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk', data: null })} style={{ border: '2px solid #000000', fontWeight: '900' }}>
                 EDITAR {selecionados.length} SELECIONADOS
               </button>
@@ -378,9 +385,9 @@ export default function CadastroTecnicosPage() {
       </div>
 
       {modal && modal.type === 'bulk' ? (
-        <ModalEdicaoEmMassa selecionados={selecionados} onClose={() => setModal(null)} onSaved={() => { setModal(null); setSelecionados([]); load(); }} supervisores={supervisores} coordenadores={coordenadores} isAdmin={isAdmin} />
+        <ModalEdicaoEmMassa selecionados={selecionados} onClose={() => setModal(null)} onSaved={() => { setModal(null); setSelecionados([]); load(); }} supervisores={supervisores} coordenadores={coordenadores} canEditAll={canEditAll} />
       ) : modal && (
-        <ModalTecnico tecnico={modal.data} onClose={() => setModal(null)} onSaved={() => { setModal(null); load(); }} isAdmin={isAdmin} supervisores={supervisores} coordenadores={coordenadores} />
+        <ModalTecnico tecnico={modal.data} onClose={() => setModal(null)} onSaved={() => { setModal(null); load(); }} isAdmin={isAdmin} isSupervisor={isSupervisor} isCoordinator={isCoordinator} supervisores={supervisores} coordenadores={coordenadores} />
       )}
     </div>
   );
