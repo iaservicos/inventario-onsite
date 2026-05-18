@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import PageHeader from '@/components/ui/PageHeader';
+import { toast } from 'sonner';
 
 const ESTADOS_BR = [
   'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG',
@@ -10,7 +11,7 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Cadastro/Edição ───────────────────────────── */
-function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
+function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isCoordinator, supervisores }) {
   const [form, setForm] = useState({
     name:            tecnico?.name            || '',
     email:           tecnico?.email           || '',
@@ -21,6 +22,8 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
+
+  const canEditStatus = isAdmin || isCoordinator;
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
@@ -114,7 +117,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
                   checked={form.active} 
                   onChange={set} 
                   id="active-check"
-                  disabled={!isAdmin}
+                  disabled={!canEditStatus}
                 />
                 <label htmlFor="active-check" style={{ fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
                   {form.active ? 'TÉCNICO ATIVO' : 'TÉCNICO INATIVO'}
@@ -136,16 +139,18 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, supervisores }) {
 }
 
 /* ─── Modal de Edição em Massa ───────────────────────────── */
-function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores }) {
+function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, isAdmin, isCoordinator }) {
   const [form, setForm] = useState({
     supervisor_name: '',
-    active: null, // null significa "não alterar"
+    active: null,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const canEditStatus = isAdmin || isCoordinator;
+
   const set = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     if (name === 'active') {
       setForm(f => ({ ...f, [name]: e.target.dataset.value === 'true' ? true : e.target.dataset.value === 'false' ? false : null }));
     } else {
@@ -158,8 +163,8 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores }) {
     setSaving(true); setError('');
     try {
       const updates = {};
-      if (form.supervisor_name) updates.supervisor_name = form.supervisor_name;
-      if (form.active !== null) updates.active = form.active;
+      if (form.supervisor_name && isAdmin) updates.supervisor_name = form.supervisor_name;
+      if (form.active !== null && canEditStatus) updates.active = form.active;
 
       if (Object.keys(updates).length === 0) {
         setError('Selecione pelo menos um campo para atualizar');
@@ -192,55 +197,30 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores }) {
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
           {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
 
-          <Field label="Novo Supervisor">
-            <select 
-              name="supervisor_name" 
-              value={form.supervisor_name} 
-              onChange={set} 
-              className="input" 
-              style={inputStyle}
-            >
-              <option value="">Não alterar</option>
-              {supervisores.map(sup => (
-                <option key={sup.id} value={sup.name}>{sup.name}</option>
-              ))}
-            </select>
-          </Field>
+          {isAdmin && (
+            <Field label="Novo Supervisor">
+              <select name="supervisor_name" value={form.supervisor_name} onChange={set} className="input" style={inputStyle}>
+                <option value="">Não alterar</option>
+                {supervisores.map(sup => <option key={sup.id} value={sup.name}>{sup.name}</option>)}
+              </select>
+            </Field>
+          )}
 
-          <Field label="Status do Técnico">
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="active" 
-                  checked={form.active === null}
-                  onChange={set}
-                  data-value="null"
-                />
-                Não alterar
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="active" 
-                  checked={form.active === true}
-                  onChange={set}
-                  data-value="true"
-                />
-                Ativar
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="active" 
-                  checked={form.active === false}
-                  onChange={set}
-                  data-value="false"
-                />
-                Desativar
-              </label>
-            </div>
-          </Field>
+          {canEditStatus && (
+            <Field label="Status do Técnico">
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                  <input type="radio" name="active" checked={form.active === null} onChange={set} data-value="null" /> Não alterar
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                  <input type="radio" name="active" checked={form.active === true} onChange={set} data-value="true" /> Ativar
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+                  <input type="radio" name="active" checked={form.active === false} onChange={set} data-value="false" /> Desativar
+                </label>
+              </div>
+            </Field>
+          )}
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
@@ -268,32 +248,21 @@ const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeigh
 export default function CadastroTecnicosPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin';
+  const isCoordinator = session?.user?.role === 'coordinator';
+  const isSupervisor = session?.user?.role === 'supervisor';
 
   const [tecnicos,      setTecnicos]      = useState([]);
   const [supervisores,  setSupervisores]  = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [search,        setSearch]        = useState('');
   const [regionFlt,     setRegionFlt]     = useState('');
-  const [supervisorFlt, setSupervisorFlt] = useState('');
   const [showInactive,  setShowInactive]  = useState(false);
-  const [modal,         setModal]         = useState(null); // { type: 'edit'|'new'|'bulk', data: null|tecnico }
+  const [modal,         setModal]         = useState(null);
   const [selecionados,  setSelecionados]  = useState([]);
 
-  // Carregar supervisores
   useEffect(() => {
     if (isAdmin) {
-      const loadSupervisores = async () => {
-        try {
-          const res = await fetch('/api/supervisors');
-          if (res.ok) {
-            const data = await res.json();
-            setSupervisores(data || []);
-          }
-        } catch (err) {
-          console.error('Erro ao carregar supervisores:', err);
-        }
-      };
-      loadSupervisores();
+      fetch('/api/supervisors').then(r => r.json()).then(data => setSupervisores(data || []));
     }
   }, [isAdmin]);
 
@@ -301,15 +270,15 @@ export default function CadastroTecnicosPage() {
     setLoading(true);
     try {
       const p = new URLSearchParams();
-      if (search)        p.set('search', search);
-      if (regionFlt)     p.set('region', regionFlt);
+      if (search) p.set('search', search);
+      if (regionFlt) p.set('region', regionFlt);
       p.set('active', showInactive ? 'false' : 'true');
       
-      const res  = await fetch(`/api/technicians?${p}`);
+      const res = await fetch(`/api/technicians?${p}`);
       const data = await res.json();
       setTecnicos(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Erro ao carregar técnicos:', err);
+      console.error(err);
       setTecnicos([]);
     } finally {
       setLoading(false);
@@ -322,14 +291,15 @@ export default function CadastroTecnicosPage() {
     setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const regioes = [...new Set(tecnicos.map(t => t.region).filter(Boolean))].sort();
-  const supervisoresFromTable = [...new Set(tecnicos.map(t => t.supervisor_name).filter(Boolean))].sort();
-
-  // Filtro local por supervisor
-  const filteredTecnicos = tecnicos.filter(t => {
-    if (supervisorFlt && t.supervisor_name !== supervisorFlt) return false;
-    return true;
-  });
+  const selectByRegion = () => {
+    if (!regionFlt) {
+      toast.error('Selecione uma região no filtro primeiro!');
+      return;
+    }
+    const ids = tecnicos.filter(t => t.region === regionFlt).map(t => t.id);
+    setSelecionados(ids);
+    toast.success(`${ids.length} técnicos de ${regionFlt} selecionados!`);
+  };
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -338,13 +308,9 @@ export default function CadastroTecnicosPage() {
         subtitle="Gerenciamento da base de técnicos e controle de acesso"
         actions={
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            {selecionados.length > 0 && isAdmin && (
-              <button 
-                className="btn btn-secondary" 
-                style={{ border: '1px solid #000000', fontWeight: '800' }}
-                onClick={() => setModal({ type: 'bulk', data: null })}
-              >
-                EDITAR {selecionados.length} EM MASSA
+            {selecionados.length > 0 && (isAdmin || isCoordinator) && (
+              <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk', data: null })} style={{ border: '2px solid #000000', fontWeight: '900' }}>
+                EDITAR {selecionados.length} SELECIONADOS
               </button>
             )}
             <button className="btn btn-primary" onClick={() => setModal({ type: 'new', data: null })} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
@@ -354,37 +320,25 @@ export default function CadastroTecnicosPage() {
         }
       />
 
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid #e4e4e7' }}>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'flex-end', border: '1px solid #e4e4e7' }}>
+        <div style={{ flex: 2 }}>
+          <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Busca</label>
+          <input type="text" placeholder="Nome, e-mail ou telefone..." value={search} onChange={e => setSearch(e.target.value)} className="input" style={inputStyle} />
+        </div>
         <div style={{ flex: 1 }}>
-          <label style={labelMiniStyle}>Busca</label>
-          <input
-            type="text"
-            placeholder="Nome do técnico..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="input"
-            style={inputStyle}
-          />
-        </div>
-        <div style={{ width: '180px' }}>
-          <label style={labelMiniStyle}>Estado</label>
+          <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Região (Estado)</label>
           <select value={regionFlt} onChange={e => setRegionFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todos</option>
-            {regioes.map(r => <option key={r} value={r}>{r}</option>)}
+            <option value="">Todas</option>
+            {ESTADOS_BR.map(e => <option key={e} value={e}>{e}</option>)}
           </select>
         </div>
-        <div style={{ width: '200px' }}>
-          <label style={labelMiniStyle}>Supervisor</label>
-          <select value={supervisorFlt} onChange={e => setSupervisorFlt(e.target.value)} className="input" style={inputStyle}>
-            <option value="">Todos os Supervisores</option>
-            {supervisoresFromTable.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-        <div style={{ paddingTop: '1.2rem' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: '800', whiteSpace: 'nowrap', cursor: 'pointer' }}>
-            <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
-            MOSTRAR INATIVOS
-          </label>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn btn-secondary" onClick={selectByRegion} disabled={!regionFlt} style={{ border: '1px solid #000000', fontWeight: '800', fontSize: '0.75rem' }}>
+            SELECIONAR {regionFlt || 'REGIÃO'}
+          </button>
+          <button className="btn btn-secondary" onClick={() => setShowInactive(!showInactive)} style={{ border: '1px solid #000000', fontWeight: '800', fontSize: '0.75rem', background: showInactive ? '#000000' : '#ffffff', color: showInactive ? '#ffffff' : '#000000' }}>
+            {showInactive ? 'VER ATIVOS' : 'VER INATIVOS'}
+          </button>
         </div>
       </div>
 
@@ -394,11 +348,10 @@ export default function CadastroTecnicosPage() {
             <thead>
               <tr style={{ background: '#f4f4f5' }}>
                 <th style={{ width: '40px' }}>
-                  <input type="checkbox" onChange={e => setSelecionados(e.target.checked ? filteredTecnicos.map(t => t.id) : [])} checked={selecionados.length === filteredTecnicos.length && filteredTecnicos.length > 0} />
+                  <input type="checkbox" onChange={(e) => setSelecionados(e.target.checked ? tecnicos.map(t => t.id) : [])} checked={selecionados.length === tecnicos.length && tecnicos.length > 0} />
                 </th>
-                <th>Nome</th>
-                <th>UF</th>
-                <th>Telefone</th>
+                <th>Técnico</th>
+                <th>Região</th>
                 <th>Supervisor</th>
                 <th>Status</th>
                 <th style={{ textAlign: 'right' }}>Ações</th>
@@ -406,24 +359,28 @@ export default function CadastroTecnicosPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
-              ) : filteredTecnicos.length === 0 ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
+              ) : tecnicos.length === 0 ? (
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM TÉCNICO ENCONTRADO</td></tr>
               ) : (
-                filteredTecnicos.map(t => (
-                  <tr key={t.id} style={{ opacity: t.active ? 1 : 0.6 }}>
+                tecnicos.map(t => (
+                  <tr key={t.id}>
                     <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => toggleSelect(t.id)} /></td>
-                    <td style={{ fontWeight: '800', color: '#000000' }}>{t.name}</td>
-                    <td><span className="badge badge-info">{t.region || '—'}</span></td>
-                    <td style={{ fontWeight: '600' }}>{t.phone || '—'}</td>
-                    <td style={{ fontWeight: '800', color: '#000000' }}>{t.supervisor_name || '—'}</td>
                     <td>
-                      <span className={`badge ${t.active ? 'badge-ok' : 'badge-not-ok'}`}>
+                      <div style={{ fontWeight: '800', color: '#000000' }}>{t.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#71717a' }}>{t.email}</div>
+                    </td>
+                    <td><span className="badge" style={{ background: '#f4f4f5', border: '1px solid #000000', color: '#000000', fontWeight: '800' }}>{t.region || 'N/A'}</span></td>
+                    <td style={{ fontWeight: '600' }}>{t.supervisor_name || '-'}</td>
+                    <td>
+                      <span className="badge" style={{ background: t.active ? '#000000' : '#ffffff', color: t.active ? '#ffffff' : '#000000', border: '1px solid #000000', fontWeight: '800' }}>
                         {t.active ? 'ATIVO' : 'INATIVO'}
                       </span>
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid #000000' }} onClick={() => setModal({ type: 'edit', data: t })}>EDITAR</button>
+                      <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid #000000' }} onClick={() => setModal({ type: 'edit', data: t })}>
+                        EDITAR
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -433,36 +390,25 @@ export default function CadastroTecnicosPage() {
         </div>
       </div>
 
-      {modal?.type === 'edit' && (
+      {modal && modal.type === 'bulk' ? (
+        <ModalEdicaoEmMassa 
+          selecionados={selecionados} 
+          onClose={() => setModal(null)} 
+          onSaved={() => { setModal(null); setSelecionados([]); load(); }} 
+          supervisores={supervisores}
+          isAdmin={isAdmin}
+          isCoordinator={isCoordinator}
+        />
+      ) : modal && (
         <ModalTecnico 
           tecnico={modal.data} 
-          isAdmin={isAdmin}
-          supervisores={supervisores}
           onClose={() => setModal(null)} 
-          onSaved={() => { load(); setModal(null); }} 
-        />
-      )}
-
-      {modal?.type === 'new' && (
-        <ModalTecnico 
-          tecnico={null} 
+          onSaved={() => { setModal(null); load(); }} 
           isAdmin={isAdmin}
+          isCoordinator={isCoordinator}
           supervisores={supervisores}
-          onClose={() => setModal(null)} 
-          onSaved={() => { load(); setSelecionados([]); setModal(null); }} 
-        />
-      )}
-
-      {modal?.type === 'bulk' && (
-        <ModalEdicaoEmMassa
-          selecionados={selecionados}
-          supervisores={supervisores}
-          onClose={() => setModal(null)}
-          onSaved={() => { load(); setSelecionados([]); setModal(null); }}
         />
       )}
     </div>
   );
 }
-
-const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
