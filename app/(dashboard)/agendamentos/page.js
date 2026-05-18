@@ -31,7 +31,7 @@ export default function GestaoEscalonamentoPage() {
       setOriginalData(JSON.parse(JSON.stringify(list)));
       setHasChanges(false);
     } catch (err) {
-      setMsg({ type: 'error', text: 'Erro ao carregar técnicos' });
+      setMsg({ type: 'error', text: 'ERRO AO CARREGAR DADOS' });
     }
     setLoading(false);
   }, []);
@@ -59,7 +59,6 @@ export default function GestaoEscalonamentoPage() {
       });
 
       if (changes.length === 0) {
-        setMsg({ type: 'info', text: 'Nenhuma alteração para salvar.' });
         setSaving(false);
         return;
       }
@@ -79,11 +78,11 @@ export default function GestaoEscalonamentoPage() {
       const allOk = results.every(r => r.ok);
 
       if (allOk) {
-        setMsg({ type: 'success', text: `PLANEJAMENTO DE ${changes.length} TECNICO(S) SALVO COM SUCESSO` });
+        setMsg({ type: 'success', text: `PLANEJAMENTO DE ${changes.length} TECNICO(S) ATUALIZADO` });
         setOriginalData(JSON.parse(JSON.stringify(tecnicos)));
         setHasChanges(false);
       } else {
-        setMsg({ type: 'error', text: 'ERRO AO SALVAR ALTERACOES' });
+        setMsg({ type: 'error', text: 'ERRO AO SALVAR' });
       }
     } catch (err) {
       setMsg({ type: 'error', text: 'ERRO DE CONEXAO' });
@@ -93,7 +92,7 @@ export default function GestaoEscalonamentoPage() {
   };
 
   if (status === 'loading' || loading) {
-    return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>CARREGANDO PAINEL DE GESTAO</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '800' }}>CARREGANDO...</div>;
   }
 
   const isAdmin = session?.user?.role === 'admin';
@@ -103,20 +102,21 @@ export default function GestaoEscalonamentoPage() {
       <PageHeader
         title="GESTAO DE ESCALONAMENTO"
         subtitle={isAdmin ? "PLANEJAMENTO SEMANAL DE TODOS OS TECNICOS" : `PLANEJAMENTO DOS TECNICOS SOB GESTAO DE ${session?.user?.name?.toUpperCase()}`}
-        action={
+        actions={
           <button
             onClick={handleSaveAll}
             disabled={!hasChanges || saving}
             style={{
               background: hasChanges ? '#000000' : '#f4f4f5',
               color: hasChanges ? '#ffffff' : '#a1a1aa',
-              border: hasChanges ? 'none' : '1px solid #e4e4e7',
-              fontWeight: '800',
+              border: '2px solid #000000',
+              fontWeight: '900',
               padding: '0.6rem 1.5rem',
-              borderRadius: '6px',
+              borderRadius: '4px',
               cursor: hasChanges ? 'pointer' : 'not-allowed',
-              fontSize: '0.875rem',
-              transition: 'all 0.2s ease'
+              fontSize: '0.75rem',
+              transition: 'all 0.1s ease',
+              textTransform: 'uppercase'
             }}
           >
             {saving ? 'SALVANDO...' : 'SALVAR PLANEJAMENTO'}
@@ -126,24 +126,22 @@ export default function GestaoEscalonamentoPage() {
 
       {msg.text && (
         <div style={{
-          marginBottom: '1.5rem', padding: '1rem 1.5rem',
-          background: msg.type === 'error' ? '#fafafa' : '#ffffff',
-          color: '#000000',
-          border: `2px solid ${msg.type === 'error' ? '#e4e4e7' : '#000000'}`, 
-          borderRadius: '8px', fontWeight: '800',
-          fontSize: '0.85rem'
+          marginBottom: '1.5rem', padding: '1rem',
+          background: '#ffffff', color: '#000000',
+          border: '2px solid #000000', borderRadius: '4px',
+          fontWeight: '900', fontSize: '0.8rem', textAlign: 'center'
         }}>
           {msg.text}
         </div>
       )}
 
-      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid #000000' }}>
-        <div style={{ padding: '1.5rem', background: '#f4f4f5', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            CRONOGRAMA DE INVENTARIO PARCIAL (SEGUNDA A SEXTA)
+      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid #000000', background: '#ffffff' }}>
+        <div style={{ padding: '1.25rem', background: '#f4f4f5', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '900', letterSpacing: '0.05em' }}>
+            CRONOGRAMA SEMANAL (SEGUNDA A SEXTA)
           </div>
           {hasChanges && (
-            <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#000000', background: '#ffffff', padding: '4px 8px', border: '1px solid #000000', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0.65rem', fontWeight: '900', color: '#ffffff', background: '#000000', padding: '4px 8px', borderRadius: '2px' }}>
               ALTERACOES PENDENTES
             </span>
           )}
@@ -156,18 +154,18 @@ export default function GestaoEscalonamentoPage() {
                 <th style={thStyle}>TECNICO</th>
                 <th style={thStyle}>REGIAO</th>
                 <th style={thStyle}>DIA DA SEMANA</th>
-                <th style={thStyle}>HORARIO DO DISPARO</th>
+                <th style={thStyle}>HORARIO DISPARO</th>
                 <th style={thStyle}>STATUS</th>
               </tr>
             </thead>
             <tbody>
               {tecnicos.length === 0 ? (
-                <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', fontWeight: '700' }}>NENHUM TECNICO SOB GESTAO</td></tr>
+                <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', fontWeight: '800' }}>NENHUM TECNICO ENCONTRADO</td></tr>
               ) : (
                 tecnicos.map((t) => (
-                  <tr key={t.id} style={{ borderBottom: '1px solid #e4e4e7' }}>
-                    <td style={{ ...tdStyle, fontWeight: '800', color: '#000000' }}>{t.name?.toUpperCase()}</td>
-                    <td style={tdStyle}><span style={{ padding: '2px 8px', background: '#f4f4f5', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '800' }}>{t.region || '—'}</span></td>
+                  <tr key={t.id} style={{ borderBottom: '1px solid #000000' }}>
+                    <td style={{ ...tdStyle, fontWeight: '900' }}>{t.name?.toUpperCase()}</td>
+                    <td style={tdStyle}><span style={{ fontWeight: '800' }}>{t.region || '—'}</span></td>
                     <td style={tdStyle}>
                       <select
                         value={t.inventory_day || ''}
@@ -187,11 +185,9 @@ export default function GestaoEscalonamentoPage() {
                       />
                     </td>
                     <td style={tdStyle}>
-                      {t.inventory_day ? (
-                        <span style={{ color: '#000000', fontWeight: '800', fontSize: '0.7rem' }}>CONFIGURADO</span>
-                      ) : (
-                        <span style={{ color: '#a1a1aa', fontWeight: '700', fontSize: '0.7rem' }}>NAO DEFINIDO</span>
-                      )}
+                      <span style={{ fontWeight: '900', fontSize: '0.7rem' }}>
+                        {t.inventory_day ? 'CONFIGURADO' : 'PENDENTE'}
+                      </span>
                     </td>
                   </tr>
                 ))
@@ -201,23 +197,21 @@ export default function GestaoEscalonamentoPage() {
         </div>
       </div>
 
-      <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#f9f9f9', border: '1px solid #e4e4e7', borderRadius: '8px' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: '900', color: '#000000', marginBottom: '0.75rem', textTransform: 'uppercase' }}>INSTRUCOES:</div>
-        <ul style={{ fontSize: '0.8rem', color: '#52525b', lineHeight: '1.6', margin: 0, paddingLeft: '1.2rem', fontWeight: '600' }}>
-          <li>DEFINA O DIA E HORARIO PARA CADA TECNICO.</li>
-          <li>ALTERACOES EM MASSA SAO PERMITIDAS.</li>
-          <li>CLIQUE EM SALVAR PLANEJAMENTO PARA CONFIRMAR AS MUDANCAS.</li>
-          <li>TECNICOS SEM DIA DEFINIDO NAO RECEBERAO O INVENTARIO AUTOMATICO.</li>
-        </ul>
+      <div style={{ marginTop: '2rem', padding: '1rem', border: '2px solid #000000' }}>
+        <div style={{ fontSize: '0.7rem', fontWeight: '900', marginBottom: '0.5rem' }}>INSTRUCOES:</div>
+        <div style={{ fontSize: '0.75rem', fontWeight: '700', lineHeight: '1.4' }}>
+          1. DEFINA O DIA E HORARIO PARA CADA TECNICO.<br/>
+          2. CLIQUE EM SALVAR PLANEJAMENTO PARA CONFIRMAR AS MUDANCAS.<br/>
+          3. TECNICOS SEM DIA DEFINIDO NAO RECEBERAO O INVENTARIO AUTOMATICO.
+        </div>
       </div>
     </div>
   );
 }
 
-const thStyle = { padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase', background: '#ffffff' };
-const tdStyle = { padding: '1rem', fontSize: '0.875rem', color: '#000000' };
+const thStyle = { padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase' };
+const tdStyle = { padding: '1rem', fontSize: '0.8rem' };
 const selectStyle = {
-  width: '100%', padding: '0.5rem', border: '1px solid #000000', borderRadius: '4px',
-  fontSize: '0.8rem', fontWeight: '800', background: '#ffffff', color: '#000000', cursor: 'pointer',
-  textTransform: 'uppercase'
+  width: '100%', padding: '0.4rem', border: '2px solid #000000', borderRadius: '0',
+  fontSize: '0.75rem', fontWeight: '900', background: '#ffffff', cursor: 'pointer'
 };
