@@ -1,5 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
-const { DBSQLClient } = require('@databricks/sql');
+const { DatabricksClient } = require('@databricks/sql');
 
 // Configurações do Supabase
 const supabase = createClient(
@@ -7,24 +7,17 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Configurações do Databricks
+const databricks = new DatabricksClient({
+  host: process.env.DATABRICKS_HOST,
+  path: process.env.DATABRICKS_PATH,
+  token: process.env.DATABRICKS_TOKEN,
+});
+
 async function syncStatus() {
   console.log('Iniciando sincronização diária de status do Datalake...');
 
-  const table = process.env.DATABRICKS_TABLE;
-  if (!table) {
-    console.error('Erro: Variável de ambiente DATABRICKS_TABLE não definida.');
-    return;
-  }
-
-  const client = new DBSQLClient();
-
   try {
-    await client.connect({
-      host: process.env.DATABRICKS_HOST,
-      path: process.env.DATABRICKS_PATH,
-      token: process.env.DATABRICKS_TOKEN,
-    });
-
     // 1. Busca todos os técnicos ativos no Supabase
     const { data: technicians, error } = await supabase
       .from('technicians')
@@ -35,23 +28,18 @@ async function syncStatus() {
 
     console.log(`Processando ${technicians.length} técnicos...`);
 
-    const session = await client.openSession();
+    const session = await databricks.openSession();
 
     for (const tech of technicians) {
       const searchName = tech.databricks_name || tech.name;
       
       try {
-        // 2. Verifica no Databricks usando parâmetros posicionais (?)
-        // A query é construída injetando o nome da tabela diretamente (seguro pois vem de env var)
-        const query = `SELECT 1 FROM ${table} WHERE UPPER(TRIM(tecnico_nome)) = UPPER(TRIM(?)) LIMIT 1`;
-        
-        const operation = await session.executeStatement(query, {
-          ordinalParameters: [searchName]
-        });
-        
+        // 2. Verifica no Databricks
+        const query = `SELECT 1 FROM ${process.env.DATABRICKS_TABLE} WHERE UPPER(TRIM(tecnico_nome)) = UPPER(TRIM(?)) LIMIT 1`;
+        const operation = await session.executeStatement(query, { namedParameters: { 1: searchName } });
         const result = await operation.fetchAll();
 
-        const isOk = result && result.length > 0;
+        const isOk = result.length > 0;
 
         // 3. Atualiza o status no Supabase
         await supabase
@@ -69,7 +57,6 @@ async function syncStatus() {
     }
 
     await session.close();
-    await client.close();
     console.log('Sincronização concluída com sucesso!');
   } catch (err) {
     console.error('Falha na sincronização:', err.message);
