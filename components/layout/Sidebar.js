@@ -96,6 +96,9 @@ const ADMIN_ITEMS = [
       </svg>
     ),
   },
+];
+
+const SHARED_ADMIN_ITEMS = [
   {
     href: '/cadastro-tecnicos',
     label: 'Cadastro Técnicos',
@@ -116,6 +119,8 @@ export default function Sidebar({ user }) {
   function isActive(href) {
     return pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
   }
+
+  const isManagement = user?.role === 'admin' || user?.role === 'supervisor' || user?.role === 'coordinator';
 
   return (
     <aside style={{
@@ -182,7 +187,7 @@ export default function Sidebar({ user }) {
           })}
         </div>
 
-        {user?.role === 'admin' && (
+        {isManagement && (
           <div style={{ marginTop: '1.5rem' }}>
             <div style={{
               fontSize: '0.6rem',
@@ -193,9 +198,41 @@ export default function Sidebar({ user }) {
               padding: '0 0.75rem',
               marginBottom: '0.5rem',
             }}>
-              Administração
+              Gestão
             </div>
-            {ADMIN_ITEMS.map((item) => {
+            
+            {/* Cadastro de Técnicos (Acessível por Admin, Supervisor e Coordenador) */}
+            {SHARED_ADMIN_ITEMS.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '6px',
+                    marginBottom: '2px',
+                    textDecoration: 'none',
+                    fontSize: '0.75rem',
+                    fontWeight: active ? '700' : '500',
+                    color: active ? '#ffffff' : '#888888',
+                    background: active ? '#333333' : 'transparent',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+
+            {/* Apenas para Admin */}
+            {user?.role === 'admin' && ADMIN_ITEMS.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
