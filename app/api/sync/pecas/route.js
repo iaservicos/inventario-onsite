@@ -1,9 +1,9 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 2.1.0 (Modo Síncrono Turbo - Forçado para Vercel Free)
+ * VERSÃO: 3.0.0 (SUPER TURBO - Sem limites)
  * 
- * Esta versão utiliza busca em massa (Bulk) e espera o término (await) 
- * para garantir que o processo não seja interrompido no plano gratuito do Vercel.
+ * Otimizada para garantir que o limite do Databricks não cause desativação 
+ * acidental de peças no Supabase.
  */
 
 import { NextResponse } from 'next/server';
@@ -59,9 +59,13 @@ export async function POST(request) {
       techMap[name] = t.id;
     });
 
-    // B. Busca TUDO no Databricks de uma vez (TURBO)
+    // B. Busca TUDO no Databricks em blocos controlados (SUPER TURBO)
     const allItems = await getAllTechniciansItems(Object.keys(techMap));
     
+    if (allItems.length === 0) {
+      throw new Error('Databricks não retornou nenhuma peça. Verifique os filtros ou conexão.');
+    }
+
     // C. Prepara UPSERT em massa
     const upsertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
@@ -82,12 +86,16 @@ export async function POST(request) {
       await supabase.from('technician_items').upsert(chunk, { onConflict: 'technician_id,item_code' });
     }
 
-    // D. Soft-delete (Desativa quem não veio)
-    await supabase.from('technician_items')
-      .update({ active: false, updated_at: syncedAt })
-      .eq('active', true)
-      .in('technician_id', techs.map(t => t.id))
-      .neq('sync_batch_id', batchId);
+    // D. Soft-delete SEGURO
+    // Só desativa peças se o Databricks realmente devolveu dados, 
+    // para evitar apagar tudo em caso de erro na consulta.
+    if (upsertRows.length > 100) { // Margem de segurança
+      await supabase.from('technician_items')
+        .update({ active: false, updated_at: syncedAt })
+        .eq('active', true)
+        .in('technician_id', techs.map(t => t.id))
+        .neq('sync_batch_id', batchId);
+    }
 
     // E. Finaliza log com sucesso
     const finishedAt = new Date().toISOString();
