@@ -146,10 +146,18 @@ export default function UsuariosPage() {
   }, [session, status, router, loadUsers]);
 
   const handleSave = async (formData) => {
+    if (!modal) return;
+    
     setSaving(true);
     try {
       const isEdit = modal.type === 'edit';
-      const url = isEdit ? `/api/users/${modal.data.id}` : '/api/users';
+      const userId = modal.data?.id;
+      
+      if (isEdit && !userId) {
+        throw new Error('ID do usuário não encontrado para edição');
+      }
+
+      const url = isEdit ? `/api/users/${userId}` : '/api/users';
       const method = isEdit ? 'PATCH' : 'POST';
       
       const res = await fetch(url, {
@@ -158,8 +166,8 @@ export default function UsuariosPage() {
         body: JSON.stringify(formData),
       });
       
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || 'Erro ao processar');
       }
       
@@ -174,6 +182,7 @@ export default function UsuariosPage() {
   };
 
   const toggleActive = async (user) => {
+    if (!user?.id) return;
     try {
       const res = await fetch(`/api/users/${user.id}`, {
         method: 'PATCH',
