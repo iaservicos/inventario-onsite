@@ -42,7 +42,7 @@ export async function GET(request) {
     // 2. Busca peças ativas do técnico no Supabase (já sincronizadas do Datalake)
     const { data: items, error: itemsError } = await supabase
       .from('technician_items')
-      .select('id, item_code, item_name, item_quantity, item_num_remessa, atp_centro, atp_nome, synced_at, sync_batch_id, active')
+      .select('id, item_code, item_name, item_subgroup, item_quantity, item_num_remessa, atp_centro, atp_nome, synced_at, sync_batch_id, active')
       .eq('technician_id', technicianId)
       .eq('active', true)
       .order('item_code', { ascending: true });
@@ -62,6 +62,7 @@ export async function GET(request) {
       id:               item.id,
       item_code:        item.item_code,
       item_name:        item.item_name,
+      item_subgroup:    item.item_subgroup,
       item_quantity:    item.item_quantity,
       item_num_remessa: item.item_num_remessa,
       atp_centro:       item.atp_centro,
