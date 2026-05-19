@@ -11,6 +11,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const region = searchParams.get('region') || '';
+    const active = searchParams.get('active'); // Captura o parâmetro active
 
     const supabase = createServiceClient();
 
@@ -18,6 +19,13 @@ export async function GET(request) {
       .from('technicians')
       .select('*')
       .order('name');
+
+    // FILTRO DE ATIVOS: Se o parâmetro active for passado, aplicamos o filtro
+    if (active === 'true') {
+      query = query.eq('active', true);
+    } else if (active === 'false') {
+      query = query.eq('active', false);
+    }
 
     /* ─── Regra de Visibilidade por Perfil ──────────────────── */
     
@@ -46,8 +54,6 @@ export async function GET(request) {
       query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
     }
 
-    // Filtro de Região: Aplicamos se não for a regra especial de SP (que já filtrou acima)
-    // Para Admin, sempre aplicamos o filtro de região se ele existir
     if (region) {
       if (isAdmin || region !== 'SP') {
         query = query.eq('region', region);

@@ -25,6 +25,7 @@ export default function GestaoEscalonamentoPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
+      // Agora a API processa corretamente o filtro active=true
       const res = await fetch('/api/technicians?active=true');
       const data = await res.json();
       const list = Array.isArray(data) ? data : [];
@@ -56,7 +57,7 @@ export default function GestaoEscalonamentoPage() {
     
     try {
       const changes = tecnicos.filter((t, index) => {
-        return JSON.stringify(t) !== JSON.stringify(originalData[index]);
+        return JSON.stringify(t) !== JSON.stringify(originalData.find(o => o.id === t.id));
       });
 
       if (changes.length === 0) {
@@ -108,7 +109,7 @@ export default function GestaoEscalonamentoPage() {
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
         title="Gestão de Escalonamento"
-        subtitle={isAdmin ? "Planejamento semanal de todos os técnicos" : `Planejamento dos técnicos sob gestão de ${session?.user?.name}`}
+        subtitle={isAdmin ? "Planejamento semanal de todos os técnicos ativos" : `Planejamento dos técnicos ativos sob gestão de ${session?.user?.name}`}
         actions={
           hasChanges && (
             <button 
@@ -167,7 +168,7 @@ export default function GestaoEscalonamentoPage() {
             </thead>
             <tbody>
               {filteredTecnicos.length === 0 ? (
-                <tr><td colSpan={5} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Nenhum técnico encontrado</td></tr>
+                <tr><td colSpan={5} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Nenhum técnico ativo encontrado</td></tr>
               ) : (
                 filteredTecnicos.map((t) => (
                   <tr key={t.id}>
@@ -211,9 +212,9 @@ export default function GestaoEscalonamentoPage() {
       <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px' }}>
         <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#000000', marginBottom: '0.5rem' }}>Instruções de Uso</h3>
         <p style={{ fontSize: '0.8rem', color: '#666666', lineHeight: '1.5' }}>
-          Utilize este painel para definir a escala semanal de inventário parcial. 
-          As alterações feitas na tabela só serão aplicadas após clicar no botão <strong>Salvar Planejamento</strong> que aparecerá no topo da página.
-          Técnicos sem dia definido não entrarão no fluxo de disparo automático.
+          Utilize este painel para definir a escala semanal de inventário parcial apenas para técnicos ativos. 
+          As alterações feitas na tabela só serão aplicadas após clicar no botão <strong>Salvar Planejamento</strong>.
+          Técnicos inativados no cadastro não aparecerão nesta listagem.
         </p>
       </div>
     </div>
