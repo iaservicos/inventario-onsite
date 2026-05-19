@@ -138,19 +138,19 @@ export default function Sidebar({ user }) {
     }}>
 
       {/* Logo Area */}
-      <div style={{ padding: '2rem 1.25rem', borderBottom: '1px solid #333333' }}>
-        <div style={{ background: '#ffffff', padding: '0.75rem', borderRadius: '8px', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ padding: '2rem 1rem', borderBottom: '1px solid #333333' }}>
+        <div style={{ background: '#ffffff', padding: '0.5rem', borderRadius: '8px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
           <Image 
             src="/logo-positivo.png" 
             alt="Positivo Tecnologia" 
-            width={180} 
-            height={45} 
+            width={220} 
+            height={55} 
             style={{ objectFit: 'contain' }}
           />
         </div>
-        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.05em', color: '#ffffff' }}>PORTAL ONSITE</div>
-          <div style={{ fontSize: '0.6rem', color: '#888888', fontWeight: '600' }}>IA SERVIÇOS</div>
+        <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.9rem', fontWeight: '900', letterSpacing: '0.05em', color: '#ffffff' }}>PORTAL ONSITE</div>
+          <div style={{ fontSize: '0.6rem', color: '#888888', fontWeight: '600', marginTop: '0.25rem' }}>IA SERVIÇOS</div>
         </div>
       </div>
 
@@ -201,7 +201,6 @@ export default function Sidebar({ user }) {
               Gestão
             </div>
             
-            {/* Cadastro de Técnicos (Acessível por Admin, Supervisor e Coordenador) */}
             {SHARED_ADMIN_ITEMS.map((item) => {
               const active = isActive(item.href);
               return (
@@ -220,18 +219,14 @@ export default function Sidebar({ user }) {
                     fontWeight: active ? '700' : '500',
                     color: active ? '#ffffff' : '#888888',
                     background: active ? '#333333' : 'transparent',
-                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>
-                    {item.icon}
-                  </span>
+                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               );
             })}
 
-            {/* Apenas para Admin */}
             {user?.role === 'admin' && ADMIN_ITEMS.map((item) => {
               const active = isActive(item.href);
               return (
@@ -250,12 +245,9 @@ export default function Sidebar({ user }) {
                     fontWeight: active ? '700' : '500',
                     color: active ? '#ffffff' : '#888888',
                     background: active ? '#333333' : 'transparent',
-                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>
-                    {item.icon}
-                  </span>
+                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               );
@@ -266,21 +258,7 @@ export default function Sidebar({ user }) {
 
       {/* User / Logout */}
       <div style={{ padding: '1rem', borderTop: '1px solid #333333', background: '#141414' }}>
-        <Link 
-          href="/perfil"
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.75rem', 
-            marginBottom: '0.75rem',
-            textDecoration: 'none',
-            padding: '0.5rem',
-            borderRadius: '6px',
-            transition: 'background 0.2s'
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = '#222222'}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', padding: '0.5rem' }}>
           <div style={{
             width: '32px', 
             height: '32px',
@@ -297,22 +275,39 @@ export default function Sidebar({ user }) {
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <div style={{ overflow: 'hidden', flex: 1 }}>
-            <div style={{
-              fontSize: '0.75rem',
-              fontWeight: '700',
-              color: '#ffffff',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}>
-              {user?.name}
-            </div>
-            <div style={{ fontSize: '0.65rem', color: '#888888' }}>
-              {ROLE_LABELS?.[user?.role] || user?.role}
-            </div>
+            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name}</div>
+            <div style={{ fontSize: '0.65rem', color: '#888888' }}>{ROLE_LABELS?.[user?.role] || user?.role}</div>
           </div>
-        </Link>
+        </div>
 
+        {/* BOTÃO EXPLÍCITO DE ALTERAR SENHA */}
+        <Link 
+          href="/perfil"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: '0.5rem', 
+            marginBottom: '0.5rem',
+            textDecoration: 'none',
+            padding: '0.6rem',
+            borderRadius: '6px',
+            background: '#222222',
+            border: '1px solid #444444',
+            color: '#ffffff',
+            fontSize: '0.7rem',
+            fontWeight: '700',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#333333'}
+          onMouseLeave={e => e.currentTarget.style.background = '#222222'}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3y-3.5" />
+          </svg>
+          ALTERAR SENHA
+        </Link>
+        
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           style={{
