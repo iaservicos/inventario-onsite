@@ -34,15 +34,14 @@ function LoginForm() {
       minHeight: '100vh',
       width: '100%',
       fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-      background: '#121212', // Fundo preto do layout
+      background: '#121212',
       color: '#ffffff',
       padding: '2rem',
     }}>
-      {/* Container Principal para Monitores Grandes */}
       <div style={{
         display: 'flex',
         width: '100%',
-        maxWidth: '1200px', // Controla a dispersão em Ultra-Wide
+        maxWidth: '1200px',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '4rem',
@@ -54,18 +53,23 @@ function LoginForm() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
+          alignItems: 'flex-start', // Garante alinhamento à esquerda para o bloco todo
         }}>
-          <div style={{ marginBottom: '2.5rem' }}>
+          {/* Logo Centralizada no Bloco de Branding se necessário, ou alinhada com o texto */}
+          <div style={{ marginBottom: '2.5rem', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
             <div style={{
               background: '#ffffff',
-              padding: '1rem 2rem',
+              padding: '1rem 2.5rem',
               borderRadius: '12px',
-              display: 'inline-block'
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minWidth: '240px'
             }}>
               <img 
                 src="/logo-positivo.png" 
                 alt="Positivo Tecnologia" 
-                style={{ height: '50px', objectFit: 'contain' }}
+                style={{ height: '55px', width: 'auto', objectFit: 'contain' }}
               />
             </div>
           </div>
@@ -96,21 +100,13 @@ function LoginForm() {
           flexShrink: 0,
           width: '100%',
           maxWidth: '450px',
-          background: '#1a1a1a', // Cinza muito escuro (mesmo da sidebar)
+          background: '#1a1a1a',
           borderRadius: '24px',
           padding: '3.5rem 3rem',
           border: '1px solid #333333',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
         }}>
-          <h2 style={{ 
-            fontSize: '1.5rem', 
-            fontWeight: '800', 
-            textAlign: 'center', 
-            marginBottom: '2.5rem',
-            color: '#ffffff',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '800', textAlign: 'center', marginBottom: '2.5rem', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Acesso ao Sistema
           </h2>
 
@@ -123,31 +119,14 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nome@empresa.com.br"
                 required
-                style={{
-                  width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '12px',
-                  background: '#222222',
-                  border: '1px solid #333333',
-                  color: '#ffffff',
-                  fontSize: '1rem',
-                  fontWeight: '500',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#666666'}
-                onBlur={(e) => e.target.style.borderColor = '#333333'}
+                style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '12px', background: '#222222', border: '1px solid #333333', color: '#ffffff', fontSize: '1rem', fontWeight: '500', outline: 'none' }}
               />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label style={{ fontSize: '0.8rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase' }}>Senha</label>
-                <button 
-                  type="button"
-                  onClick={() => alert('Contate o administrador para resetar sua senha.')}
-                  style={{ background: 'none', border: 'none', color: '#666666', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '700', textDecoration: 'underline' }}
-                >
+                <button type="button" onClick={() => alert('Contate o administrador para resetar sua senha.')} style={{ background: 'none', border: 'none', color: '#666666', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '700', textDecoration: 'underline' }}>
                   Esqueci minha senha
                 </button>
               </div>
@@ -157,49 +136,11 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                style={{
-                  width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '12px',
-                  background: '#222222',
-                  border: '1px solid #333333',
-                  color: '#ffffff',
-                  fontSize: '1rem',
-                  fontWeight: '500',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#666666'}
-                onBlur={(e) => e.target.style.borderColor = '#333333'}
+                style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '12px', background: '#222222', border: '1px solid #333333', color: '#ffffff', fontSize: '1rem', fontWeight: '500', outline: 'none' }}
               />
             </div>
 
-            {error && (
-              <div style={{ color: '#ff4d4d', fontSize: '0.9rem', textAlign: 'center', fontWeight: '700' }}>
-                {error}
-              </div>
-            )}
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={{ 
-                width: '100%',
-                padding: '1.1rem',
-                background: '#ffffff',
-                color: '#000000',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '1rem',
-                fontWeight: '900',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}
-              onMouseEnter={(e) => e.target.style.background = '#e5e5e5'}
-              onMouseLeave={(e) => e.target.style.background = '#ffffff'}
-            >
+            <button type="submit" disabled={loading} style={{ width: '100%', padding: '1.1rem', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '12px', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {loading ? 'AUTENTICANDO...' : 'ENTRAR NO PORTAL'}
             </button>
           </form>
@@ -210,19 +151,6 @@ function LoginForm() {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Footer Copyright */}
-      <div style={{
-        position: 'absolute',
-        bottom: '2rem',
-        width: '100%',
-        textAlign: 'center',
-        fontSize: '0.75rem',
-        color: '#444444',
-        fontWeight: '600'
-      }}>
-        © 2026 PORTAL ONSITE. TODOS OS DIREITOS RESERVADOS.
       </div>
     </div>
   );
