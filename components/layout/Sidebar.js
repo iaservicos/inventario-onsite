@@ -9,7 +9,7 @@ import Image from 'next/image';
 const NAV_ITEMS = [
   {
     href: '/dashboard',
-    label: 'Dashboard',
+    label: 'Dashboard Inventário',
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -43,7 +43,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/divergencias',
-    label: 'Divergências',
+    label: 'Divergência Inventário',
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -52,7 +52,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/agendamentos',
-    label: 'Agendamentos',
+    label: 'Agendamento Inventário',
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -64,7 +64,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/pecas',
-    label: 'Peças',
+    label: 'Peças Novas',
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -143,13 +143,13 @@ export default function Sidebar({ user }) {
           <Image 
             src="/logo-positivo.png" 
             alt="Positivo Tecnologia" 
-            width={140} 
-            height={35} 
+            width={180} 
+            height={45} 
             style={{ objectFit: 'contain' }}
           />
         </div>
         <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.05em', color: '#ffffff' }}>INVENTÁRIO ONSITE</div>
+          <div style={{ fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.05em', color: '#ffffff' }}>PORTAL ONSITE</div>
           <div style={{ fontSize: '0.6rem', color: '#888888', fontWeight: '600' }}>IA SERVIÇOS</div>
         </div>
       </div>
@@ -266,7 +266,6 @@ export default function Sidebar({ user }) {
 
       {/* User / Logout */}
       <div style={{ padding: '1rem', borderTop: '1px solid #333333', background: '#141414' }}>
-        {/* Transformado em Link para o Perfil */}
         <Link 
           href="/perfil"
           style={{ 
