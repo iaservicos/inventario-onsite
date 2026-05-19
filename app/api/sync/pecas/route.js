@@ -1,6 +1,6 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 7.1.0 (RESTRICTED TO ADMIN)
+ * VERSÃO: 8.0.0 (COM SUBGRUPOS)
  */
 
 import { NextResponse } from 'next/server';
@@ -12,23 +12,28 @@ import { getAllTechniciansItems } from '@/lib/databricks';
 export const maxDuration = 300; 
 
 function isAuthorized(request, session) {
-  // 1. Permite se houver o segredo de automação externa (Cron/Power Automate)
   const secret = request.headers.get('x-dispatch-secret');
   if (secret && secret === process.env.DISPATCH_SECRET) return true;
-  
-  // 2. Permite apenas se o usuário logado tiver a role 'admin'
   if (session?.user?.role === 'admin') return true;
-  
   return false;
+}
+
+// Lógica de detecção de subgrupos
+function detectSubgroup(name) {
+  const n = (name || '').toUpperCase();
+  if (n.includes('SSD') || n.includes('HD ') || n.includes('DISCO RIGIDO')) return 'SSD/HD';
+  if (n.includes('MEM') || n.includes('DDR') || n.includes('DIMM')) return 'Memória';
+  if (n.includes('PLM') || n.includes('PLACA MAE') || n.includes('MOTHERBOARD')) return 'PLM';
+  if (n.includes('BAT') || n.includes('LI-ION') || n.includes('BATERIA')) return 'Bateria';
+  if (n.includes('LCD') || n.includes('TELA') || n.includes('DISPLAY')) return 'LCD';
+  if (n.includes('FONTE') || n.includes('ADAPTADOR') || n.includes('POWER SUPPLY')) return 'Fonte/Adaptador';
+  if (n.includes('TECLADO') || n.includes('KBD')) return 'Teclado';
+  return 'Outros';
 }
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-  
-  // Validação de autorização restrita a administradores
-  if (!isAuthorized(request, session)) {
-    return NextResponse.json({ error: 'Apenas administradores podem disparar a sincronização manual.' }, { status: 401 });
-  }
+  if (!isAuthorized(request, session)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
   const triggeredBy = body.triggered_by || 'api';
@@ -37,13 +42,11 @@ export async function POST(request) {
   const batchId = `sync-${Date.now()}`;
   const syncedAt = new Date().toISOString();
 
-  // 1. Log inicial
   const { data: logRow } = await supabase.from('datalake_sync_log').insert({
     batch_id: batchId, status: 'running', started_at: syncedAt, triggered_by: triggeredBy
   }).select('id').single();
 
   try {
-    // A. Busca técnicos ativos
     const { data: techs } = await supabase.from('technicians').select('id, name, databricks_name').eq('active', true);
     if (!techs?.length) throw new Error('Nenhum técnico ativo.');
 
@@ -54,17 +57,12 @@ export async function POST(request) {
       techMap[name] = t.id;
     });
 
-    // B. Busca TUDO no Databricks (TURBO Paginado)
     const allItems = await getAllTechniciansItems(Object.keys(techMap));
     
-    if (allItems.length === 0) {
-      throw new Error('Databricks retornou zero peças. Verifique os filtros.');
-    }
+    if (allItems.length === 0) throw new Error('Databricks retornou zero peças.');
 
-    // C. LIMPEZA TOTAL (DELETE)
     await supabase.from('technician_items').delete().in('technician_id', techIds);
 
-    // D. CARGA SIMPLES (INSERT)
     const insertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
       if (!techId) return null;
@@ -72,6 +70,7 @@ export async function POST(request) {
         technician_id: techId,
         item_code: String(item.item_code).trim(),
         item_name: String(item.item_name).trim(),
+        item_subgroup: detectSubgroup(item.item_name), // NOVA COLUNA
         item_quantity: parseInt(item.item_quantity) || 0,
         item_num_remessa: String(item.item_num_remessa || '').trim(),
         atp_centro: String(item.atp_centro || '').trim(),
@@ -84,22 +83,18 @@ export async function POST(request) {
       };
     }).filter(Boolean);
 
-    // Insere em lotes de 500
     for (let i = 0; i < insertRows.length; i += 500) {
       const chunk = insertRows.slice(i, i + 500);
       const { error: insError } = await supabase.from('technician_items').insert(chunk);
       if (insError) throw new Error(`Erro ao inserir peças: ${insError.message}`);
     }
 
-    // E. Finaliza log com sucesso
     await supabase.from('datalake_sync_log').update({
       status: 'success', finished_at: new Date().toISOString(),
       technicians_total: techs.length, technicians_ok: techs.length, items_upserted: insertRows.length
     }).eq('id', logRow.id);
 
-    return NextResponse.json({ 
-      ok: true, status: 'success', total_gravado: insertRows.length, batch_id: batchId, technicians_ok: techs.length
-    });
+    return NextResponse.json({ ok: true, status: 'success', total_gravado: insertRows.length, batch_id: batchId });
 
   } catch (err) {
     await supabase.from('datalake_sync_log').update({
