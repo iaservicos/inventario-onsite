@@ -61,7 +61,7 @@ const DATABRICKS_HOST   = (process.env.DATABRICKS_HOST || '').replace(/\/$/, '')
 const DATABRICKS_TOKEN  = process.env.DATABRICKS_TOKEN;
 const WAREHOUSE_ID      = process.env.DATABRICKS_WAREHOUSE_ID;
 const DATABRICKS_TABLE  = process.env.DATABRICKS_TABLE ||
-  'datalake_prod.indicadores_servicos.consolidacao_fiscal';
+  'datalake_prod.indicadores_servicos.vw_inventario_onsite';
 
 // ── Argumentos CLI ────────────────────────────────────────────────────────────
 const args    = process.argv.slice(2);
