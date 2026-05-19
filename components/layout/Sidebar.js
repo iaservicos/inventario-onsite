@@ -266,7 +266,22 @@ export default function Sidebar({ user }) {
 
       {/* User / Logout */}
       <div style={{ padding: '1rem', borderTop: '1px solid #333333', background: '#141414' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+        {/* Link para o Perfil do Usuário */}
+        <Link 
+          href="/perfil"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.75rem', 
+            marginBottom: '1rem',
+            textDecoration: 'none',
+            padding: '0.5rem',
+            borderRadius: '6px',
+            transition: 'background 0.2s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#222222'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
           <div style={{
             width: '32px', 
             height: '32px',
@@ -297,7 +312,8 @@ export default function Sidebar({ user }) {
               {ROLE_LABELS?.[user?.role] || user?.role}
             </div>
           </div>
-        </div>
+        </Link>
+
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           style={{
@@ -325,7 +341,7 @@ export default function Sidebar({ user }) {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Sair
+          Sair do Sistema
         </button>
       </div>
     </aside>

@@ -219,6 +219,24 @@ function LoginForm() {
               </div>
             </div>
 
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-0.75rem' }}>
+              <button 
+                type="button"
+                onClick={() => alert('Por favor, entre em contato com o administrador do sistema para resetar sua senha.')}
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  color: '#666666', 
+                  fontSize: '0.75rem', 
+                  fontWeight: '600', 
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Esqueci minha senha
+              </button>
+            </div>
+
             {error && (
               <div style={{
                 padding: '1rem',
