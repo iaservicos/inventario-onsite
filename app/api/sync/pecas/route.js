@@ -18,9 +18,26 @@ function isAuthorized(request, session) {
   return false;
 }
 
-// Lógica de detecção de subgrupos
+// Lógica de detecção de subgrupos baseada na primeira palavra
 function detectSubgroup(name) {
-  const n = (name || '').toUpperCase();
+  if (!name) return 'Outros';
+  
+  const words = name.trim().toUpperCase().split(/\s+/);
+  const firstWord = words[0];
+
+  // Regras baseadas na primeira palavra
+  if (firstWord === 'PLM') return 'PLM';
+  if (firstWord === 'ADAPT' || firstWord === 'FONTE') return 'Fonte/Adaptador';
+  if (firstWord === 'HDD' || firstWord === 'SSD') return 'SSD/HD';
+  if (firstWord === 'MON' && words[1] === 'LED') return 'MONITOR';
+  if (firstWord === 'MEM') return 'Memória';
+  if (firstWord === 'CONJ.') return 'Diversos';
+  if (firstWord === 'LCD') return 'LCD';
+  if (firstWord === 'BATER') return 'Bateria';
+  if (firstWord === 'PROC') return 'Processador';
+
+  // Fallback para busca por palavras-chave se a primeira palavra não bater
+  const n = name.toUpperCase();
   if (n.includes('SSD') || n.includes('HD ') || n.includes('DISCO RIGIDO')) return 'SSD/HD';
   if (n.includes('MEM') || n.includes('DDR') || n.includes('DIMM')) return 'Memória';
   if (n.includes('PLM') || n.includes('PLACA MAE') || n.includes('MOTHERBOARD')) return 'PLM';
@@ -28,6 +45,7 @@ function detectSubgroup(name) {
   if (n.includes('LCD') || n.includes('TELA') || n.includes('DISPLAY')) return 'LCD';
   if (n.includes('FONTE') || n.includes('ADAPTADOR') || n.includes('POWER SUPPLY')) return 'Fonte/Adaptador';
   if (n.includes('TECLADO') || n.includes('KBD')) return 'Teclado';
+  
   return 'Outros';
 }
 
