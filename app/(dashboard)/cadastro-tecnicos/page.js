@@ -67,7 +67,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
             <Field label="Nome completo *">
               <input name="name" value={form.name} onChange={set} required className="input" style={inputStyle} />
             </Field>
-            {/* O e-mail agora só é obrigatório se o técnico estiver ATIVO */}
+            {/* O campo e-mail só é obrigatório se active for true */}
             <Field label={form.active ? "E-mail *" : "E-mail"}>
               <input 
                 name="email" 
@@ -82,7 +82,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
             </Field>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-            {/* O telefone agora só é obrigatório se o técnico estiver ATIVO */}
+            {/* O campo telefone só é obrigatório se active for true */}
             <Field label={form.active ? "Telefone (WhatsApp) *" : "Telefone (WhatsApp)"}>
               <input 
                 name="phone" 
@@ -120,7 +120,14 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
           <div style={{ marginBottom: '1rem' }}>
             <Field label="Status do Técnico">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}>
-                <input type="checkbox" name="active" checked={form.active} onChange={set} id="active-check" disabled={!canEditAll} />
+                <input 
+                  type="checkbox" 
+                  name="active" 
+                  checked={form.active} 
+                  onChange={set} 
+                  id="active-check" 
+                  disabled={!canEditAll} 
+                />
                 <label htmlFor="active-check" style={{ fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
                   {form.active ? 'TÉCNICO ATIVO' : 'TÉCNICO INATIVO'}
                 </label>
