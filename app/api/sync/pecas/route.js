@@ -1,9 +1,8 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 5.1.0 (CONSOLIDATED LOAD)
+ * VERSÃO: 6.0.0 (INDIVIDUAL REMESSAS)
  * 
- * Resolve o erro de "duplicate key" somando as quantidades de peças 
- * iguais para o mesmo técnico antes de inserir no banco.
+ * Mantém cada remessa como um registro separado. NÃO soma quantidades.
  */
 
 import { NextResponse } from 'next/server';
@@ -47,40 +46,33 @@ export async function POST(request) {
       techMap[name] = t.id;
     });
 
+    // Busca TUDO no Databricks (Paginado e com filtros originais)
     const allItems = await getAllTechniciansItems(Object.keys(techMap));
+    
     if (allItems.length === 0) throw new Error('Databricks retornou zero peças.');
 
-    // --- CONSOLIDAÇÃO DE DUPLICADOS ---
-    // Se o Databricks mandar a mesma peça 2x para o mesmo técnico, nós somamos a QTD.
-    const consolidated = {};
-    allItems.forEach(item => {
+    // Prepara inserção INDIVIDUAL (Sem somar nada)
+    const insertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
-      if (!techId) return;
-      
-      const key = `${techId}_${item.item_code}`;
-      if (!consolidated[key]) {
-        consolidated[key] = {
-          technician_id: techId,
-          item_code: String(item.item_code).trim(),
-          item_name: String(item.item_name).trim(),
-          item_quantity: 0,
-          item_num_remessa: String(item.item_num_remessa || '').trim(),
-          active: true,
-          synced_at: syncedAt,
-          sync_batch_id: batchId,
-          updated_at: syncedAt,
-          unit: 'un'
-        };
-      }
-      consolidated[key].item_quantity += (parseInt(item.item_quantity) || 0);
-    });
+      if (!techId) return null;
+      return {
+        technician_id: techId,
+        item_code: String(item.item_code).trim(),
+        item_name: String(item.item_name).trim(),
+        item_quantity: parseInt(item.item_quantity) || 0,
+        item_num_remessa: String(item.item_num_remessa || '').trim(),
+        active: true,
+        synced_at: syncedAt, 
+        sync_batch_id: batchId, 
+        updated_at: syncedAt,
+        unit: 'un'
+      };
+    }).filter(Boolean);
 
-    const insertRows = Object.values(consolidated);
-
-    // Limpeza (DELETE REAL)
+    // Limpeza Total antes da carga
     await supabase.from('technician_items').delete().in('technician_id', techIds);
 
-    // Carga (INSERT)
+    // Inserção em massa
     for (let i = 0; i < insertRows.length; i += 500) {
       const chunk = insertRows.slice(i, i + 500);
       const { error: insError } = await supabase.from('technician_items').insert(chunk);
