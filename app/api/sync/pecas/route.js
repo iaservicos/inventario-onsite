@@ -70,6 +70,8 @@ export async function POST(request) {
         item_name: String(item.item_name).trim(),
         item_quantity: parseInt(item.item_quantity) || 0,
         item_num_remessa: String(item.item_num_remessa || '').trim(),
+        atp_centro: String(item.atp_centro || '').trim(),
+        atp_nome: String(item.atp_nome || '').trim(),
         active: true,
         synced_at: syncedAt, 
         sync_batch_id: batchId, 
