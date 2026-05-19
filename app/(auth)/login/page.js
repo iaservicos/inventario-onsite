@@ -53,23 +53,29 @@ function LoginForm() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'flex-start', // Garante alinhamento à esquerda para o bloco todo
+          alignItems: 'flex-start',
         }}>
-          {/* Logo Centralizada no Bloco de Branding se necessário, ou alinhada com o texto */}
-          <div style={{ marginBottom: '2.5rem', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+          {/* LOGO ESTILO HAAS: Container retangular branco com cantos arredondados */}
+          <div style={{ marginBottom: '2.5rem' }}>
             <div style={{
               background: '#ffffff',
-              padding: '1rem 2.5rem',
-              borderRadius: '12px',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '8px', // Cantos menos arredondados, estilo HaaS
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              minWidth: '240px'
+              width: '200px', // Largura fixa para manter o formato retangular
+              height: '100px', // Altura fixa para o bloco
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
             }}>
               <img 
                 src="/logo-positivo.png" 
                 alt="Positivo Tecnologia" 
-                style={{ height: '55px', width: 'auto', objectFit: 'contain' }}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'contain' 
+                }}
               />
             </div>
           </div>
@@ -139,6 +145,12 @@ function LoginForm() {
                 style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '12px', background: '#222222', border: '1px solid #333333', color: '#ffffff', fontSize: '1rem', fontWeight: '500', outline: 'none' }}
               />
             </div>
+
+            {error && (
+              <div style={{ color: '#ff4d4d', fontSize: '0.9rem', textAlign: 'center', fontWeight: '700' }}>
+                {error}
+              </div>
+            )}
 
             <button type="submit" disabled={loading} style={{ width: '100%', padding: '1.1rem', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '12px', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {loading ? 'AUTENTICANDO...' : 'ENTRAR NO PORTAL'}
