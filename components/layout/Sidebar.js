@@ -266,14 +266,14 @@ export default function Sidebar({ user }) {
 
       {/* User / Logout */}
       <div style={{ padding: '1rem', borderTop: '1px solid #333333', background: '#141414' }}>
-        {/* Link para o Perfil do Usuário */}
+        {/* Transformado em Link para o Perfil */}
         <Link 
           href="/perfil"
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
             gap: '0.75rem', 
-            marginBottom: '1rem',
+            marginBottom: '0.75rem',
             textDecoration: 'none',
             padding: '0.5rem',
             borderRadius: '6px',
@@ -341,7 +341,7 @@ export default function Sidebar({ user }) {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Sair do Sistema
+          Sair
         </button>
       </div>
     </aside>

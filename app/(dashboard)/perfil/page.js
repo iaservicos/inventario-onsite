@@ -56,7 +56,7 @@ export default function PerfilPage() {
       <div className="card" style={{ marginTop: '2rem', border: '2px solid #000000' }}>
         <div style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid #eeeeee' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#000000' }}>Alterar Senha</h3>
-          <p style={{ fontSize: '0.8rem', color: '#666666' }}>Recomendamos o uso de uma senha forte que você não utilize em outros sites.</p>
+          <p style={{ fontSize: '0.8rem', color: '#666666' }}>Recomendamos o uso de uma senha forte.</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -114,17 +114,6 @@ export default function PerfilPage() {
             </button>
           </div>
         </form>
-      </div>
-
-      <div className="card" style={{ marginTop: '1.5rem', background: '#f9f9f9' }}>
-        <h3 style={{ fontSize: '0.8rem', fontWeight: '800', color: '#000000', marginBottom: '0.5rem' }}>Dados da Conta</h3>
-        <div style={{ fontSize: '0.8rem', color: '#333333' }}>
-          <div style={{ marginBottom: '0.25rem' }}><strong>Nome:</strong> {session?.user?.name}</div>
-          <div><strong>E-mail:</strong> {session?.user?.email}</div>
-          <div style={{ marginTop: '0.5rem' }}>
-            <strong>Perfil:</strong> <span className="badge badge-info" style={{ marginLeft: '0.5rem' }}>{session?.user?.role}</span>
-          </div>
-        </div>
       </div>
     </div>
   );
