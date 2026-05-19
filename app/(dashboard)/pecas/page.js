@@ -151,21 +151,21 @@ export default function PecasPage() {
   function handleExportExcel() {
     if (filteredItems.length === 0) return;
 
-    const rows = [['Subgrupo', 'Código', 'Nome da Peça', 'Quantidade', 'Remessa', 'ATP Centro', 'ATP Nome']];
+    const rows = [['Código', 'Nome da Peça', 'Quantidade', 'Remessa', 'ATP Centro', 'ATP Nome', 'Subgrupo']];
     filteredItems.forEach(item => {
       rows.push([
-        item.item_subgroup || '—',
         item.item_code,
         item.item_name,
         item.item_quantity ?? '—',
         item.item_num_remessa || '—',
         item.atp_centro || '—',
         item.atp_nome || '—',
+        item.item_subgroup || 'OUTROS'
       ]);
     });
 
     const ws = XLSX.utils.json_to_sheet(rows.slice(1), { header: rows[0] });
-    ws['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 35 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 25 }];
+    ws['!cols'] = [{ wch: 15 }, { wch: 35 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 }];
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Peças');
@@ -428,20 +428,17 @@ export default function PecasPage() {
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: '120px' }}>Subgrupo</th>
                   <th style={{ width: '120px' }}>Código</th>
                   <th>Nome da Peça</th>
                   <th style={{ width: '100px', textAlign: 'center' }}>Qtd</th>
                   <th style={{ width: '140px' }}>Remessa</th>
                   <th style={{ width: '180px' }}>ATP</th>
+                  <th style={{ width: '140px' }}>Subgrupo</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredItems.map(item => (
                   <tr key={item.id}>
-                    <td style={{ color: '#000000', fontWeight: '800', fontSize: '0.85rem' }}>
-                      {item.item_subgroup || 'OUTROS'}
-                    </td>
                     <td>
                       <code style={{
                         background: '#f0f0f0',
@@ -467,6 +464,9 @@ export default function PecasPage() {
                     <td>
                       <div style={{ color: '#000000', fontWeight: '800', fontSize: '0.85rem' }}>{item.atp_centro || '—'}</div>
                       <div style={{ color: '#666666', fontSize: '0.75rem', fontWeight: '600' }}>{item.atp_nome || '—'}</div>
+                    </td>
+                    <td style={{ color: '#000000', fontWeight: '800', fontSize: '0.85rem' }}>
+                      {item.item_subgroup || 'OUTROS'}
                     </td>
                   </tr>
                 ))}
