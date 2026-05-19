@@ -1,9 +1,9 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 6.1.0 (UPSERT REMESSAS)
+ * VERSÃO: 7.0.0 (SIMPLE INSERT - Modo Espelho Total)
  * 
- * Permite múltiplas remessas da mesma peça.
- * Usa UPSERT para ignorar duplicatas exatas vinda do Databricks.
+ * Esta versão usa INSERT simples. Não exige chaves únicas.
+ * Reflete exatamente o que vier do Databricks sob os filtros aplicados.
  */
 
 import { NextResponse } from 'next/server';
@@ -32,11 +32,13 @@ export async function POST(request) {
   const batchId = `sync-${Date.now()}`;
   const syncedAt = new Date().toISOString();
 
+  // 1. Log inicial
   const { data: logRow } = await supabase.from('datalake_sync_log').insert({
     batch_id: batchId, status: 'running', started_at: syncedAt, triggered_by: triggeredBy
   }).select('id').single();
 
   try {
+    // A. Busca técnicos ativos
     const { data: techs } = await supabase.from('technicians').select('id, name, databricks_name').eq('active', true);
     if (!techs?.length) throw new Error('Nenhum técnico ativo.');
 
@@ -47,9 +49,18 @@ export async function POST(request) {
       techMap[name] = t.id;
     });
 
+    // B. Busca TUDO no Databricks (TURBO Paginado)
     const allItems = await getAllTechniciansItems(Object.keys(techMap));
-    if (allItems.length === 0) throw new Error('Databricks retornou zero peças.');
+    
+    if (allItems.length === 0) {
+      throw new Error('Databricks retornou zero peças. Verifique os filtros.');
+    }
 
+    // C. LIMPEZA TOTAL (DELETE)
+    // Como não há chave única, deletamos tudo antes de inserir o novo lote
+    await supabase.from('technician_items').delete().in('technician_id', techIds);
+
+    // D. CARGA SIMPLES (INSERT)
     const insertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
       if (!techId) return null;
@@ -67,25 +78,22 @@ export async function POST(request) {
       };
     }).filter(Boolean);
 
-    // Limpeza Total (Opcional, mas mantida para garantir que só o que veio agora fique ativo)
-    await supabase.from('technician_items').delete().in('technician_id', techIds);
-
-    // Inserção com UPSERT para evitar erro de chave duplicada (técnico + peça + remessa)
+    // Insere em lotes de 500
     for (let i = 0; i < insertRows.length; i += 500) {
       const chunk = insertRows.slice(i, i + 500);
-      const { error: insError } = await supabase
-        .from('technician_items')
-        .upsert(chunk, { onConflict: 'technician_id,item_code,item_num_remessa' });
-      
+      const { error: insError } = await supabase.from('technician_items').insert(chunk);
       if (insError) throw new Error(`Erro ao inserir peças: ${insError.message}`);
     }
 
+    // E. Finaliza log com sucesso
     await supabase.from('datalake_sync_log').update({
       status: 'success', finished_at: new Date().toISOString(),
       technicians_total: techs.length, technicians_ok: techs.length, items_upserted: insertRows.length
     }).eq('id', logRow.id);
 
-    return NextResponse.json({ ok: true, total_gravado: insertRows.length });
+    return NextResponse.json({ 
+      ok: true, status: 'success', total_gravado: insertRows.length, batch_id: batchId 
+    });
 
   } catch (err) {
     await supabase.from('datalake_sync_log').update({
