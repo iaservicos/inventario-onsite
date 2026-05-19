@@ -1,9 +1,6 @@
 /**
  * app/api/sync/pecas/route.js
- * VERSÃO: 7.0.0 (SIMPLE INSERT - Modo Espelho Total)
- * 
- * Esta versão usa INSERT simples. Não exige chaves únicas.
- * Reflete exatamente o que vier do Databricks sob os filtros aplicados.
+ * VERSÃO: 7.1.0 (RESTRICTED TO ADMIN)
  */
 
 import { NextResponse } from 'next/server';
@@ -15,15 +12,23 @@ import { getAllTechniciansItems } from '@/lib/databricks';
 export const maxDuration = 300; 
 
 function isAuthorized(request, session) {
+  // 1. Permite se houver o segredo de automação externa (Cron/Power Automate)
   const secret = request.headers.get('x-dispatch-secret');
   if (secret && secret === process.env.DISPATCH_SECRET) return true;
-  if (session?.user) return true;
+  
+  // 2. Permite apenas se o usuário logado tiver a role 'admin'
+  if (session?.user?.role === 'admin') return true;
+  
   return false;
 }
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-  if (!isAuthorized(request, session)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  
+  // Validação de autorização restrita a administradores
+  if (!isAuthorized(request, session)) {
+    return NextResponse.json({ error: 'Apenas administradores podem disparar a sincronização manual.' }, { status: 401 });
+  }
 
   const body = await request.json().catch(() => ({}));
   const triggeredBy = body.triggered_by || 'api';
@@ -57,7 +62,6 @@ export async function POST(request) {
     }
 
     // C. LIMPEZA TOTAL (DELETE)
-    // Como não há chave única, deletamos tudo antes de inserir o novo lote
     await supabase.from('technician_items').delete().in('technician_id', techIds);
 
     // D. CARGA SIMPLES (INSERT)
@@ -94,7 +98,7 @@ export async function POST(request) {
     }).eq('id', logRow.id);
 
     return NextResponse.json({ 
-      ok: true, status: 'success', total_gravado: insertRows.length, batch_id: batchId 
+      ok: true, status: 'success', total_gravado: insertRows.length, batch_id: batchId, technicians_ok: techs.length
     });
 
   } catch (err) {

@@ -231,28 +231,31 @@ export default function PecasPage() {
           )}
         </div>
 
-        <button
-          onClick={handleManualSync}
-          disabled={syncing}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.4rem 0.9rem',
-            background: syncing ? '#e5e7eb' : '#1d4ed8',
-            color: syncing ? '#6b7280' : '#ffffff',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '0.8rem',
-            fontWeight: '700',
-            cursor: syncing ? 'not-allowed' : 'pointer',
-            transition: 'background 0.2s',
-          }}
-          title="Sincronizar agora (fora do horário automático das 08h)"
-        >
-          <IconRefresh spinning={syncing} />
-          {syncing ? 'Sincronizando...' : 'Sincronizar agora'}
-        </button>
+        {/* APENAS ADMIN PODE SINCRONIZAR MANUALMENTE */}
+        {session?.user?.role === 'admin' && (
+          <button
+            onClick={handleManualSync}
+            disabled={syncing}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.4rem 0.9rem',
+              background: syncing ? '#e5e7eb' : '#1d4ed8',
+              color: syncing ? '#6b7280' : '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              cursor: syncing ? 'not-allowed' : 'pointer',
+              transition: 'background 0.2s',
+            }}
+            title="Sincronizar agora (fora do horário automático das 08h)"
+          >
+            <IconRefresh spinning={syncing} />
+            {syncing ? 'Sincronizando...' : 'Sincronizar agora'}
+          </button>
+        )}
       </div>
 
       {/* ── Mensagem de resultado da sincronização manual ─────────────────── */}
@@ -387,79 +390,29 @@ export default function PecasPage() {
                 {searchFilter && items.length !== filteredItems.length && ` de ${items.length}`}
               </span>
             </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              {lastSync?.formatted_at && (
-                <span style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.3rem',
-                  fontSize: '0.75rem',
-                  color: '#1e40af',
-                  background: '#eff6ff',
-                  padding: '0.3rem 0.7rem',
-                  borderRadius: '6px',
-                  border: '1px solid #bfdbfe',
-                  fontWeight: '700',
-                }}>
-                  <IconClock />
-                  Atualizado em {lastSync.formatted_at}
-                </span>
-              )}
-              <span style={{
-                fontSize: '0.75rem',
-                color: '#333333',
-                fontWeight: '700',
-                background: '#ffffff',
-                padding: '0.3rem 0.7rem',
-                borderRadius: '6px',
-                border: '1px solid #d0d0d0',
-              }}>
-                Datalake → Supabase
-              </span>
-            </div>
           </div>
 
-          <div className="table-wrapper" style={{ border: 'none', borderRadius: '0' }}>
-            <table>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr>
-                  <th style={{ width: '120px' }}>Código</th>
-                  <th>Nome da Peça</th>
-                  <th style={{ width: '100px', textAlign: 'center' }}>Qtd</th>
-                  <th style={{ width: '140px' }}>Remessa</th>
-                  <th style={{ width: '180px' }}>ATP</th>
+                <tr style={{ background: '#000', color: '#fff' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', textTransform: 'uppercase' }}>Código</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', textTransform: 'uppercase' }}>Descrição</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', fontSize: '0.75rem', textTransform: 'uppercase' }}>Qtd</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', textTransform: 'uppercase' }}>Remessa</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', textTransform: 'uppercase' }}>ATP Centro</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', textTransform: 'uppercase' }}>ATP Nome</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredItems.map(item => (
-                  <tr key={item.id}>
-                    <td>
-                      <code style={{
-                        background: '#f0f0f0',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.85rem',
-                        color: '#000000',
-                        fontWeight: '800',
-                        border: '1px solid #d0d0d0',
-                      }}>
-                        {item.item_code}
-                      </code>
-                    </td>
-                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.95rem' }}>
-                      {item.item_name}
-                    </td>
-                    <td style={{ color: '#000000', fontWeight: '700', textAlign: 'center', fontSize: '1rem' }}>
-                      {item.item_quantity ?? '—'}
-                    </td>
-                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.9rem' }}>
-                      {item.item_num_remessa || '—'}
-                    </td>
-                    <td>
-                      <div style={{ color: '#000000', fontWeight: '800', fontSize: '0.85rem' }}>{item.atp_centro || '—'}</div>
-                      <div style={{ color: '#666666', fontSize: '0.75rem', fontWeight: '600' }}>{item.atp_nome || '—'}</div>
-                    </td>
+                {filteredItems.map((item, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #eee', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: '700' }}>{item.item_code}</td>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem' }}>{item.item_name}</td>
+                    <td style={{ padding: '1rem', textAlign: 'center', fontSize: '0.85rem', fontWeight: '700' }}>{item.item_quantity}</td>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem' }}>{item.item_num_remessa || '—'}</td>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem' }}>{item.atp_centro || '—'}</td>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem' }}>{item.atp_nome || '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -469,23 +422,14 @@ export default function PecasPage() {
       )}
 
       {/* ── Loading ───────────────────────────────────────────────────────── */}
-      {selectedTech && loading && (
-        <div style={{ padding: '5rem 2rem', textAlign: 'center', color: '#000000' }}>
-          <div style={{
-            display: 'inline-block',
-            width: '36px',
-            height: '36px',
-            border: '3px solid #f0f0f0',
-            borderTop: '3px solid #000000',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: '1rem',
-          }} />
-          <p style={{ fontWeight: '700', fontSize: '1rem' }}>Buscando peças...</p>
+      {loading && (
+        <div style={{ padding: '4rem', textAlign: 'center', color: '#000' }}>
+          <div style={{ marginBottom: '1rem' }}><IconRefresh spinning={true} /></div>
+          <div style={{ fontWeight: '700' }}>Buscando peças no banco local...</div>
         </div>
       )}
 
-      {/* ── Sem peças ─────────────────────────────────────────────────────── */}
+      {/* ── Vazio ─────────────────────────────────────────────────────────── */}
       {selectedTech && !loading && items.length === 0 && (
         <div style={{
           padding: '5rem 2rem',
@@ -495,10 +439,7 @@ export default function PecasPage() {
           borderRadius: '10px',
           border: '2px dashed #d0d0d0',
         }}>
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#cccccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1rem' }}>
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-          </svg>
-          <h3 style={{ fontSize: '1.1rem', color: '#000000', marginBottom: '0.5rem', fontWeight: '800' }}>
+          <h3 style={{ fontSize: '1.25rem', color: '#000000', marginBottom: '0.5rem', fontWeight: '900' }}>
             Nenhuma peça encontrada
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#666666', marginBottom: '1rem' }}>
@@ -510,7 +451,7 @@ export default function PecasPage() {
             </p>
           ) : (
             <p style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
-              O banco ainda não foi sincronizado com o Datalake. Use o botão "Sincronizar agora".
+              O banco ainda não foi sincronizado com o Datalake. {session?.user?.role === 'admin' && 'Use o botão "Sincronizar agora".'}
             </p>
           )}
         </div>
