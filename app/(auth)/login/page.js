@@ -84,14 +84,14 @@ function LoginForm() {
             Portal Onsite
           </h1>
           <p style={{ fontSize: '1.25rem', color: '#888888', marginBottom: '3rem', fontWeight: '500', maxWidth: '500px', lineHeight: '1.4' }}>
-            Gestão geral de peças e performance dos técnicos
+            IA SERVIÇOS
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {[
               'Gerenciamento centralizado',
               'Relatórios em tempo real',
-              'Sincronização Databricks'
+              'Análise de desempenho'
             ].map((item, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <span style={{ color: '#ffffff', fontSize: '1.25rem', fontWeight: 'bold' }}>✓</span>
