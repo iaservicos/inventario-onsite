@@ -172,22 +172,19 @@ async function runDatabricksQuery(sql, parameters = [], maxWaitMs = 90000) {
  */
 async function fetchTechnicianItemsFromDatabricks(technicianName) {
   const cleanName = (technicianName || '').trim();
-
   const sql = `
     SELECT
-      cod_peca_enviada   AS item_code,
+      atp_centro,
+      atp_nome,
+      technician_name_key,
+      cod_peca_enviada AS item_code,
       descr_peca_enviada AS item_name,
-      qtd_peca_enviada   AS item_quantity,
-      num_remessa        AS item_num_remessa
+      qtd_peca_enviada AS item_quantity,
+      num_remessa AS item_num_remessa
     FROM ${DATABRICKS_TABLE}
-    WHERE UPPER(TRIM(tecnico_nome)) = UPPER(TRIM(:technicianName))
-      AND status_consumo = 'NOVO'
-      AND (data_montagem_lote_dev IS NULL OR TRIM(CAST(data_montagem_lote_dev AS STRING)) = '')
-      AND (data_envio_dev IS NULL OR TRIM(CAST(data_envio_dev AS STRING)) = '')
-      AND (mont_lote IS NULL OR TRIM(CAST(mont_lote AS STRING)) = '')
-    LIMIT 500
+    WHERE technician_name_key = UPPER(TRIM(:technicianName))
+    LIMIT 1000
   `;
-
   return await runDatabricksQuery(sql, [
     { name: 'technicianName', value: cleanName },
   ]);
@@ -223,8 +220,10 @@ async function syncTechnician(supabase, tech, batchId, syncedAt) {
       technician_id:    tech.id,
       item_code:        String(item.item_code || '').trim(),
       item_name:        String(item.item_name || '').trim(),
-      item_quantity:    item.item_quantity != null ? parseInt(item.item_quantity, 10) : null,
+      item_quantity:    item.item_quantity != null ? parseFloat(item.item_quantity) : 0,
       item_num_remessa: item.item_num_remessa != null ? String(item.item_num_remessa).trim() : null,
+      atp_centro:       item.atp_centro != null ? String(item.atp_centro).trim() : null,
+      atp_nome:         item.atp_nome != null ? String(item.atp_nome).trim() : null,
       unit:             'un',
       active:           true,
       synced_at:        syncedAt,
