@@ -187,10 +187,23 @@ export async function PATCH(request, context) {
             selected = allItems.filter(item => (item.item_subgroup || '').toLowerCase() === weekSubgroup.toLowerCase());
           }
           
-          // Fallback se subgrupo vazio: pega 10 peças aleatórias
+          // Fallback se subgrupo vazio: pega todas as peças (sem limite de 10)
           if (selected.length === 0) {
-            selected = allItems.sort(() => Math.random() - 0.5).slice(0, 10);
+            selected = allItems;
           }
+
+          // 3.1 Consolidação de Peças (Soma quantidades de códigos iguais)
+          const consolidatedMap = new Map();
+          selected.forEach(item => {
+            const code = item.item_code;
+            if (consolidatedMap.has(code)) {
+              const existing = consolidatedMap.get(code);
+              existing.quantity = (existing.quantity || 0) + (item.quantity || 1);
+            } else {
+              consolidatedMap.set(code, { ...item });
+            }
+          });
+          const consolidatedItems = Array.from(consolidatedMap.values());
 
           // 4. Calcula data do próximo agendamento (Brasília)
           const targetDay = techData.inventory_day || 1;
@@ -216,9 +229,9 @@ export async function PATCH(request, context) {
             technician_id: id,
             scheduled_at: utcScheduledDate.toISOString(),
             week_ref: week,
-            items_count: selected.length,
+            items_count: consolidatedItems.length, // Agora conta itens únicos consolidados
             status: 'pending',
-            notes: `Agendamento em tempo real (Supervisor). Subgrupo: ${weekSubgroup || 'N/A'}`
+            notes: `Agendamento em tempo real (Supervisor). Subgrupo: ${weekSubgroup || 'N/A'}. Total peças: ${selected.length}`
           }, { onConflict: 'technician_id,week_ref' });
         }
       } catch (err) {
