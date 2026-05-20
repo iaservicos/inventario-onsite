@@ -343,32 +343,44 @@ async function generateSchedules() {
 
         // Calcula horário de disparo baseado na configuração do técnico
         // Se não tiver dia definido, usa segunda-feira (1) como padrão
-        const targetDay = tech.inventory_day || 1; 
+        const targetDay = tech.inventory_day || 1; // 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex
         const targetTime = tech.inventory_time || '09:00';
         const [hours, minutes] = targetTime.split(':').map(Number);
 
-        const scheduledDate = new Date();
-        const currentDay = scheduledDate.getDay(); // 0=Dom, 1=Seg...
+        // Trabalha com o horário de Brasília (GMT-3)
+        const now = new Date();
+        const brNow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
         
-        // Calcula a diferença para o próximo dia alvo
-        // Se hoje for o dia alvo e já passou do horário, agenda para a próxima semana
-        let dayDiff = targetDay - currentDay;
-        if (dayDiff < 0 || (dayDiff === 0 && (scheduledDate.getHours() > hours || (scheduledDate.getHours() === hours && scheduledDate.getMinutes() >= minutes)))) {
+        const scheduledDate = new Date(brNow);
+        let currentDay = brNow.getDay(); // 0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sab
+        
+        // Ajusta o currentDay para o padrão 1=Seg...7=Dom se necessário, 
+        // mas o JS usa 0=Dom. Vamos converter o targetDay para o padrão do JS:
+        // Se targetDay for 1 (Seg), no JS é 1. Se for 7 (Dom), no JS é 0.
+        const jsTargetDay = targetDay === 7 ? 0 : targetDay;
+
+        let dayDiff = jsTargetDay - currentDay;
+        
+        // Se o dia já passou ou é hoje mas o horário já passou, pula para a próxima semana
+        if (dayDiff < 0 || (dayDiff === 0 && (brNow.getHours() > hours || (brNow.getHours() === hours && brNow.getMinutes() >= minutes)))) {
           dayDiff += 7;
         }
         
-        scheduledDate.setDate(scheduledDate.getDate() + dayDiff);
+        scheduledDate.setDate(brNow.getDate() + dayDiff);
         scheduledDate.setHours(hours, minutes, 0, 0);
+
+        // Converte de volta para UTC para salvar no banco
+        const utcScheduledDate = new Date(scheduledDate.getTime() + (3 * 60 * 60 * 1000));
 
         schedulesToCreate.push({
           technician_id: tech.id,
-          scheduled_at: scheduledDate.toISOString(),
+          scheduled_at: utcScheduledDate.toISOString(),
           week_ref: week,
           items_count: selected.length,
           notes: `Agendamento automático. Seleção: ${selected.map(s => s.selection_reason).join(', ')}`,
         });
 
-        console.log(`    ✓ Agendamento preparado para ${scheduledDate.toLocaleString('pt-BR')} (Dia ${targetDay} às ${targetTime})\n`);
+        console.log(`    ✓ Agendamento preparado para ${scheduledDate.toLocaleString('pt-BR')} (Brasília) | UTC: ${utcScheduledDate.toISOString()}\n`);
       } catch (err) {
         console.error(`    ❌ Erro: ${err.message}`);
         errors.push(`${tech.name}: ${err.message}`);
