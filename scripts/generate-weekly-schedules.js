@@ -210,88 +210,39 @@ async function getTechnicianItems(technicianName) {
   ]);
 }
 
-// Função para selecionar 10 peças com prioridade
-async function selectItemsWithPriority(allItems, technicianId, count = 10) {
-  // Busca histórico de contagens (últimos 6 meses)
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+// Função para buscar o subgrupo prioritário da semana atual
+async function getWeekSubgroup() {
+  const { data } = await supabase
+    .from('v_current_week_subgroup')
+    .select('subgroup_name')
+    .maybeSingle();
+  return data?.subgroup_name || null;
+}
 
-  const { data: history } = await supabase
-    .from('inventory_items')
-    .select(`
-      item_code,
-      created_at,
-      inventories!inner (
-        technician_id,
-        status,
-        created_at
-      )
-    `)
-    .eq('inventories.technician_id', technicianId)
-    .in('inventories.status', ['completed', 'recount_pending'])
-    .gte('inventories.created_at', sixMonthsAgo.toISOString())
-    .order('created_at', { ascending: false });
-
-  // Monta mapa de última contagem
-  const lastCountedMap = {};
-  if (history && history.length > 0) {
-    for (const row of history) {
-      const code = row.item_code;
-      if (!lastCountedMap[code]) {
-        lastCountedMap[code] = row.created_at;
-      }
-    }
+// Função para selecionar peças baseada no subgrupo da semana
+async function selectItemsBySubgroup(allItems, weekSubgroup) {
+  if (!weekSubgroup) {
+    // Se não houver subgrupo definido, seleciona 10 peças aleatórias como fallback
+    return allItems
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10)
+      .map(item => ({ ...item, selection_reason: 'fallback_random' }));
   }
 
-  // Classifica peças por prioridade
-  const neverCounted = [];
-  const countedOld = [];
-  const countedRecent = [];
+  // Filtra peças que pertencem ao subgrupo da semana
+  const selected = allItems
+    .filter(item => (item.item_subgroup || '').toLowerCase() === weekSubgroup.toLowerCase())
+    .map(item => ({ ...item, selection_reason: `subgroup_${weekSubgroup}` }));
 
-  const fourWeeksAgo = new Date();
-  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-
-  for (const item of allItems) {
-    const lastDate = lastCountedMap[item.item_code];
-
-    if (!lastDate) {
-      neverCounted.push(item);
-    } else if (new Date(lastDate) < fourWeeksAgo) {
-      countedOld.push({ ...item, last_counted: lastDate });
-    } else {
-      countedRecent.push({ ...item, last_counted: lastDate });
-    }
+  // Se o subgrupo estiver vazio para este técnico, tenta buscar 10 peças aleatórias
+  if (selected.length === 0) {
+    return allItems
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10)
+      .map(item => ({ ...item, selection_reason: 'subgroup_empty_fallback' }));
   }
 
-  // Ordena contadas antigas da mais antiga para a mais recente
-  countedOld.sort((a, b) => new Date(a.last_counted) - new Date(b.last_counted));
-
-  // Embaralha nunca contadas
-  const shuffledNever = neverCounted.sort(() => Math.random() - 0.5);
-
-  // Monta lista final com prioridade
-  const selected = [];
-
-  // 1ª: Nunca contadas
-  for (const item of shuffledNever) {
-    if (selected.length >= count) break;
-    selected.push({ ...item, selection_reason: 'never_counted' });
-  }
-
-  // 2ª: Contadas antigas
-  for (const item of countedOld) {
-    if (selected.length >= count) break;
-    selected.push({ ...item, selection_reason: 'oldest_count' });
-  }
-
-  // 3ª: Contadas recentemente
-  const shuffledRecent = countedRecent.sort(() => Math.random() - 0.5);
-  for (const item of shuffledRecent) {
-    if (selected.length >= count) break;
-    selected.push({ ...item, selection_reason: 'recent_random' });
-  }
-
-  return selected.slice(0, count);
+  return selected;
 }
 
 // Função principal
@@ -336,10 +287,13 @@ async function generateSchedules() {
 
         console.log(`    ✓ ${allItems.length} peça(s) encontrada(s) no Databricks`);
 
-        // Seleciona 10 peças com prioridade
-        const selected = await selectItemsWithPriority(allItems, tech.id, 10);
+        // Busca o subgrupo da semana
+        const weekSubgroup = await getWeekSubgroup();
+        
+        // Seleciona peças baseada no subgrupo
+        const selected = await selectItemsBySubgroup(allItems, weekSubgroup);
 
-        console.log(`    ✓ ${selected.length} peça(s) selecionada(s) para contagem`);
+        console.log(`    ✓ ${selected.length} peça(s) selecionada(s) (Subgrupo: ${weekSubgroup || 'N/A'})`);
 
         // Calcula horário de disparo baseado na configuração do técnico
         // Se não tiver dia definido, usa segunda-feira (1) como padrão
