@@ -1,3 +1,5 @@
+// CAMINHO: app/api/technicians/route.js
+
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -11,7 +13,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const region = searchParams.get('region') || '';
-    const active = searchParams.get('active'); // Captura o parâmetro active
+    const active = searchParams.get('active');
 
     const supabase = createServiceClient();
 
@@ -20,26 +22,20 @@ export async function GET(request) {
       .select('*')
       .order('name');
 
-    // FILTRO DE ATIVOS: Se o parâmetro active for passado, aplicamos o filtro
     if (active === 'true') {
       query = query.eq('active', true);
     } else if (active === 'false') {
       query = query.eq('active', false);
     }
 
-    /* ─── Regra de Visibilidade por Perfil ──────────────────── */
-    
     const isSupervisor = session.user.role === 'supervisor';
     const isCoordinator = session.user.role === 'coordinator';
     const isAdmin = session.user.role === 'admin';
 
     if (isSupervisor || isCoordinator) {
-      // REGRA ESPECIAL SP: Se filtrar por SP, permite ver todos de SP.
       if (region === 'SP') {
         query = query.eq('region', 'SP');
-      } 
-      // Caso contrário, aplica a restrição de dono do técnico
-      else {
+      } else {
         if (isSupervisor) {
           query = query.ilike('supervisor_name', session.user.name);
         } else if (isCoordinator) {
@@ -47,8 +43,6 @@ export async function GET(request) {
         }
       }
     }
-
-    /* ─── Filtros Adicionais (Busca e Região) ───────────────── */
 
     if (search) {
       query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
@@ -89,7 +83,9 @@ export async function POST(request) {
       region: body.region || null,
       supervisor_name: body.supervisor_name || null,
       coordinator_name: body.coordinator_name || null,
-      active: body.active !== undefined ? body.active : true
+      active: body.active !== undefined ? body.active : true,
+      inventory_day: body.inventory_day !== undefined ? body.inventory_day : null,
+      inventory_time: body.inventory_time || '09:00'
     };
 
     const { data, error } = await supabase

@@ -1,3 +1,5 @@
+// CAMINHO: app/api/technicians/[id]/route.js
+
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -19,11 +21,7 @@ export async function GET(request, context) {
       .select('*')
       .order('name');
 
-    /* ─── Regra de Visibilidade por Perfil ──────────────────── */
-    
     if (session.user.role === 'supervisor') {
-      // REGRA ESPECIAL SP: Se o filtro for SP, permite ver todos de SP. 
-      // Caso contrário, vê apenas os seus.
       if (region === 'SP') {
         query = query.eq('region', 'SP');
       } else {
@@ -31,15 +29,11 @@ export async function GET(request, context) {
       }
     }
 
-    /* ─── Filtros de Busca e Região ─────────────────────────── */
-
     if (search) {
-      // Busca por nome ou e-mail
       query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
     }
 
     if (region && region !== 'SP') {
-      // Se não for SP (que já tratamos na regra de supervisor), aplica o filtro de região
       query = query.eq('region', region);
     }
 
@@ -71,7 +65,9 @@ export async function POST(request, context) {
       phone: body.phone || null,
       region: body.region || null,
       supervisor_name: body.supervisor_name || session.user.name,
-      active: body.active !== undefined ? body.active : true
+      active: body.active !== undefined ? body.active : true,
+      inventory_day: body.inventory_day !== undefined ? body.inventory_day : null,
+      inventory_time: body.inventory_time || '09:00'
     };
 
     const { data, error } = await supabase
@@ -110,7 +106,6 @@ export async function PATCH(request, context) {
     const body = await request.json();
     const supabase = createServiceClient();
 
-    // Validação de Permissão para Supervisor
     if (!isAdmin && !isCoordinator) {
       const { data: tech } = await supabase.from('technicians').select('supervisor_name, region').eq('id', id).single();
       const isHisTech = tech?.supervisor_name === session.user.name;
@@ -128,6 +123,8 @@ export async function PATCH(request, context) {
     if (body.region !== undefined) updateData.region = body.region || null;
     if (body.supervisor_name !== undefined && (isAdmin || isCoordinator)) updateData.supervisor_name = body.supervisor_name;
     if (body.active !== undefined) updateData.active = body.active;
+    if (body.inventory_day !== undefined) updateData.inventory_day = body.inventory_day;
+    if (body.inventory_time !== undefined) updateData.inventory_time = body.inventory_time;
     
     updateData.updated_at = new Date().toISOString();
 

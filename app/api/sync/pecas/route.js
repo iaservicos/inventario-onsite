@@ -1,7 +1,4 @@
-/**
- * app/api/sync/pecas/route.js
- * VERSÃO: 8.0.0 (COM SUBGRUPOS)
- */
+// CAMINHO: app/api/sync/pecas/route.js
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
@@ -18,14 +15,12 @@ function isAuthorized(request, session) {
   return false;
 }
 
-// Lógica de detecção de subgrupos baseada na primeira palavra
 function detectSubgroup(name) {
   if (!name) return 'Outros';
   
   const words = name.trim().toUpperCase().split(/\s+/);
   const firstWord = words[0];
 
-  // Regras baseadas na primeira palavra
   if (firstWord === 'PLM') return 'PLM';
   if (firstWord === 'ADAPT' || firstWord === 'FONTE') return 'Fonte/Adaptador';
   if (firstWord === 'HDD' || firstWord === 'SSD') return 'SSD/HD';
@@ -36,7 +31,6 @@ function detectSubgroup(name) {
   if (firstWord === 'BATER') return 'Bateria';
   if (firstWord === 'PROC') return 'Processador';
 
-  // Fallback para busca por palavras-chave se a primeira palavra não bater
   const n = name.toUpperCase();
   if (n.includes('SSD') || n.includes('HD ') || n.includes('DISCO RIGIDO')) return 'SSD/HD';
   if (n.includes('MEM') || n.includes('DDR') || n.includes('DIMM')) return 'Memória';
@@ -88,7 +82,7 @@ export async function POST(request) {
         technician_id: techId,
         item_code: String(item.item_code).trim(),
         item_name: String(item.item_name).trim(),
-        item_subgroup: detectSubgroup(item.item_name), // NOVA COLUNA
+        item_subgroup: detectSubgroup(item.item_name),
         item_quantity: parseInt(item.item_quantity) || 0,
         item_num_remessa: String(item.item_num_remessa || '').trim(),
         atp_centro: String(item.atp_centro || '').trim(),

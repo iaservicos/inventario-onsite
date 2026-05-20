@@ -303,7 +303,7 @@ async function generateSchedules() {
     // 1. Busca todos os técnicos ativos
     const { data: technicians, error: techError } = await supabase
       .from('technicians')
-      .select('id, name, databricks_name, phone, active')
+      .select('id, name, databricks_name, phone, active, inventory_day, inventory_time')
       .eq('active', true);
 
     if (techError) throw techError;
@@ -341,22 +341,34 @@ async function generateSchedules() {
 
         console.log(`    ✓ ${selected.length} peça(s) selecionada(s) para contagem`);
 
-        // Calcula horário de disparo (próxima segunda-feira às 09:00)
-        const nextMonday = new Date();
-        const day = nextMonday.getDay();
-        const diff = nextMonday.getDate() - day + (day === 0 ? -6 : 1);
-        nextMonday.setDate(diff);
-        nextMonday.setHours(9, 0, 0, 0);
+        // Calcula horário de disparo baseado na configuração do técnico
+        // Se não tiver dia definido, usa segunda-feira (1) como padrão
+        const targetDay = tech.inventory_day || 1; 
+        const targetTime = tech.inventory_time || '09:00';
+        const [hours, minutes] = targetTime.split(':').map(Number);
+
+        const scheduledDate = new Date();
+        const currentDay = scheduledDate.getDay(); // 0=Dom, 1=Seg...
+        
+        // Calcula a diferença para o próximo dia alvo
+        // Se hoje for o dia alvo e já passou do horário, agenda para a próxima semana
+        let dayDiff = targetDay - currentDay;
+        if (dayDiff < 0 || (dayDiff === 0 && (scheduledDate.getHours() > hours || (scheduledDate.getHours() === hours && scheduledDate.getMinutes() >= minutes)))) {
+          dayDiff += 7;
+        }
+        
+        scheduledDate.setDate(scheduledDate.getDate() + dayDiff);
+        scheduledDate.setHours(hours, minutes, 0, 0);
 
         schedulesToCreate.push({
           technician_id: tech.id,
-          scheduled_at: nextMonday.toISOString(),
+          scheduled_at: scheduledDate.toISOString(),
           week_ref: week,
           items_count: selected.length,
           notes: `Agendamento automático. Seleção: ${selected.map(s => s.selection_reason).join(', ')}`,
         });
 
-        console.log(`    ✓ Agendamento preparado para ${nextMonday.toLocaleString('pt-BR')}\n`);
+        console.log(`    ✓ Agendamento preparado para ${scheduledDate.toLocaleString('pt-BR')} (Dia ${targetDay} às ${targetTime})\n`);
       } catch (err) {
         console.error(`    ❌ Erro: ${err.message}`);
         errors.push(`${tech.name}: ${err.message}`);
