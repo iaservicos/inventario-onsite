@@ -51,24 +51,27 @@ export async function POST(request) {
     // Não bloqueia se não houver subgrupo, apenas envia sem o foco
     const subgroupLabel = weekSubgroup ? `\n\nPor favor, separe as peças do subgrupo: *${weekSubgroup}*` : '';
 
-    // Busca agendamentos de amanhã com status pending
+    // Busca agendamentos de amanhã com status pending (considerando fuso horário de Brasília GMT-3)
     const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setUTCDate(now.getUTCDate() + 1);
+    // Ajusta para o fuso de Brasília para calcular o "amanhã" corretamente
+    const brNow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
+    const brTomorrow = new Date(brNow);
+    brTomorrow.setDate(brNow.getDate() + 1);
 
-    const tomorrowStart = new Date(
-      Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate(), 0, 0, 0)
-    );
-    const tomorrowEnd = new Date(
-      Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate(), 23, 59, 59)
-    );
+    // Define o início e fim do dia de amanhã no fuso de Brasília
+    const tomorrowStart = new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 0, 0, 0);
+    const tomorrowEnd = new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 23, 59, 59);
+
+    // Converte de volta para UTC para a query no banco (Supabase armazena em UTC)
+    const utcStart = new Date(tomorrowStart.getTime() + (3 * 60 * 60 * 1000));
+    const utcEnd = new Date(tomorrowEnd.getTime() + (3 * 60 * 60 * 1000));
 
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
       .select('*, technicians(*)')
       .eq('status', 'pending')
-      .gte('scheduled_at', tomorrowStart.toISOString())
-      .lte('scheduled_at', tomorrowEnd.toISOString());
+      .gte('scheduled_at', utcStart.toISOString())
+      .lte('scheduled_at', utcEnd.toISOString());
 
     if (error) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
