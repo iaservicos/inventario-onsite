@@ -48,21 +48,27 @@ export async function POST(request) {
 
     // Busca o subgrupo da semana atual
     const weekSubgroup = await getWeekSubgroup(supabase);
-    if (!weekSubgroup) {
-      return NextResponse.json({ ok: false, error: 'Subgrupo da semana não encontrado' }, { status: 500 });
-    }
+    // Não bloqueia se não houver subgrupo, apenas envia sem o foco
+    const subgroupLabel = weekSubgroup ? `\n\nPor favor, separe as peças do subgrupo: *${weekSubgroup}*` : '';
 
     // Busca agendamentos de amanhã com status pending
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setUTCDate(now.getUTCDate() + 1);
+
+    const tomorrowStart = new Date(
+      Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate(), 0, 0, 0)
+    );
+    const tomorrowEnd = new Date(
+      Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate(), 23, 59, 59)
+    );
 
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
       .select('*, technicians(*)')
       .eq('status', 'pending')
-      .gte('scheduled_date', `${tomorrowStr}T00:00:00`)
-      .lte('scheduled_date', `${tomorrowStr}T23:59:59`);
+      .gte('scheduled_at', tomorrowStart.toISOString())
+      .lte('scheduled_at', tomorrowEnd.toISOString());
 
     if (error) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
@@ -82,8 +88,7 @@ export async function POST(request) {
 
       const message =
         `Olá, ${tech.name}! 👋\n\n` +
-        `Amanhã é dia do seu inventário semanal.\n\n` +
-        `Por favor, separe as peças do subgrupo: *${weekSubgroup}*\n\n` +
+        `Amanhã é dia do seu inventário semanal.${subgroupLabel}\n\n` +
         `Amanhã você receberá a lista completa para contagem. Qualquer dúvida, fale com seu supervisor.`;
 
       const sent = await sendGptMakerMessage(tech.phone, message);

@@ -116,7 +116,7 @@ export async function GET(request) {
       };
     });
 
-  // Registra log do alerta D-1 no banco
+  // Registra log do alerta D-1 no banco (usando tipo 'timeout' como fallback ou ignorando se o schema não permitir)
   if (result.length > 0) {
     const alertLogs = result.map(s => ({
       inventory_id: null,
@@ -128,7 +128,7 @@ export async function GET(request) {
     }));
 
     // Insere silenciosamente — não bloqueia a resposta se falhar
-    supabase.from('alerts').insert(alertLogs).then(() => {});
+    supabase.from('alerts').insert(alertLogs).catch(e => console.error('Erro ao inserir alerta:', e));
   }
 
   return NextResponse.json({
