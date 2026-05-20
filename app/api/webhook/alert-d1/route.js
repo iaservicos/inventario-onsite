@@ -21,20 +21,31 @@ async function sendGptMakerMessage(phone, message) {
     return false;
   }
 
-  const res = await fetch(`https://api.gptmaker.ai/v2/send-message`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GPTMAKER_TOKEN}`,
-    },
-    body: JSON.stringify({
-      phone,
-      message,
-      agent_id: GPTMAKER_AGENT_ID,
-    }),
-  });
+  try {
+    const res = await fetch(`https://api.gptmaker.ai/v2/send-message`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GPTMAKER_TOKEN}`,
+      },
+      body: JSON.stringify({
+        phone,
+        message,
+        agent_id: GPTMAKER_AGENT_ID,
+      }),
+    });
 
-  return res.ok;
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('[alert-d1] Erro GPT Maker:', res.status, errorData);
+      return { ok: false, error: errorData.message || `Status ${res.status}` };
+    }
+
+    return { ok: true };
+  } catch (err) {
+    console.error('[alert-d1] Erro fetch GPT Maker:', err);
+    return { ok: false, error: err.message };
+  }
 }
 
 export async function POST(request) {
@@ -51,27 +62,21 @@ export async function POST(request) {
     // Não bloqueia se não houver subgrupo, apenas envia sem o foco
     const subgroupLabel = weekSubgroup ? `\n\nPor favor, separe as peças do subgrupo: *${weekSubgroup}*` : '';
 
-    // Busca agendamentos de amanhã com status pending (considerando fuso horário de Brasília GMT-3)
+    // Busca agendamentos que ocorrerão nas próximas 24 a 48 horas (Janela D-1 flexível)
     const now = new Date();
-    // Ajusta para o fuso de Brasília para calcular o "amanhã" corretamente
-    const brNow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
-    const brTomorrow = new Date(brNow);
-    brTomorrow.setDate(brNow.getDate() + 1);
-
-    // Define o início e fim do dia de amanhã no fuso de Brasília
-    const tomorrowStart = new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 0, 0, 0);
-    const tomorrowEnd = new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 23, 59, 59);
-
-    // Converte de volta para UTC para a query no banco (Supabase armazena em UTC)
-    const utcStart = new Date(tomorrowStart.getTime() + (3 * 60 * 60 * 1000));
-    const utcEnd = new Date(tomorrowEnd.getTime() + (3 * 60 * 60 * 1000));
+    
+    // Início da busca: daqui a 18 horas
+    // Fim da busca: daqui a 42 horas
+    // Isso cobre o dia de amanhã independentemente do horário que o script rodar
+    const searchStart = new Date(now.getTime() + (18 * 60 * 60 * 1000));
+    const searchEnd = new Date(now.getTime() + (42 * 60 * 60 * 1000));
 
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
       .select('*, technicians(*)')
       .eq('status', 'pending')
-      .gte('scheduled_at', utcStart.toISOString())
-      .lte('scheduled_at', utcEnd.toISOString());
+      .gte('scheduled_at', searchStart.toISOString())
+      .lte('scheduled_at', searchEnd.toISOString());
 
     if (error) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
@@ -84,9 +89,8 @@ export async function POST(request) {
         message: 'Nenhum agendamento para amanhã',
         debug: {
           now_utc: now.toISOString(),
-          br_now: brNow.toISOString(),
-          search_start_utc: utcStart.toISOString(),
-          search_end_utc: utcEnd.toISOString()
+          search_start_utc: searchStart.toISOString(),
+          search_end_utc: searchEnd.toISOString()
         }
       });
     }
@@ -104,8 +108,13 @@ export async function POST(request) {
         `Amanhã é dia do seu inventário semanal.${subgroupLabel}\n\n` +
         `Amanhã você receberá a lista completa para contagem. Qualquer dúvida, fale com seu supervisor.`;
 
-      const sent = await sendGptMakerMessage(tech.phone, message);
-      results.push({ technician_id: schedule.technician_id, name: tech.name, ok: sent });
+      const sendResult = await sendGptMakerMessage(tech.phone, message);
+      results.push({ 
+        technician_id: schedule.technician_id, 
+        name: tech.name, 
+        ok: sendResult.ok,
+        error: sendResult.error 
+      });
     }
 
     return NextResponse.json({ ok: true, subgroup: weekSubgroup, sent: results.filter(r => r.ok).length, results });
