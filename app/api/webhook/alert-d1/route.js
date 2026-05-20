@@ -62,14 +62,22 @@ export async function POST(request) {
     // Não bloqueia se não houver subgrupo, apenas envia sem o foco
     const subgroupLabel = weekSubgroup ? `\n\nPor favor, separe as peças do subgrupo: *${weekSubgroup}*` : '';
 
-    // Busca agendamentos que ocorrerão nas próximas 24 a 48 horas (Janela D-1 flexível)
+    // Busca agendamentos para o dia civil de amanhã (Brasília GMT-3)
     const now = new Date();
+    // Ajusta para Brasília
+    const brNow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
     
-    // Início da busca: daqui a 18 horas
-    // Fim da busca: daqui a 42 horas
-    // Isso cobre o dia de amanhã independentemente do horário que o script rodar
-    const searchStart = new Date(now.getTime() + (18 * 60 * 60 * 1000));
-    const searchEnd = new Date(now.getTime() + (42 * 60 * 60 * 1000));
+    // Define o dia de amanhã
+    const brTomorrow = new Date(brNow);
+    brTomorrow.setDate(brNow.getDate() + 1);
+    
+    // Início e fim do dia de amanhã em Brasília
+    const startOfTomorrow = new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 0, 0, 0);
+    const endOfTomorrow = new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 23, 59, 59);
+    
+    // Converte para UTC para a query no Supabase
+    const searchStart = new Date(startOfTomorrow.getTime() + (3 * 60 * 60 * 1000));
+    const searchEnd = new Date(endOfTomorrow.getTime() + (3 * 60 * 60 * 1000));
 
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
