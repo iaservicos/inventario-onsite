@@ -78,7 +78,17 @@ export async function POST(request) {
     }
 
     if (!schedules || schedules.length === 0) {
-      return NextResponse.json({ ok: true, sent: 0, message: 'Nenhum agendamento para amanhã' });
+      return NextResponse.json({ 
+        ok: true, 
+        sent: 0, 
+        message: 'Nenhum agendamento para amanhã',
+        debug: {
+          now_utc: now.toISOString(),
+          br_now: brNow.toISOString(),
+          search_start_utc: utcStart.toISOString(),
+          search_end_utc: utcEnd.toISOString()
+        }
+      });
     }
 
     const results = [];
