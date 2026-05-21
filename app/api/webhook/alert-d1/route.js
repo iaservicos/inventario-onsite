@@ -22,7 +22,7 @@ async function sendGptMakerMessage(phone, message) {
 
   try {
     // Tentando endpoint alternativo para a v2 do GPT Maker
-    const url = `https://api.gptmaker.ai/v2/agent/${GPTMAKER_AGENT_ID}/send-message`;
+    const url = `https://api.gptmaker.ai/v2/agent/3EEB3169DA74F05E061F8A73F674B203/send-message`;
     
     const res = await fetch(url, {
       method: 'POST',
