@@ -21,8 +21,8 @@ async function sendGptMakerMessage(phone, message) {
   }
 
   try {
-    // URL correta para a v2 do GPT Maker enviando via agente específico
-    const url = `https://api.gptmaker.ai/v2/agent/${GPTMAKER_AGENT_ID}/message/send`;
+    // Tentando endpoint alternativo para a v2 do GPT Maker
+    const url = `https://api.gptmaker.ai/v2/agent/${GPTMAKER_AGENT_ID}/send-message`;
     
     const res = await fetch(url, {
       method: 'POST',
@@ -89,42 +89,22 @@ export async function POST(request) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
-    if (!schedules || schedules.length === 0) {
-      return NextResponse.json({ 
-        ok: true, 
-        sent: 0, 
-        message: 'Nenhum agendamento para amanhã',
-        debug: {
-          now_utc: now.toISOString(),
-          search_start_utc: searchStart.toISOString(),
-          search_end_utc: searchEnd.toISOString()
-        }
-      });
-    }
+    // Retorna a lista de técnicos para o Power Automate disparar via Dispara.ai
+    const techniciansToAlert = (schedules || []).map(s => ({
+      technician_id: s.technician_id,
+      name: s.technicians?.name,
+      phone: s.technicians?.phone,
+      scheduled_at: s.scheduled_at,
+      subgroup: weekSubgroup,
+      message: `Olá, ${s.technicians?.name}! 👋\n\nAmanhã é dia do seu inventário semanal.${subgroupLabel}\n\nAmanhã você receberá a lista completa para contagem. Qualquer dúvida, fale com seu supervisor.`
+    })).filter(t => t.phone);
 
-    const results = [];
-    for (const schedule of schedules) {
-      const tech = schedule.technicians;
-      if (!tech?.phone) {
-        results.push({ technician_id: schedule.technician_id, ok: false, reason: 'sem_telefone' });
-        continue;
-      }
-
-      const message =
-        `Olá, ${tech.name}! 👋\n\n` +
-        `Amanhã é dia do seu inventário semanal.${subgroupLabel}\n\n` +
-        `Amanhã você receberá a lista completa para contagem. Qualquer dúvida, fale com seu supervisor.`;
-
-      const sendResult = await sendGptMakerMessage(tech.phone, message);
-      results.push({ 
-        technician_id: schedule.technician_id, 
-        name: tech.name, 
-        ok: sendResult.ok,
-        error: sendResult.error 
-      });
-    }
-
-    return NextResponse.json({ ok: true, subgroup: weekSubgroup, sent: results.filter(r => r.ok).length, results });
+    return NextResponse.json({ 
+      ok: true, 
+      subgroup: weekSubgroup, 
+      count: techniciansToAlert.length,
+      technicians: techniciansToAlert 
+    });
   } catch (err) {
     console.error('[alert-d1]', err);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
