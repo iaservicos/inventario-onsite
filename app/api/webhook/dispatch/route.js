@@ -72,58 +72,39 @@ export async function POST(request) {
         }
 
         // --- LÓGICA DE SELEÇÃO COM PRIORIDADE DE SUBGRUPO SEMANAL ---
-        const limit = schedule.items_count || 10;
         let selectedItems = [];
 
-        // 1. Primeiro: tenta preencher com peças do subgrupo da semana (aleatório dentro do grupo)
+        // 1. Primeiro: tenta preencher com peças do subgrupo da semana
         if (weekSubgroup) {
-          const weekItems = allItems
-            .filter(item => (item.item_subgroup || '').toLowerCase() === weekSubgroup.toLowerCase())
-            .sort(() => Math.random() - 0.5);
-          selectedItems = weekItems.slice(0, limit);
+          selectedItems = allItems.filter(item => (item.item_subgroup || '').toLowerCase() === weekSubgroup.toLowerCase());
         }
 
-        // 2. Se não atingiu o limite, completa com outros subgrupos (rotação aleatória entre grupos)
-        if (selectedItems.length < limit) {
-          const usedIds = new Set(selectedItems.map(i => i.id));
-          const remaining = allItems.filter(i => !usedIds.has(i.id));
-
-          // Agrupa os restantes por subgrupo
-          const groups = {};
-          remaining.forEach(item => {
-            const sub = item.item_subgroup || 'Outros';
-            if (!groups[sub]) groups[sub] = [];
-            groups[sub].push(item);
-          });
-
-          const groupNames = Object.keys(groups).sort(() => Math.random() - 0.5);
-          let attempt = 0;
-          while (selectedItems.length < limit && groupNames.length > 0 && attempt < 100) {
-            const groupName = groupNames[attempt % groupNames.length];
-            if (groups[groupName].length > 0) {
-              const idx = Math.floor(Math.random() * groups[groupName].length);
-              selectedItems.push(groups[groupName].splice(idx, 1)[0]);
-            } else {
-              groupNames.splice(attempt % groupNames.length, 1);
-              continue;
-            }
-            attempt++;
-          }
-        }
-
-        // Fallback: se ainda vazio, sorteia aleatoriamente
+        // 2. Fallback: se não houver peças no subgrupo, pega todas as peças ativas
         if (selectedItems.length === 0) {
-          selectedItems = allItems.sort(() => Math.random() - 0.5).slice(0, limit);
+          selectedItems = allItems;
         }
+
+        // 3. Consolidação por Código (Soma quantidades de códigos iguais)
+        const consolidatedMap = new Map();
+        selectedItems.forEach(item => {
+          const code = item.item_code;
+          if (consolidatedMap.has(code)) {
+            const existing = consolidatedMap.get(code);
+            existing.item_quantity = (Number(existing.item_quantity) || 0) + (Number(item.item_quantity) || 1);
+          } else {
+            consolidatedMap.set(code, { ...item });
+          }
+        });
+        const consolidatedItems = Array.from(consolidatedMap.values());
 
         // Cria o inventário no banco
         const inventory = await createInventory({
           technician_id: schedule.technician_id,
           week_ref: schedule.week_ref,
-          total_items: selectedItems.length,
+          total_items: consolidatedItems.length,
         });
 
-        const itemRows = selectedItems.map(item => ({
+        const itemRows = consolidatedItems.map(item => ({
           inventory_id: inventory.id,
           item_code: item.item_code,
           item_name: item.item_name,
@@ -135,14 +116,23 @@ export async function POST(request) {
         await supabase.from('inventory_items').insert(itemRows);
         await updateInventory(inventory.id, { status: 'in_progress', started_at: new Date().toISOString() });
 
-        // Monta a mensagem inicial com a lista de peças para o GPT Maker
-        const firstMessage = buildFirstMessage(tech.name, selectedItems, weekSubgroup);
+        // Monta a mensagem inicial com a lista de peças consolidada
+        const firstMessage = buildFirstMessage(tech.name, consolidatedItems, weekSubgroup);
 
         const sessionToken = crypto.randomBytes(32).toString('hex');
         await createGptSession({ inventory_id: inventory.id, technician_id: schedule.technician_id, phone: tech.phone, session_token: sessionToken });
         await updateSchedule(schedule.id, { status: 'dispatched', inventory_id: inventory.id });
 
-        results.push({ schedule_id: schedule.id, ok: true, session_token: sessionToken, first_message: firstMessage, phone: tech.phone });
+        results.push({ 
+          schedule_id: schedule.id, 
+          ok: true, 
+          session_token: sessionToken, 
+          first_message: firstMessage, 
+          phone: tech.phone,
+          technician_name: tech.name,
+          items_count: consolidatedItems.length,
+          items: consolidatedItems.map(i => ({ code: i.item_code, name: i.item_name, qty: i.item_quantity }))
+        });
       } catch (err) {
         results.push({ schedule_id: schedule.id, ok: false, reason: err.message });
       }
