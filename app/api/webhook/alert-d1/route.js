@@ -78,26 +78,22 @@ export async function POST(request) {
     const searchStart = new Date(startOfTomorrow.getTime() + (3 * 60 * 60 * 1000));
     const searchEnd = new Date(endOfTomorrow.getTime() + (3 * 60 * 60 * 1000));
 
-    const { data: schedules, error } = await supabase
-      .from('inventory_schedules')
-      .select('*, technicians(*)')
-      .eq('status', 'pending')
-      .gte('scheduled_at', searchStart.toISOString())
-      .lte('scheduled_at', searchEnd.toISOString());
+const { data: schedules, error } = await supabase
+  .from('inventory_schedules')
+  .select('*, technicians(*), scheduled_subgroup, scheduled_items')
+  .eq('status', 'pending')
+  .gte('scheduled_at', searchStart.toISOString())
+  .lte('scheduled_at', searchEnd.toISOString());
 
-    if (error) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
-    }
+const techniciansToAlert = (schedules || []).map(s => ({
+  technician_id: s.technician_id,
+  name: s.technicians?.name,
+  phone: s.technicians?.phone,
+  scheduled_at: s.scheduled_at,
+  subgroup: s.scheduled_subgroup,
+  message: `Olá, ${s.technicians?.name}! 👋\n\nAmanhã é dia do seu inventário semanal.${s.scheduled_subgroup ? `\n\nFoco da semana: *${s.scheduled_subgroup}*` : ''}\n\nQualquer dúvida, fale com seu supervisor.`
+})).filter(t => t.phone);
 
-    // Retorna a lista de técnicos para o Power Automate disparar via Dispara.ai
-    const techniciansToAlert = (schedules || []).map(s => ({
-      technician_id: s.technician_id,
-      name: s.technicians?.name,
-      phone: s.technicians?.phone,
-      scheduled_at: s.scheduled_at,
-      subgroup: weekSubgroup,
-      message: `Olá, ${s.technicians?.name}! 👋\n\nAmanhã é dia do seu inventário semanal.${subgroupLabel}\n\nAmanhã você receberá a lista completa para contagem. Qualquer dúvida, fale com seu supervisor.`
-    })).filter(t => t.phone);
 
     return NextResponse.json({ 
       ok: true, 

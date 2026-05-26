@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getSchedules, createSchedule } from '@/lib/db-gptmaker';
+import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
+import { createServiceClient } from '@/lib/supabase';
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -28,7 +30,15 @@ export async function POST(request) {
   const { technician_id, scheduled_at, week_ref, items_count, notes } = body;
 
   if (!technician_id || !scheduled_at || !week_ref) {
-    return NextResponse.json({ error: 'technician_id, scheduled_at e week_ref são obrigatórios' }, { status: 400 });
+    return NextResponse.json({ error: 'Dados obrigatórios ausentes' }, { status: 400 });
+  }
+
+  const supabase = createServiceClient();
+  const weekSubgroup = await getWeekSubgroup(supabase);
+  const consolidatedItems = await getConsolidatedTechnicianItems(supabase, technician_id, weekSubgroup);
+
+  if (!consolidatedItems?.length) {
+    return NextResponse.json({ error: 'Técnico sem peças ativas para inventário.' }, { status: 400 });
   }
 
   const data = await createSchedule({
@@ -38,6 +48,8 @@ export async function POST(request) {
     week_ref,
     items_count: items_count || 10,
     notes,
+    scheduled_subgroup: weekSubgroup,
+    scheduled_items: consolidatedItems,
   });
   return NextResponse.json(data, { status: 201 });
 }
