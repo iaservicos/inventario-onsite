@@ -27,10 +27,10 @@ export async function POST(request) {
   }
 
   const body = await request.json();
-  const { technician_id, scheduled_at, week_ref, items_count, notes } = body;
+  const { technician_id, scheduled_at, week_ref, notes } = body;
 
   if (!technician_id || !scheduled_at || !week_ref) {
-    return NextResponse.json({ error: 'Dados obrigatórios ausentes' }, { status: 400 });
+    return NextResponse.json({ error: 'technician_id, scheduled_at e week_ref são obrigatórios' }, { status: 400 });
   }
 
   const supabase = createServiceClient();
@@ -38,7 +38,7 @@ export async function POST(request) {
   const consolidatedItems = await getConsolidatedTechnicianItems(supabase, technician_id, weekSubgroup);
 
   if (!consolidatedItems?.length) {
-    return NextResponse.json({ error: 'Técnico sem peças ativas para inventário.' }, { status: 400 });
+    return NextResponse.json({ error: 'Não foi possível determinar as peças para este agendamento.' }, { status: 400 });
   }
 
   const data = await createSchedule({
@@ -46,7 +46,7 @@ export async function POST(request) {
     scheduled_by: session.user.id,
     scheduled_at,
     week_ref,
-    items_count: items_count || 10,
+    items_count: consolidatedItems.length,
     notes,
     scheduled_subgroup: weekSubgroup,
     scheduled_items: consolidatedItems,

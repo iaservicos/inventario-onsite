@@ -1,21 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
-import { updateSchedule, createGptSession, getTechnicianItems } from '@/lib/db-gptmaker';
+import { updateSchedule, createGptSession } from '@/lib/db-gptmaker';
 import { createInventory, updateInventory, createFlowLog } from '@/lib/db';
 import crypto from 'crypto';
 
 const DISPATCH_SECRET = process.env.DISPATCH_SECRET || '';
 
-// Retorna o subgrupo prioritário da semana atual (ciclo de 5 semanas)
-async function getWeekSubgroup(supabase) {
-  const { data } = await supabase
-    .from('v_current_week_subgroup')
-    .select('subgroup_name')
-    .maybeSingle();
-  return data?.subgroup_name || null;
-}
-
-// Monta a mensagem inicial para o GPT Maker com a lista de peças
 function buildFirstMessage(techName, items, weekSubgroup) {
   const subgroupLabel = weekSubgroup ? ` (foco: ${weekSubgroup})` : '';
   const itemLines = items
@@ -42,62 +32,22 @@ export async function POST(request) {
     let schedules = [];
 
     if (scheduleId) {
-      const { data } = await supabase.from('inventory_schedules').select('*, technicians(*)').eq('id', scheduleId).eq('status', 'pending').single();
+      const { data } = await supabase.from('inventory_schedules').select('*, technicians(*), scheduled_subgroup, scheduled_items').eq('id', scheduleId).eq('status', 'pending').single();
       if (data) schedules = [data];
     } else {
-      const { data } = await supabase.from('inventory_schedules').select('*, technicians(*)').eq('status', 'pending');
+      const { data } = await supabase.from('inventory_schedules').select('*, technicians(*), scheduled_subgroup, scheduled_items').eq('status', 'pending');
       schedules = data || [];
     }
 
     if (schedules.length === 0) return NextResponse.json({ ok: true, dispatched: 0 });
 
-    // Busca o subgrupo prioritário da semana atual
-    const weekSubgroup = await getWeekSubgroup(supabase);
-
     const results = [];
     for (const schedule of schedules) {
       try {
         const tech = schedule.technicians;
+        const consolidatedItems = schedule.scheduled_items || [];
+        const weekSubgroup = schedule.scheduled_subgroup;
 
-        // Busca TODAS as peças ativas do técnico
-        const { data: allItems } = await supabase
-          .from('technician_items')
-          .select('*')
-          .eq('technician_id', schedule.technician_id)
-          .eq('active', true);
-
-        if (!allItems?.length) {
-          results.push({ schedule_id: schedule.id, ok: false, reason: 'sem_pecas' });
-          continue;
-        }
-
-        // --- LÓGICA DE SELEÇÃO COM PRIORIDADE DE SUBGRUPO SEMANAL ---
-        let selectedItems = [];
-
-        // 1. Primeiro: tenta preencher com peças do subgrupo da semana
-        if (weekSubgroup) {
-          selectedItems = allItems.filter(item => (item.item_subgroup || '').toLowerCase() === weekSubgroup.toLowerCase());
-        }
-
-        // 2. Fallback: se não houver peças no subgrupo, pega todas as peças ativas
-        if (selectedItems.length === 0) {
-          selectedItems = allItems;
-        }
-
-        // 3. Consolidação por Código (Soma quantidades de códigos iguais)
-        const consolidatedMap = new Map();
-        selectedItems.forEach(item => {
-          const code = item.item_code;
-          if (consolidatedMap.has(code)) {
-            const existing = consolidatedMap.get(code);
-            existing.item_quantity = (Number(existing.item_quantity) || 0) + (Number(item.item_quantity) || 1);
-          } else {
-            consolidatedMap.set(code, { ...item });
-          }
-        });
-        const consolidatedItems = Array.from(consolidatedMap.values());
-
-        // Cria o inventário no banco
         const inventory = await createInventory({
           technician_id: schedule.technician_id,
           week_ref: schedule.week_ref,
@@ -116,7 +66,6 @@ export async function POST(request) {
         await supabase.from('inventory_items').insert(itemRows);
         await updateInventory(inventory.id, { status: 'in_progress', started_at: new Date().toISOString() });
 
-        // Monta a mensagem inicial com a lista de peças consolidada
         const firstMessage = buildFirstMessage(tech.name, consolidatedItems, weekSubgroup);
 
         const sessionToken = crypto.randomBytes(32).toString('hex');
