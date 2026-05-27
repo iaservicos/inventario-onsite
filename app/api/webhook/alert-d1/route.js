@@ -25,7 +25,7 @@ export async function POST(req) {
       .eq('inventory_day', diaAmanha)
       .eq('active', true);
 
-    if (!tecnicos || tecnicos.length === 0) return NextResponse.json([]);
+    if (!tecnicos || tecnicos.length === 0) return NextResponse.json({ content: [] });
 
     const subgrupo = await getWeekSubgroup(supabase);
     const respostaPowerAutomate = [];
@@ -53,7 +53,7 @@ export async function POST(req) {
       });
     }
 
-    return NextResponse.json(respostaPowerAutomate);
+    return NextResponse.json({ content: respostaPowerAutomate });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
