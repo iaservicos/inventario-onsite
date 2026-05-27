@@ -4,7 +4,7 @@ import { updateSchedule, createGptSession } from '@/lib/db-gptmaker';
 import { createInventory, updateInventory, createFlowLog } from '@/lib/db';
 import crypto from 'crypto';
 
-const DISPATCH_SECRET = process.env.DISPATCH_SECRET || '';
+const DISPATCH_SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
 
 function buildFirstMessage(techName, items, weekSubgroup) {
   const subgroupLabel = weekSubgroup ? ` (foco: ${weekSubgroup})` : '';
@@ -23,7 +23,9 @@ function buildFirstMessage(techName, items, weekSubgroup) {
 export async function POST(request) {
   try {
     const authHeader = request.headers.get('x-dispatch-secret') || '';
-    if (DISPATCH_SECRET && authHeader !== DISPATCH_SECRET) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (DISPATCH_SECRET && authHeader !== DISPATCH_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const body = await request.json().catch(() => ({}));
     const scheduleId = body.schedule_id || null;
@@ -32,33 +34,40 @@ export async function POST(request) {
     let schedules = [];
 
     if (scheduleId) {
-      const { data } = await supabase.from('inventory_schedules').select('*, technicians(*), scheduled_subgroup, scheduled_items').eq('id', scheduleId).eq('status', 'pending').single();
-      if (data) schedules = [data];
-    } else {
-      const { data } = await supabase.from('inventory_schedules').select('*, technicians(*), scheduled_subgroup, scheduled_items').eq('status', 'pending');
-      schedules = data || [];
+      const { data } = await supabase
+        .from('inventory_schedules')
+        .select('*, technicians(*)')
+        .eq('id', scheduleId);
+      if (data) schedules = data;
     }
 
-    if (schedules.length === 0) return NextResponse.json({ ok: true, dispatched: 0 });
-
     const results = [];
+
     for (const schedule of schedules) {
       try {
         const tech = schedule.technicians;
+        if (!tech) continue;
+
+        // USA O QUE FOI SALVO NO AGENDAMENTO (SSD/HD e as peças)
         const consolidatedItems = schedule.scheduled_items || [];
         const weekSubgroup = schedule.scheduled_subgroup;
 
+        if (consolidatedItems.length === 0) continue;
+
+        // Cria o inventário oficial
         const inventory = await createInventory({
           technician_id: schedule.technician_id,
-          week_ref: schedule.week_ref,
-          total_items: consolidatedItems.length,
+          status: 'pending',
+          week_ref: schedule.week_ref || 'AUTO',
+          notes: `Inventário agendado: ${weekSubgroup || 'Geral'}`
         });
 
-        const itemRows = consolidatedItems.map(item => ({
+        // Insere os itens no inventário
+        const itemRows = consolidatedItems.map((item) => ({
           inventory_id: inventory.id,
           item_code: item.item_code,
           item_name: item.item_name,
-          item_subgroup: item.item_subgroup,
+          subgroup: item.item_subgroup || item.subgroup || weekSubgroup,
           system_qty: item.item_quantity,
           status: 'pending',
         }));
@@ -67,20 +76,24 @@ export async function POST(request) {
         await updateInventory(inventory.id, { status: 'in_progress', started_at: new Date().toISOString() });
 
         const firstMessage = buildFirstMessage(tech.name, consolidatedItems, weekSubgroup);
-
         const sessionToken = crypto.randomBytes(32).toString('hex');
-        await createGptSession({ inventory_id: inventory.id, technician_id: schedule.technician_id, phone: tech.phone, session_token: sessionToken });
+
+        await createGptSession({
+          inventory_id: inventory.id,
+          technician_id: schedule.technician_id,
+          phone: tech.phone,
+          session_token: sessionToken
+        });
+
         await updateSchedule(schedule.id, { status: 'dispatched', inventory_id: inventory.id });
 
-        results.push({ 
-          schedule_id: schedule.id, 
-          ok: true, 
-          session_token: sessionToken, 
-          first_message: firstMessage, 
+        results.push({
+          schedule_id: schedule.id,
+          ok: true,
           phone: tech.phone,
           technician_name: tech.name,
-          items_count: consolidatedItems.length,
-          items: consolidatedItems.map(i => ({ code: i.item_code, name: i.item_name, qty: i.item_quantity }))
+          message: firstMessage, // ESTA É A MENSAGEM PARA O DISPARA.AI
+          session_token: sessionToken
         });
       } catch (err) {
         results.push({ schedule_id: schedule.id, ok: false, reason: err.message });
@@ -89,6 +102,6 @@ export async function POST(request) {
 
     return NextResponse.json({ ok: true, results });
   } catch (err) {
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
