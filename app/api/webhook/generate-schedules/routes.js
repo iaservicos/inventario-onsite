@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase';
-import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
-import { createSchedule } from '@/lib/db-gptmaker';
+import { createServiceClient } from '../../../lib/supabase';
+import { getWeekSubgroup, getConsolidatedTechnicianItems } from '../../../lib/db';
+import { createSchedule } from '../../../lib/db-gptmaker';
+
 
 export const dynamic = 'force-dynamic';
 
