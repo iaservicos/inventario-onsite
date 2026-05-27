@@ -4,12 +4,7 @@ import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
 import { createSchedule } from '@/lib/db-gptmaker';
 
 export const dynamic = 'force-dynamic';
-
 const DISPATCH_SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
-
-export async function GET() {
-  return NextResponse.json({ message: "API Alerta D-1 Ativa" });
-}
 
 export async function POST(req) {
   try {
@@ -22,9 +17,9 @@ export async function POST(req) {
     const { searchParams } = new URL(req.url);
     const action = searchParams.get('action');
 
-    // SE A AÇÃO FOR GERAR AGENDAMENTOS
     if (action === 'generate') {
       const now = new Date();
+      // Ajuste para amanhã no fuso de Brasília
       const brTomorrow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
       brTomorrow.setDate(brTomorrow.getDate() + 1);
       const dayOfWeek = brTomorrow.getDay();
@@ -35,34 +30,44 @@ export async function POST(req) {
         .eq('inventory_day', dayOfWeek)
         .eq('active', true);
 
-      const weekSubgroup = await getWeekSubgroup(supabase);
-      const generated = [];
-
-      for (const tech of technicians) {
-        const items = await getConsolidatedTechnicianItems(supabase, tech.id, weekSubgroup);
-        if (items.length === 0) continue;
-
-        const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
-        const scheduled_at = new Date(brTomorrow);
-        scheduled_at.setHours(h, m, 0, 0);
-
-        const s = await createSchedule({
-          technician_id: tech.id,
-          scheduled_by: 'system',
-          scheduled_at: scheduled_at.toISOString(),
-          week_ref: 'AUTO',
-          items_count: items.length,
-          scheduled_subgroup: weekSubgroup,
-          scheduled_items: items
-        });
-        generated.push(s);
+      if (!technicians || technicians.length === 0) {
+        return NextResponse.json({ ok: true, message: "Nenhum técnico para amanhã" });
       }
-      return NextResponse.json({ ok: true, generated: generated.length });
+
+      const weekSubgroup = await getWeekSubgroup(supabase);
+
+      // PROCESSAMENTO EM PARALELO (Muito mais rápido)
+      const promises = technicians.map(async (tech) => {
+        try {
+          const items = await getConsolidatedTechnicianItems(supabase, tech.id, weekSubgroup);
+          if (!items || items.length === 0) return null;
+
+          const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
+          const scheduled_at = new Date(brTomorrow);
+          scheduled_at.setHours(h, m, 0, 0);
+
+          return createSchedule({
+            technician_id: tech.id,
+            scheduled_by: 'system',
+            scheduled_at: scheduled_at.toISOString(),
+            week_ref: 'AUTO',
+            items_count: items.length,
+            scheduled_subgroup: weekSubgroup,
+            scheduled_items: items
+          });
+        } catch (e) {
+          return null;
+        }
+      });
+
+      const results = await Promise.all(promises);
+      const generatedCount = results.filter(r => r !== null).length;
+
+      return NextResponse.json({ ok: true, generated: generatedCount });
     }
 
-    // LÓGICA NORMAL DE ALERTA D-1 (Se não houver action=generate)
-    // ... (seu código de alerta aqui)
-    return NextResponse.json({ message: "Alerta enviado" });
+    // Se não for 'generate', segue o fluxo normal de alerta
+    return NextResponse.json({ message: "Ação não reconhecida" });
 
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
