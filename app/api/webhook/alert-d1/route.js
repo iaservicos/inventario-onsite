@@ -1,74 +1,59 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
-import { createSchedule } from '@/lib/db-gptmaker';
 
 export const dynamic = 'force-dynamic';
-const DISPATCH_SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
+const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
 
 export async function POST(req) {
   try {
-    const secret = req.headers.get('x-dispatch-secret');
-    if (secret !== DISPATCH_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = req.headers.get('x-dispatch-secret');
+    if (auth !== SECRET) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const supabase = createServiceClient();
-    const { searchParams } = new URL(req.url);
-    const action = searchParams.get('action');
+    
+    // 1. Descobre que dia é amanhã (0-6)
+    const hoje = new Date();
+    const amanha = new Date(hoje);
+    amanha.setDate(hoje.getDate() + 1);
+    const diaAmanha = amanha.getDay(); // 0=Dom, 1=Seg...
 
-    if (action === 'generate') {
-      const now = new Date();
-      // Ajuste para amanhã no fuso de Brasília
-      const brTomorrow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
-      brTomorrow.setDate(brTomorrow.getDate() + 1);
-      const dayOfWeek = brTomorrow.getDay();
+    // 2. Busca técnicos que fazem inventário amanhã
+    const { data: tecnicos } = await supabase
+      .from('technicians')
+      .select('*')
+      .eq('inventory_day', diaAmanha)
+      .eq('active', true);
 
-      const { data: technicians } = await supabase
-        .from('technicians')
-        .select('*')
-        .eq('inventory_day', dayOfWeek)
-        .eq('active', true);
+    if (!tecnicos || tecnicos.length === 0) return NextResponse.json([]);
 
-      if (!technicians || technicians.length === 0) {
-        return NextResponse.json({ ok: true, message: "Nenhum técnico para amanhã" });
-      }
+    const subgrupo = await getWeekSubgroup(supabase);
+    const respostaPowerAutomate = [];
 
-      const weekSubgroup = await getWeekSubgroup(supabase);
+    for (const tech of tecnicos) {
+      const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
+      if (pecas.length === 0) continue;
 
-      // PROCESSAMENTO EM PARALELO (Muito mais rápido)
-      const promises = technicians.map(async (tech) => {
-        try {
-          const items = await getConsolidatedTechnicianItems(supabase, tech.id, weekSubgroup);
-          if (!items || items.length === 0) return null;
+      // 3. SALVA O AGENDAMENTO NO BANCO (Para o Power Automate ler amanhã)
+      const { data: agendamento } = await supabase.from('inventory_schedules').insert({
+        technician_id: tech.id,
+        scheduled_at: amanha.toISOString(),
+        status: 'pending',
+        scheduled_subgroup: subgrupo || 'Geral',
+        scheduled_items: pecas,
+        week_ref: `${amanha.getFullYear()}-W${Math.ceil(amanha.getDate()/7)}`
+      }).select().single();
 
-          const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
-          const scheduled_at = new Date(brTomorrow);
-          scheduled_at.setHours(h, m, 0, 0);
-
-          return createSchedule({
-            technician_id: tech.id,
-            scheduled_by: 'system',
-            scheduled_at: scheduled_at.toISOString(),
-            week_ref: 'AUTO',
-            items_count: items.length,
-            scheduled_subgroup: weekSubgroup,
-            scheduled_items: items
-          });
-        } catch (e) {
-          return null;
-        }
+      // 4. Prepara o retorno para o Dispara.ai
+      respostaPowerAutomate.push({
+        nome: tech.name,
+        telefone: tech.phone,
+        subgrupo: subgrupo || 'Geral',
+        mensagem: `Olá ${tech.name}, amanhã você fará seu inventário de ${subgrupo || 'peças gerais'}.`
       });
-
-      const results = await Promise.all(promises);
-      const generatedCount = results.filter(r => r !== null).length;
-
-      return NextResponse.json({ ok: true, generated: generatedCount });
     }
 
-    // Se não for 'generate', segue o fluxo normal de alerta
-    return NextResponse.json({ message: "Ação não reconhecida" });
-
+    return NextResponse.json(respostaPowerAutomate);
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
