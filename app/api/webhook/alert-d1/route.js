@@ -49,7 +49,7 @@ export async function POST(req) {
         nome: tech.name,
         telefone: tech.phone,
         subgrupo: subgrupo || 'Geral',
-        mensagem: `Olá ${tech.name}, amanhã você fará seu inventário de ${subgrupo || 'peças gerais'}.`
+        
       });
     }
 
