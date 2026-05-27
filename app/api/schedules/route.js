@@ -38,7 +38,7 @@ export async function POST(request) {
   const consolidatedItems = await getConsolidatedTechnicianItems(supabase, technician_id, weekSubgroup);
 
   if (!consolidatedItems?.length) {
-    return NextResponse.json({ error: 'Não foi possível determinar as peças para este agendamento.' }, { status: 400 });
+    return NextResponse.json({ error: 'Técnico sem peças ativas para inventário.' }, { status: 400 });
   }
 
   const data = await createSchedule({
