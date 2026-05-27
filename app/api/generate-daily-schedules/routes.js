@@ -1,100 +1,82 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
-import { createSchedule } from '@/lib/db-gptmaker';
+import { createSchedule } from '@/lib/db-gptmaker'; // ESTE IMPORT FALTAVA
 
-export async function POST(request) {
+export const dynamic = 'force-dynamic';
+
+const DISPATCH_SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
+
+export async function POST(req) {
   try {
-    const supabase = createServiceClient();
-    const now = new Date();
+    const secret = req.headers.get('x-dispatch-secret');
+    if (secret !== DISPATCH_SECRET) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
 
-    // Ajusta para Brasília (GMT-3)
-    const brNow = new Date(now.getTime() - (3 * 60 * 60 * 1000));
+    const supabase = createServiceClient();
+
+    // 1. Pega a data de amanhã (ajustada para o fuso de Brasília)
+    const now = new Date();
+    const brNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
     const brTomorrow = new Date(brNow);
     brTomorrow.setDate(brNow.getDate() + 1);
     
-    // Obtém o dia da semana de amanhã (1 para Segunda, 7 para Domingo)
-    const tomorrowDayOfWeek = brTomorrow.getDay(); // getDay() retorna 0 para Domingo, 1 para Segunda...
-    const targetDay = tomorrowDayOfWeek === 0 ? 7 : tomorrowDayOfWeek; // Ajusta para 1=Segunda, 7=Domingo
+    const dayOfWeek = brTomorrow.getDay(); // 0 = Domingo, 1 = Segunda, etc.
 
-    // Busca técnicos que têm agendamento para o dia da semana de amanhã
+    // 2. Busca técnicos que têm inventário agendado para o dia da semana de amanhã
     const { data: technicians, error: techError } = await supabase
       .from('technicians')
-      .select('id, name, inventory_day, inventory_time')
-      .eq('active', true)
-      .eq('inventory_day', targetDay);
+      .select('*')
+      .eq('inventory_day', dayOfWeek)
+      .eq('active', true);
 
-    if (techError) {
-      console.error('Erro ao buscar técnicos:', techError);
-      return NextResponse.json({ error: 'Erro ao buscar técnicos' }, { status: 500 });
-    }
-
+    if (techError) throw techError;
     if (!technicians || technicians.length === 0) {
-      return NextResponse.json({ message: 'Nenhum técnico agendado para amanhã.', generated_schedules: 0 });
+      return NextResponse.json({ message: 'Nenhum técnico agendado para amanhã.' });
     }
+
+    // 3. Pega o subgrupo da semana
+    const weekSubgroup = await getWeekSubgroup(supabase);
 
     const generatedSchedules = [];
-    const weekSubgroup = await getWeekSubgroup(supabase); // Busca o subgrupo da semana uma vez
 
     for (const tech of technicians) {
       try {
-        // Verifica se já existe um agendamento para este técnico amanhã
-        const { data: existingSchedules } = await supabase
-          .from('inventory_schedules')
-          .select('id')
-          .eq('technician_id', tech.id)
-          .gte('scheduled_at', new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 0, 0, 0).toISOString())
-          .lte('scheduled_at', new Date(brTomorrow.getFullYear(), brTomorrow.getMonth(), brTomorrow.getDate(), 23, 59, 59).toISOString());
-
-        if (existingSchedules && existingSchedules.length > 0) {
-          console.log(`Agendamento para ${tech.name} em ${brTomorrow.toLocaleDateString()} já existe. Pulando.`);
-          continue;
-        }
-
+        // Busca e consolida as peças para este técnico
         const consolidatedItems = await getConsolidatedTechnicianItems(supabase, tech.id, weekSubgroup);
+        
+        if (consolidatedItems.length === 0) continue;
 
-        if (!consolidatedItems?.length) {
-          console.warn(`Técnico ${tech.name} sem peças ativas ou para o subgrupo ${weekSubgroup}. Pulando agendamento.`);
-          continue;
-        }
-
-        // Monta a data e hora do agendamento para amanhã
-        const [hour, minute] = tech.inventory_time.split(':').map(Number);
-        const scheduled_at = new Date(
-          brTomorrow.getFullYear(),
-          brTomorrow.getMonth(),
-          brTomorrow.getDate(),
-          hour,
-          minute,
-          0
-        );
+        // Define o horário do agendamento baseado no cadastro do técnico
+        const [hour, minute] = (tech.inventory_time || '08:00').split(':').map(Number);
+        const scheduled_at = new Date(brTomorrow);
+        scheduled_at.setHours(hour, minute, 0, 0);
 
         // Cria o agendamento
         const newSchedule = await createSchedule({
           technician_id: tech.id,
           scheduled_by: 'system',
           scheduled_at: scheduled_at.toISOString(),
-          week_ref: `${brTomorrow.getFullYear()}-W${Math.ceil((brTomorrow.getTime() - new Date(brTomorrow.getFullYear(), 0, 1).getTime()) / (86400000 * 7))}`, // Calcula week_ref
+          week_ref: `${brTomorrow.getFullYear()}-W${Math.ceil((brTomorrow.getTime() - new Date(brTomorrow.getFullYear(), 0, 1).getTime()) / (86400000 * 7))}`,
           items_count: consolidatedItems.length,
           notes: 'Agendamento automático diário',
           scheduled_subgroup: weekSubgroup,
           scheduled_items: consolidatedItems,
         });
         generatedSchedules.push(newSchedule);
-      } catch (scheduleErr) {
-        console.error(`Erro ao gerar agendamento para ${tech.name}:`, scheduleErr);
+      } catch (err) {
+        console.error(`Erro ao processar técnico ${tech.name}:`, err);
       }
     }
 
     return NextResponse.json({ 
-      message: `Processamento concluído. ${generatedSchedules.length} agendamento(s) criado(s).`,
-      generated_schedules: generatedSchedules.length,
-      details: generatedSchedules.map(s => ({ id: s.id, technician_id: s.technician_id, scheduled_at: s.scheduled_at }))
+      ok: true, 
+      generated: generatedSchedules.length 
     });
 
   } catch (err) {
-    console.error('Erro interno na geração de agendamentos diários:', err);
-    return NextResponse.json({ error: 'Erro interno na geração de agendamentos diários' }, { status: 500 });
+    console.error('Erro na API:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
