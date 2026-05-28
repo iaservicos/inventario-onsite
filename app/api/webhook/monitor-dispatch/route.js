@@ -13,27 +13,46 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
 
-    // Define o período de busca: desde o início do dia até agora + 15 minutos
+    // Define o período de busca: hoje
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const fifteenMinutesFromNow = new Date(now.getTime() + (15 * 60 * 1000));
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
-    // Busca agendamentos PENDENTES que estão no horário de agora
+    // Busca agendamentos PENDENTES que estão no horário de agora (ou que já passaram e não foram disparados)
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
-      .select('id, technician_id, scheduled_at')
+      .select(`
+        id,
+        scheduled_at,
+        scheduled_subgroup,
+        technicians (
+          id,
+          name,
+          phone
+        )
+      `)
       .eq('status', 'pending')
       .gte('scheduled_at', startOfDay.toISOString())
-      .lte('scheduled_at', fifteenMinutesFromNow.toISOString());
+      .lte('scheduled_at', endOfDay.toISOString());
 
     if (error) throw error;
 
-    // Retorna a lista de IDs para o Power Automate processar
-    const schedulesToDispatch = (schedules || []).map(s => ({ 
-      schedule_id: s.id 
+    // Filtra apenas os que já chegaram no horário de disparo
+    const currentSchedules = (schedules || []).filter(s => new Date(s.scheduled_at) <= now);
+
+    // Retorna a lista completa para o Power Automate
+    const schedulesToDispatch = currentSchedules.map(s => ({
+      schedule_id: s.id,
+      nome: s.technicians.name,
+      telefone: s.technicians.phone,
+      subgrupo: s.scheduled_subgroup || 'Geral'
     }));
 
-    return NextResponse.json(schedulesToDispatch);
+    return NextResponse.json({ 
+      count: schedulesToDispatch.length,
+      content: schedulesToDispatch 
+    });
+
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
