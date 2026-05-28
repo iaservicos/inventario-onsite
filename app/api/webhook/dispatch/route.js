@@ -10,49 +10,47 @@ export async function POST(req) {
     if (auth !== SECRET) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
-    const { schedule_id } = body;
+    // Forçamos o ID a ser um número inteiro, caso o banco espere integer
+    const scheduleId = parseInt(body.schedule_id);
 
-    if (!schedule_id) return NextResponse.json({ error: 'schedule_id is required' }, { status: 400 });
+    if (isNaN(scheduleId)) {
+      return NextResponse.json({ error: 'ID de agendamento inválido' }, { status: 400 });
+    }
 
     const supabase = createServiceClient();
 
-    // 1. Busca dados básicos do agendamento
-    const { data: schedule, error: sError } = await supabase
-      .from('inventory_schedules')
-      .select('*, technicians(*)')
-      .eq('id', schedule_id)
-      .single();
-
-    if (sError || !schedule) return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
-
-    // 2. Cria o inventário (Vapt-Vupt)
-    const { data: inventory, error: iError } = await supabase
-      .from('inventories')
-      .insert({
-        technician_id: schedule.technician_id,
-        schedule_id: schedule.id,
-        status: 'in_progress', // Já começa como em progresso
-        items: schedule.scheduled_items || []
-      })
-      .select()
-      .single();
-
-    if (iError) throw iError;
-
-    // 3. Atualiza o agendamento para 'dispatched'
-    await supabase
+    // 1. Atualiza o status do agendamento primeiro (operação mais rápida)
+    const { error: updateError } = await supabase
       .from('inventory_schedules')
       .update({ status: 'dispatched' })
-      .eq('id', schedule_id);
+      .eq('id', scheduleId);
+
+    if (updateError) throw updateError;
+
+    // 2. Busca os dados para criar o inventário
+    const { data: schedule, error: sError } = await supabase
+      .from('inventory_schedules')
+      .select('technician_id, scheduled_items')
+      .eq('id', scheduleId)
+      .single();
+
+    if (sError || !schedule) throw new Error('Agendamento não encontrado após atualização');
+
+    // 3. Cria o registro de inventário
+    await supabase.from('inventories').insert({
+      technician_id: schedule.technician_id,
+      schedule_id: scheduleId,
+      status: 'in_progress',
+      items: schedule.scheduled_items || []
+    });
 
     return NextResponse.json({ 
       success: true, 
-      inventory_id: inventory.id,
-      message: "Inventário iniciado com sucesso no banco!"
+      message: "Status atualizado e inventário criado!" 
     });
 
   } catch (err) {
-    console.error('Erro no Dispatch:', err);
+    console.error('Erro no Dispatch:', err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
