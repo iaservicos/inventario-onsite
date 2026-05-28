@@ -30,78 +30,90 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     const scheduleId = body.schedule_id || null;
 
+    if (!scheduleId) {
+      return NextResponse.json({ error: 'schedule_id é obrigatório' }, { status: 400 });
+    }
+
     const supabase = createServiceClient();
-    let schedules = [];
+    
+    // Busca o agendamento específico com os dados do técnico
+    const { data: schedule, error: scheduleError } = await supabase
+      .from('inventory_schedules')
+      .select('*, technicians(*)')
+      .eq('id', scheduleId)
+      .single();
 
-    if (scheduleId) {
-      const { data } = await supabase
-        .from('inventory_schedules')
-        .select('*, technicians(*)')
-        .eq('id', scheduleId);
-      if (data) schedules = data;
+    if (scheduleError || !schedule) {
+      return NextResponse.json({ error: 'Agendamento não encontrado' }, { status: 404 });
     }
 
-    const results = [];
+    const tech = schedule.technicians;
+    if (!tech) {
+      return NextResponse.json({ error: 'Técnico não encontrado no agendamento' }, { status: 404 });
+    }
 
-    for (const schedule of schedules) {
-      try {
-        const tech = schedule.technicians;
-        if (!tech) continue;
+    // USA OS DADOS QUE SALVAMOS NO ALERTA D-1
+    const consolidatedItems = schedule.scheduled_items || [];
+    const weekSubgroup = schedule.scheduled_subgroup;
 
-        // USA O QUE FOI SALVO NO AGENDAMENTO (SSD/HD e as peças)
-        const consolidatedItems = schedule.scheduled_items || [];
-        const weekSubgroup = schedule.scheduled_subgroup;
+    if (consolidatedItems.length === 0) {
+      return NextResponse.json({ error: 'Nenhum item encontrado para este agendamento' }, { status: 400 });
+    }
 
-        if (consolidatedItems.length === 0) continue;
+    // 1. Cria o inventário oficial
+    const inventory = await createInventory({
+      technician_id: schedule.technician_id,
+      status: 'pending',
+      week_ref: schedule.week_ref || 'AUTO',
+      notes: `Inventário: ${weekSubgroup || 'Geral'}`
+    });
 
-        // Cria o inventário oficial
-        const inventory = await createInventory({
-          technician_id: schedule.technician_id,
-          status: 'pending',
-          week_ref: schedule.week_ref || 'AUTO',
-          notes: `Inventário agendado: ${weekSubgroup || 'Geral'}`
-        });
+    // 2. Insere os itens no inventário
+    const itemRows = consolidatedItems.map((item) => ({
+      inventory_id: inventory.id,
+      item_code: item.item_code,
+      item_name: item.item_name,
+      subgroup: item.item_subgroup || item.subgroup || weekSubgroup,
+      system_qty: item.item_quantity,
+      status: 'pending',
+    }));
 
-        // Insere os itens no inventário
-        const itemRows = consolidatedItems.map((item) => ({
-          inventory_id: inventory.id,
-          item_code: item.item_code,
-          item_name: item.item_name,
-          subgroup: item.item_subgroup || item.subgroup || weekSubgroup,
-          system_qty: item.item_quantity,
-          status: 'pending',
-        }));
+    await supabase.from('inventory_items').insert(itemRows);
+    
+    // 3. Atualiza status para em progresso
+    await updateInventory(inventory.id, { 
+      status: 'in_progress', 
+      started_at: new Date().toISOString() 
+    });
 
-        await supabase.from('inventory_items').insert(itemRows);
-        await updateInventory(inventory.id, { status: 'in_progress', started_at: new Date().toISOString() });
+    // 4. Cria a sessão do GPT Maker
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    await createGptSession({
+      inventory_id: inventory.id,
+      technician_id: schedule.technician_id,
+      phone: tech.phone,
+      session_token: sessionToken
+    });
 
-        const firstMessage = buildFirstMessage(tech.name, consolidatedItems, weekSubgroup);
-        const sessionToken = crypto.randomBytes(32).toString('hex');
+    // 5. Marca o agendamento como disparado
+    await updateSchedule(schedule.id, { 
+      status: 'dispatched', 
+      inventory_id: inventory.id 
+    });
 
-        await createGptSession({
-          inventory_id: inventory.id,
-          technician_id: schedule.technician_id,
-          phone: tech.phone,
-          session_token: sessionToken
-        });
-
-        await updateSchedule(schedule.id, { status: 'dispatched', inventory_id: inventory.id });
-
-        results.push({
-          schedule_id: schedule.id,
-          ok: true,
-          phone: tech.phone,
-          technician_name: tech.name,
-          message: firstMessage, // ESTA É A MENSAGEM PARA O DISPARA.AI
-          session_token: sessionToken
-        });
-      } catch (err) {
-        results.push({ schedule_id: schedule.id, ok: false, reason: err.message });
+    // RETORNO PARA O POWER AUTOMATE / DISPARA.AI
+    return NextResponse.json({
+      ok: true,
+      result: {
+        phone: tech.phone,
+        technician_name: tech.name,
+        message: buildFirstMessage(tech.name, consolidatedItems, weekSubgroup),
+        session_token: sessionToken
       }
-    }
+    });
 
-    return NextResponse.json({ ok: true, results });
   } catch (err) {
+    console.error('Erro no dispatch:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
