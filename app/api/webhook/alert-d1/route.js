@@ -11,12 +11,17 @@ export async function POST(req) {
     if (auth !== SECRET) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const supabase = createServiceClient();
-    
+
     // 1. Descobre que dia é amanhã (0-6)
     const hoje = new Date();
     const amanha = new Date(hoje);
     amanha.setDate(hoje.getDate() + 1);
-    const diaAmanha = amanha.getDay(); // 0=Dom, 1=Seg...
+    const diaAmanha = amanha.getDay();
+
+    const amanhaInicio = new Date(amanha);
+    amanhaInicio.setHours(0, 0, 0, 0);
+    const amanhaFim = new Date(amanha);
+    amanhaFim.setHours(23, 59, 59, 999);
 
     // 2. Busca técnicos que fazem inventário amanhã
     const { data: tecnicos } = await supabase
@@ -34,22 +39,45 @@ export async function POST(req) {
       const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
       if (pecas.length === 0) continue;
 
-      // 3. SALVA O AGENDAMENTO NO BANCO (Para o Power Automate ler amanhã)
-      const { data: agendamento } = await supabase.from('inventory_schedules').insert({
+      const dadosAgendamento = {
         technician_id: tech.id,
         scheduled_at: amanha.toISOString(),
         status: 'pending',
         scheduled_subgroup: subgrupo || 'Geral',
         scheduled_items: pecas,
         week_ref: `${amanha.getFullYear()}-W${Math.ceil(amanha.getDate()/7)}`
-      }).select().single();
+      };
 
-      // 4. Prepara o retorno para o Dispara.ai
+      // --- LÓGICA DE ATUALIZAÇÃO (UPSERT) ---
+      // Verifica se já existe um agendamento para amanhã
+      const { data: existente } = await supabase
+        .from('inventory_schedules')
+        .select('id')
+        .eq('technician_id', tech.id)
+        .gte('scheduled_at', amanhaInicio.toISOString())
+        .lte('scheduled_at', amanhaFim.toISOString())
+        .maybeSingle();
+
+      if (existente) {
+        // Se existe, ATUALIZA (Update)
+        await supabase
+          .from('inventory_schedules')
+          .update(dadosAgendamento)
+          .eq('id', existente.id);
+        console.log(`Agendamento ATUALIZADO para o técnico ${tech.name}`);
+      } else {
+        // Se não existe, CRIA (Insert)
+        await supabase
+          .from('inventory_schedules')
+          .insert(dadosAgendamento);
+        console.log(`Agendamento CRIADO para o técnico ${tech.name}`);
+      }
+      // --------------------------------------
+
       respostaPowerAutomate.push({
         nome: tech.name,
         telefone: tech.phone,
         subgrupo: subgrupo || 'Geral',
-        
       });
     }
 
