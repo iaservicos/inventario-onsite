@@ -16,8 +16,16 @@ export async function POST(req) {
     const hoje = new Date();
     const amanha = new Date(hoje);
     amanha.setDate(hoje.getDate() + 1);
+    
+    // --- AJUSTE DE HORÁRIO ---
+    // Fixamos o horário para as 08:00 da manhã. 
+    // Assim, o inventário estará "pronto" para o Power Automate a partir desse horário.
+    // Se deixarmos o horário da execução (ex: 20:00), o técnico só receberia a mensagem às 20:00 do dia seguinte.
+    amanha.setHours(8, 0, 0, 0); 
+    
     const diaAmanha = amanha.getDay();
 
+    // Define o range de amanhã para a verificação de duplicidade (00:00 até 23:59)
     const amanhaInicio = new Date(amanha);
     amanhaInicio.setHours(0, 0, 0, 0);
     const amanhaFim = new Date(amanha);
@@ -49,7 +57,7 @@ export async function POST(req) {
       };
 
       // --- LÓGICA DE ATUALIZAÇÃO (UPSERT) ---
-      // Verifica se já existe um agendamento para amanhã
+      // Verifica se já existe um agendamento para este técnico no dia de amanhã
       const { data: existente } = await supabase
         .from('inventory_schedules')
         .select('id')
@@ -59,18 +67,16 @@ export async function POST(req) {
         .maybeSingle();
 
       if (existente) {
-        // Se existe, ATUALIZA (Update)
+        // Se já existe, ATUALIZA (evita duplicatas e mantém os itens em dia)
         await supabase
           .from('inventory_schedules')
           .update(dadosAgendamento)
           .eq('id', existente.id);
-        console.log(`Agendamento ATUALIZADO para o técnico ${tech.name}`);
       } else {
-        // Se não existe, CRIA (Insert)
+        // Se não existe, CRIA um novo
         await supabase
           .from('inventory_schedules')
           .insert(dadosAgendamento);
-        console.log(`Agendamento CRIADO para o técnico ${tech.name}`);
       }
       // --------------------------------------
 
