@@ -13,6 +13,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTechnicianItems } from '@/lib/databricks';
+import { getConsolidatedTechnicianItems } from '@/lib/db';
 import crypto from 'crypto';
 
 const supabase = createClient(
@@ -32,94 +33,17 @@ function getWeekRef(date = new Date()) {
 }
 
 /**
- * Seleção inteligente de peças com prioridade por histórico de contagens.
- *
- * @param {Array} allItems - Todas as peças do técnico vindas do Databricks
- * @param {string} technicianId - ID do técnico no banco
- * @param {number} count - Quantidade de peças a selecionar (padrão: 10)
- * @returns {Array} Peças selecionadas com prioridade
+ * Monta mapa item_code → quantidade total consolidando remessas do Databricks.
+ * Usado apenas para enriquecer as quantidades do sistema — a lista definitiva
+ * de peças vem sempre de technician_items (que tem o subgrupo).
  */
-async function selectItemsWithPriority(allItems, technicianId, count = 10) {
-  // Busca histórico de contagens do técnico (últimos 6 meses)
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-  const { data: history } = await supabase
-    .from('inventory_items')
-    .select(`
-      item_code,
-      created_at,
-      inventories!inner (
-        technician_id,
-        status,
-        created_at
-      )
-    `)
-    .eq('inventories.technician_id', technicianId)
-    .in('inventories.status', ['completed', 'divergent'])
-    .gte('inventories.created_at', sixMonthsAgo.toISOString())
-    .order('created_at', { ascending: false });
-
-  // Monta mapa: item_code → data da última contagem
-  const lastCountedMap = {};
-  if (history && history.length > 0) {
-    for (const row of history) {
-      const code = row.item_code;
-      if (!lastCountedMap[code]) {
-        lastCountedMap[code] = row.created_at;
-      }
-    }
+function buildDatabricksQtyMap(databricksItems) {
+  const map = {};
+  for (const item of (databricksItems || [])) {
+    const code = item.item_code;
+    map[code] = (map[code] || 0) + (Number(item.item_quantity) || 0);
   }
-
-  // Classifica cada peça
-  const neverCounted = [];   // Nunca contadas — máxima prioridade
-  const countedOld = [];     // Contadas há mais de 4 semanas
-  const countedRecent = [];  // Contadas recentemente (menos de 4 semanas)
-
-  const fourWeeksAgo = new Date();
-  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-
-  for (const item of allItems) {
-    const lastDate = lastCountedMap[item.item_code];
-
-    if (!lastDate) {
-      neverCounted.push(item);
-    } else if (new Date(lastDate) < fourWeeksAgo) {
-      countedOld.push({ ...item, last_counted: lastDate });
-    } else {
-      countedRecent.push({ ...item, last_counted: lastDate });
-    }
-  }
-
-  // Ordena as contadas antigas da mais antiga para a mais recente
-  countedOld.sort((a, b) => new Date(a.last_counted) - new Date(b.last_counted));
-
-  // Embaralha as nunca contadas para variedade
-  const shuffledNever = neverCounted.sort(() => Math.random() - 0.5);
-
-  // Monta a lista final com prioridade
-  const selected = [];
-
-  // 1ª: Nunca contadas (até completar `count`)
-  for (const item of shuffledNever) {
-    if (selected.length >= count) break;
-    selected.push({ ...item, selection_reason: 'never_counted' });
-  }
-
-  // 2ª: Contadas mais antigas
-  for (const item of countedOld) {
-    if (selected.length >= count) break;
-    selected.push({ ...item, selection_reason: 'oldest_count' });
-  }
-
-  // 3ª: Contadas recentemente (completar se necessário)
-  const shuffledRecent = countedRecent.sort(() => Math.random() - 0.5);
-  for (const item of shuffledRecent) {
-    if (selected.length >= count) break;
-    selected.push({ ...item, selection_reason: 'recent_random' });
-  }
-
-  return selected.slice(0, count);
+  return map;
 }
 
 export async function POST(request) {
@@ -130,7 +54,7 @@ export async function POST(request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const { schedule_id, items_count = 10 } = body;
+  const { schedule_id } = body;
 
   if (!schedule_id) {
     return NextResponse.json({ error: 'schedule_id é obrigatório' }, { status: 400 });
@@ -143,7 +67,7 @@ export async function POST(request) {
       id,
       technician_id,
       week_ref,
-      items_count,
+      scheduled_subgroup,
       status,
       technicians (
         id,
@@ -172,8 +96,8 @@ export async function POST(request) {
   }
 
   const searchName = technician.databricks_name || technician.name;
-  const totalItems = schedule.items_count || items_count;
   const weekRef = schedule.week_ref || getWeekRef();
+  const scheduledSubgroup = schedule.scheduled_subgroup || null;
 
   // Verifica se já existe inventário para esta semana
   const { data: existing } = await supabase
@@ -182,7 +106,7 @@ export async function POST(request) {
     .eq('technician_id', technician.id)
     .eq('week_ref', weekRef)
     .is('recount_of', null)
-    .single();
+    .maybeSingle();
 
   if (existing && !['cancelled', 'abandoned'].includes(existing.status)) {
     return NextResponse.json({
@@ -190,45 +114,44 @@ export async function POST(request) {
     }, { status: 409 });
   }
 
-  // Busca TODAS as peças do técnico no Databricks
-  let allItems;
-  try {
-    allItems = await getTechnicianItems(searchName);
-  } catch (e) {
+  // 1. Lista definitiva: todas as peças do subgrupo agendado (vem de technician_items)
+  const subgroupItems = await getConsolidatedTechnicianItems(supabase, technician.id, scheduledSubgroup);
+
+  if (!subgroupItems || subgroupItems.length === 0) {
     await supabase
       .from('inventory_schedules')
-      .update({
-        status: 'cancelled',
-        notes: `Erro Databricks: ${e.message}`,
-        updated_at: new Date().toISOString()
-      })
+      .update({ status: 'cancelled', notes: `Técnico sem peças no subgrupo "${scheduledSubgroup}"`, updated_at: new Date().toISOString() })
       .eq('id', schedule_id);
 
     return NextResponse.json({
-      error: `Erro ao buscar peças no Databricks: ${e.message}`,
+      error: `Nenhuma peça encontrada para o subgrupo "${scheduledSubgroup}"`,
       technician: technician.name,
-      searched_as: searchName,
-    }, { status: 500 });
-  }
-
-  if (!allItems || allItems.length === 0) {
-    await supabase
-      .from('inventory_schedules')
-      .update({
-        status: 'cancelled',
-        notes: `Técnico "${searchName}" sem peças no Databricks`,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', schedule_id);
-
-    return NextResponse.json({
-      error: `Nenhuma peça encontrada para "${searchName}" no Databricks`,
-      hint: 'Verifique se o nome do técnico no sistema corresponde exatamente ao nome no Data Lake'
     }, { status: 404 });
   }
 
-  // Seleção inteligente com prioridade por histórico
-  const items = await selectItemsWithPriority(allItems, technician.id, totalItems);
+  // 2. Enriquece quantidades com Databricks (melhor esforço — não bloqueia se falhar)
+  let databricksQtyMap = {};
+  let databricksSource = false;
+  try {
+    const databricksItems = await getTechnicianItems(searchName);
+    if (databricksItems && databricksItems.length > 0) {
+      databricksQtyMap = buildDatabricksQtyMap(databricksItems);
+      databricksSource = true;
+    }
+  } catch (e) {
+    console.warn('[dispatch-databricks] Databricks indisponível, usando quantidades de technician_items:', e.message);
+  }
+
+  // 3. Monta a lista final: todas as peças do subgrupo com qty do Databricks quando disponível
+  const items = subgroupItems.map(item => ({
+    item_code:     item.item_code,
+    item_name:     item.item_name,
+    unit:          item.unit || 'UN',
+    item_subgroup: item.item_subgroup || item.subgroup || scheduledSubgroup,
+    item_quantity: databricksQtyMap[item.item_code] !== undefined
+      ? databricksQtyMap[item.item_code]
+      : (Number(item.item_quantity) || 0),
+  }));
 
   // Cria o inventário
   const { data: inventory, error: invError } = await supabase
@@ -309,9 +232,10 @@ export async function POST(request) {
 
   // Monta e envia a primeira mensagem via GPT Maker
   const firstName = technician.name.split(' ')[0];
+  const subgroupLabel = scheduledSubgroup ? ` — subgrupo *${scheduledSubgroup}*` : '';
   const firstMessage =
     `Olá, ${firstName}! 👋\n\n` +
-    `É hora do inventário semanal — semana *${weekRef}*.\n\n` +
+    `É hora do inventário semanal — semana *${weekRef}*${subgroupLabel}.\n\n` +
     `Vamos contar *${items.length} peça(s)*. Responda apenas com o número de cada uma.\n\n` +
     `📦 *Peça 1 de ${items.length}*\n` +
     `*${firstItem.item_name}*\n` +
@@ -351,16 +275,10 @@ export async function POST(request) {
     ok: true,
     inventory_id: inventory.id,
     technician: technician.name,
-    databricks_name: searchName,
     week_ref: weekRef,
-    total_in_databricks: allItems.length,
+    subgroup: scheduledSubgroup,
     items_count: items.length,
-    items_selected: items.map(i => ({
-      code: i.item_code,
-      name: i.item_name,
-      expected: Number(i.item_quantity) || 0,
-      reason: i.selection_reason,
-    })),
+    qty_source: databricksSource ? 'databricks' : 'technician_items',
     dispatched,
     dispatch_error: dispatchError,
   });

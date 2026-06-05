@@ -65,6 +65,7 @@ export async function POST(req) {
         status: 'pending',
         scheduled_subgroup: subgrupo || 'Geral',
         scheduled_items: pecas,
+        items_count: pecas.length,
         week_ref: getWeekRef(amanha)
       };
 
