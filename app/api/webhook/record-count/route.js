@@ -18,7 +18,8 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
     const physQty = Number(physical_qty);
-    const code    = String(item_code).trim();
+    // Remove zeros à esquerda para bater com qualquer formato (11232522 = 000000000011232522)
+    const code = String(item_code).trim().replace(/^0+/, '') || '0';
 
     // 1. Técnico
     const { data: tech } = await supabase
@@ -56,7 +57,7 @@ export async function POST(req) {
       .from('technician_items')
       .select('item_quantity')
       .eq('technician_id', tech.id)
-      .ilike('item_code', code)
+      .ilike('item_code', `%${code}`)
       .eq('active', true);
 
     const systemQty = (techItemRows || []).reduce(
@@ -68,7 +69,7 @@ export async function POST(req) {
       .from('inventory_items')
       .select('id')
       .eq('inventory_id', inventory.id)
-      .ilike('item_code', code)
+      .ilike('item_code', `%${code}`)
       .limit(1)
       .maybeSingle();
 
