@@ -170,7 +170,11 @@ export async function POST(req) {
     }
 
     // 5. Atualizar inventário
-    const newStatus = recountItems.length > 0 ? 'recount_pending' : 'completed';
+    // Se já era recontagem, fecha como completed independente de divergências
+    // (evita loop infinito de recontagem → recontagem → recontagem)
+    const eraRecontagem = inventory.status === 'recount_pending';
+    const newStatus = (!eraRecontagem && recountItems.length > 0) ? 'recount_pending' : 'completed';
+
     await supabase
       .from('inventories')
       .update({
@@ -198,7 +202,8 @@ export async function POST(req) {
       });
     }
 
-    const mensagemRecontagem = recountItems.length > 0
+    // Se era recontagem, não gera nova mensagem de recontagem (retorna recontagem: 0)
+    const mensagemRecontagem = (!eraRecontagem && recountItems.length > 0)
       ? `Encontrei *${recountItems.length}* peça(s) com divergência:\n\n` +
         recountItems.map(i =>
           `• *${i.code}* — ${i.name}\n  Sistema: ${i.system_qty} | Você contou: ${i.physical_qty}`
@@ -213,7 +218,7 @@ export async function POST(req) {
       status:              newStatus,
       total_contados:      countedItems.length,
       total_divergencias:  divergencesToInsert.length,
-      recontagem:          recountItems.length,
+      recontagem:          eraRecontagem ? 0 : recountItems.length,
       excesso:             surplusItems.length,
       mensagem_recontagem: mensagemRecontagem,
       itens_recontagem:    recountItems,
