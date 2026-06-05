@@ -166,7 +166,7 @@ export default function DashboardPage() {
                     <th>Status</th>
                     <th>Progresso</th>
                     <th>Divergências</th>
-                    <th>Início</th>
+                    <th>1ª Resposta</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -194,7 +194,13 @@ export default function DashboardPage() {
                           <td style={{ fontWeight: '900', color: inv.divergence_count > 0 ? '#000000' : '#888888' }}>
                             {inv.divergence_count}
                           </td>
-                          <td style={{ fontSize: '0.75rem', fontWeight: '600' }}>{formatDate(inv.started_at || inv.created_at)}</td>
+                          <td>
+                            {inv.started_at ? (
+                              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#000' }}>{formatDate(inv.started_at)}</span>
+                            ) : (
+                              <span style={{ fontSize: '0.7rem', fontWeight: '600', color: '#bbb' }}>Aguardando</span>
+                            )}
+                          </td>
                         </tr>
                       );
                     })
