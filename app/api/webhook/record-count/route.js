@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
+import { getConsolidatedTechnicianItems } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
@@ -38,7 +39,7 @@ export async function POST(req) {
     for (const status of ['in_progress', 'pending']) {
       const { data } = await supabase
         .from('inventories')
-        .select('id, status, started_at, counted_items, total_items')
+        .select('id, status, started_at, counted_items, total_items, week_ref')
         .eq('technician_id', tech.id)
         .eq('status', status)
         .order('created_at', { ascending: false })
@@ -116,6 +117,25 @@ export async function POST(req) {
     };
     if (!inventory.started_at) {
       inventoryUpdate.started_at = new Date().toISOString();
+    }
+
+    // Define total_items na primeira contagem (quando ainda não foi definido)
+    if (!inventory.total_items) {
+      try {
+        const { data: schedule } = await supabase
+          .from('inventory_schedules')
+          .select('scheduled_subgroup')
+          .eq('inventory_id', inventory.id)
+          .maybeSingle();
+
+        const subgroup = schedule?.scheduled_subgroup || null;
+        const allItems = await getConsolidatedTechnicianItems(supabase, tech.id, subgroup);
+        if (allItems && allItems.length > 0) {
+          inventoryUpdate.total_items = allItems.length;
+        }
+      } catch (e) {
+        // não crítico — ignora se falhar
+      }
     }
 
     await supabase.from('inventories').update(inventoryUpdate).eq('id', inventory.id);

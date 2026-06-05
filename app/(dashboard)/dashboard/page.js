@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [technicians, setTechnicians] = useState([]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     fetch('/api/technicians').then((r) => r.json()).then(setTechnicians);
@@ -34,10 +35,17 @@ export default function DashboardPage() {
     const res = await fetch(`/api/dashboard?${params}`);
     const json = await res.json();
     setData(json);
+    setLastUpdated(new Date());
     setLoading(false);
   }, [filters]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Auto-refresh a cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
+  }, [load]);
 
   const kpis = data?.kpis || {};
   const recent = data?.recent || [];
@@ -55,10 +63,27 @@ export default function DashboardPage() {
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
-      <PageHeader
-        title="Dashboard"
-        subtitle="Visão geral do inventário cíclico de técnicos"
-      />
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+        <PageHeader
+          title="Dashboard"
+          subtitle="Visão geral do inventário cíclico de técnicos"
+        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {lastUpdated && (
+            <span style={{ fontSize: '0.7rem', color: '#888', fontWeight: '600' }}>
+              Atualizado às {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          )}
+          <button
+            className="btn"
+            style={{ fontSize: '0.7rem', padding: '0.35rem 0.75rem' }}
+            onClick={load}
+            disabled={loading}
+          >
+            {loading ? '...' : 'Atualizar'}
+          </button>
+        </div>
+      </div>
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
 
@@ -149,7 +174,9 @@ export default function DashboardPage() {
                     <tr><td colSpan={7} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
                   ) : (
                     recent.map((inv) => {
-                      const pct = inv.total_items > 0 ? Math.round((inv.counted_items / inv.total_items) * 100) : 0;
+                      const pct = inv.total_items > 0
+                        ? Math.round((inv.counted_items / inv.total_items) * 100)
+                        : 0;
                       return (
                         <tr key={inv.id}>
                           <td style={{ fontWeight: '800', color: '#000000' }}>{inv.technicians?.name}</td>
