@@ -3,47 +3,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
-import StatusBadge from '@/components/ui/StatusBadge';
 import { formatDate } from '@/lib/utils';
 
-const SOURCE_OPTIONS = [
-  { value: '', label: 'Todas as fontes' },
-  { value: 'power_automate', label: 'Power Automate' },
-  { value: 'dispara_ai', label: 'Dispara.AI' },
-  { value: 'system', label: 'Sistema' },
-  { value: 'user', label: 'Usuário' },
-];
-
-const LEVEL_OPTIONS = [
-  { value: '', label: 'Todos os níveis' },
-  { value: 'info', label: 'Info' },
-  { value: 'success', label: 'Sucesso' },
-  { value: 'warning', label: 'Aviso' },
-  { value: 'error', label: 'Erro' },
-];
-
-const SOURCE_COLORS = {
-  power_automate: '#71717a',
-  dispara_ai: '#52525b',
-  system: '#a1a1aa',
-  user: '#71717a',
-};
-
-const SOURCE_LABELS = {
-  power_automate: 'Power Automate',
-  dispara_ai: 'Dispara.AI',
-  system: 'Sistema',
-  user: 'Usuário',
-};
-
 export default function LogsPage() {
-  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '' });
-  const [source, setSource] = useState('');
-  const [level, setLevel] = useState('');
-  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '' });
   const [technicians, setTechnicians] = useState([]);
-  const [logs, setLogs] = useState([]);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetch('/api/technicians').then((r) => r.json()).then(setTechnicians);
@@ -55,134 +22,131 @@ export default function LogsPage() {
     if (filters.from) params.set('from', filters.from);
     if (filters.to) params.set('to', filters.to);
     if (filters.technicianId) params.set('technicianId', filters.technicianId);
-    if (source) params.set('source', source);
-    if (level) params.set('level', level);
     const res = await fetch(`/api/logs?${params}`);
     const json = await res.json();
-    setLogs(json);
+    setHistory(Array.isArray(json) ? json : []);
     setLoading(false);
-  }, [filters, source, level]);
+  }, [filters]);
 
   useEffect(() => { load(); }, [load]);
 
   const filtered = search
-    ? logs.filter((l) => l.message.toLowerCase().includes(search.toLowerCase()) || l.action.toLowerCase().includes(search.toLowerCase()))
-    : logs;
+    ? history.filter((r) =>
+        (r.item_code || '').toLowerCase().includes(search.toLowerCase()) ||
+        (r.item_name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (r.technicians?.name || '').toLowerCase().includes(search.toLowerCase())
+      )
+    : history;
 
-  const errors = logs.filter((l) => l.level === 'error').length;
-  const warnings = logs.filter((l) => l.level === 'warning').length;
+  const recontagens   = history.filter((r) => r.count_number > 1).length;
+  const tecnicos      = new Set(history.map((r) => r.technicians?.id)).size;
+  const totalContagens = history.length;
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1400px' }}>
+    <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
-        title="Logs de Fluxo"
-        subtitle="Registro centralizado de eventos do Power Automate e Dispara.AI"
+        title="Histórico de Contagens"
+        subtitle="Registro completo de cada item contado, com recontagens e quantidades informadas"
       />
 
-      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
+      <FilterBar filters={filters} onChange={(f) => setFilters({ from: f.from, to: f.to, technicianId: f.technicianId })} technicians={technicians} />
 
-      <div style={{ height: '0.75rem' }} />
+      <div style={{ height: '1.5rem' }} />
 
-      <div className="filter-bar" style={{ marginBottom: '1rem' }}>
-        <select
-          className="input"
-          style={{ width: '180px' }}
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-        >
-          {SOURCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <select
-          className="input"
-          style={{ width: '150px' }}
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-        >
-          {LEVEL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <KpiCard label="Total de registros" value={totalContagens} />
+        <KpiCard label="Recontagens"         value={recontagens} alert={recontagens > 0} />
+        <KpiCard label="Técnicos"            value={tecnicos} />
+      </div>
+
+      <div className="card" style={{ marginBottom: '1rem' }}>
         <input
+          type="text"
           className="input"
-          style={{ flex: 1, minWidth: '200px' }}
-          placeholder="Buscar por mensagem ou ação..."
+          placeholder="Buscar por código, nome da peça ou técnico..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-        <SummaryBadge label="Total" value={logs.length} />
-        <SummaryBadge label="Erros" value={errors} />
-        <SummaryBadge label="Avisos" value={warnings} />
-        <SummaryBadge label="Power Automate" value={logs.filter((l) => l.source === 'power_automate').length} />
-        <SummaryBadge label="Dispara.AI" value={logs.filter((l) => l.source === 'dispara_ai').length} />
-      </div>
-
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#52525b' }}>Carregando...</div>
-      ) : (
-        <div className="card" style={{ padding: 0 }}>
-          {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#52525b' }}>Nenhum log encontrado</div>
-          ) : (
-            <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-              {filtered.map((log, i) => (
-                <div
-                  key={log.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    borderBottom: i < filtered.length - 1 ? '1px solid #f4f4f5' : 'none',
-                    transition: 'background 0.15s',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#f4f4f5'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: { info: '#52525b', success: '#a1a1aa', warning: '#71717a', error: '#f4f4f5' }[log.level] || '#52525b', marginTop: '6px', flexShrink: 0 }} />
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2px' }}>
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          fontWeight: '600',
-                          color: '#71717a',
-                          background: '#f4f4f5',
-                          padding: '1px 6px',
-                          borderRadius: '4px',
-                          border: '1px solid #e4e4e7',
-                        }}
-                      >
-                        {SOURCE_LABELS[log.source] || log.source}
-                      </span>
-                      <StatusBadge status={log.level} size="xs" />
-                      <span style={{ fontSize: '0.7rem', color: '#52525b', fontFamily: 'monospace' }}>{log.action}</span>
-                    </div>
-                    <div style={{ fontSize: '0.875rem', color: '#f4f4f5' }}>{log.message}</div>
-                    {log.technicians?.name && (
-                      <div style={{ fontSize: '0.75rem', color: '#52525b', marginTop: '2px' }}>Técnico: {log.technicians.name}</div>
-                    )}
-                  </div>
-
-                  <div style={{ fontSize: '0.7rem', color: '#52525b', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                    {formatDate(log.created_at)}
-                  </div>
-                </div>
-              ))}
+      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="table-wrapper" style={{ border: 'none' }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: '#888' }}>
+              Nenhum registro encontrado
             </div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Técnico</th>
+                  <th>UF</th>
+                  <th>Código</th>
+                  <th>Item</th>
+                  <th style={{ textAlign: 'center' }}>Contagem #</th>
+                  <th style={{ textAlign: 'right' }}>Qtd. Informada</th>
+                  <th style={{ textAlign: 'right' }}>Qtd. Sistema</th>
+                  <th style={{ textAlign: 'right' }}>Diferença</th>
+                  <th>Data/Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r) => {
+                  const diff = Number(r.physical_qty) - Number(r.system_qty);
+                  const isRecount = r.count_number > 1;
+                  return (
+                    <tr key={r.id} style={{ background: isRecount ? '#fafafa' : 'transparent' }}>
+                      <td style={{ fontWeight: '800', color: '#000' }}>{r.technicians?.name || '—'}</td>
+                      <td><span className="badge badge-info">{r.technicians?.region || '—'}</span></td>
+                      <td>
+                        <code style={{ fontSize: '0.75rem', background: '#f5f5f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #eee' }}>
+                          {r.item_code}
+                        </code>
+                      </td>
+                      <td style={{ fontWeight: '600', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.item_name}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        {isRecount ? (
+                          <span style={{ fontWeight: '800', fontSize: '0.75rem', background: '#000', color: '#fff', padding: '2px 8px', borderRadius: '999px' }}>
+                            #{r.count_number}
+                          </span>
+                        ) : (
+                          <span style={{ color: '#aaa', fontWeight: '600', fontSize: '0.8rem' }}>1ª</span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: 'right', fontWeight: '800' }}>{r.physical_qty}</td>
+                      <td style={{ textAlign: 'right', color: '#666' }}>{r.system_qty}</td>
+                      <td style={{ textAlign: 'right', fontWeight: '800', color: diff !== 0 ? '#000' : '#bbb' }}>
+                        {diff !== 0 ? (diff > 0 ? `+${diff}` : diff) : '—'}
+                      </td>
+                      <td style={{ fontSize: '0.78rem', color: '#666', whiteSpace: 'nowrap' }}>
+                        {formatDate(r.counted_at)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-function SummaryBadge({ label, value }) {
+function KpiCard({ label, value, alert: isAlert }) {
   return (
-    <div style={{ padding: '0.4rem 0.75rem', background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-      <span style={{ fontWeight: '700', color: '#f4f4f5' }}>{value}</span>
-      <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{label}</span>
+    <div className="card" style={{
+      border: `1px solid ${isAlert && value > 0 ? '#000' : '#e8e8e8'}`,
+      background: isAlert && value > 0 ? '#000' : '#fff',
+    }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert && value > 0 ? '#fff' : '#888', marginBottom: '0.4rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert && value > 0 ? '#fff' : '#000', lineHeight: 1 }}>
+        {value}
+      </div>
     </div>
   );
 }

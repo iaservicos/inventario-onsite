@@ -7,6 +7,13 @@ import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { formatDate } from '@/lib/utils';
 
+function formatDateShort(date) {
+  if (!date) return '—';
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+  }).format(new Date(date));
+}
+
 const STATUS_COLORS = {
   completed:       '#000000',
   in_progress:     '#333333',
@@ -166,17 +173,21 @@ export default function DashboardPage() {
                     <th>Status</th>
                     <th>Progresso</th>
                     <th>Divergências</th>
+                    <th>Agendado</th>
                     <th>1ª Resposta</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recent.length === 0 ? (
-                    <tr><td colSpan={7} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
+                    <tr><td colSpan={8} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
                   ) : (
                     recent.map((inv) => {
                       const pct = inv.total_items > 0
                         ? Math.round((inv.counted_items / inv.total_items) * 100)
                         : 0;
+                      const scheduledAt = inv.inventory_schedules?.[0]?.scheduled_at;
+                      const isPending   = inv.status === 'pending';
+                      const isOverdue   = isPending && scheduledAt && new Date(scheduledAt) < new Date();
                       return (
                         <tr key={inv.id}>
                           <td style={{ fontWeight: '800', color: '#000000' }}>{inv.technicians?.name}</td>
@@ -195,8 +206,25 @@ export default function DashboardPage() {
                             {inv.divergence_count}
                           </td>
                           <td>
+                            {scheduledAt ? (
+                              <span style={{
+                                fontSize: '0.75rem',
+                                fontWeight: isPending ? '800' : '600',
+                                color: isOverdue ? '#000' : isPending ? '#333' : '#aaa',
+                                background: isOverdue ? '#f0f0f0' : 'transparent',
+                                padding: isOverdue ? '2px 6px' : '0',
+                                borderRadius: '4px',
+                                border: isOverdue ? '1px solid #ccc' : 'none',
+                              }}>
+                                {formatDateShort(scheduledAt)}
+                              </span>
+                            ) : (
+                              <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>
+                            )}
+                          </td>
+                          <td>
                             {inv.started_at ? (
-                              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#000' }}>{formatDate(inv.started_at)}</span>
+                              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#000' }}>{formatDateShort(inv.started_at)}</span>
                             ) : (
                               <span style={{ fontSize: '0.7rem', fontWeight: '600', color: '#bbb' }}>Aguardando</span>
                             )}

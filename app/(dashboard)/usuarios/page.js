@@ -8,13 +8,14 @@ import { formatDate, ROLE_LABELS } from '@/lib/utils';
 import { toast } from 'sonner';
 
 /* ─── Modal de Cadastro/Edição de Usuário ────────────────── */
-function ModalUsuario({ usuario, onClose, onSaved, saving }) {
+function ModalUsuario({ usuario, onClose, onSaved, saving, supervisores }) {
   const [form, setForm] = useState({
-    name:     usuario?.name     || '',
-    email:    usuario?.email    || '',
-    password: '',
-    role:     usuario?.role     || 'supervisor',
-    active:   usuario?.active !== undefined ? usuario.active : true
+    name:      usuario?.name      || '',
+    email:     usuario?.email     || '',
+    password:  '',
+    role:      usuario?.role      || 'supervisor',
+    linked_to: usuario?.linked_to || null,
+    active:    usuario?.active !== undefined ? usuario.active : true,
   });
 
   const set = (e) => {
@@ -65,9 +66,33 @@ function ModalUsuario({ usuario, onClose, onSaved, saving }) {
                 <option value="admin">Administrador</option>
                 <option value="supervisor">Supervisor</option>
                 <option value="coordinator">Coordenador</option>
+                <option value="analyst">Analista</option>
               </select>
             </Field>
           </div>
+
+          {form.role === 'analyst' && (
+            <div style={{ marginBottom: '1rem' }}>
+              <Field label="Supervisor vinculado *">
+                <select
+                  name="linked_to"
+                  value={form.linked_to || ''}
+                  onChange={(e) => setForm(f => ({ ...f, linked_to: e.target.value ? Number(e.target.value) : null }))}
+                  className="input"
+                  style={inputStyle}
+                  required
+                >
+                  <option value="">Selecione o supervisor</option>
+                  {(supervisores || []).map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+                <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '0.3rem', fontWeight: '600' }}>
+                  A analista enxerga os mesmos dados do supervisor selecionado.
+                </div>
+              </Field>
+            </div>
+          )}
 
           {usuario && (
             <div style={{ marginBottom: '1rem' }}>
@@ -117,9 +142,10 @@ export default function UsuariosPage() {
   const router = useRouter();
   
   const [users, setUsers] = useState([]);
+  const [supervisores, setSupervisores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [modal, setModal] = useState(null); // { type: 'new'|'edit', data: null|user }
+  const [modal, setModal] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const loadUsers = useCallback(async () => {
@@ -128,7 +154,9 @@ export default function UsuariosPage() {
     try {
       const res = await fetch('/api/users');
       const data = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : [];
+      setUsers(list);
+      setSupervisores(list.filter(u => u.role === 'supervisor' && u.active));
     } catch (err) {
       console.error('Erro ao carregar usuários:', err);
       toast.error('Erro ao carregar lista de usuários');
@@ -243,6 +271,7 @@ export default function UsuariosPage() {
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Perfil</th>
+                <th>Vínculo</th>
                 <th>Status</th>
                 <th>Criado em</th>
                 <th style={{ textAlign: 'right' }}>Ações</th>
@@ -250,18 +279,27 @@ export default function UsuariosPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>CARREGANDO...</td></tr>
               ) : filteredUsers.length === 0 ? (
-                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM USUÁRIO ENCONTRADO</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '3rem', fontWeight: '800' }}>NENHUM USUÁRIO ENCONTRADO</td></tr>
               ) : (
-                filteredUsers.map(u => (
+                filteredUsers.map(u => {
+                  const supervisorName = u.role === 'analyst' && u.linked_to
+                    ? (users.find(s => s.id === u.linked_to)?.name || `ID ${u.linked_to}`)
+                    : null;
+                  return (
                   <tr key={u.id} style={{ opacity: u.active ? 1 : 0.6 }}>
                     <td style={{ fontWeight: '800', color: '#000000' }}>{u.name}</td>
                     <td style={{ fontWeight: '600' }}>{u.email}</td>
                     <td>
-                      <span className="badge" style={{ textTransform: 'uppercase', background: '#f4f4f5', color: '#000000', border: '1px solid #000000', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                      <span className="badge" style={{ textTransform: 'uppercase', background: '#f0f0f0', color: '#000000', border: '1px solid #ccc', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                         {ROLE_LABELS[u.role] || u.role}
                       </span>
+                    </td>
+                    <td style={{ fontSize: '0.78rem', color: '#555', fontWeight: '600' }}>
+                      {supervisorName ? (
+                        <span>↳ {supervisorName}</span>
+                      ) : '—'}
                     </td>
                     <td>
                       <span className="badge" style={{ textTransform: 'uppercase', background: u.active ? '#000000' : '#ffffff', color: u.active ? '#ffffff' : '#000000', border: '1px solid #000000', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
@@ -294,7 +332,8 @@ export default function UsuariosPage() {
                       )}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -302,11 +341,12 @@ export default function UsuariosPage() {
       </div>
 
       {modal && (
-        <ModalUsuario 
-          usuario={modal.data} 
+        <ModalUsuario
+          usuario={modal.data}
           saving={saving}
-          onClose={() => setModal(null)} 
-          onSaved={handleSave} 
+          supervisores={supervisores}
+          onClose={() => setModal(null)}
+          onSaved={handleSave}
         />
       )}
     </div>

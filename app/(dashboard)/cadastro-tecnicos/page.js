@@ -388,7 +388,7 @@ export default function CadastroTecnicosPage() {
         </div>
       </div>
 
-      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid #000000' }}>
+      <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
         <div className="table-wrapper" style={{ border: 'none' }}>
           <table>
             <thead>

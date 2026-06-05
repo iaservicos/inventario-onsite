@@ -30,10 +30,11 @@ export const authOptions = {
           }
 
           return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
+            id:        user.id,
+            name:      user.name,
+            email:     user.email,
+            role:      user.role,
+            linked_to: user.linked_to || null,
           };
         } catch (err) {
           console.error('[AUTH ERROR]', err);
@@ -45,15 +46,17 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
+        token.id        = user.id;
+        token.role      = user.role;
+        token.linked_to = user.linked_to;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+        session.user.id        = token.id;
+        session.user.role      = token.role;
+        session.user.linked_to = token.linked_to;
       }
       return session;
     },

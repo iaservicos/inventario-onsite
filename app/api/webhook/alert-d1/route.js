@@ -24,21 +24,18 @@ export async function POST(req) {
     // 1. Descobre que dia é amanhã (0-6)
     const hoje = new Date();
     const amanha = new Date(hoje);
-    amanha.setDate(hoje.getDate() + 1);
-    
-    // --- AJUSTE DE HORÁRIO ---
-    // Fixamos o horário para as 08:00 da manhã. 
-    // Assim, o inventário estará "pronto" para o Power Automate a partir desse horário.
-    // Se deixarmos o horário da execução (ex: 20:00), o técnico só receberia a mensagem às 20:00 do dia seguinte.
-    amanha.setHours(8, 0, 0, 0); 
-    
-    const diaAmanha = amanha.getDay();
+    amanha.setUTCDate(amanha.getUTCDate() + 1);
+    amanha.setUTCHours(0, 0, 0, 0); // data base limpa em UTC
 
-    // Define o range de amanhã para a verificação de duplicidade (00:00 até 23:59)
+    // day-of-week em SP (UTC-3): offset de 3h
+    const amanhaEmSP = new Date(amanha.getTime() - 3 * 60 * 60 * 1000);
+    const diaAmanha  = amanhaEmSP.getUTCDay();
+
+    // Range do dia de amanhã em SP (UTC-3): 00:00 SP = 03:00 UTC
     const amanhaInicio = new Date(amanha);
-    amanhaInicio.setHours(0, 0, 0, 0);
+    amanhaInicio.setUTCHours(3, 0, 0, 0);
     const amanhaFim = new Date(amanha);
-    amanhaFim.setHours(23, 59, 59, 999);
+    amanhaFim.setUTCHours(26, 59, 59, 999); // overflow automático → 02:59 UTC do dia seguinte
 
     // 2. Busca técnicos que fazem inventário amanhã
     const { data: tecnicos } = await supabase
@@ -90,6 +87,11 @@ export async function POST(req) {
       const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
       if (pecas.length === 0) continue;
 
+      // Horário do técnico em SP (UTC-3) → converte para UTC somando 3h
+      const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
+      const agendar = new Date(amanha);
+      agendar.setUTCHours(h + 3, m, 0, 0);
+
       const { data: inv } = await supabase
         .from('inventories')
         .insert({ technician_id: tech.id, status: 'pending', week_ref: weekRef })
@@ -98,7 +100,7 @@ export async function POST(req) {
 
       await supabase.from('inventory_schedules').insert({
         technician_id:      tech.id,
-        scheduled_at:       amanha.toISOString(),
+        scheduled_at:       agendar.toISOString(),
         status:             'pending',
         scheduled_subgroup: subgrupo || 'Geral',
         scheduled_items:    pecas,

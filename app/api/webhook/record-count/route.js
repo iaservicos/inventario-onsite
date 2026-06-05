@@ -56,7 +56,7 @@ export async function POST(req) {
     //    (já sincronizado com o Databricks pelo sync/pecas)
     const { data: techItemRows } = await supabase
       .from('technician_items')
-      .select('item_quantity')
+      .select('item_quantity, item_subgroup')
       .eq('technician_id', tech.id)
       .ilike('item_code', `%${code}`)
       .eq('active', true);
@@ -64,6 +64,44 @@ export async function POST(req) {
     const systemQty = (techItemRows || []).reduce(
       (sum, r) => sum + (Number(r.item_quantity) || 0), 0
     );
+
+    // Detecta se a peça pertence a subgrupo diferente do agendado para este inventário
+    const { data: scheduleData } = await supabase
+      .from('inventory_schedules')
+      .select('scheduled_subgroup')
+      .eq('inventory_id', inventory.id)
+      .maybeSingle();
+
+    const scheduledSubgroup = scheduleData?.scheduled_subgroup || null;
+
+    if (scheduledSubgroup && techItemRows && techItemRows.length > 0 && physQty > 0) {
+      const inCurrentSubgroup = techItemRows.some(
+        (r) => (r.item_subgroup || '').trim().toLowerCase() === scheduledSubgroup.trim().toLowerCase()
+      );
+      if (!inCurrentSubgroup) {
+        const itemSubgroup = techItemRows.find((r) => r.item_subgroup)?.item_subgroup || 'outro subgrupo';
+        // Gera alerta apenas na primeira vez que este item é reportado (evita flood)
+        const { count: jaAlertou } = await supabase
+          .from('alerts')
+          .select('id', { count: 'exact', head: true })
+          .eq('inventory_id', inventory.id)
+          .eq('type', 'surplus_subgroup')
+          .ilike('description', `%${code}%`);
+
+        if (!jaAlertou || jaAlertou === 0) {
+          await supabase.from('alerts').insert({
+            type:          'surplus_subgroup',
+            severity:      'medium',
+            title:         `Peça de outro subgrupo — ${tech.name}`,
+            description:   `Peça ${code} (${item_name || code}) pertence ao subgrupo "${itemSubgroup}" mas foi informada no inventário de "${scheduledSubgroup}". Qtd informada: ${physQty}.`,
+            technician_id: tech.id,
+            inventory_id:  inventory.id,
+            resolved:      false,
+            created_at:    new Date().toISOString(),
+          });
+        }
+      }
+    }
 
     // 4. Upsert: atualiza se já existe, insere se não existe
     const { data: existingRow } = await supabase
