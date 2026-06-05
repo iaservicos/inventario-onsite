@@ -24,10 +24,10 @@ const SHARED_ADMIN_ITEMS = [
   { href: '/cadastro-tecnicos', label: 'Cadastro Técnicos', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>) },
 ];
 
-export default function Sidebar({ user }) {
+export default function Sidebar({ user, isOpen }) {
   const pathname = usePathname();
   function isActive(href) { return pathname === href || (href !== '/dashboard' && pathname.startsWith(href)); }
-  const isManagement = user?.role === 'admin' || user?.role === 'supervisor' || user?.role === 'coordinator';
+  const isManagement = user?.role === 'admin' || user?.role === 'supervisor' || user?.role === 'coordinator' || user?.role === 'analyst';
 
   // Estilo comum para os botões da parte inferior
   const bottomButtonStyle = {
@@ -53,7 +53,7 @@ export default function Sidebar({ user }) {
   const handleMouseLeave = e => { e.currentTarget.style.borderColor = '#333333'; e.currentTarget.style.color = '#888888'; };
 
   return (
-    <aside style={{ position: 'fixed', top: 0, left: 0, width: '240px', height: '100vh', background: '#1a1a1a', borderRight: '1px solid #333333', display: 'flex', flexDirection: 'column', zIndex: 100, overflowY: 'auto' }}>
+    <aside className={`sidebar${isOpen ? ' sidebar-open' : ''}`}>
       <div style={{ padding: '2rem 1rem', borderBottom: '1px solid #333333' }}>
         <div style={{ background: '#ffffff', padding: '0.5rem', borderRadius: '8px', display: 'flex', justifyContent: 'center' }}>
           <Image src="/logo-positivo.png" alt="Positivo Tecnologia" width={220} height={55} style={{ objectFit: 'contain' }} />

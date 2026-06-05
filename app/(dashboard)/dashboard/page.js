@@ -29,24 +29,24 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  useEffect(() => {
-    fetch('/api/technicians').then((r) => r.json()).then(setTechnicians);
-  }, []);
-
-  const load = useCallback(async () => {
+  const load = useCallback(async (isInitial = false) => {
     setLoading(true);
     const params = new URLSearchParams();
     if (filters.from) params.set('from', filters.from);
     if (filters.to) params.set('to', filters.to);
     if (filters.technicianId) params.set('technicianId', filters.technicianId);
-    const res = await fetch(`/api/dashboard?${params}`);
-    const json = await res.json();
+
+    const fetches = [fetch(`/api/dashboard?${params}`).then(r => r.json())];
+    if (isInitial) fetches.push(fetch('/api/technicians').then(r => r.json()));
+
+    const [json, techs] = await Promise.all(fetches);
     setData(json);
+    if (techs) setTechnicians(techs);
     setLastUpdated(new Date());
     setLoading(false);
   }, [filters]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(true); }, [load]);
 
   // Auto-refresh a cada 30 segundos
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // cache de 60s — lista de técnicos raramente muda
 
 // FUNÇÃO PARA LISTAR (Já existia)
 export async function GET(request) {

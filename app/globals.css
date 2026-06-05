@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   height: 100%;
   width: 100%;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: inherit, system-ui, -apple-system, sans-serif;
   background: #ffffff;
   color: #000000;
   line-height: 1.4;
@@ -152,3 +150,108 @@ tr:hover td { background: #fafafa; }
 /* ── Animations ── */
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
+
+/* ── FilterBar ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── Sidebar responsive ── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  background: #1a1a1a;
+  border-right: 1px solid #333333;
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  overflow-y: auto;
+  transition: transform 0.25s ease;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+}
+
+.mobile-topbar {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.hamburger {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #000;
+  border-radius: 2px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+  }
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay {
+    display: block;
+  }
+  .mobile-topbar {
+    display: flex;
+  }
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0;
+  }
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-bar .input,
+  .filter-bar select,
+  .filter-bar input {
+    width: 100%;
+    min-width: unset;
+  }
+  td, th {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.72rem;
+  }
+  .page-header-title {
+    font-size: 1.2rem;
+  }
+  .grid-fluid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
