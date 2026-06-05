@@ -21,21 +21,28 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
 
-    // 1. Descobre que dia é amanhã (0-6)
+    // 1. Descobre que dia é amanhã no horário de Brasília (UTC-3)
     const hoje = new Date();
-    const amanha = new Date(hoje);
-    amanha.setUTCDate(amanha.getUTCDate() + 1);
-    amanha.setUTCHours(0, 0, 0, 0); // data base limpa em UTC
+    // SP "agora" = UTC - 3h
+    const agoraSP = new Date(hoje.getTime() - 3 * 60 * 60 * 1000);
 
-    // day-of-week em SP (UTC-3): offset de 3h
-    const amanhaEmSP = new Date(amanha.getTime() - 3 * 60 * 60 * 1000);
-    const diaAmanha  = amanhaEmSP.getUTCDay();
+    // "Amanhã" no calendário SP
+    const amanhaNoSP = new Date(agoraSP);
+    amanhaNoSP.setUTCDate(amanhaNoSP.getUTCDate() + 1);
+    const diaAmanha = amanhaNoSP.getUTCDay(); // 0=Dom … 6=Sáb, calculado corretamente em SP
 
-    // Range do dia de amanhã em SP (UTC-3): 00:00 SP = 03:00 UTC
-    const amanhaInicio = new Date(amanha);
-    amanhaInicio.setUTCHours(3, 0, 0, 0);
-    const amanhaFim = new Date(amanha);
-    amanhaFim.setUTCHours(26, 59, 59, 999); // overflow automático → 02:59 UTC do dia seguinte
+    // 00:00 SP = 03:00 UTC   |   23:59:59 SP = 02:59:59 UTC do dia seguinte
+    const amanhaInicio = new Date(Date.UTC(
+      amanhaNoSP.getUTCFullYear(), amanhaNoSP.getUTCMonth(), amanhaNoSP.getUTCDate(),
+      3, 0, 0, 0,
+    ));
+    const amanhaFim = new Date(amanhaInicio.getTime() + 24 * 60 * 60 * 1000 - 1);
+
+    // Base de data (meia-noite UTC do dia SP de amanhã) usada para montar scheduled_at
+    const amanha = new Date(Date.UTC(
+      amanhaNoSP.getUTCFullYear(), amanhaNoSP.getUTCMonth(), amanhaNoSP.getUTCDate(),
+      0, 0, 0, 0,
+    ));
 
     // 2. Busca técnicos que fazem inventário amanhã
     const { data: tecnicos } = await supabase
@@ -56,24 +63,39 @@ export async function POST(req) {
       // Se existir, não recalcula o subgrupo (evita trocar lcd→ssd em execuções repetidas do cron).
       const { data: existente } = await supabase
         .from('inventory_schedules')
-        .select('id, inventory_id, scheduled_subgroup')
+        .select('id, inventory_id, scheduled_subgroup, scheduled_at')
         .eq('technician_id', tech.id)
         .gte('scheduled_at', amanhaInicio.toISOString())
         .lte('scheduled_at', amanhaFim.toISOString())
         .maybeSingle();
 
       if (existente) {
-        // Agendamento já criado — só garante que o inventário está vinculado
+        // Calcula o scheduled_at correto (SP → UTC)
+        const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
+        const scheduledCorreto = new Date(amanha);
+        scheduledCorreto.setUTCHours(h + 3, m, 0, 0);
+
+        const updates = {};
+
+        // Corrige horário se foi criado antes da correção de timezone (guarda SP→UTC)
+        if (existente.scheduled_at !== scheduledCorreto.toISOString()) {
+          updates.scheduled_at = scheduledCorreto.toISOString();
+        }
+
+        // Vincula inventário se ainda não foi vinculado
         if (!existente.inventory_id) {
           const { data: inv } = await supabase
             .from('inventories')
             .insert({ technician_id: tech.id, status: 'pending', week_ref: weekRef })
             .select('id')
             .single();
-          if (inv) {
-            await supabase.from('inventory_schedules').update({ inventory_id: inv.id }).eq('id', existente.id);
-          }
+          if (inv) updates.inventory_id = inv.id;
         }
+
+        if (Object.keys(updates).length > 0) {
+          await supabase.from('inventory_schedules').update(updates).eq('id', existente.id);
+        }
+
         respostaPowerAutomate.push({
           nome: tech.name,
           telefone: tech.phone,
