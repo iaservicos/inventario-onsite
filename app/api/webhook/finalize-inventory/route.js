@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
+import { getConsolidatedTechnicianItems } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
@@ -60,7 +61,61 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Nenhum item foi contado ainda' }, { status: 400 });
     }
 
-    // 3. Comparar e classificar
+    // 3. Detectar peças do subgrupo que não foram contadas (physical_qty ausente)
+    //    Busca todas as peças esperadas e compara com o que foi contado
+    try {
+      const { data: schedule } = await supabase
+        .from('inventory_schedules')
+        .select('scheduled_subgroup')
+        .eq('inventory_id', invId)
+        .maybeSingle();
+
+      const subgroup = schedule?.scheduled_subgroup || null;
+      const expectedItems = await getConsolidatedTechnicianItems(supabase, techId, subgroup);
+
+      if (expectedItems && expectedItems.length > 0) {
+        // Normaliza os códigos contados (remove zeros à esquerda) para comparação
+        const countedCodes = new Set(
+          countedItems.map(i => String(i.item_code).replace(/^0+/, '') || '0')
+        );
+
+        for (const expected of expectedItems) {
+          const normalizedCode = String(expected.item_code).replace(/^0+/, '') || '0';
+          if (countedCodes.has(normalizedCode)) continue; // já foi contada
+
+          const sysQty = Number(expected.item_quantity) || 0;
+          if (sysQty === 0) continue; // sem quantidade no sistema, ignora
+
+          // Insere linha como não contada (physical_qty = 0)
+          await supabase.from('inventory_items').insert({
+            inventory_id:  invId,
+            item_code:     expected.item_code,
+            item_name:     expected.item_name,
+            item_subgroup: expected.item_subgroup || subgroup || null,
+            system_qty:    sysQty,
+            physical_qty:  0,
+            has_divergence: true,
+            status:        'recount',
+            counted_at:    new Date().toISOString(),
+          });
+
+          // Adiciona como item contado para entrar na comparação abaixo
+          countedItems.push({
+            id:           null,
+            item_code:    expected.item_code,
+            item_name:    expected.item_name,
+            physical_qty: 0,
+            system_qty:   sysQty,
+            counted_at:   new Date().toISOString(),
+            _already_saved: true,
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[finalize-inventory] Falha ao verificar peças não contadas:', e.message);
+    }
+
+    // 4. Comparar e classificar
     const divergencesToInsert = [];
     const recountItems        = [];
     const surplusItems        = [];
@@ -74,14 +129,16 @@ export async function POST(req) {
         ? parseFloat(Math.abs((diff / sysQty) * 100).toFixed(2))
         : physQty > 0 ? 100 : 0;
 
-      await supabase
-        .from('inventory_items')
-        .update({
-          has_divergence: hasDiv,
-          status:         !hasDiv ? 'counted' : diff < 0 ? 'recount' : 'counted',
-          counted_at:     item.counted_at || new Date().toISOString(),
-        })
-        .eq('id', item.id);
+      if (!item._already_saved) {
+        await supabase
+          .from('inventory_items')
+          .update({
+            has_divergence: hasDiv,
+            status:         !hasDiv ? 'counted' : diff < 0 ? 'recount' : 'counted',
+            counted_at:     item.counted_at || new Date().toISOString(),
+          })
+          .eq('id', item.id);
+      }
 
       if (hasDiv) {
         divergencesToInsert.push({
