@@ -119,7 +119,7 @@ export default function TecnicosPage() {
                   {byTech.length === 0 ? (
                     <tr><td colSpan={9} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700', color: '#888' }}>Nenhum dado no período</td></tr>
                   ) : byTech.map((t) => (
-                    <tbody key={t.id}>
+                    <Fragment key={t.id}>
                       <tr
                         style={{ cursor: 'pointer' }}
                         onClick={() => setExpanded(expanded === t.id ? null : t.id)}
