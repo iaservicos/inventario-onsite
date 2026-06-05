@@ -49,10 +49,12 @@ export async function POST(req) {
 
     const { id: invId, technician_id: techId } = inventory;
 
-    // 2. Buscar itens contados neste inventário
+    // 2. Buscar itens contados neste inventário (physical_qty preenchido)
+    //    Inclui sort_order para distinguir linhas do dispatch (sort_order não-nulo)
+    //    de linhas inseridas diretamente pelo PA antigo (sort_order nulo, system_qty = 0)
     const { data: countedItems } = await supabase
       .from('inventory_items')
-      .select('*')
+      .select('id, item_code, item_name, physical_qty, system_qty, counted_at, sort_order')
       .eq('inventory_id', invId)
       .not('physical_qty', 'is', null);
 
@@ -60,18 +62,19 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Nenhum item foi contado ainda' }, { status: 400 });
     }
 
-    // 3. Buscar peças do técnico no sistema e consolidar por item_code
-    // Um mesmo código pode ter múltiplas linhas com quantidades — somamos tudo
-    const { data: techItems } = await supabase
-      .from('technician_items')
-      .select('item_code, item_name, item_quantity, item_subgroup')
-      .eq('technician_id', techId)
-      .eq('active', true);
-
+    // 3. Fallback para linhas sem system_qty (PA antigo que inseria system_qty = 0)
+    //    Para linhas do dispatch (sort_order definido), usa o system_qty da própria linha.
+    const needsFallback = countedItems.some(i => i.sort_order === null || i.sort_order === undefined);
     const sysQtyMap = {};
-    for (const item of (techItems || [])) {
-      const code = item.item_code;
-      sysQtyMap[code] = (sysQtyMap[code] || 0) + (Number(item.item_quantity) || 0);
+    if (needsFallback) {
+      const { data: techItems } = await supabase
+        .from('technician_items')
+        .select('item_code, item_quantity')
+        .eq('technician_id', techId)
+        .eq('active', true);
+      for (const ti of (techItems || [])) {
+        sysQtyMap[ti.item_code] = (sysQtyMap[ti.item_code] || 0) + (Number(ti.item_quantity) || 0);
+      }
     }
 
     // 4. Comparar cada item contado com o sistema
@@ -80,7 +83,11 @@ export async function POST(req) {
     const surplusItems   = []; // contou mais que o sistema → aviso ao supervisor
 
     for (const item of countedItems) {
-      const sysQty  = sysQtyMap[item.item_code] || 0;
+      // Linhas do dispatch têm sort_order definido e system_qty correto do momento do disparo.
+      // Linhas inseridas pelo PA antigo têm sort_order nulo — usa technician_items como fallback.
+      const sysQty = (item.sort_order !== null && item.sort_order !== undefined)
+        ? (Number(item.system_qty) || 0)
+        : (sysQtyMap[item.item_code] || 0);
       const physQty = Number(item.physical_qty);
       const diff    = physQty - sysQty;
       const hasDiv  = diff !== 0;
