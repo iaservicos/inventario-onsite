@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import * as XLSX from 'xlsx';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -13,9 +12,9 @@ export default function TecnicosPage() {
   const [technicians, setTechnicians] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [exporting, setExporting] = useState(false);
   const [dbChecking, setDbChecking] = useState(null);
   const [dbStatus, setDbStatus] = useState({});
+  const [expanded, setExpanded] = useState(null);
 
   async function checkDatabricks(techId) {
     setDbChecking(techId);
@@ -55,27 +54,26 @@ export default function TecnicosPage() {
 
   const byTech = technicians.map((t) => {
     const invs = inventories.filter((i) => i.technician_id === t.id);
-    const completed = invs.filter((i) => i.status === 'completed').length;
-    const totalDivergences = invs.reduce((s, i) => s + (i.divergence_count || 0), 0);
-    const rate = invs.length > 0 ? Math.round((completed / invs.length) * 100) : 0;
-    return { ...t, invs, completed, totalDivergences, rate };
+    const corretos     = invs.filter((i) => i.status === 'completed' && (i.divergence_count || 0) === 0).length;
+    const comDiv       = invs.filter((i) => (i.divergence_count || 0) > 0).length;
+    const recontagens  = comDiv;
+    const totalDiv     = invs.reduce((s, i) => s + (i.divergence_count || 0), 0);
+    const rate         = invs.length > 0 ? Math.round((corretos / invs.length) * 100) : 0;
+    return { ...t, invs, corretos, comDiv, recontagens, totalDiv, rate };
   }).filter((t) => t.invs.length > 0 || !filters.technicianId);
+
+  // KPIs globais
+  const totalTecnicos  = byTech.length;
+  const totalInvs      = byTech.reduce((s, t) => s + t.invs.length, 0);
+  const totalCorretos  = byTech.reduce((s, t) => s + t.corretos, 0);
+  const taxaMedia      = totalInvs > 0 ? Math.round((totalCorretos / totalInvs) * 100) : 0;
+  const totalDivGlobal = byTech.reduce((s, t) => s + t.totalDiv, 0);
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
         title="Técnicos"
-        subtitle="Desempenho e status dos inventários"
-        actions={
-          <button className="btn btn-primary" onClick={() => {}} disabled={exporting}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Exportar Excel
-          </button>
-        }
+        subtitle="Desempenho e histórico de inventários"
       />
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
@@ -83,95 +81,160 @@ export default function TecnicosPage() {
       <div style={{ height: '1.5rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '4rem', color: '#888888', fontSize: '0.85rem', fontWeight: '600' }}>Carregando...</div>
+        <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Carregando...</div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-            {byTech.map((t) => (
-              <div key={t.id} className="card card-hover" style={{ padding: '1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1rem' }}>
-                  <div style={{
-                    width: '36px', height: '36px', borderRadius: '50%',
-                    background: '#000000', color: '#ffffff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '1rem', fontWeight: '800', flexShrink: 0,
-                  }}>
-                    {t.name.charAt(0)}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: '800', color: '#000000', fontSize: '0.95rem', lineHeight: 1.2 }}>{t.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#666666', fontWeight: '600' }}>{t.region || '—'}</div>
-                  </div>
-                  <button
-                    className="btn btn-secondary"
-                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.65rem', fontWeight: '800' }}
-                    disabled={dbChecking === t.id}
-                    onClick={() => checkDatabricks(t.id)}
-                  >
-                    {dbChecking === t.id ? '...' : 'DB'}
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '1rem' }}>
-                  <Metric label="Invs" value={t.invs.length} />
-                  <Metric label="Feitos" value={t.completed} />
-                  <Metric label="Diverg" value={t.totalDivergences} color={t.totalDivergences > 0 ? '#000000' : '#888888'} />
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#000000', marginBottom: '4px', fontWeight: '700' }}>
-                    <span>Taxa de conclusão</span>
-                    <span>{t.rate}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${t.rate}%` }} />
-                  </div>
-                </div>
-              </div>
-            ))}
+          {/* KPIs */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            <KpiCard label="Técnicos ativos" value={totalTecnicos} />
+            <KpiCard label="Inventários" value={totalInvs} />
+            <KpiCard label="Sem divergência" value={totalCorretos} highlight />
+            <KpiCard label="Taxa de acerto" value={`${taxaMedia}%`} highlight={taxaMedia >= 80} />
+            <KpiCard label="Total divergências" value={totalDivGlobal} alert={totalDivGlobal > 0} />
           </div>
 
-          <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-            <div style={{ padding: '1rem 1.25rem', background: '#f9f9f9', borderBottom: '1px solid #eeeeee' }}>
-              <div className="section-title" style={{ fontSize: '0.95rem' }}>Todos os Inventários</div>
+          {/* Tabela de técnicos */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '2rem' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '2px solid #000', background: '#f9f9f9' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Desempenho por Técnico
+              </span>
             </div>
             <div className="table-wrapper" style={{ border: 'none' }}>
               <table>
                 <thead>
                   <tr>
                     <th>Técnico</th>
-                    <th>Região</th>
-                    <th>Semana</th>
-                    <th>Status</th>
-                    <th>Progresso</th>
-                    <th>Divergências</th>
-                    <th>Duração</th>
+                    <th>UF</th>
+                    <th style={{ textAlign: 'center' }}>Inventários</th>
+                    <th style={{ textAlign: 'center' }}>✓ Corretos</th>
+                    <th style={{ textAlign: 'center' }}>⚠ C/ Divergência</th>
+                    <th style={{ textAlign: 'center' }}>↺ Recontagens</th>
+                    <th style={{ textAlign: 'center' }}>Itens Diverg.</th>
+                    <th style={{ textAlign: 'center', minWidth: '140px' }}>Taxa de Acerto</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {inventories.map((inv) => {
-                    const pct = inv.total_items > 0 ? Math.round((inv.counted_items / inv.total_items) * 100) : 0;
-                    return (
-                      <tr key={inv.id}>
-                        <td style={{ fontWeight: '700', color: '#000000' }}>{inv.technicians?.name}</td>
-                        <td style={{ fontWeight: '600' }}>{inv.technicians?.region || '—'}</td>
-                        <td style={{ fontWeight: '600' }}>{inv.week_ref || '—'}</td>
-                        <td><StatusBadge status={inv.status} /></td>
+                  {byTech.length === 0 ? (
+                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700', color: '#888' }}>Nenhum dado no período</td></tr>
+                  ) : byTech.map((t) => (
+                    <tbody key={t.id}>
+                      <tr
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setExpanded(expanded === t.id ? null : t.id)}
+                      >
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <div className="progress-bar" style={{ width: '60px' }}>
-                              <div className="progress-fill" style={{ width: `${pct}%` }} />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                            <div style={{
+                              width: '30px', height: '30px', borderRadius: '50%',
+                              background: '#000', color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '0.8rem', fontWeight: '800', flexShrink: 0,
+                            }}>
+                              {t.name.charAt(0)}
                             </div>
-                            <span style={{ fontSize: '0.7rem', fontWeight: '700' }}>{pct}%</span>
+                            <span style={{ fontWeight: '800', color: '#000' }}>{t.name}</span>
                           </div>
                         </td>
-                        <td style={{ fontWeight: '800', color: inv.divergence_count > 0 ? '#000000' : '#888888' }}>
-                          {inv.divergence_count}
+                        <td><span className="badge badge-info">{t.region || '—'}</span></td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>{t.invs.length}</td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span style={{
+                            display: 'inline-block', minWidth: '28px', padding: '2px 8px',
+                            background: t.corretos > 0 ? '#000' : '#f0f0f0',
+                            color: t.corretos > 0 ? '#fff' : '#999',
+                            borderRadius: '999px', fontSize: '0.75rem', fontWeight: '800',
+                          }}>{t.corretos}</span>
                         </td>
-                        <td style={{ fontSize: '0.75rem', fontWeight: '600' }}>{formatDuration(inv.started_at, inv.completed_at)}</td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span style={{
+                            display: 'inline-block', minWidth: '28px', padding: '2px 8px',
+                            background: t.comDiv > 0 ? '#555' : '#f0f0f0',
+                            color: t.comDiv > 0 ? '#fff' : '#999',
+                            borderRadius: '999px', fontSize: '0.75rem', fontWeight: '800',
+                          }}>{t.comDiv}</span>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span style={{
+                            display: 'inline-block', minWidth: '28px', padding: '2px 8px',
+                            background: t.recontagens > 0 ? '#888' : '#f0f0f0',
+                            color: t.recontagens > 0 ? '#fff' : '#999',
+                            borderRadius: '999px', fontSize: '0.75rem', fontWeight: '700',
+                          }}>{t.recontagens}</span>
+                        </td>
+                        <td style={{ textAlign: 'center', fontWeight: '700', color: t.totalDiv > 0 ? '#000' : '#bbb' }}>
+                          {t.totalDiv}
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div className="progress-bar" style={{ flex: 1 }}>
+                              <div className="progress-fill" style={{ width: `${t.rate}%` }} />
+                            </div>
+                            <span style={{ fontSize: '0.75rem', fontWeight: '800', minWidth: '34px', textAlign: 'right' }}>
+                              {t.rate}%
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <button
+                            className="btn btn-secondary"
+                            style={{ fontSize: '0.65rem', padding: '0.2rem 0.5rem', fontWeight: '800' }}
+                            disabled={dbChecking === t.id}
+                            onClick={(e) => { e.stopPropagation(); checkDatabricks(t.id); }}
+                          >
+                            {dbChecking === t.id ? '...' : 'DB'}
+                          </button>
+                        </td>
                       </tr>
-                    );
-                  })}
+
+                      {/* Linha expandida: inventários do técnico */}
+                      {expanded === t.id && (
+                        <tr key={`exp-${t.id}`}>
+                          <td colSpan={9} style={{ padding: 0, background: '#fafafa', borderBottom: '2px solid #eee' }}>
+                            <table style={{ width: '100%', fontSize: '0.8rem' }}>
+                              <thead>
+                                <tr style={{ background: '#f0f0f0' }}>
+                                  <th style={{ padding: '0.4rem 1rem' }}>Semana</th>
+                                  <th style={{ padding: '0.4rem 0.5rem' }}>Status</th>
+                                  <th style={{ padding: '0.4rem 0.5rem', textAlign: 'center' }}>Progresso</th>
+                                  <th style={{ padding: '0.4rem 0.5rem', textAlign: 'center' }}>Divergências</th>
+                                  <th style={{ padding: '0.4rem 0.5rem' }}>Duração</th>
+                                  <th style={{ padding: '0.4rem 1rem' }}>Início</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {t.invs.map((inv) => {
+                                  const pct = inv.total_items > 0
+                                    ? Math.round((inv.counted_items / inv.total_items) * 100)
+                                    : 0;
+                                  return (
+                                    <tr key={inv.id} style={{ borderTop: '1px solid #eee' }}>
+                                      <td style={{ padding: '0.5rem 1rem', fontWeight: '700' }}>{inv.week_ref || '—'}</td>
+                                      <td style={{ padding: '0.5rem' }}><StatusBadge status={inv.status} /></td>
+                                      <td style={{ padding: '0.5rem', textAlign: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}>
+                                          <div className="progress-bar" style={{ width: '60px' }}>
+                                            <div className="progress-fill" style={{ width: `${pct}%` }} />
+                                          </div>
+                                          <span style={{ fontWeight: '700' }}>{pct}%</span>
+                                        </div>
+                                      </td>
+                                      <td style={{ padding: '0.5rem', textAlign: 'center', fontWeight: '800', color: inv.divergence_count > 0 ? '#000' : '#bbb' }}>
+                                        {inv.divergence_count}
+                                      </td>
+                                      <td style={{ padding: '0.5rem', color: '#666' }}>{formatDuration(inv.started_at, inv.completed_at)}</td>
+                                      <td style={{ padding: '0.5rem 1rem', color: '#666' }}>{formatDate(inv.started_at || inv.created_at)}</td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -182,11 +245,18 @@ export default function TecnicosPage() {
   );
 }
 
-function Metric({ label, value, color }) {
+function KpiCard({ label, value, highlight, alert }) {
   return (
-    <div style={{ textAlign: 'center', padding: '0.5rem', background: '#fcfcfc', borderRadius: '6px', border: '1px solid #f0f0f0' }}>
-      <div style={{ fontSize: '1.1rem', fontWeight: '900', color: color || '#000000', lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: '0.6rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '700', marginTop: '2px' }}>{label}</div>
+    <div className="card" style={{
+      border: `1px solid ${alert ? '#000' : '#e8e8e8'}`,
+      background: alert ? '#000' : '#fff',
+    }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: alert ? '#fff' : '#888', marginBottom: '0.4rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: alert ? '#fff' : '#000', lineHeight: 1 }}>
+        {value}
+      </div>
     </div>
   );
 }
