@@ -77,7 +77,7 @@ function ModalUsuario({ usuario, onClose, onSaved, saving, supervisores }) {
                 <select
                   name="linked_to"
                   value={form.linked_to || ''}
-                  onChange={(e) => setForm(f => ({ ...f, linked_to: e.target.value ? Number(e.target.value) : null }))}
+                  onChange={(e) => setForm(f => ({ ...f, linked_to: e.target.value || null }))}
                   className="input"
                   style={inputStyle}
                   required
