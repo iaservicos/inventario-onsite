@@ -38,7 +38,7 @@ export async function POST(req) {
         .from('inventories')
         .select('id, technician_id, week_ref, status, technicians(id, name, phone)')
         .eq('technician_id', tech.id)
-        .in('status', ['in_progress', 'pending'])
+        .in('status', ['in_progress', 'pending', 'recount_pending'])
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
@@ -49,6 +49,9 @@ export async function POST(req) {
     }
 
     const { id: invId, technician_id: techId } = inventory;
+
+    // Limpa divergências anteriores deste inventário (para recontagem não duplicar)
+    await supabase.from('divergences').delete().eq('inventory_id', invId);
 
     // 2. Busca apenas itens contados — system_qty já correto, gravado pelo record-count
     const { data: countedItems } = await supabase

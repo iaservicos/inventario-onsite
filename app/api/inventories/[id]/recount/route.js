@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth/[...nextauth]/route';
-import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+import { createServiceClient } from '@/lib/supabase';
 
 const GPTMAKER_API_URL = 'https://api.gptmaker.ai/v2/send-message';
 
@@ -18,136 +12,62 @@ export async function POST(request, { params }) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const originalInventoryId = parseInt(params.id);
+  const inventoryId = parseInt(params.id);
+  const supabase = createServiceClient();
 
-  const { data: original, error: origError } = await supabase
+  // 1. Busca inventário com técnico
+  const { data: inventory, error } = await supabase
     .from('inventories')
-    .select(`
-      id,
-      technician_id,
-      week_ref,
-      status,
-      technicians (
-        id,
-        name,
-        phone
-      ),
-      inventory_items (
-        id,
-        item_code,
-        item_name,
-        unit,
-        expected_qty,
-        counted_qty,
-        status
-      )
-    `)
-    .eq('id', originalInventoryId)
+    .select('id, technician_id, week_ref, status, technicians(id, name, phone)')
+    .eq('id', inventoryId)
     .single();
 
-  if (origError || !original) {
+  if (error || !inventory) {
     return NextResponse.json({ error: 'Inventário não encontrado' }, { status: 404 });
   }
 
-  if (!['completed', 'recount_pending'].includes(original.status)) {
-    return NextResponse.json({
-      error: 'Recontagem só pode ser criada para inventários com status completed ou recount_pending'
-    }, { status: 400 });
-  }
-
-  const divergentItems = (original.inventory_items || []).filter(
-    (item) => item.status === 'divergent' || item.status === 'recount'
-  );
-
-  if (divergentItems.length === 0) {
-    return NextResponse.json({ error: 'Nenhuma peça divergente encontrada neste inventário' }, { status: 400 });
-  }
-
-  const { data: newInventory, error: invError } = await supabase
-    .from('inventories')
-    .insert({
-      technician_id: original.technician_id,
-      week_ref: original.week_ref,
-      status: 'in_progress',
-      items_total: divergentItems.length,
-      items_counted: 0,
-      recount_of: originalInventoryId,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
-
-  if (invError) {
-    return NextResponse.json({ error: invError.message }, { status: 500 });
-  }
-
-  const newItems = divergentItems.map((item, index) => ({
-    inventory_id: newInventory.id,
-    item_code: item.item_code,
-    item_name: item.item_name,
-    unit: item.unit,
-    expected_qty: item.counted_qty ?? item.expected_qty,
-    counted_qty: null,
-    status: 'pending',
-    sort_order: index,
-    created_at: new Date().toISOString(),
-  }));
-
-  const { error: itemsError } = await supabase
+  // 2. Busca peças que precisam de recontagem (status = recount)
+  const { data: recountItems } = await supabase
     .from('inventory_items')
-    .insert(newItems);
+    .select('id, item_code, item_name, system_qty, physical_qty')
+    .eq('inventory_id', inventoryId)
+    .eq('status', 'recount');
 
-  if (itemsError) {
-    await supabase.from('inventories').delete().eq('id', newInventory.id);
-    return NextResponse.json({ error: itemsError.message }, { status: 500 });
+  if (!recountItems || recountItems.length === 0) {
+    return NextResponse.json({ error: 'Nenhuma peça para recontagem encontrada' }, { status: 400 });
   }
 
+  const tech = inventory.technicians;
+  const techName = tech?.name || 'Técnico';
+  const firstName = techName.split(' ')[0];
+
+  // 3. Monta mensagem com as peças divergentes
+  const listaItens = recountItems
+    .map((item, i) =>
+      `📦 *${i + 1}. ${item.item_name}*\n` +
+      `Código: \`${item.item_code}\`\n` +
+      `Você informou: *${Number(item.physical_qty)}* | Sistema: *${Number(item.system_qty)}*`
+    )
+    .join('\n\n');
+
+  const message =
+    `Olá, ${firstName}! 👋\n\n` +
+    `Encontramos *${recountItems.length}* peça(s) com divergência no inventário da semana *${inventory.week_ref}*.\n\n` +
+    `Por favor, recontar as peças abaixo e informar a quantidade correta:\n\n` +
+    listaItens +
+    `\n\nResponda com o código e a quantidade. Exemplo:\n*11128693 = 5*`;
+
+  // 4. Marca inventário como recount_pending
   await supabase
     .from('inventories')
     .update({ status: 'recount_pending', updated_at: new Date().toISOString() })
-    .eq('id', originalInventoryId);
+    .eq('id', inventoryId);
 
-  const sessionToken = crypto.randomBytes(32).toString('hex');
-  const techName = original.technicians?.name || 'Técnico';
-  const techPhone = original.technicians?.phone;
-
-  const { data: gptSession, error: sessionError } = await supabase
-    .from('gptmaker_sessions')
-    .insert({
-      inventory_id: newInventory.id,
-      technician_id: original.technician_id,
-      phone: techPhone || '',
-      technician_phone: techPhone || '',
-      technician_name: techName,
-      session_token: sessionToken,
-      current_item_index: 0,
-      status: 'active',
-      last_message_at: new Date().toISOString(),
-      renotify_count: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
-
-  if (sessionError) {
-    console.error('[recount] Erro ao criar sessão GPT Maker:', sessionError.message);
-  }
-
-  const firstItem = divergentItems[0];
-  const firstMessage =
-    `Olá, ${techName}! 👋\n\n` +
-    `Identificamos uma divergência no seu inventário da semana ${original.week_ref}.\n\n` +
-    `Precisamos recontar ${divergentItems.length} peça(s). Vamos começar:\n\n` +
-    `📦 *${firstItem.item_name}* (${firstItem.item_code})\n` +
-    `Quantidade anterior informada: ${firstItem.counted_qty ?? '—'}\n\n` +
-    `Qual a quantidade atual em estoque? Responda apenas com o número.`;
-
+  // 5. Dispara via GPT Maker
   let dispatched = false;
   let dispatchError = null;
 
-  if (techPhone && process.env.GPTMAKER_API_TOKEN) {
+  if (tech?.phone && process.env.GPTMAKER_API_TOKEN) {
     try {
       const res = await fetch(GPTMAKER_API_URL, {
         method: 'POST',
@@ -156,9 +76,8 @@ export async function POST(request, { params }) {
           Authorization: `Bearer ${process.env.GPTMAKER_API_TOKEN}`,
         },
         body: JSON.stringify({
-          phone: techPhone,
-          message: firstMessage,
-          custom_fields: { session_token: sessionToken },
+          phone: tech.phone,
+          message,
         }),
       });
       dispatched = res.ok;
@@ -167,29 +86,28 @@ export async function POST(request, { params }) {
       dispatchError = e.message;
     }
   } else {
-    dispatchError = !techPhone
+    dispatchError = !tech?.phone
       ? 'Técnico sem telefone cadastrado'
       : 'GPTMAKER_API_TOKEN não configurado';
   }
 
+  // 6. Alerta para o supervisor
   await supabase.from('alerts').insert({
-    type: 'recount',
-    severity: 'medium',
-    title: `Recontagem iniciada — ${techName}`,
-    description: `Recontagem criada para ${divergentItems.length} peça(s) divergente(s) do inventário #${originalInventoryId}. ${dispatched ? 'Mensagem enviada ao técnico.' : 'Mensagem não enviada: ' + dispatchError}`,
-    technician_id: original.technician_id,
-    inventory_id: newInventory.id,
-    resolved: false,
-    created_at: new Date().toISOString(),
+    type:          'recount',
+    severity:      'medium',
+    title:         `Recontagem iniciada — ${techName}`,
+    description:   `${recountItems.length} peça(s) divergente(s) enviadas para recontagem. ${dispatched ? 'Mensagem enviada ao técnico.' : 'Falha no envio: ' + dispatchError}`,
+    technician_id: inventory.technician_id,
+    inventory_id:  inventoryId,
+    resolved:      false,
+    created_at:    new Date().toISOString(),
   });
 
   return NextResponse.json({
-    ok: true,
-    recount_inventory_id: newInventory.id,
-    items_to_recount: divergentItems.length,
-    session_token: sessionToken,
+    ok:               true,
+    inventory_id:     inventoryId,
+    items_to_recount: recountItems.length,
     dispatched,
-    dispatch_error: dispatchError,
-    first_message: firstMessage,
+    dispatch_error:   dispatchError,
   });
 }

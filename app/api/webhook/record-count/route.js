@@ -36,7 +36,7 @@ export async function POST(req) {
 
     // 2. Inventário ativo
     let inventory = null;
-    for (const status of ['in_progress', 'pending']) {
+    for (const status of ['in_progress', 'pending', 'recount_pending']) {
       const { data } = await supabase
         .from('inventories')
         .select('id, status, started_at, counted_items, total_items, week_ref')
@@ -103,7 +103,26 @@ export async function POST(req) {
       itemId = newRow?.id;
     }
 
-    // 5. Atualiza contadores do inventário
+    // 5. Registra histórico de cada contagem
+    const { count: previousCounts } = await supabase
+      .from('inventory_count_history')
+      .select('id', { count: 'exact', head: true })
+      .eq('inventory_id', inventory.id)
+      .ilike('item_code', `%${code}`);
+
+    await supabase.from('inventory_count_history').insert({
+      inventory_id:  inventory.id,
+      item_id:       itemId || null,
+      technician_id: tech.id,
+      item_code:     code,
+      item_name:     item_name || code,
+      physical_qty:  physQty,
+      system_qty:    systemQty,
+      count_number:  (previousCounts || 0) + 1,
+      counted_at:    new Date().toISOString(),
+    });
+
+    // 6. Atualiza contadores do inventário
     const { count: countedNow } = await supabase
       .from('inventory_items')
       .select('id', { count: 'exact', head: true })
