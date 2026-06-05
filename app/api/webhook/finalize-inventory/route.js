@@ -154,6 +154,14 @@ export async function POST(req) {
       });
     }
 
+    const mensagemRecontagem = recountItems.length > 0
+      ? `Encontrei *${recountItems.length}* peça(s) com divergência no seu inventário:\n\n` +
+        recountItems.map(i =>
+          `• *${i.code}* — ${i.name}\n  Sistema: ${i.system_qty} | Você contou: ${i.physical_qty}`
+        ).join('\n') +
+        `\n\nPor favor, recontar estas peças e informar os valores corretos.`
+      : null;
+
     return NextResponse.json({
       ok:               true,
       inventory_id:     invId,
@@ -163,7 +171,7 @@ export async function POST(req) {
       total_divergencias: divergencesToInsert.length,
       recontagem:       recountItems.length,
       excesso:          surplusItems.length,
-      // Detalhes para o Power Automate usar na mensagem ao técnico
+      mensagem_recontagem: mensagemRecontagem,
       itens_recontagem: recountItems,
       itens_excesso:    surplusItems,
     });
