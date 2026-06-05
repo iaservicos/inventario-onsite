@@ -190,7 +190,7 @@ export default function TecnicosPage() {
 
                       {/* Linha expandida: inventários do técnico */}
                       {expanded === t.id && (
-                        <tr key={`exp-${t.id}`}>
+                        <tr>
                           <td colSpan={9} style={{ padding: 0, background: '#fafafa', borderBottom: '2px solid #eee' }}>
                             <table style={{ width: '100%', fontSize: '0.8rem' }}>
                               <thead>
@@ -233,7 +233,7 @@ export default function TecnicosPage() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>

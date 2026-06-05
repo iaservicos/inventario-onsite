@@ -53,57 +53,59 @@ export async function POST(req) {
     const respostaPowerAutomate = [];
 
     for (const tech of tecnicos) {
-      // Selects the best subgroup for this technician: default week subgroup if they
-      // have items there, otherwise the next unused subgroup, cycling when all used.
-      const subgrupo = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
-      const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
-      if (pecas.length === 0) continue;
+      const weekRef = getWeekRef(amanha);
 
-      const dadosAgendamento = {
-        technician_id: tech.id,
-        scheduled_at: amanha.toISOString(),
-        status: 'pending',
-        scheduled_subgroup: subgrupo || 'Geral',
-        scheduled_items: pecas,
-        items_count: pecas.length,
-        week_ref: getWeekRef(amanha)
-      };
-
+      // Verifica PRIMEIRO se já existe agendamento para amanhã.
+      // Se existir, não recalcula o subgrupo (evita trocar lcd→ssd em execuções repetidas do cron).
       const { data: existente } = await supabase
         .from('inventory_schedules')
-        .select('id, inventory_id')
+        .select('id, inventory_id, scheduled_subgroup')
         .eq('technician_id', tech.id)
         .gte('scheduled_at', amanhaInicio.toISOString())
         .lte('scheduled_at', amanhaFim.toISOString())
         .maybeSingle();
 
       if (existente) {
-        await supabase
-          .from('inventory_schedules')
-          .update(dadosAgendamento)
-          .eq('id', existente.id);
-
+        // Agendamento já criado — só garante que o inventário está vinculado
         if (!existente.inventory_id) {
           const { data: inv } = await supabase
             .from('inventories')
-            .insert({ technician_id: tech.id, status: 'pending', week_ref: dadosAgendamento.week_ref })
+            .insert({ technician_id: tech.id, status: 'pending', week_ref: weekRef })
             .select('id')
             .single();
           if (inv) {
             await supabase.from('inventory_schedules').update({ inventory_id: inv.id }).eq('id', existente.id);
           }
         }
-      } else {
-        const { data: inv } = await supabase
-          .from('inventories')
-          .insert({ technician_id: tech.id, status: 'pending', week_ref: dadosAgendamento.week_ref })
-          .select('id')
-          .single();
-
-        await supabase
-          .from('inventory_schedules')
-          .insert({ ...dadosAgendamento, inventory_id: inv?.id || null });
+        respostaPowerAutomate.push({
+          nome: tech.name,
+          telefone: tech.phone,
+          subgrupo: existente.scheduled_subgroup || 'Geral',
+        });
+        continue;
       }
+
+      // Nenhum agendamento existe ainda — calcula subgrupo e cria
+      const subgrupo = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
+      const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
+      if (pecas.length === 0) continue;
+
+      const { data: inv } = await supabase
+        .from('inventories')
+        .insert({ technician_id: tech.id, status: 'pending', week_ref: weekRef })
+        .select('id')
+        .single();
+
+      await supabase.from('inventory_schedules').insert({
+        technician_id:      tech.id,
+        scheduled_at:       amanha.toISOString(),
+        status:             'pending',
+        scheduled_subgroup: subgrupo || 'Geral',
+        scheduled_items:    pecas,
+        items_count:        pecas.length,
+        week_ref:           weekRef,
+        inventory_id:       inv?.id || null,
+      });
 
       respostaPowerAutomate.push({
         nome: tech.name,
