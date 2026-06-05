@@ -14,9 +14,8 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
 
-    // 1. Localizar o inventário (por ID ou nome do técnico)
+    // 1. Localizar o inventário
     let inventory;
-
     if (inventory_id) {
       const { data, error } = await supabase
         .from('inventories')
@@ -29,7 +28,8 @@ export async function POST(req) {
       const { data: tech } = await supabase
         .from('technicians')
         .select('id, name, phone')
-        .ilike('name', nome)
+        .ilike('name', `%${String(nome).trim()}%`)
+        .limit(1)
         .single();
       if (!tech) return NextResponse.json({ error: 'Técnico não encontrado' }, { status: 404 });
 
@@ -49,58 +49,24 @@ export async function POST(req) {
 
     const { id: invId, technician_id: techId } = inventory;
 
-    // 2. Buscar TODOS os itens do inventário de uma vez
-    const { data: allItems } = await supabase
+    // 2. Busca apenas itens contados — system_qty já correto, gravado pelo record-count
+    const { data: countedItems } = await supabase
       .from('inventory_items')
       .select('id, item_code, item_name, physical_qty, system_qty, counted_at')
-      .eq('inventory_id', invId);
+      .eq('inventory_id', invId)
+      .not('physical_qty', 'is', null);
 
-    if (!allItems || allItems.length === 0) {
-      return NextResponse.json({ error: 'Nenhum item encontrado neste inventário' }, { status: 400 });
-    }
-
-    // Separa linhas contadas das linhas originais do dispatch
-    const countedItems = allItems.filter(i => i.physical_qty !== null);
-
-    if (countedItems.length === 0) {
+    if (!countedItems || countedItems.length === 0) {
       return NextResponse.json({ error: 'Nenhum item foi contado ainda' }, { status: 400 });
     }
 
-    // Monta mapa do system_qty a partir das linhas originais do dispatch
-    // (physical_qty = null = linha criada pelo dispatch, tem o system_qty correto)
-    const dispatchSysQtyMap = {};
-    for (const item of allItems.filter(i => i.physical_qty === null)) {
-      dispatchSysQtyMap[item.item_code] = Number(item.system_qty) || 0;
-    }
-
-    // Fallback: technician_items para itens sem linha de dispatch correspondente
-    const missingCodes = countedItems
-      .filter(i => dispatchSysQtyMap[i.item_code] === undefined)
-      .map(i => i.item_code);
-
-    const sysQtyFallback = {};
-    if (missingCodes.length > 0) {
-      const { data: techItems } = await supabase
-        .from('technician_items')
-        .select('item_code, item_quantity')
-        .eq('technician_id', techId)
-        .eq('active', true);
-      for (const ti of (techItems || [])) {
-        sysQtyFallback[ti.item_code] = (sysQtyFallback[ti.item_code] || 0) + (Number(ti.item_quantity) || 0);
-      }
-    }
-
-    // 4. Comparar cada item contado com o sistema
+    // 3. Comparar e classificar
     const divergencesToInsert = [];
-    const recountItems   = [];
-    const surplusItems   = [];
+    const recountItems        = [];
+    const surplusItems        = [];
 
     for (const item of countedItems) {
-      // Usa system_qty da linha original do dispatch quando disponível.
-      // Fallback para technician_items se o item foi inserido direto pelo PA (sem linha de dispatch).
-      const sysQty = dispatchSysQtyMap[item.item_code] !== undefined
-        ? dispatchSysQtyMap[item.item_code]
-        : (sysQtyFallback[item.item_code] || 0);
+      const sysQty  = Number(item.system_qty)  || 0;
       const physQty = Number(item.physical_qty);
       const diff    = physQty - sysQty;
       const hasDiv  = diff !== 0;
@@ -108,11 +74,9 @@ export async function POST(req) {
         ? parseFloat(Math.abs((diff / sysQty) * 100).toFixed(2))
         : physQty > 0 ? 100 : 0;
 
-      // Atualiza o item com o system_qty real e o resultado da contagem
       await supabase
         .from('inventory_items')
         .update({
-          system_qty:     sysQty,
           has_divergence: hasDiv,
           status:         !hasDiv ? 'counted' : diff < 0 ? 'recount' : 'counted',
           counted_at:     item.counted_at || new Date().toISOString(),
@@ -140,33 +104,33 @@ export async function POST(req) {
       }
     }
 
-    // 5. Gravar divergências
+    // 4. Gravar divergências
     if (divergencesToInsert.length > 0) {
       await supabase.from('divergences').insert(divergencesToInsert);
     }
 
-    // 6. Atualizar status do inventário
+    // 5. Atualizar inventário
     const newStatus = recountItems.length > 0 ? 'recount_pending' : 'completed';
     await supabase
       .from('inventories')
       .update({
-        status:          newStatus,
-        completed_at:    new Date().toISOString(),
-        total_items:     countedItems.length,
-        counted_items:   countedItems.length,
+        status:           newStatus,
+        completed_at:     new Date().toISOString(),
+        total_items:      countedItems.length,
+        counted_items:    countedItems.length,
         divergence_count: divergencesToInsert.length,
-        updated_at:      new Date().toISOString(),
+        updated_at:       new Date().toISOString(),
       })
       .eq('id', invId);
 
-    // 7. Criar alerta para supervisor quando há excesso
+    // 6. Alerta de excesso para supervisor
     if (surplusItems.length > 0) {
       const techName = inventory.technicians?.name || 'Técnico';
       await supabase.from('alerts').insert({
         type:          'surplus',
         severity:      'medium',
         title:         `Excesso de peças — ${techName}`,
-        description:   `${surplusItems.length} peça(s) com quantidade ACIMA do sistema: ${surplusItems.map(i => `${i.code} (+${i.diff})`).join(', ')}. Verificação necessária.`,
+        description:   `${surplusItems.length} peça(s) acima do sistema: ${surplusItems.map(i => `${i.code} (+${i.diff})`).join(', ')}`,
         technician_id: techId,
         inventory_id:  invId,
         resolved:      false,
@@ -175,25 +139,25 @@ export async function POST(req) {
     }
 
     const mensagemRecontagem = recountItems.length > 0
-      ? `Encontrei *${recountItems.length}* peça(s) com divergência no seu inventário:\n\n` +
+      ? `Encontrei *${recountItems.length}* peça(s) com divergência:\n\n` +
         recountItems.map(i =>
           `• *${i.code}* — ${i.name}\n  Sistema: ${i.system_qty} | Você contou: ${i.physical_qty}`
         ).join('\n') +
-        `\n\nPor favor, recontar estas peças e informar os valores corretos.`
+        `\n\nPor favor, recontar estas peças.`
       : null;
 
     return NextResponse.json({
-      ok:               true,
-      inventory_id:     invId,
-      tecnico:          inventory.technicians?.name,
-      status:           newStatus,
-      total_contados:   countedItems.length,
-      total_divergencias: divergencesToInsert.length,
-      recontagem:       recountItems.length,
-      excesso:          surplusItems.length,
+      ok:                  true,
+      inventory_id:        invId,
+      tecnico:             inventory.technicians?.name,
+      status:              newStatus,
+      total_contados:      countedItems.length,
+      total_divergencias:  divergencesToInsert.length,
+      recontagem:          recountItems.length,
+      excesso:             surplusItems.length,
       mensagem_recontagem: mensagemRecontagem,
-      itens_recontagem: recountItems,
-      itens_excesso:    surplusItems,
+      itens_recontagem:    recountItems,
+      itens_excesso:       surplusItems,
     });
 
   } catch (err) {

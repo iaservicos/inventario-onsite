@@ -10,7 +10,7 @@ export async function POST(req) {
     if (auth !== SECRET) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
-    const { nome, item_code, physical_qty } = body;
+    const { nome, item_code, item_name, physical_qty } = body;
 
     if (!nome || item_code === undefined || physical_qty === undefined) {
       return NextResponse.json({ error: 'nome, item_code e physical_qty são obrigatórios' }, { status: 400 });
@@ -18,12 +18,13 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
     const physQty = Number(physical_qty);
+    const code    = String(item_code).trim();
 
-    // 1. Encontra o técnico pelo nome (busca parcial, case-insensitive)
+    // 1. Técnico
     const { data: tech } = await supabase
       .from('technicians')
       .select('id, name')
-      .ilike('name', `%${nome.trim()}%`)
+      .ilike('name', `%${String(nome).trim()}%`)
       .limit(1)
       .maybeSingle();
 
@@ -31,7 +32,7 @@ export async function POST(req) {
       return NextResponse.json({ error: `Técnico "${nome}" não encontrado` }, { status: 404 });
     }
 
-    // 2. Encontra o inventário ativo (in_progress primeiro, depois pending)
+    // 2. Inventário ativo
     let inventory = null;
     for (const status of ['in_progress', 'pending']) {
       const { data } = await supabase
@@ -49,69 +50,58 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Inventário ativo não encontrado' }, { status: 404 });
     }
 
-    // 3. Procura a linha pré-criada pelo dispatch (physical_qty ainda null)
-    //    Usa ilike para tolerar diferenças de capitalização no código
-    const { data: dispatchRow } = await supabase
+    // 3. system_qty em tempo real direto do technician_items
+    //    (já sincronizado com o Databricks pelo sync/pecas)
+    const { data: techItemRows } = await supabase
+      .from('technician_items')
+      .select('item_quantity')
+      .eq('technician_id', tech.id)
+      .ilike('item_code', code)
+      .eq('active', true);
+
+    const systemQty = (techItemRows || []).reduce(
+      (sum, r) => sum + (Number(r.item_quantity) || 0), 0
+    );
+
+    // 4. Upsert: atualiza se já existe, insere se não existe
+    const { data: existingRow } = await supabase
       .from('inventory_items')
-      .select('id, item_code, item_name, system_qty, physical_qty, sort_order')
+      .select('id')
       .eq('inventory_id', inventory.id)
-      .ilike('item_code', item_code.trim())
-      .is('physical_qty', null)
+      .ilike('item_code', code)
+      .limit(1)
       .maybeSingle();
 
     let itemId;
-    let systemQty = 0;
-
-    if (dispatchRow) {
-      // Atualiza a linha criada pelo dispatch — system_qty já está correto
-      systemQty = Number(dispatchRow.system_qty) || 0;
+    if (existingRow) {
       await supabase
         .from('inventory_items')
         .update({
           physical_qty: physQty,
-          status: 'counted',
-          counted_at: new Date().toISOString(),
+          system_qty:   systemQty,
+          status:       'counted',
+          counted_at:   new Date().toISOString(),
         })
-        .eq('id', dispatchRow.id);
-      itemId = dispatchRow.id;
+        .eq('id', existingRow.id);
+      itemId = existingRow.id;
     } else {
-      // Item não está na lista do dispatch: pode ser re-contagem ou item inesperado
-      const { data: existingRow } = await supabase
+      const { data: newRow } = await supabase
         .from('inventory_items')
-        .select('id, system_qty')
-        .eq('inventory_id', inventory.id)
-        .ilike('item_code', item_code.trim())
-        .maybeSingle();
-
-      if (existingRow) {
-        // Re-contagem: atualiza physical_qty
-        systemQty = Number(existingRow.system_qty) || 0;
-        await supabase
-          .from('inventory_items')
-          .update({ physical_qty: physQty, status: 'counted', counted_at: new Date().toISOString() })
-          .eq('id', existingRow.id);
-        itemId = existingRow.id;
-      } else {
-        // Item completamente inesperado — insere como novo
-        const { data: newRow } = await supabase
-          .from('inventory_items')
-          .insert({
-            inventory_id: inventory.id,
-            item_code: item_code.trim(),
-            item_name: 'Item não catalogado',
-            system_qty: 0,
-            physical_qty: physQty,
-            status: 'counted',
-            counted_at: new Date().toISOString(),
-          })
-          .select('id, system_qty')
-          .single();
-        itemId = newRow?.id;
-        systemQty = 0;
-      }
+        .insert({
+          inventory_id: inventory.id,
+          item_code:    code,
+          item_name:    item_name || code,
+          system_qty:   systemQty,
+          physical_qty: physQty,
+          status:       'counted',
+          counted_at:   new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+      itemId = newRow?.id;
     }
 
-    // 4. Atualiza o inventário: status in_progress, started_at se primeiro item, counted_items
+    // 5. Atualiza contadores do inventário
     const { count: countedNow } = await supabase
       .from('inventory_items')
       .select('id', { count: 'exact', head: true })
@@ -119,9 +109,9 @@ export async function POST(req) {
       .not('physical_qty', 'is', null);
 
     const inventoryUpdate = {
-      status: 'in_progress',
+      status:        'in_progress',
       counted_items: countedNow || 0,
-      updated_at: new Date().toISOString(),
+      updated_at:    new Date().toISOString(),
     };
     if (!inventory.started_at) {
       inventoryUpdate.started_at = new Date().toISOString();
@@ -130,14 +120,14 @@ export async function POST(req) {
     await supabase.from('inventories').update(inventoryUpdate).eq('id', inventory.id);
 
     return NextResponse.json({
-      ok: true,
-      inventory_id: inventory.id,
-      item_id: itemId,
-      item_code: item_code.trim(),
-      physical_qty: physQty,
-      system_qty: systemQty,
+      ok:            true,
+      inventory_id:  inventory.id,
+      item_id:       itemId,
+      item_code:     code,
+      physical_qty:  physQty,
+      system_qty:    systemQty,
       counted_items: inventoryUpdate.counted_items,
-      total_items: inventory.total_items,
+      total_items:   inventory.total_items,
     });
 
   } catch (err) {
