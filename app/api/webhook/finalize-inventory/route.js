@@ -49,45 +49,58 @@ export async function POST(req) {
 
     const { id: invId, technician_id: techId } = inventory;
 
-    // 2. Buscar itens contados neste inventário (physical_qty preenchido)
-    //    Inclui sort_order para distinguir linhas do dispatch (sort_order não-nulo)
-    //    de linhas inseridas diretamente pelo PA antigo (sort_order nulo, system_qty = 0)
-    const { data: countedItems } = await supabase
+    // 2. Buscar TODOS os itens do inventário de uma vez
+    const { data: allItems } = await supabase
       .from('inventory_items')
-      .select('id, item_code, item_name, physical_qty, system_qty, counted_at, sort_order')
-      .eq('inventory_id', invId)
-      .not('physical_qty', 'is', null);
+      .select('id, item_code, item_name, physical_qty, system_qty, counted_at')
+      .eq('inventory_id', invId);
 
-    if (!countedItems || countedItems.length === 0) {
+    if (!allItems || allItems.length === 0) {
+      return NextResponse.json({ error: 'Nenhum item encontrado neste inventário' }, { status: 400 });
+    }
+
+    // Separa linhas contadas das linhas originais do dispatch
+    const countedItems = allItems.filter(i => i.physical_qty !== null);
+
+    if (countedItems.length === 0) {
       return NextResponse.json({ error: 'Nenhum item foi contado ainda' }, { status: 400 });
     }
 
-    // 3. Fallback para linhas sem system_qty (PA antigo que inseria system_qty = 0)
-    //    Para linhas do dispatch (sort_order definido), usa o system_qty da própria linha.
-    const needsFallback = countedItems.some(i => i.sort_order === null || i.sort_order === undefined);
-    const sysQtyMap = {};
-    if (needsFallback) {
+    // Monta mapa do system_qty a partir das linhas originais do dispatch
+    // (physical_qty = null = linha criada pelo dispatch, tem o system_qty correto)
+    const dispatchSysQtyMap = {};
+    for (const item of allItems.filter(i => i.physical_qty === null)) {
+      dispatchSysQtyMap[item.item_code] = Number(item.system_qty) || 0;
+    }
+
+    // Fallback: technician_items para itens sem linha de dispatch correspondente
+    const missingCodes = countedItems
+      .filter(i => dispatchSysQtyMap[i.item_code] === undefined)
+      .map(i => i.item_code);
+
+    const sysQtyFallback = {};
+    if (missingCodes.length > 0) {
       const { data: techItems } = await supabase
         .from('technician_items')
         .select('item_code, item_quantity')
         .eq('technician_id', techId)
         .eq('active', true);
       for (const ti of (techItems || [])) {
-        sysQtyMap[ti.item_code] = (sysQtyMap[ti.item_code] || 0) + (Number(ti.item_quantity) || 0);
+        sysQtyFallback[ti.item_code] = (sysQtyFallback[ti.item_code] || 0) + (Number(ti.item_quantity) || 0);
       }
     }
 
     // 4. Comparar cada item contado com o sistema
     const divergencesToInsert = [];
-    const recountItems   = []; // contou menos que o sistema → recontagem
-    const surplusItems   = []; // contou mais que o sistema → aviso ao supervisor
+    const recountItems   = [];
+    const surplusItems   = [];
 
     for (const item of countedItems) {
-      // Linhas do dispatch têm sort_order definido e system_qty correto do momento do disparo.
-      // Linhas inseridas pelo PA antigo têm sort_order nulo — usa technician_items como fallback.
-      const sysQty = (item.sort_order !== null && item.sort_order !== undefined)
-        ? (Number(item.system_qty) || 0)
-        : (sysQtyMap[item.item_code] || 0);
+      // Usa system_qty da linha original do dispatch quando disponível.
+      // Fallback para technician_items se o item foi inserido direto pelo PA (sem linha de dispatch).
+      const sysQty = dispatchSysQtyMap[item.item_code] !== undefined
+        ? dispatchSysQtyMap[item.item_code]
+        : (sysQtyFallback[item.item_code] || 0);
       const physQty = Number(item.physical_qty);
       const diff    = physQty - sysQty;
       const hasDiv  = diff !== 0;
