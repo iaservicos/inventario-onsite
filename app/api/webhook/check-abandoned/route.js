@@ -37,8 +37,8 @@ export async function GET(request) {
       inventories (
         id,
         status,
-        items_counted,
-        items_total
+        counted_items,
+        total_items
       )
     `)
     .eq('status', 'active')
@@ -106,7 +106,7 @@ export async function GET(request) {
 
 async function renotifyTechnician(session, hoursInactive) {
   const progress = session.inventories
-    ? `${session.inventories.items_counted || 0} de ${session.inventories.items_total || '?'} peças contadas`
+    ? `${session.inventories.counted_items || 0} de ${session.inventories.total_items || '?'} peças contadas`
     : 'inventário em andamento';
 
   const message =
