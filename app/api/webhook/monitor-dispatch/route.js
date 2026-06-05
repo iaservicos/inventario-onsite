@@ -31,15 +31,7 @@ export async function POST(req) {
 
     if (error) throw error;
 
-    // 3. FILTRO DE HORÁRIO: Só pega o que já chegou a hora de disparar
-    // Adicionamos 1 minuto de tolerância para não perder agendamentos por segundos
-    const tolerance = 60 * 1000; 
-    const currentSchedules = (schedules || []).filter(s => {
-      const scheduleTime = new Date(s.scheduled_at);
-      return scheduleTime.getTime() <= (now.getTime() + tolerance);
-    });
-
-    const schedulesToDispatch = currentSchedules.map(s => ({
+    const schedulesToDispatch = (schedules || []).map(s => ({
       schedule_id: String(s.id),
       nome: s.technicians?.name || 'Técnico',
       telefone: s.technicians?.phone || '',

@@ -10,6 +10,7 @@ const DIAS_SEMANA = [
   { id: 3, label: 'Quarta-feira' },
   { id: 4, label: 'Quinta-feira' },
   { id: 5, label: 'Sexta-feira' },
+  { id: 6, label: 'Sábado' },
 ];
 
 export default function GestaoEscalonamentoPage() {

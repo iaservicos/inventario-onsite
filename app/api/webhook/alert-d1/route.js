@@ -56,29 +56,41 @@ export async function POST(req) {
         week_ref: `${amanha.getFullYear()}-W${Math.ceil(amanha.getDate()/7)}`
       };
 
-      // --- LÓGICA DE ATUALIZAÇÃO (UPSERT) ---
-      // Verifica se já existe um agendamento para este técnico no dia de amanhã
       const { data: existente } = await supabase
         .from('inventory_schedules')
-        .select('id')
+        .select('id, inventory_id')
         .eq('technician_id', tech.id)
         .gte('scheduled_at', amanhaInicio.toISOString())
         .lte('scheduled_at', amanhaFim.toISOString())
         .maybeSingle();
 
       if (existente) {
-        // Se já existe, ATUALIZA (evita duplicatas e mantém os itens em dia)
         await supabase
           .from('inventory_schedules')
           .update(dadosAgendamento)
           .eq('id', existente.id);
+
+        if (!existente.inventory_id) {
+          const { data: inv } = await supabase
+            .from('inventories')
+            .insert({ technician_id: tech.id, status: 'pending', week_ref: dadosAgendamento.week_ref })
+            .select('id')
+            .single();
+          if (inv) {
+            await supabase.from('inventory_schedules').update({ inventory_id: inv.id }).eq('id', existente.id);
+          }
+        }
       } else {
-        // Se não existe, CRIA um novo
+        const { data: inv } = await supabase
+          .from('inventories')
+          .insert({ technician_id: tech.id, status: 'pending', week_ref: dadosAgendamento.week_ref })
+          .select('id')
+          .single();
+
         await supabase
           .from('inventory_schedules')
-          .insert(dadosAgendamento);
+          .insert({ ...dadosAgendamento, inventory_id: inv?.id || null });
       }
-      // --------------------------------------
 
       respostaPowerAutomate.push({
         nome: tech.name,
