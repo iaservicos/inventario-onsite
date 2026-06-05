@@ -5,6 +5,15 @@ import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
 
+function getWeekRef(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
 export async function POST(req) {
   try {
     const auth = req.headers.get('x-dispatch-secret');
@@ -53,7 +62,7 @@ export async function POST(req) {
         status: 'pending',
         scheduled_subgroup: subgrupo || 'Geral',
         scheduled_items: pecas,
-        week_ref: `${amanha.getFullYear()}-W${Math.ceil(amanha.getDate()/7)}`
+        week_ref: getWeekRef(amanha)
       };
 
       const { data: existente } = await supabase
