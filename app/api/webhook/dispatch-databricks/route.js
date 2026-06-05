@@ -173,16 +173,14 @@ export async function POST(request) {
   }
 
   // Insere as peças selecionadas no inventário
-  const inventoryItems = items.map((item, index) => ({
+  const inventoryItems = items.map(item => ({
     inventory_id: inventory.id,
     item_code: item.item_code,
     item_name: item.item_name,
-    unit: item.unit || 'UN',
+    item_subgroup: item.item_subgroup || null,
     system_qty: Number(item.item_quantity) || 0,
     physical_qty: null,
     status: 'pending',
-    sort_order: index,
-    created_at: new Date().toISOString(),
   }));
 
   const { error: itemsError } = await supabase
