@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { updateSchedule } from '@/lib/db-gptmaker';
+import { getConsolidatedTechnicianItems } from '@/lib/db';
+import { createServiceClient } from '@/lib/supabase';
 
 export async function PATCH(request, { params }) {
   const session = await getServerSession(authOptions);
@@ -11,6 +13,23 @@ export async function PATCH(request, { params }) {
   }
 
   const body = await request.json();
+
+  // When subgroup changes, recalculate the items list and count
+  if (body.scheduled_subgroup !== undefined) {
+    const supabase = createServiceClient();
+    const { data: sched } = await supabase
+      .from('inventory_schedules')
+      .select('technician_id')
+      .eq('id', params.id)
+      .single();
+
+    if (sched) {
+      const items = await getConsolidatedTechnicianItems(supabase, sched.technician_id, body.scheduled_subgroup);
+      body.scheduled_items = items;
+      body.items_count = items.length;
+    }
+  }
+
   const data = await updateSchedule(params.id, body);
   return NextResponse.json(data);
 }

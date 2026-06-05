@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
-import { getWeekSubgroup, getConsolidatedTechnicianItems } from '@/lib/db';
+import { getWeekSubgroup, getConsolidatedTechnicianItems, getSubgroupForTechnician } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
@@ -49,10 +49,13 @@ export async function POST(req) {
 
     if (!tecnicos || tecnicos.length === 0) return NextResponse.json({ content: [] });
 
-    const subgrupo = await getWeekSubgroup(supabase);
+    const weekSubgroup = await getWeekSubgroup(supabase);
     const respostaPowerAutomate = [];
 
     for (const tech of tecnicos) {
+      // Selects the best subgroup for this technician: default week subgroup if they
+      // have items there, otherwise the next unused subgroup, cycling when all used.
+      const subgrupo = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
       const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
       if (pecas.length === 0) continue;
 
