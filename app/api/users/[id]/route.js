@@ -25,6 +25,7 @@ export async function PATCH(request, context) {
     if (body.email) fields.email = body.email;
     if (body.role) fields.role = body.role;
     if (body.active !== undefined) fields.active = body.active;
+    if ('linked_to' in body) fields.linked_to = body.linked_to || null;
     
     if (body.password && body.password.trim() !== '') {
       fields.password_hash = await bcrypt.hash(body.password, 10);

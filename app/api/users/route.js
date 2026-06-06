@@ -35,13 +35,13 @@ export async function POST(request) {
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const { name, email, password, role } = await request.json();
+    const { name, email, password, role, linked_to } = await request.json();
     if (!name || !email || !password || !role) {
       return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 });
     }
 
     const password_hash = await bcrypt.hash(password, 10);
-    const data = await createUser({ name, email, password_hash, role });
+    const data = await createUser({ name, email, password_hash, role, linked_to: linked_to || null });
     
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
