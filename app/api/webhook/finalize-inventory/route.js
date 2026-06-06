@@ -240,6 +240,7 @@ export async function POST(req) {
       total_divergencias:  divergencesToInsert.length,
       recontagem:          eraRecontagem ? 0 : recountItems.length,
       excesso:             surplusItems.length,
+      enviar_email:        newStatus === 'completed' && divergencesToInsert.length === 0,
       mensagem_recontagem: mensagemRecontagem,
       itens_recontagem:    recountItems,
       itens_excesso:       surplusItems,
