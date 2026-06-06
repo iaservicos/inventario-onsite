@@ -13,7 +13,14 @@ export async function GET() {
   if (scope !== null && scope.length === 0) return NextResponse.json([]);
 
   const now = new Date();
-  const in14days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+  // Início do dia de hoje em SP (UTC-3) = 03:00 UTC
+  const nowSP = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+  const hojeInicio = new Date(Date.UTC(
+    nowSP.getUTCFullYear(), nowSP.getUTCMonth(), nowSP.getUTCDate(),
+    3, 0, 0, 0,
+  ));
+  const in14days = new Date(hojeInicio.getTime() + 14 * 24 * 60 * 60 * 1000);
 
   let schedulesQuery = supabase
     .from('inventory_schedules')
@@ -21,8 +28,8 @@ export async function GET() {
       id, scheduled_at, week_ref, scheduled_subgroup, items_count, status,
       technicians(id, name, region)
     `)
-    .eq('status', 'pending')
-    .gte('scheduled_at', now.toISOString())
+    .in('status', ['pending', 'dispatched', 'in_progress'])
+    .gte('scheduled_at', hojeInicio.toISOString())
     .lte('scheduled_at', in14days.toISOString())
     .order('scheduled_at', { ascending: true });
 
