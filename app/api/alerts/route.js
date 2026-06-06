@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getAlerts } from '@/lib/db';
+import { getAlerts, getScopeFilter } from '@/lib/db';
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -9,12 +9,14 @@ export async function GET(request) {
 
   const { searchParams } = new URL(request.url);
   const resolved = searchParams.get('resolved');
+  const scope = await getScopeFilter(session);
 
   const data = await getAlerts({
     from: searchParams.get('from') || '',
     to: searchParams.get('to') || '',
     technicianId: searchParams.get('technicianId') || '',
     resolved: resolved === null ? undefined : resolved === 'true',
+    technicianIds: scope,
   });
 
   return NextResponse.json(data);

@@ -2,17 +2,20 @@ import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createServiceClient } from '@/lib/supabase';
+import { getScopeFilter } from '@/lib/db';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const supabase = createServiceClient();
+  const scope = await getScopeFilter(session);
+  if (scope !== null && scope.length === 0) return NextResponse.json([]);
 
   const now = new Date();
   const in14days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
 
-  const { data: schedules, error } = await supabase
+  let schedulesQuery = supabase
     .from('inventory_schedules')
     .select(`
       id, scheduled_at, week_ref, scheduled_subgroup, items_count, status,
@@ -22,6 +25,10 @@ export async function GET() {
     .gte('scheduled_at', now.toISOString())
     .lte('scheduled_at', in14days.toISOString())
     .order('scheduled_at', { ascending: true });
+
+  if (scope !== null) schedulesQuery = schedulesQuery.in('technician_id', scope);
+
+  const { data: schedules, error } = await schedulesQuery;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

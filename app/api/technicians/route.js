@@ -1,23 +1,29 @@
+import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createServiceClient } from '@/lib/supabase';
+import { getScopeFilter } from '@/lib/db';
 
-export const revalidate = 60; // cache de 60s — lista de técnicos raramente muda
+export const dynamic = 'force-dynamic';
 
-// FUNÇÃO PARA LISTAR (Já existia)
 export async function GET(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const { searchParams } = new URL(request.url);
     const active = searchParams.get('active');
+    const search = searchParams.get('search') || '';
+
+    const scope = await getScopeFilter(session);
+    if (scope !== null && scope.length === 0) return NextResponse.json([]);
 
     const supabase = createServiceClient();
-    let query = supabase
-      .from('technicians')
-      .select('*')
-      .order('name', { ascending: true });
+    let query = supabase.from('technicians').select('*').order('name', { ascending: true });
 
-    if (active === 'true') {
-      query = query.eq('active', true);
-    }
+    if (active === 'true') query = query.eq('active', true);
+    if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+    if (scope !== null) query = query.in('id', scope);
 
     const { data, error } = await query;
     if (error) throw error;
