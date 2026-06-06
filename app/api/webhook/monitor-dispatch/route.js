@@ -13,24 +13,19 @@ export async function POST(req) {
     const supabase = createServiceClient();
     const now = new Date();
 
-    // Início do dia de hoje em SP (UTC-3): 00:00 SP = 03:00 UTC
-    const nowSP = new Date(now.getTime() - 3 * 60 * 60 * 1000);
-    const hojeInicio = new Date(Date.UTC(
-      nowSP.getUTCFullYear(), nowSP.getUTCMonth(), nowSP.getUTCDate(),
-      3, 0, 0, 0,
-    ));
+    // Janela de 15 minutos: só retorna agendamentos cujo horário caiu nos últimos 15 min.
+    // Isso garante que cada agendamento é disparado exatamente UMA vez,
+    // já que um mesmo scheduled_at só pode cair em UMA janela de 15 min.
+    const windowStart = new Date(now.getTime() - 15 * 60 * 1000);
 
-    // Busca agendamentos do dia cujo horário JÁ CHEGOU e o D-1 já foi enviado (dispatched).
-    // Status 'dispatched' = aviso D-1 enviado, inventário criado, aguardando disparo no horário.
-    // O filtro scheduled_at <= now garante que o disparo só ocorre no horário correto.
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
       .select(`
         id, scheduled_at, scheduled_subgroup, inventory_id,
         technicians ( id, name, phone )
       `)
-      .eq('status', 'dispatched')
-      .gte('scheduled_at', hojeInicio.toISOString())
+      .in('status', ['pending', 'dispatched'])
+      .gt('scheduled_at', windowStart.toISOString())
       .lte('scheduled_at', now.toISOString());
 
     if (error) throw error;
@@ -84,16 +79,6 @@ export async function POST(req) {
       telefone:    s.technicians?.phone || '',
       subgrupo:    s.scheduled_subgroup || 'Geral',
     }));
-
-    // Atualiza status para in_progress antes de retornar,
-    // evitando que o próximo ciclo de 15 minutos dispare novamente.
-    if (schedulesToDispatch.length > 0) {
-      const ids = (schedules || []).map(s => s.id);
-      await supabase
-        .from('inventory_schedules')
-        .update({ status: 'in_progress' })
-        .in('id', ids);
-    }
 
     return NextResponse.json({
       success: true,

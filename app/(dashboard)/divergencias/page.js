@@ -12,9 +12,90 @@ const DIV_STATUS_OPTIONS = [
   { value: '', label: 'Todos os status' },
   { value: 'open', label: 'Aberta' },
   { value: 'recount', label: 'Recontagem' },
+  { value: 'tratativa', label: 'Em Tratativa' },
   { value: 'validated', label: 'Validada' },
   { value: 'adjusted', label: 'Ajustada' },
 ];
+
+function ModalTratativa({ divergencia, onClose, onSaved }) {
+  const [ticket, setTicket] = useState(divergencia?.ticket_number || '');
+  const [note, setNote]     = useState(divergencia?.ticket_note   || '');
+  const [saving, setSaving] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!ticket.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/divergences/${divergencia.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'tratativa', ticket_number: ticket.trim(), ticket_note: note.trim() }),
+      });
+      if (!res.ok) throw new Error();
+      onSaved();
+    } catch {
+      toast.error('Erro ao salvar tratativa');
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
+      <div style={{ background: '#fff', width: '100%', maxWidth: '480px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: '900', fontSize: '0.95rem', textTransform: 'uppercase' }}>Em Tratativa</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900' }}>✕</button>
+        </div>
+
+        <div style={{ padding: '1rem 1.5rem', background: '#fafafa', borderBottom: '1px solid #eee', fontSize: '0.8rem', color: '#444' }}>
+          <div style={{ fontWeight: '800', color: '#000', marginBottom: '2px' }}>{divergencia.item_name}</div>
+          <div style={{ color: '#666' }}>
+            Técnico: <strong>{divergencia.technicians?.name}</strong> &nbsp;|&nbsp;
+            Diferença: <strong style={{ color: '#000' }}>{divergencia.difference}</strong>
+          </div>
+        </div>
+
+        <form onSubmit={submit} style={{ padding: '1.5rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+              Número do Chamado *
+            </label>
+            <input
+              type="text"
+              value={ticket}
+              onChange={e => setTicket(e.target.value)}
+              placeholder="Ex: INC0012345"
+              required
+              autoFocus
+              className="input"
+              style={{ border: '1px solid #000', borderRadius: '4px', fontWeight: '600', width: '100%' }}
+            />
+          </div>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+              Observação (opcional)
+            </label>
+            <textarea
+              value={note}
+              onChange={e => setNote(e.target.value)}
+              placeholder="Descreva a ação em andamento..."
+              rows={3}
+              className="input"
+              style={{ border: '1px solid #000', borderRadius: '4px', fontWeight: '600', width: '100%', resize: 'vertical' }}
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving || !ticket.trim()} style={{ background: '#000', border: 'none', fontWeight: '900' }}>
+              {saving ? 'Salvando...' : 'Confirmar Tratativa'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 export default function DivergenciasPage() {
   const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '' });
@@ -24,6 +105,7 @@ export default function DivergenciasPage() {
   const [updating, setUpdating] = useState(null);
   const [exporting, setExporting] = useState(false);
   const [recounting, setRecounting] = useState(null);
+  const [tratativaModal, setTratativaModal] = useState(null);
 
   useEffect(() => {
     fetch('/api/technicians').then((r) => r.json()).then(setTechnicians);
@@ -91,7 +173,9 @@ export default function DivergenciasPage() {
         'Qtd. Física':   d.physical_qty,
         'Diferença':     d.difference,
         'Variação (%)':  d.percentage_diff,
-        'Status':        { open: 'Aberta', recount: 'Recontagem', validated: 'Validada', adjusted: 'Ajustada' }[d.status] || d.status,
+        'Status':        { open: 'Aberta', recount: 'Recontagem', tratativa: 'Em Tratativa', validated: 'Validada', adjusted: 'Ajustada' }[d.status] || d.status,
+        'Chamado':       d.ticket_number || '',
+        'Obs. Tratativa': d.ticket_note || '',
         'Data':          d.created_at ? new Date(d.created_at).toLocaleString('pt-BR') : '',
       }));
       const ws = XLSX.utils.json_to_sheet(rows);
@@ -106,7 +190,8 @@ export default function DivergenciasPage() {
     setExporting(false);
   }
 
-  const critical = divergences.filter((d) => Math.abs(d.percentage_diff) >= 30).length;
+  const critical   = divergences.filter((d) => Math.abs(d.percentage_diff) >= 30).length;
+  const tratativas = divergences.filter((d) => d.status === 'tratativa').length;
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -129,11 +214,12 @@ export default function DivergenciasPage() {
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            <KpiCard label="Total"        value={divergences.length}                                             alert={divergences.length > 0} />
-            <KpiCard label="Críticas ≥30%" value={critical}                                                     alert={critical > 0} />
-            <KpiCard label="Abertas"      value={divergences.filter((d) => d.status === 'open').length}         alert />
-            <KpiCard label="Recontagem"   value={divergences.filter((d) => d.status === 'recount').length} />
-            <KpiCard label="Validadas"    value={divergences.filter((d) => d.status === 'validated').length} />
+            <KpiCard label="Total"         value={divergences.length}                                              alert={divergences.length > 0} />
+            <KpiCard label="Críticas ≥30%" value={critical}                                                      alert={critical > 0} />
+            <KpiCard label="Abertas"       value={divergences.filter((d) => d.status === 'open').length}          alert />
+            <KpiCard label="Recontagem"    value={divergences.filter((d) => d.status === 'recount').length} />
+            <KpiCard label="Em Tratativa"  value={tratativas}                                                     alert={tratativas > 0} />
+            <KpiCard label="Validadas"     value={divergences.filter((d) => d.status === 'validated').length} />
           </div>
 
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -153,6 +239,7 @@ export default function DivergenciasPage() {
                       <th style={{ textAlign: 'right' }}>Diferença</th>
                       <th style={{ textAlign: 'right' }}>Variação</th>
                       <th>Status</th>
+                      <th>Chamado</th>
                       <th>Ações</th>
                     </tr>
                   </thead>
@@ -191,6 +278,14 @@ export default function DivergenciasPage() {
                           </td>
                           <td><StatusBadge status={d.status} /></td>
                           <td>
+                            {d.ticket_number ? (
+                              <div>
+                                <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#000' }}>{d.ticket_number}</div>
+                                {d.ticket_note && <div style={{ fontSize: '0.65rem', color: '#666', marginTop: '1px' }}>{d.ticket_note}</div>}
+                              </div>
+                            ) : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>}
+                          </td>
+                          <td>
                             <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                               {d.status === 'open' && (
                                 <button
@@ -215,6 +310,16 @@ export default function DivergenciasPage() {
                               {(d.status === 'open' || d.status === 'recount') && (
                                 <button
                                   className="btn btn-secondary"
+                                  style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: '#000', color: '#fff', border: 'none' }}
+                                  disabled={updating === d.id}
+                                  onClick={() => setTratativaModal(d)}
+                                >
+                                  Em Tratativa
+                                </button>
+                              )}
+                              {(d.status === 'open' || d.status === 'recount') && (
+                                <button
+                                  className="btn btn-secondary"
                                   style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
                                   disabled={updating === d.id}
                                   onClick={() => updateStatus(d.id, 'validated')}
@@ -233,6 +338,14 @@ export default function DivergenciasPage() {
             </div>
           </div>
         </>
+      )}
+
+      {tratativaModal && (
+        <ModalTratativa
+          divergencia={tratativaModal}
+          onClose={() => setTratativaModal(null)}
+          onSaved={() => { setTratativaModal(null); toast.success('Tratativa registrada!'); load(); }}
+        />
       )}
     </div>
   );

@@ -7,7 +7,11 @@ export async function PATCH(request, { params }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { status } = await request.json();
-  const data = await updateDivergenceStatus(params.id, status);
+  const body = await request.json();
+  const data = await updateDivergenceStatus(params.id, {
+    status:        body.status,
+    ticket_number: body.ticket_number,
+    ticket_note:   body.ticket_note,
+  });
   return NextResponse.json(data);
 }

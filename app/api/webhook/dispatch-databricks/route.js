@@ -84,7 +84,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Agendamento não encontrado' }, { status: 404 });
   }
 
-  if (schedule.status !== 'pending') {
+  if (!['pending', 'dispatched'].includes(schedule.status)) {
     return NextResponse.json({
       error: `Agendamento já foi processado (status: ${schedule.status})`
     }, { status: 400 });
