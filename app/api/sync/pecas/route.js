@@ -84,18 +84,23 @@ export async function POST(request) {
     const insertRows = allItems.map(item => {
       const techId = techMap[item.technician_name_key];
       if (!techId) return null;
+
+      // Produto final: código começa com "8" após remover zeros à esquerda — não entra no inventário
+      const code = String(item.item_code).trim();
+      if (code.replace(/^0+/, '').startsWith('8')) return null;
+
       return {
         technician_id: techId,
-        item_code: String(item.item_code).trim(),
+        item_code: code,
         item_name: String(item.item_name).trim(),
-        item_subgroup: detectSubgroup(item.item_name), // NOVA COLUNA
+        item_subgroup: detectSubgroup(item.item_name),
         item_quantity: parseInt(item.item_quantity) || 0,
         item_num_remessa: String(item.item_num_remessa || '').trim(),
         atp_centro: String(item.atp_centro || '').trim(),
         atp_nome: String(item.atp_nome || '').trim(),
         active: true,
-        synced_at: syncedAt, 
-        sync_batch_id: batchId, 
+        synced_at: syncedAt,
+        sync_batch_id: batchId,
         updated_at: syncedAt,
         unit: 'un'
       };
