@@ -21,26 +21,30 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
 
-    // 1. Descobre que dia é amanhã no horário de Brasília (UTC-3)
-    const hoje = new Date();
-    // SP "agora" = UTC - 3h
-    const agoraSP = new Date(hoje.getTime() - 3 * 60 * 60 * 1000);
+    const { searchParams } = new URL(req.url);
+    const diaParam = searchParams.get('dia'); // 'hoje' gera para hoje; padrão = amanhã
 
-    // "Amanhã" no calendário SP
-    const amanhaNoSP = new Date(agoraSP);
-    amanhaNoSP.setUTCDate(amanhaNoSP.getUTCDate() + 1);
-    const diaAmanha = amanhaNoSP.getUTCDay(); // 0=Dom … 6=Sáb, calculado corretamente em SP
+    // 1. Descobre o dia alvo no horário de Brasília (UTC-3)
+    const agora = new Date();
+    const agoraSP = new Date(agora.getTime() - 3 * 60 * 60 * 1000);
 
-    // 00:00 SP = 03:00 UTC   |   23:59:59 SP = 02:59:59 UTC do dia seguinte
+    const alvoDiaSP = new Date(agoraSP);
+    if (diaParam !== 'hoje') {
+      alvoDiaSP.setUTCDate(alvoDiaSP.getUTCDate() + 1); // padrão: amanhã
+    }
+
+    const diaAlvo = alvoDiaSP.getUTCDay(); // 0=Dom … 6=Sáb
+
+    // 00:00 SP = 03:00 UTC do mesmo dia calendário
     const amanhaInicio = new Date(Date.UTC(
-      amanhaNoSP.getUTCFullYear(), amanhaNoSP.getUTCMonth(), amanhaNoSP.getUTCDate(),
+      alvoDiaSP.getUTCFullYear(), alvoDiaSP.getUTCMonth(), alvoDiaSP.getUTCDate(),
       3, 0, 0, 0,
     ));
     const amanhaFim = new Date(amanhaInicio.getTime() + 24 * 60 * 60 * 1000 - 1);
 
-    // Base de data (meia-noite UTC do dia SP de amanhã) usada para montar scheduled_at
+    // Base de data (meia-noite UTC do dia alvo SP) usada para montar scheduled_at
     const amanha = new Date(Date.UTC(
-      amanhaNoSP.getUTCFullYear(), amanhaNoSP.getUTCMonth(), amanhaNoSP.getUTCDate(),
+      alvoDiaSP.getUTCFullYear(), alvoDiaSP.getUTCMonth(), alvoDiaSP.getUTCDate(),
       0, 0, 0, 0,
     ));
 
@@ -48,7 +52,7 @@ export async function POST(req) {
     const { data: tecnicos } = await supabase
       .from('technicians')
       .select('*')
-      .eq('inventory_day', diaAmanha)
+      .eq('inventory_day', diaAlvo)
       .eq('active', true);
 
     if (!tecnicos || tecnicos.length === 0) return NextResponse.json({ content: [] });
@@ -77,9 +81,16 @@ export async function POST(req) {
 
         const updates = {};
 
-        // Corrige horário se foi criado antes da correção de timezone (guarda SP→UTC)
+        // Corrige horário se mudou
         if (existente.scheduled_at !== scheduledCorreto.toISOString()) {
           updates.scheduled_at = scheduledCorreto.toISOString();
+        }
+
+        // Sempre reconfirma o subgrupo com base no saldo atual — papel central do D-1
+        // (função é determinística: mesmo saldo → mesmo subgrupo, sem risco de flip)
+        const subgrupoAtual = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
+        if (subgrupoAtual && subgrupoAtual !== existente.scheduled_subgroup) {
+          updates.scheduled_subgroup = subgrupoAtual;
         }
 
         // Vincula inventário se ainda não foi vinculado
@@ -96,10 +107,11 @@ export async function POST(req) {
           await supabase.from('inventory_schedules').update(updates).eq('id', existente.id);
         }
 
+        const subgrupoFinal = updates.scheduled_subgroup || existente.scheduled_subgroup || 'Geral';
         respostaPowerAutomate.push({
-          nome: tech.name,
+          nome:     tech.name,
           telefone: tech.phone,
-          subgrupo: existente.scheduled_subgroup || 'Geral',
+          subgrupo: subgrupoFinal,
         });
         continue;
       }
