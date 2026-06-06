@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preview — E-mail Inventário</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:'Segoe UI',Arial,sans-serif;">
+
+  <div style="max-width:640px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+
+    <!-- CABEÇALHO -->
+    <div style="background:#000000;padding:32px 40px 24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#888;margin-bottom:6px;">Positivo Tecnologia · Portal Onsite</div>
+      <div style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:0.02em;">Inventário Concluído</div>
+      <div style="font-size:13px;color:#aaa;margin-top:4px;">Contagem finalizada sem divergências</div>
+    </div>
+
+    <!-- FAIXA SEMANA -->
+    <div style="background:#f4f4f5;border-bottom:1px solid #e4e4e7;padding:14px 40px;display:flex;align-items:center;gap:16px;">
+      <div>
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Semana</span>
+        <span style="font-size:15px;font-weight:900;color:#000;margin-left:8px;">2024-W23</span>
+      </div>
+      <div style="width:1px;height:24px;background:#ddd;"></div>
+      <div>
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Técnico</span>
+        <span style="font-size:15px;font-weight:900;color:#000;margin-left:8px;">Arnildo Kamien Junior</span>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:2px solid #000;">
+      <div style="padding:20px;text-align:center;border-right:1px solid #e4e4e7;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Total contado</div>
+        <div style="font-size:28px;font-weight:900;color:#000;">13</div>
+      </div>
+      <div style="padding:20px;text-align:center;border-right:1px solid #e4e4e7;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Corretas</div>
+        <div style="font-size:28px;font-weight:900;color:#000;">13</div>
+      </div>
+      <div style="padding:20px;text-align:center;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Divergências</div>
+        <div style="font-size:28px;font-weight:900;color:#000;">0</div>
+      </div>
+    </div>
+
+    <!-- TABELA DE ITENS -->
+    <div style="padding:28px 40px 8px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:14px;">Itens contados</div>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="border-bottom:2px solid #000;">
+            <th align="left"  style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Código</th>
+            <th align="left"  style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Item</th>
+            <th align="right" style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Sistema</th>
+            <th align="right" style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Físico</th>
+            <th align="center" style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Dif.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11192386</td>
+            <td style="padding:9px 6px;font-weight:700;color:#000;">11192386</td>
+            <td align="right" style="padding:9px 6px;color:#666;">2</td>
+            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">2</td>
+            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa;">
+            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11225754</td>
+            <td style="padding:9px 6px;font-weight:700;color:#000;">11225754</td>
+            <td align="right" style="padding:9px 6px;color:#666;">0</td>
+            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">1</td>
+            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11176317</td>
+            <td style="padding:9px 6px;font-weight:700;color:#000;">11176317</td>
+            <td align="right" style="padding:9px 6px;color:#666;">1</td>
+            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">1</td>
+            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa;">
+            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11176319</td>
+            <td style="padding:9px 6px;font-weight:700;color:#000;">11176319</td>
+            <td align="right" style="padding:9px 6px;color:#666;">2</td>
+            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">2</td>
+            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11175485</td>
+            <td style="padding:9px 6px;font-weight:700;color:#000;">11175485</td>
+            <td align="right" style="padding:9px 6px;color:#666;">1</td>
+            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">1</td>
+            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align:right;padding:8px 6px;font-size:11px;color:#aaa;">+ 8 itens adicionais · todos corretos</div>
+    </div>
+
+    <!-- SEPARADOR -->
+    <div style="margin:0 40px;border-top:1px solid #e4e4e7;"></div>
+
+    <!-- RODAPÉ / ASSINATURA -->
+    <div style="padding:24px 40px 32px;background:#fafafa;">
+      <div style="font-size:12px;color:#666;line-height:1.6;margin-bottom:16px;">
+        Este e-mail foi gerado automaticamente pelo <strong style="color:#000;">Portal Onsite</strong> após a finalização do inventário.
+        Nenhuma ação é necessária.
+      </div>
+      <div style="border-top:2px solid #000;padding-top:16px;display:flex;align-items:center;gap:16px;">
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:900;color:#000;letter-spacing:0.03em;">IA SERVIÇOS</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Portal Onsite · Gestão de Inventário</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="display:inline-block;background:#000;color:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;border-radius:3px;">Positivo Tecnologia</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;padding:16px;font-size:11px;color:#aaa;">
+    Este é um preview do e-mail — os dados reais vêm do Power Automate
+  </div>
+
+</body>
+</html>

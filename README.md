@@ -1,4 +1,0 @@
-# Inventário Onsite — Dashboard de Monitoramento
-
-Dashboard de supervisão para o fluxo de inventário cíclico de técnicos, integrando **Power Automate** e **Dispara.AI**.
-
