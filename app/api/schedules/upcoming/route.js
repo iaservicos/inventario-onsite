@@ -42,6 +42,7 @@ export async function GET() {
   // Fetch available subgroups for each unique technician in one query
   const techIds = [...new Set((schedules || []).map(s => s.technicians?.id).filter(Boolean))];
 
+  // Conta peças por técnico+subgrupo — só mostra subgrupos com 2 ou mais peças
   const subgroupsByTech = {};
   if (techIds.length > 0) {
     const { data: items } = await supabase
@@ -51,11 +52,21 @@ export async function GET() {
       .eq('active', true)
       .not('item_subgroup', 'is', null);
 
+    // Conta quantas peças cada subgrupo tem por técnico
+    const countMap = {};
     for (const item of (items || [])) {
       const s = (item.item_subgroup || '').trim();
       if (!s) continue;
-      if (!subgroupsByTech[item.technician_id]) subgroupsByTech[item.technician_id] = new Set();
-      subgroupsByTech[item.technician_id].add(s);
+      const key = `${item.technician_id}__${s}`;
+      countMap[key] = (countMap[key] || 0) + 1;
+    }
+
+    // Inclui só subgrupos com >= 2 peças
+    for (const [key, count] of Object.entries(countMap)) {
+      if (count < 2) continue;
+      const [techId, subgroup] = key.split('__');
+      if (!subgroupsByTech[techId]) subgroupsByTech[techId] = new Set();
+      subgroupsByTech[techId].add(subgroup);
     }
   }
 
