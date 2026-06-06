@@ -15,6 +15,15 @@ const WEBHOOK_SECRET = process.env.GPTMAKER_WEBHOOK_SECRET || '';
 
 export async function POST(request) {
   try {
+    // Valida secret enviado pelo GPT Maker no header x-gptmaker-secret
+    if (WEBHOOK_SECRET) {
+      const incoming = request.headers.get('x-gptmaker-secret')
+        ?? request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+      if (incoming !== WEBHOOK_SECRET) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
     const body = await request.json();
 
     // Validação básica do payload do GPT Maker

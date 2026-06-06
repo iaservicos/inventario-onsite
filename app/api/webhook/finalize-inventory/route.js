@@ -4,7 +4,7 @@ import { getConsolidatedTechnicianItems } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
+const SECRET = process.env.DISPATCH_SECRET || '';
 
 export async function POST(req) {
   try {

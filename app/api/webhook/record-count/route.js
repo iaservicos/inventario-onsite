@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { getConsolidatedTechnicianItems } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
-const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
+const SECRET = process.env.DISPATCH_SECRET || '';
 
 export async function POST(req) {
   try {

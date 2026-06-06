@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { getWeekSubgroup, getConsolidatedTechnicianItems, getSubgroupForTechnician } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
-const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
+const SECRET = process.env.DISPATCH_SECRET || '';
 
 function getWeekRef(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
