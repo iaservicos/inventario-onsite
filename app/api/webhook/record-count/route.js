@@ -172,7 +172,8 @@ export async function POST(req) {
       .not('physical_qty', 'is', null);
 
     const inventoryUpdate = {
-      status:        'in_progress',
+      // Preserva recount_pending para o finalize-inventory saber que é recontagem
+      status:        inventory.status === 'recount_pending' ? 'recount_pending' : 'in_progress',
       counted_items: countedNow || 0,
       updated_at:    new Date().toISOString(),
     };
