@@ -148,7 +148,7 @@ export async function POST(req) {
       .eq('inventory_id', inventory.id)
       .ilike('item_code', `%${code}`);
 
-    await supabase.from('inventory_count_history').insert({
+    const { error: logError } = await supabase.from('inventory_count_history').insert({
       inventory_id:  inventory.id,
       item_id:       itemId || null,
       technician_id: tech.id,
@@ -159,6 +159,10 @@ export async function POST(req) {
       count_number:  (previousCounts || 0) + 1,
       counted_at:    new Date().toISOString(),
     });
+
+    if (logError) {
+      console.error('[record-count] Falha ao gravar log:', logError.message);
+    }
 
     // 6. Atualiza contadores do inventário
     const { count: countedNow } = await supabase

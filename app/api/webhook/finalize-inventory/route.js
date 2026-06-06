@@ -138,7 +138,9 @@ export async function POST(req) {
           .from('inventory_items')
           .update({
             has_divergence: hasDiv,
-            status:         !hasDiv ? 'counted' : diff < 0 ? 'recount' : 'counted',
+            // Na recontagem, item com divergência vira 'counted' — sem novo ciclo de recontagem.
+            // Só marca 'recount' na 1ª contagem para acionar o fluxo de recontagem.
+            status:         !hasDiv ? 'counted' : (diff < 0 && !eraRecontagem) ? 'recount' : 'counted',
             counted_at:     item.counted_at || new Date().toISOString(),
           })
           .eq('id', item.id);
