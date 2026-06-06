@@ -85,6 +85,16 @@ export async function POST(req) {
       subgrupo:    s.scheduled_subgroup || 'Geral',
     }));
 
+    // Atualiza status para in_progress antes de retornar,
+    // evitando que o próximo ciclo de 15 minutos dispare novamente.
+    if (schedulesToDispatch.length > 0) {
+      const ids = (schedules || []).map(s => s.id);
+      await supabase
+        .from('inventory_schedules')
+        .update({ status: 'in_progress' })
+        .in('id', ids);
+    }
+
     return NextResponse.json({
       success: true,
       count:   schedulesToDispatch.length,
