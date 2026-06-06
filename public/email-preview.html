@@ -2,8 +2,17 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Preview — E-mail Inventário</title>
+  <style>
+    /* CSS para estilizar a tabela gerada pelo "Criar Tabela HTML" do PA */
+    table  { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: #000 !important; }
+    th     { background: #000; color: #fff; padding: 9px 10px; font-size: 10px;
+             font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+             text-align: left; }
+    td     { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; color: #333; }
+    tr:nth-child(even) td { background: #fafafa; }
+  </style>
 </head>
 <body style="margin:0;padding:0;background:#f0f0f0;font-family:'Segoe UI',Arial,sans-serif;">
 
@@ -12,117 +21,102 @@
     <!-- CABEÇALHO -->
     <div style="background:#000000;padding:32px 40px 24px;">
       <div style="font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#888;margin-bottom:6px;">Positivo Tecnologia · Portal Onsite</div>
-      <div style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:0.02em;">Inventário Concluído</div>
-      <div style="font-size:13px;color:#aaa;margin-top:4px;">Contagem finalizada sem divergências</div>
+      <div style="font-size:26px;font-weight:900;color:#ffffff;letter-spacing:0.01em;">Inventário Concluído</div>
+      <div style="font-size:13px;color:#aaa;margin-top:6px;">Contagem finalizada sem divergências</div>
     </div>
 
-    <!-- FAIXA SEMANA -->
-    <div style="background:#f4f4f5;border-bottom:1px solid #e4e4e7;padding:14px 40px;display:flex;align-items:center;gap:16px;">
-      <div>
-        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Semana</span>
-        <span style="font-size:15px;font-weight:900;color:#000;margin-left:8px;">2024-W23</span>
-      </div>
-      <div style="width:1px;height:24px;background:#ddd;"></div>
-      <div>
-        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Técnico</span>
-        <span style="font-size:15px;font-weight:900;color:#000;margin-left:8px;">Arnildo Kamien Junior</span>
-      </div>
+    <!-- SEMANA / TÉCNICO -->
+    <div style="background:#f4f4f5;border-bottom:2px solid #000;padding:16px 40px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Técnico</span><br/>
+            <span style="font-size:16px;font-weight:900;color:#000;">ARNILDO KAMIEN JUNIOR</span>
+          </td>
+          <td align="right">
+            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Semana</span><br/>
+            <span style="font-size:16px;font-weight:900;color:#000;">2026-W23</span>
+          </td>
+        </tr>
+      </table>
     </div>
 
     <!-- KPIs -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:2px solid #000;">
-      <div style="padding:20px;text-align:center;border-right:1px solid #e4e4e7;">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Total contado</div>
-        <div style="font-size:28px;font-weight:900;color:#000;">13</div>
-      </div>
-      <div style="padding:20px;text-align:center;border-right:1px solid #e4e4e7;">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Corretas</div>
-        <div style="font-size:28px;font-weight:900;color:#000;">13</div>
-      </div>
-      <div style="padding:20px;text-align:center;">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Divergências</div>
-        <div style="font-size:28px;font-weight:900;color:#000;">0</div>
-      </div>
-    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #000;border-collapse:collapse;">
+      <tr>
+        <td width="33%" align="center" style="padding:20px 10px;border-right:1px solid #e4e4e7;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:6px;">Total contado</div>
+          <div style="font-size:30px;font-weight:900;color:#000;line-height:1;">4</div>
+        </td>
+        <td width="33%" align="center" style="padding:20px 10px;border-right:1px solid #e4e4e7;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:6px;">Corretas</div>
+          <div style="font-size:30px;font-weight:900;color:#000;line-height:1;">4</div>
+        </td>
+        <td width="33%" align="center" style="padding:20px 10px;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:6px;">Divergências</div>
+          <div style="font-size:30px;font-weight:900;color:#000;line-height:1;">0</div>
+        </td>
+      </tr>
+    </table>
 
-    <!-- TABELA DE ITENS -->
-    <div style="padding:28px 40px 8px;">
-      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:14px;">Itens contados</div>
-      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
+    <!-- TÍTULO DA TABELA -->
+    <div style="padding:24px 40px 12px;">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Itens contados</div>
+
+      <!-- Tabela gerada pelo "Criar Tabela HTML" do Power Automate (estilizada pelo CSS acima) -->
+      <table>
         <thead>
-          <tr style="border-bottom:2px solid #000;">
-            <th align="left"  style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Código</th>
-            <th align="left"  style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Item</th>
-            <th align="right" style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Sistema</th>
-            <th align="right" style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Físico</th>
-            <th align="center" style="padding:8px 6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Dif.</th>
+          <tr>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Sistema</th>
+            <th>Físico</th>
+            <th>Diferença</th>
           </tr>
         </thead>
         <tbody>
-          <tr style="border-bottom:1px solid #f0f0f0;">
-            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11192386</td>
-            <td style="padding:9px 6px;font-weight:700;color:#000;">11192386</td>
-            <td align="right" style="padding:9px 6px;color:#666;">2</td>
-            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">2</td>
-            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          <tr>
+            <td>11176319</td>
+            <td>MEM 8GB DDR4 PC25600 SODIMM ADATA MONT</td>
+            <td>2</td><td>2</td><td>0</td>
           </tr>
-          <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa;">
-            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11225754</td>
-            <td style="padding:9px 6px;font-weight:700;color:#000;">11225754</td>
-            <td align="right" style="padding:9px 6px;color:#666;">0</td>
-            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">1</td>
-            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          <tr>
+            <td>11176317</td>
+            <td>MEM 16GB DDR4 PC25600 SODIMM ADATA MONT</td>
+            <td>1</td><td>1</td><td>0</td>
           </tr>
-          <tr style="border-bottom:1px solid #f0f0f0;">
-            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11176317</td>
-            <td style="padding:9px 6px;font-weight:700;color:#000;">11176317</td>
-            <td align="right" style="padding:9px 6px;color:#666;">1</td>
-            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">1</td>
-            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          <tr>
+            <td>11225854</td>
+            <td>MEM 32GB DDR4 SODIMM APACE MONT</td>
+            <td>1</td><td>1</td><td>0</td>
           </tr>
-          <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa;">
-            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11176319</td>
-            <td style="padding:9px 6px;font-weight:700;color:#000;">11176319</td>
-            <td align="right" style="padding:9px 6px;color:#666;">2</td>
-            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">2</td>
-            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
-          </tr>
-          <tr style="border-bottom:1px solid #f0f0f0;">
-            <td style="padding:9px 6px;color:#666;font-size:12px;font-family:monospace;">11175485</td>
-            <td style="padding:9px 6px;font-weight:700;color:#000;">11175485</td>
-            <td align="right" style="padding:9px 6px;color:#666;">1</td>
-            <td align="right" style="padding:9px 6px;font-weight:700;color:#000;">1</td>
-            <td align="center" style="padding:9px 6px;font-weight:900;color:#000;">✓</td>
+          <tr>
+            <td>11192386</td>
+            <td>MEM 16GB DDR4 SODIMM SMART MONT</td>
+            <td>2</td><td>2</td><td>0</td>
           </tr>
         </tbody>
       </table>
-      <div style="text-align:right;padding:8px 6px;font-size:11px;color:#aaa;">+ 8 itens adicionais · todos corretos</div>
     </div>
 
-    <!-- SEPARADOR -->
-    <div style="margin:0 40px;border-top:1px solid #e4e4e7;"></div>
+    <div style="margin:8px 40px 0;border-top:1px solid #e4e4e7;"></div>
 
-    <!-- RODAPÉ / ASSINATURA -->
+    <!-- ASSINATURA -->
     <div style="padding:24px 40px 32px;background:#fafafa;">
-      <div style="font-size:12px;color:#666;line-height:1.6;margin-bottom:16px;">
-        Este e-mail foi gerado automaticamente pelo <strong style="color:#000;">Portal Onsite</strong> após a finalização do inventário.
-        Nenhuma ação é necessária.
+      <div style="font-size:12px;color:#666;line-height:1.7;margin-bottom:18px;">
+        Este e-mail foi gerado automaticamente pelo <strong style="color:#000;">Portal Onsite</strong>
+        após a finalização do inventário. Nenhuma ação é necessária.
       </div>
-      <div style="border-top:2px solid #000;padding-top:16px;display:flex;align-items:center;gap:16px;">
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:900;color:#000;letter-spacing:0.03em;">IA SERVIÇOS</div>
-          <div style="font-size:11px;color:#888;margin-top:2px;">Portal Onsite · Gestão de Inventário</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="display:inline-block;background:#000;color:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;border-radius:3px;">Positivo Tecnologia</div>
-        </div>
+      <div style="border-top:2px solid #000;padding-top:16px;">
+        <div style="font-size:13px;font-weight:900;color:#000;letter-spacing:0.03em;">IA SERVIÇOS</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Portal Onsite · Gestão de Inventário · Positivo Tecnologia</div>
       </div>
     </div>
 
   </div>
 
-  <div style="text-align:center;padding:16px;font-size:11px;color:#aaa;">
-    Este é um preview do e-mail — os dados reais vêm do Power Automate
+  <div style="text-align:center;padding:12px;font-size:11px;color:#aaa;">
+    Preview local — dados reais vêm do Power Automate
   </div>
 
 </body>

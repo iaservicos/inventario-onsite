@@ -99,7 +99,29 @@ export async function POST(request) {
   const weekRef = schedule.week_ref || getWeekRef();
   const scheduledSubgroup = schedule.scheduled_subgroup || null;
 
-  // Verifica se já existe inventário para esta semana
+  // "Claim" atômico: marca como dispatched ANTES de criar o inventário.
+  // Usa WHERE status='pending' como condição — se dois requests chegarem ao mesmo tempo,
+  // apenas um consegue fazer o update; o outro recebe 0 linhas e aborta.
+  // Agendamentos já em 'dispatched' (retry após falha parcial) passam para o check de inventário.
+  if (schedule.status === 'pending') {
+    const { data: claimed } = await supabase
+      .from('inventory_schedules')
+      .update({ status: 'dispatched', updated_at: new Date().toISOString() })
+      .eq('id', schedule_id)
+      .eq('status', 'pending')
+      .select('id')
+      .maybeSingle();
+
+    if (!claimed) {
+      return NextResponse.json({
+        ok: true,
+        skipped: true,
+        reason: 'Agendamento já foi iniciado por outra requisição simultânea',
+      }, { status: 200 });
+    }
+  }
+
+  // Verifica se já existe inventário para esta semana (protege retries)
   const { data: existing } = await supabase
     .from('inventories')
     .select('id, status')
@@ -192,14 +214,10 @@ export async function POST(request) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  // Atualiza o agendamento como disparado
+  // Vincula o inventory_id ao agendamento (status já foi para 'dispatched' no claim acima)
   await supabase
     .from('inventory_schedules')
-    .update({
-      status: 'dispatched',
-      inventory_id: inventory.id,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ inventory_id: inventory.id, updated_at: new Date().toISOString() })
     .eq('id', schedule_id);
 
   // Cria sessão GPT Maker
