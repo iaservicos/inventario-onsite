@@ -20,7 +20,7 @@ export async function POST(req) {
     if (inventory_id) {
       const { data, error } = await supabase
         .from('inventories')
-        .select('id, technician_id, week_ref, status, technicians(id, name, phone)')
+        .select('id, technician_id, week_ref, status, technicians(id, name, phone, email)')
         .eq('id', parseInt(inventory_id))
         .single();
       if (error || !data) return NextResponse.json({ error: 'Inventário não encontrado' }, { status: 404 });
@@ -28,7 +28,7 @@ export async function POST(req) {
     } else if (nome) {
       const { data: tech } = await supabase
         .from('technicians')
-        .select('id, name, phone')
+        .select('id, name, phone, email')
         .ilike('name', `%${String(nome).trim()}%`)
         .limit(1)
         .single();
@@ -36,7 +36,7 @@ export async function POST(req) {
 
       const { data, error } = await supabase
         .from('inventories')
-        .select('id, technician_id, week_ref, status, technicians(id, name, phone)')
+        .select('id, technician_id, week_ref, status, technicians(id, name, phone, email)')
         .eq('technician_id', tech.id)
         .in('status', ['in_progress', 'pending', 'recount_pending'])
         .order('created_at', { ascending: false })
@@ -122,6 +122,7 @@ export async function POST(req) {
     const divergencesToInsert = [];
     const recountItems        = [];
     const surplusItems        = [];
+    const itensSummary        = [];
 
     for (const item of countedItems) {
       const sysQty  = Number(item.system_qty)  || 0;
@@ -143,6 +144,16 @@ export async function POST(req) {
           .eq('id', item.id);
       }
 
+      // Acumula resumo completo para envio por e-mail
+      itensSummary.push({
+        item_code:    item.item_code,
+        item_name:    item.item_name,
+        system_qty:   sysQty,
+        physical_qty: physQty,
+        difference:   diff,
+        status_item:  !hasDiv ? 'ok' : diff < 0 ? 'falta' : 'excesso',
+      });
+
       if (hasDiv) {
         divergencesToInsert.push({
           inventory_id:    invId,
@@ -163,6 +174,12 @@ export async function POST(req) {
         }
       }
     }
+
+    // Ordena: divergências primeiro, depois itens ok
+    itensSummary.sort((a, b) => {
+      const order = { falta: 0, excesso: 1, ok: 2 };
+      return (order[a.status_item] ?? 3) - (order[b.status_item] ?? 3);
+    });
 
     // 4. Gravar divergências
     if (divergencesToInsert.length > 0) {
@@ -215,6 +232,9 @@ export async function POST(req) {
       ok:                  true,
       inventory_id:        invId,
       tecnico:             inventory.technicians?.name,
+      email_tecnico:       inventory.technicians?.email || null,
+      week_ref:            inventory.week_ref,
+      tipo_finalizacao:    eraRecontagem ? 'recontagem' : '1a_contagem',
       status:              newStatus,
       total_contados:      countedItems.length,
       total_divergencias:  divergencesToInsert.length,
@@ -223,6 +243,7 @@ export async function POST(req) {
       mensagem_recontagem: mensagemRecontagem,
       itens_recontagem:    recountItems,
       itens_excesso:       surplusItems,
+      itens_contados:      itensSummary,
     });
 
   } catch (err) {

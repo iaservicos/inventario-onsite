@@ -102,9 +102,7 @@ export default function DivergenciasPage() {
   const [technicians, setTechnicians] = useState([]);
   const [divergences, setDivergences] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(null);
   const [exporting, setExporting] = useState(false);
-  const [recounting, setRecounting] = useState(null);
   const [tratativaModal, setTratativaModal] = useState(null);
 
   useEffect(() => {
@@ -126,39 +124,6 @@ export default function DivergenciasPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function updateStatus(id, status) {
-    setUpdating(id);
-    try {
-      await fetch(`/api/divergences/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-      toast.success('Status atualizado!');
-      load();
-    } catch {
-      toast.error('Erro ao atualizar status');
-    }
-    setUpdating(null);
-  }
-
-  async function triggerRecount(inventoryId, techName) {
-    if (!confirm(`Iniciar recontagem para ${techName}?`)) return;
-    setRecounting(inventoryId);
-    try {
-      const res = await fetch(`/api/inventories/${inventoryId}/recount`, { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success(`Recontagem iniciada: ${data.items_to_recount} peça(s).`);
-        load();
-      } else {
-        toast.error(data.error || 'Erro ao criar recontagem');
-      }
-    } catch {
-      toast.error('Erro de conexão');
-    }
-    setRecounting(null);
-  }
 
   async function exportExcel() {
     setExporting(true);
@@ -245,10 +210,8 @@ export default function DivergenciasPage() {
                   </thead>
                   <tbody>
                     {divergences.map((d) => {
-                      const pct           = Number(d.percentage_diff);
-                      const isCritical    = pct >= 30;
-                      const inventoryId   = d.inventories?.id || d.inventory_id;
-                      const isRecounting  = recounting === inventoryId;
+                      const pct        = Number(d.percentage_diff);
+                      const isCritical = pct >= 30;
                       return (
                         <tr key={d.id}>
                           <td style={{ fontWeight: '800', color: '#000' }}>{d.technicians?.name}</td>
@@ -286,45 +249,14 @@ export default function DivergenciasPage() {
                             ) : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>}
                           </td>
                           <td>
-                            <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                              {d.status === 'open' && (
-                                <button
-                                  className="btn btn-secondary"
-                                  style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-                                  disabled={updating === d.id || isRecounting}
-                                  onClick={() => updateStatus(d.id, 'recount')}
-                                >
-                                  Recontagem
-                                </button>
-                              )}
-                              {d.status === 'open' && inventoryId && (
-                                <button
-                                  className="btn btn-secondary"
-                                  style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-                                  disabled={isRecounting}
-                                  onClick={() => triggerRecount(inventoryId, d.technicians?.name)}
-                                >
-                                  {isRecounting ? '...' : '↺ WhatsApp'}
-                                </button>
-                              )}
+                            <div style={{ display: 'flex', gap: '0.3rem' }}>
                               {(d.status === 'open' || d.status === 'recount') && (
                                 <button
                                   className="btn btn-secondary"
                                   style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: '#000', color: '#fff', border: 'none' }}
-                                  disabled={updating === d.id}
                                   onClick={() => setTratativaModal(d)}
                                 >
                                   Em Tratativa
-                                </button>
-                              )}
-                              {(d.status === 'open' || d.status === 'recount') && (
-                                <button
-                                  className="btn btn-secondary"
-                                  style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-                                  disabled={updating === d.id}
-                                  onClick={() => updateStatus(d.id, 'validated')}
-                                >
-                                  Validar
                                 </button>
                               )}
                             </div>
