@@ -13,20 +13,25 @@ export async function POST(req) {
     const supabase = createServiceClient();
     const now = new Date();
 
-    const startOfDay = new Date(now);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(now);
-    endOfDay.setHours(23, 59, 59, 999);
+    // Início do dia de hoje em SP (UTC-3): 00:00 SP = 03:00 UTC
+    const nowSP = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+    const hojeInicio = new Date(Date.UTC(
+      nowSP.getUTCFullYear(), nowSP.getUTCMonth(), nowSP.getUTCDate(),
+      3, 0, 0, 0,
+    ));
 
+    // Busca agendamentos do dia cujo horário JÁ CHEGOU e o D-1 já foi enviado (dispatched).
+    // Status 'dispatched' = aviso D-1 enviado, inventário criado, aguardando disparo no horário.
+    // O filtro scheduled_at <= now garante que o disparo só ocorre no horário correto.
     const { data: schedules, error } = await supabase
       .from('inventory_schedules')
       .select(`
         id, scheduled_at, scheduled_subgroup, inventory_id,
         technicians ( id, name, phone )
       `)
-      .eq('status', 'pending')
-      .gte('scheduled_at', startOfDay.toISOString())
-      .lte('scheduled_at', endOfDay.toISOString());
+      .eq('status', 'dispatched')
+      .gte('scheduled_at', hojeInicio.toISOString())
+      .lte('scheduled_at', now.toISOString());
 
     if (error) throw error;
 
