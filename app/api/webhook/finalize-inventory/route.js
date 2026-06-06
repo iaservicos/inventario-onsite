@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { getConsolidatedTechnicianItems } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 const SECRET = process.env.DISPATCH_SECRET || 'dispatch@positivo2026';
 
 export async function POST(req) {
@@ -119,10 +120,13 @@ export async function POST(req) {
     }
 
     // 4. Comparar e classificar
+    const eraRecontagem = inventory.status === 'recount_pending';
+
     const divergencesToInsert = [];
     const recountItems        = [];
     const surplusItems        = [];
     const itensSummary        = [];
+    const itemUpdates         = [];
 
     for (const item of countedItems) {
       const sysQty  = Number(item.system_qty)  || 0;
@@ -133,20 +137,15 @@ export async function POST(req) {
         ? parseFloat(Math.abs((diff / sysQty) * 100).toFixed(2))
         : physQty > 0 ? 100 : 0;
 
-      if (!item._already_saved) {
-        await supabase
-          .from('inventory_items')
-          .update({
-            has_divergence: hasDiv,
-            // Na recontagem, item com divergência vira 'counted' — sem novo ciclo de recontagem.
-            // Só marca 'recount' na 1ª contagem para acionar o fluxo de recontagem.
-            status:         !hasDiv ? 'counted' : (diff < 0 && !eraRecontagem) ? 'recount' : 'counted',
-            counted_at:     item.counted_at || new Date().toISOString(),
-          })
-          .eq('id', item.id);
+      if (!item._already_saved && item.id) {
+        const needsRecount = !eraRecontagem && diff < 0;
+        itemUpdates.push({
+          id:            item.id,
+          has_divergence: hasDiv,
+          status:        needsRecount ? 'recount' : 'counted',
+        });
       }
 
-      // Acumula resumo completo para envio por e-mail
       itensSummary.push({
         item_code:    item.item_code,
         item_name:    item.item_name,
@@ -177,6 +176,18 @@ export async function POST(req) {
       }
     }
 
+    // Atualiza itens em paralelo (cada um com has_divergence correto)
+    const now = new Date().toISOString();
+    if (itemUpdates.length > 0) {
+      await Promise.all(
+        itemUpdates.map(({ id, has_divergence, status }) =>
+          supabase.from('inventory_items')
+            .update({ has_divergence, status, counted_at: now })
+            .eq('id', id)
+        )
+      );
+    }
+
     // Ordena: divergências primeiro, depois itens ok
     itensSummary.sort((a, b) => {
       const order = { falta: 0, excesso: 1, ok: 2 };
@@ -191,7 +202,6 @@ export async function POST(req) {
     // 5. Atualizar inventário
     // Se já era recontagem, fecha como completed independente de divergências
     // (evita loop infinito de recontagem → recontagem → recontagem)
-    const eraRecontagem = inventory.status === 'recount_pending';
     const newStatus = (!eraRecontagem && recountItems.length > 0) ? 'recount_pending' : 'completed';
 
     await supabase
