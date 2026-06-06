@@ -24,46 +24,58 @@ function ModalItens({ inventory, onClose }) {
       .then(data => { setItems(data); setLoading(false); });
   }, [inventory.id]);
 
-  const ok        = items.filter(i => !i.has_divergence).length;
-  const diverg    = items.filter(i => i.has_divergence).length;
-  const pendentes = items.filter(i => i.physical_qty === null).length;
+  const total    = items.length;
+  const ok       = items.filter(i => !i.has_divergence && i.physical_qty !== null).length;
+  const diverg   = items.filter(i => i.has_divergence).length;
+  const pendente = items.filter(i => i.physical_qty === null).length;
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}
       onClick={onClose}
     >
       <div
-        style={{ background: '#fff', width: '100%', maxWidth: '800px', maxHeight: '90vh', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000', display: 'flex', flexDirection: 'column' }}
+        style={{ background: '#fff', width: '100%', maxWidth: '860px', maxHeight: '90vh', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000', display: 'flex', flexDirection: 'column' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#000', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <div style={{ fontWeight: '900', fontSize: '0.95rem', color: '#fff', textTransform: 'uppercase' }}>
+            <div style={{ fontWeight: '900', fontSize: '0.95rem', color: '#000', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {inventory.technicians?.name}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '2px' }}>
-              Semana {inventory.week_ref} &nbsp;·&nbsp; {inventory.technicians?.region}
+            <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px', fontWeight: '600' }}>
+              Semana {inventory.week_ref} &nbsp;·&nbsp; {inventory.technicians?.region} &nbsp;·&nbsp; {inventory.inventory_schedules?.[0]?.scheduled_subgroup || '—'}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900', color: '#fff' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900', color: '#000' }}>✕</button>
         </div>
 
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid #eee' }}>
-          {[
-            { label: 'Total', value: items.length, color: '#000' },
-            { label: 'Corretas', value: ok, color: '#16a34a' },
-            { label: 'Divergentes', value: diverg, color: diverg > 0 ? '#dc2626' : '#000' },
-            { label: 'Pendentes', value: pendentes, color: pendentes > 0 ? '#d97706' : '#000' },
-          ].map(k => (
-            <div key={k.label} style={{ padding: '1rem', textAlign: 'center', borderRight: '1px solid #eee' }}>
-              <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', color: '#888', marginBottom: '4px' }}>{k.label}</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '900', color: k.color }}>{loading ? '—' : k.value}</div>
-            </div>
-          ))}
-        </div>
+        {!loading && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid #e4e4e7' }}>
+            {[
+              { label: 'Total',       value: total },
+              { label: 'Corretas',    value: ok,       highlight: false },
+              { label: 'Divergentes', value: diverg,   highlight: diverg > 0 },
+              { label: 'Pendentes',   value: pendente, highlight: pendente > 0 },
+            ].map((k, i) => (
+              <div key={k.label} style={{
+                padding: '1rem',
+                textAlign: 'center',
+                borderRight: i < 3 ? '1px solid #e4e4e7' : 'none',
+                background: k.highlight ? '#000' : '#fff',
+              }}>
+                <div style={{ fontSize: '0.6rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: k.highlight ? '#aaa' : '#888', marginBottom: '4px' }}>
+                  {k.label}
+                </div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '900', color: k.highlight ? '#fff' : '#000' }}>
+                  {k.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Tabela */}
         <div style={{ overflowY: 'auto', flex: 1 }}>
@@ -74,39 +86,43 @@ function ModalItens({ inventory, onClose }) {
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
               <thead>
-                <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #e4e4e7' }}>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'left', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Código</th>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'left', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Item</th>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'left', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Subgrupo</th>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Sistema</th>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Físico</th>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Diff</th>
-                  <th style={{ padding: '0.6rem 0.75rem', textAlign: 'center', fontWeight: '800', fontSize: '0.7rem', textTransform: 'uppercase' }}>Status</th>
+                <tr style={{ borderBottom: '2px solid #e4e4e7' }}>
+                  {['Código', 'Item', 'Subgrupo', 'Sistema', 'Físico', 'Diferença', 'Status'].map((h, i) => (
+                    <th key={h} style={{
+                      padding: '0.6rem 0.75rem',
+                      textAlign: i >= 3 && i <= 5 ? 'right' : i === 6 ? 'center' : 'left',
+                      fontWeight: '800',
+                      fontSize: '0.65rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      color: '#888',
+                      background: '#fafafa',
+                    }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, idx) => {
-                  const diff     = item.physical_qty !== null ? Number(item.physical_qty) - Number(item.system_qty) : null;
-                  const pending  = item.physical_qty === null;
-                  const rowBg    = item.has_divergence ? '#fff8f8' : pending ? '#fffbeb' : '#fff';
+                {items.map(item => {
+                  const diff    = item.physical_qty !== null ? Number(item.physical_qty) - Number(item.system_qty) : null;
+                  const pending = item.physical_qty === null;
                   return (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0', background: rowBg }}>
+                    <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                       <td style={{ padding: '0.55rem 0.75rem' }}>
                         <code style={{ fontSize: '0.72rem', background: '#f5f5f5', padding: '2px 5px', borderRadius: '3px', border: '1px solid #eee' }}>
                           {item.item_code}
                         </code>
                       </td>
-                      <td style={{ padding: '0.55rem 0.75rem', fontWeight: '600', color: '#000' }}>{item.item_name}</td>
-                      <td style={{ padding: '0.55rem 0.75rem', color: '#666', fontSize: '0.72rem' }}>{item.item_subgroup || '—'}</td>
-                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', color: '#666' }}>{item.system_qty}</td>
-                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '700', color: pending ? '#d97706' : '#000' }}>
+                      <td style={{ padding: '0.55rem 0.75rem', fontWeight: '700', color: '#000' }}>{item.item_name}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', color: '#666', fontSize: '0.75rem' }}>{item.item_subgroup || '—'}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', color: '#666' }}>{item.system_qty ?? '—'}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '700', color: pending ? '#888' : '#000' }}>
                         {pending ? '—' : item.physical_qty}
                       </td>
-                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '800', color: diff === null ? '#aaa' : diff === 0 ? '#16a34a' : '#dc2626' }}>
-                        {diff === null ? '—' : diff > 0 ? `+${diff}` : diff}
+                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '800', color: '#000' }}>
+                        {diff === null ? '—' : diff > 0 ? `+${diff}` : diff === 0 ? '✓' : diff}
                       </td>
                       <td style={{ padding: '0.55rem 0.75rem', textAlign: 'center' }}>
-                        <StatusBadge status={pending ? 'pending' : item.has_divergence ? 'divergence' : 'ok'} />
+                        <StatusBadge status={pending ? 'pending' : item.has_divergence ? 'recount' : 'counted'} />
                       </td>
                     </tr>
                   );
@@ -121,7 +137,7 @@ function ModalItens({ inventory, onClose }) {
 }
 
 export default function HistoricoPage() {
-  const [filters, setFilters]       = useState({ from: '', to: '', technicianId: '', status: '' });
+  const [filters, setFilters]         = useState({ from: '', to: '', technicianId: '', status: '' });
   const [technicians, setTechnicians] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -134,24 +150,16 @@ export default function HistoricoPage() {
   const load = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (filters.from)          params.set('from', filters.from);
-    if (filters.to)            params.set('to', filters.to);
-    if (filters.technicianId)  params.set('technicianId', filters.technicianId);
-    if (filters.status)        params.set('status', filters.status);
+    if (filters.from)         params.set('from', filters.from);
+    if (filters.to)           params.set('to', filters.to);
+    if (filters.technicianId) params.set('technicianId', filters.technicianId);
+    if (filters.status)       params.set('status', filters.status);
     const res = await fetch(`/api/inventories?${params}`);
     setInventories(await res.json());
     setLoading(false);
   }, [filters]);
 
   useEffect(() => { load(); }, [load]);
-
-  const STATUS_LABEL = {
-    in_progress:     'Em andamento',
-    completed:       'Concluído',
-    recount_pending: 'Recontagem',
-    cancelled:       'Cancelado',
-    pending:         'Pendente',
-  };
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -182,7 +190,7 @@ export default function HistoricoPage() {
                   <th style={{ textAlign: 'center' }}>Divergências</th>
                   <th>Status</th>
                   <th>Data</th>
-                  <th>Ações</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -195,10 +203,10 @@ export default function HistoricoPage() {
                       <td style={{ fontWeight: '700' }}>{inv.week_ref}</td>
                       <td style={{ color: '#666', fontSize: '0.8rem' }}>{sched?.scheduled_subgroup || '—'}</td>
                       <td style={{ textAlign: 'center', fontWeight: '700' }}>{inv.total_items ?? '—'}</td>
-                      <td style={{ textAlign: 'center' }}>
+                      <td style={{ textAlign: 'center', fontWeight: '800' }}>
                         {inv.divergence_count > 0
-                          ? <span style={{ fontWeight: '900', color: '#dc2626' }}>{inv.divergence_count}</span>
-                          : <span style={{ color: '#16a34a', fontWeight: '700' }}>0</span>}
+                          ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.75rem' }}>{inv.divergence_count}</span>
+                          : <span style={{ color: '#888' }}>0</span>}
                       </td>
                       <td><StatusBadge status={inv.status} /></td>
                       <td style={{ color: '#666', fontSize: '0.8rem' }}>{inv.created_at ? formatDate(inv.created_at) : '—'}</td>
