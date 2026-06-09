@@ -86,11 +86,16 @@ export async function POST(req) {
           updates.scheduled_at = scheduledCorreto.toISOString();
         }
 
-        // Sempre reconfirma o subgrupo com base no saldo atual — papel central do D-1
-        // (função é determinística: mesmo saldo → mesmo subgrupo, sem risco de flip)
-        const subgrupoAtual = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
-        if (subgrupoAtual && subgrupoAtual !== existente.scheduled_subgroup) {
-          updates.scheduled_subgroup = subgrupoAtual;
+        // Só troca o subgrupo se o atual ficou sem peças no saldo.
+        // NÃO recalcular incondicionalmente: getSubgroupForTechnician usa o histórico de
+        // inventory_schedules, que já contém o agendamento atual. Recalcular causaria um
+        // "flip" a cada execução do cron (SSD → Bateria → SSD → ...).
+        const pecasSubgrupoAtual = await getConsolidatedTechnicianItems(
+          supabase, tech.id, existente.scheduled_subgroup
+        );
+        if (pecasSubgrupoAtual.length === 0) {
+          const subgrupoAtual = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
+          if (subgrupoAtual) updates.scheduled_subgroup = subgrupoAtual;
         }
 
         // Vincula inventário se ainda não foi vinculado
