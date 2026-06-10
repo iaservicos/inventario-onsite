@@ -98,7 +98,7 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
 }
 
 export default function DivergenciasPage() {
-  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '' });
+  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '', supervisor: '' });
   const [technicians, setTechnicians] = useState([]);
   const [divergences, setDivergences] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,13 +109,22 @@ export default function DivergenciasPage() {
     fetch('/api/technicians').then((r) => r.json()).then(setTechnicians);
   }, []);
 
+  const supervisors = [...new Set(
+    technicians.filter(t => t.supervisor_name).map(t => t.supervisor_name)
+  )].sort();
+
   const load = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (filters.from) params.set('from', filters.from);
     if (filters.to) params.set('to', filters.to);
-    if (filters.technicianId) params.set('technicianId', filters.technicianId);
     if (filters.status) params.set('status', filters.status);
+    if (filters.technicianId) {
+      params.set('technicianId', filters.technicianId);
+    } else if (filters.supervisor) {
+      const ids = technicians.filter(t => t.supervisor_name === filters.supervisor).map(t => t.id);
+      if (ids.length > 0) params.set('technicianIds', ids.join(','));
+    }
     const res = await fetch(`/api/divergences?${params}`);
     const json = await res.json();
     setDivergences(json);
@@ -170,7 +179,7 @@ export default function DivergenciasPage() {
         }
       />
 
-      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} statusOptions={DIV_STATUS_OPTIONS} />
+      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} statusOptions={DIV_STATUS_OPTIONS} />
 
       <div style={{ height: '1.5rem' }} />
 

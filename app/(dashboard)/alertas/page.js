@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
 import { formatDate } from '@/lib/utils';
@@ -45,7 +45,7 @@ const statusOptions = [
 ];
 
 export default function AlertasPage() {
-  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '' });
+  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '', supervisor: '' });
   const [technicians, setTechnicians] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,18 +56,28 @@ export default function AlertasPage() {
     fetch('/api/technicians').then((r) => r.json()).then(setTechnicians);
   }, []);
 
+  const supervisors = useMemo(() =>
+    [...new Set(technicians.filter(t => t.supervisor_name).map(t => t.supervisor_name))].sort(),
+    [technicians]
+  );
+
   const load = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (filters.from) params.set('from', filters.from);
     if (filters.to) params.set('to', filters.to);
-    if (filters.technicianId) params.set('technicianId', filters.technicianId);
     if (!showResolved) params.set('resolved', 'false');
+    if (filters.technicianId) {
+      params.set('technicianId', filters.technicianId);
+    } else if (filters.supervisor) {
+      const ids = technicians.filter(t => t.supervisor_name === filters.supervisor).map(t => t.id);
+      if (ids.length > 0) params.set('technicianIds', ids.join(','));
+    }
     const res = await fetch(`/api/alerts?${params}`);
     const json = await res.json();
     setAlerts(json);
     setLoading(false);
-  }, [filters, showResolved]);
+  }, [filters, showResolved, technicians]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -116,7 +126,7 @@ export default function AlertasPage() {
         }
       />
 
-      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} statusOptions={statusOptions} />
+      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} statusOptions={statusOptions} />
 
       <div style={{ height: '1.5rem' }} />
 

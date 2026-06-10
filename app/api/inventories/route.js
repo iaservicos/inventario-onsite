@@ -10,12 +10,17 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const scope = await getScopeFilter(session);
 
+  const queryIds = searchParams.get('technicianIds')?.split(',').filter(Boolean) || null;
+  const effectiveIds = queryIds
+    ? (scope ? scope.filter(id => queryIds.includes(id)) : queryIds)
+    : scope;
+
   const data = await getInventories({
     from: searchParams.get('from') || '',
     to: searchParams.get('to') || '',
     technicianId: searchParams.get('technicianId') || '',
     status: searchParams.get('status') || '',
-    technicianIds: scope,
+    technicianIds: effectiveIds,
   });
 
   return NextResponse.json(data);

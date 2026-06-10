@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import FilterBar from '@/components/ui/FilterBar';
@@ -137,7 +137,7 @@ function ModalItens({ inventory, onClose }) {
 }
 
 export default function HistoricoPage() {
-  const [filters, setFilters]         = useState({ from: '', to: '', technicianId: '', status: '' });
+  const [filters, setFilters]         = useState({ from: '', to: '', technicianId: '', status: '', supervisor: '' });
   const [technicians, setTechnicians] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -147,17 +147,27 @@ export default function HistoricoPage() {
     fetch('/api/technicians').then(r => r.json()).then(setTechnicians);
   }, []);
 
+  const supervisors = useMemo(() =>
+    [...new Set(technicians.filter(t => t.supervisor_name).map(t => t.supervisor_name))].sort(),
+    [technicians]
+  );
+
   const load = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (filters.from)         params.set('from', filters.from);
-    if (filters.to)           params.set('to', filters.to);
-    if (filters.technicianId) params.set('technicianId', filters.technicianId);
-    if (filters.status)       params.set('status', filters.status);
+    if (filters.from)   params.set('from', filters.from);
+    if (filters.to)     params.set('to', filters.to);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.technicianId) {
+      params.set('technicianId', filters.technicianId);
+    } else if (filters.supervisor) {
+      const ids = technicians.filter(t => t.supervisor_name === filters.supervisor).map(t => t.id);
+      if (ids.length > 0) params.set('technicianIds', ids.join(','));
+    }
     const res = await fetch(`/api/inventories?${params}`);
     setInventories(await res.json());
     setLoading(false);
-  }, [filters]);
+  }, [filters, technicians]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -168,7 +178,7 @@ export default function HistoricoPage() {
         subtitle="Consulte todas as peças contadas por inventário"
       />
 
-      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} statusOptions={STATUS_OPTIONS} />
+      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} statusOptions={STATUS_OPTIONS} />
 
       <div style={{ height: '1.5rem' }} />
 

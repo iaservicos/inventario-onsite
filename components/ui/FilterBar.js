@@ -9,9 +9,13 @@ const DEFAULT_STATUS = [
   { value: 'recount_pending', label: 'Recontagem' },
 ];
 
-export default function FilterBar({ filters, onChange, technicians = [], statusOptions, children }) {
+export default function FilterBar({ filters, onChange, technicians = [], supervisors = [], statusOptions, children }) {
   const statuses = statusOptions || DEFAULT_STATUS;
-  const hasFilters = filters.from || filters.to || filters.technicianId || filters.status;
+  const hasFilters = filters.from || filters.to || filters.technicianId || filters.status || filters.supervisor;
+
+  const visibleTechs = filters.supervisor
+    ? technicians.filter(t => t.supervisor_name === filters.supervisor)
+    : technicians;
 
   return (
     <div className="filter-bar">
@@ -35,7 +39,21 @@ export default function FilterBar({ filters, onChange, technicians = [], statusO
         onChange={(e) => onChange({ ...filters, to: e.target.value })}
       />
 
-      {technicians.length > 0 && (
+      {supervisors.length > 0 && (
+        <select
+          className="input"
+          style={{ width: 'auto', minWidth: '170px' }}
+          value={filters.supervisor || ''}
+          onChange={(e) => onChange({ ...filters, supervisor: e.target.value, technicianId: '' })}
+        >
+          <option value="">Todos os supervisores</option>
+          {supervisors.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      )}
+
+      {visibleTechs.length > 0 && (
         <select
           className="input"
           style={{ width: 'auto', minWidth: '160px' }}
@@ -43,7 +61,7 @@ export default function FilterBar({ filters, onChange, technicians = [], statusO
           onChange={(e) => onChange({ ...filters, technicianId: e.target.value })}
         >
           <option value="">Todos os tecnicos</option>
-          {technicians.map((t) => (
+          {visibleTechs.map((t) => (
             <option key={t.id} value={t.id}>{t.name}</option>
           ))}
         </select>
@@ -65,7 +83,7 @@ export default function FilterBar({ filters, onChange, technicians = [], statusO
       {hasFilters && (
         <button
           className="btn btn-ghost btn-sm"
-          onClick={() => onChange({ from: '', to: '', technicianId: '', status: '' })}
+          onClick={() => onChange({ from: '', to: '', technicianId: '', status: '', supervisor: '' })}
         >
           Limpar
         </button>

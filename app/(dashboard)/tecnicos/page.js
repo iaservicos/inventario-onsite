@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -8,7 +8,7 @@ import { formatDate, formatDuration } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export default function TecnicosPage() {
-  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '' });
+  const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '', supervisor: '' });
   const [technicians, setTechnicians] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,13 +33,23 @@ export default function TecnicosPage() {
     setDbChecking(null);
   }
 
+  const supervisors = useMemo(() =>
+    [...new Set(technicians.filter(t => t.supervisor_name).map(t => t.supervisor_name))].sort(),
+    [technicians]
+  );
+
   const load = useCallback(async (isInitial = false) => {
     setLoading(true);
     const params = new URLSearchParams();
     if (filters.from) params.set('from', filters.from);
     if (filters.to) params.set('to', filters.to);
-    if (filters.technicianId) params.set('technicianId', filters.technicianId);
     if (filters.status) params.set('status', filters.status);
+    if (filters.technicianId) {
+      params.set('technicianId', filters.technicianId);
+    } else if (filters.supervisor) {
+      const ids = technicians.filter(t => t.supervisor_name === filters.supervisor).map(t => t.id);
+      if (ids.length > 0) params.set('technicianIds', ids.join(','));
+    }
 
     const fetches = [fetch(`/api/inventories?${params}`).then(r => r.json())];
     if (isInitial) fetches.push(fetch('/api/technicians').then(r => r.json()));
@@ -48,11 +58,15 @@ export default function TecnicosPage() {
     setInventories(invs);
     if (techs) setTechnicians(techs);
     setLoading(false);
-  }, [filters]);
+  }, [filters, technicians]);
 
   useEffect(() => { load(true); }, [load]);
 
-  const byTech = technicians.map((t) => {
+  const techsVisible = filters.supervisor
+    ? technicians.filter(t => t.supervisor_name === filters.supervisor)
+    : technicians;
+
+  const byTech = techsVisible.map((t) => {
     const invs = inventories.filter((i) => i.technician_id === t.id);
     const corretos     = invs.filter((i) => i.status === 'completed' && (i.divergence_count || 0) === 0).length;
     const comDiv       = invs.filter((i) => (i.divergence_count || 0) > 0).length;
@@ -76,7 +90,7 @@ export default function TecnicosPage() {
         subtitle="Desempenho e histórico de inventários"
       />
 
-      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
+      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} />
 
       <div style={{ height: '1.5rem' }} />
 
