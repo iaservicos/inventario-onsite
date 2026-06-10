@@ -167,7 +167,7 @@ export default function HistoricoPage() {
     const res = await fetch(`/api/inventories?${params}`);
     setInventories(await res.json());
     setLoading(false);
-  }, [filters, technicians]);
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(); }, [load]);
 

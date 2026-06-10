@@ -77,7 +77,7 @@ export default function AlertasPage() {
     const json = await res.json();
     setAlerts(json);
     setLoading(false);
-  }, [filters, showResolved, technicians]);
+  }, [filters, showResolved]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(); }, [load]);
 

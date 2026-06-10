@@ -58,7 +58,7 @@ export default function TecnicosPage() {
     setInventories(invs);
     if (techs) setTechnicians(techs);
     setLoading(false);
-  }, [filters, technicians]);
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(true); }, [load]);
 
