@@ -196,7 +196,7 @@ export default function PecasPage() {
 
       <PageHeader
         title="Peças Novas"
-        subtitle="Dados sincronizados diariamente às 08h do Datalake"
+        subtitle="Dados sincronizados diariamente às 08h"
       />
 
       {/* ── Banner de última atualização ─────────────────────────────────── */}
@@ -215,7 +215,7 @@ export default function PecasPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#1e40af' }}>
           <IconDatabase />
           <span style={{ fontWeight: '700' }}>Fonte:</span>
-          <span>Banco de dados local (sincronizado do Datalake)</span>
+          <span>Dados sincronizados do sistema</span>
           {lastSync?.formatted_at && (
             <>
               <span style={{ color: '#93c5fd', margin: '0 0.25rem' }}>·</span>
@@ -419,7 +419,7 @@ export default function PecasPage() {
                 borderRadius: '6px',
                 border: '1px solid #d0d0d0',
               }}>
-                Datalake → Supabase
+                Sincronização de dados
               </span>
             </div>
           </div>
@@ -514,11 +514,11 @@ export default function PecasPage() {
           </p>
           {lastSync ? (
             <p style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
-              Última sincronização com o Datalake: {lastSync.formatted_at}
+              Última sincronização: {lastSync.formatted_at}
             </p>
           ) : (
             <p style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
-              O banco ainda não foi sincronizado com o Datalake. Use o botão "Sincronizar agora".
+              As peças ainda não foram sincronizadas. Use o botão "Sincronizar agora".
             </p>
           )}
         </div>
@@ -564,7 +564,7 @@ export default function PecasPage() {
             Nenhum técnico selecionado
           </h3>
           <p style={{ fontSize: '0.95rem', color: '#666666' }}>
-            Selecione um técnico acima para visualizar as peças sincronizadas do Datalake.
+            Selecione um técnico acima para visualizar as peças.
           </p>
         </div>
       )}

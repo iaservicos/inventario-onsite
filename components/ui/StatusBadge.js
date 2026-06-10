@@ -1,16 +1,27 @@
 // Todos os badges em escala de cinza — sem cores de destaque
 const STATUS_MAP = {
-  completed:       { label: 'Concluido',    cls: 'badge-success' },
+  // Inventário
+  completed:       { label: 'Concluído',    cls: 'badge-success' },
   in_progress:     { label: 'Em Andamento', cls: 'badge-info' },
   abandoned:       { label: 'Abandonado',   cls: 'badge-error' },
   recount_pending: { label: 'Recontagem',   cls: 'badge-warning' },
   pending:         { label: 'Pendente',     cls: 'badge-neutral' },
+  cancelled:       { label: 'Cancelado',    cls: 'badge-neutral' },
+  dispatched:      { label: 'Disparado',    cls: 'badge-info' },
+  // Divergências
+  open:            { label: 'Aberta',       cls: 'badge-warning' },
+  recount:         { label: 'Recontagem',   cls: 'badge-warning' },
+  tratativa:       { label: 'Em Tratativa', cls: 'badge-info' },
+  validated:       { label: 'Validada',     cls: 'badge-success' },
+  adjusted:        { label: 'Ajustada',     cls: 'badge-success' },
+  // Itens
+  counted:         { label: 'Contado',      cls: 'badge-success' },
+  // Sistema
   resolved:        { label: 'Resolvido',    cls: 'badge-success' },
-  open:            { label: 'Aberto',       cls: 'badge-warning' },
-  critical:        { label: 'Critico',      cls: 'badge-error' },
-  warning:         { label: 'Atencao',      cls: 'badge-warning' },
+  critical:        { label: 'Crítico',      cls: 'badge-error' },
+  warning:         { label: 'Atenção',      cls: 'badge-warning' },
   info:            { label: 'Info',         cls: 'badge-info' },
-  healthy:         { label: 'Saudavel',     cls: 'badge-success' },
+  healthy:         { label: 'Saudável',     cls: 'badge-success' },
   degraded:        { label: 'Degradado',    cls: 'badge-warning' },
   down:            { label: 'Inativo',      cls: 'badge-error' },
   error:           { label: 'Erro',         cls: 'badge-error' },

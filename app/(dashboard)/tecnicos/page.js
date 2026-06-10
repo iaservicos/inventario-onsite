@@ -5,33 +5,12 @@ import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { formatDate, formatDuration } from '@/lib/utils';
-import { toast } from 'sonner';
-
 export default function TecnicosPage() {
   const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '', supervisor: '' });
   const [technicians, setTechnicians] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dbChecking, setDbChecking] = useState(null);
-  const [dbStatus, setDbStatus] = useState({});
   const [expanded, setExpanded] = useState(null);
-
-  async function checkDatabricks(techId) {
-    setDbChecking(techId);
-    try {
-      const res = await fetch(`/api/technicians/${techId}/sync-items`);
-      const data = await res.json();
-      setDbStatus((prev) => ({ ...prev, [techId]: data }));
-      if (data.found_in_databricks) {
-        toast.success(`${data.technician_name}: ${data.total_items} peças`);
-      } else {
-        toast.error('Não encontrado no Datalake');
-      }
-    } catch {
-      toast.error('Erro de conexão');
-    }
-    setDbChecking(null);
-  }
 
   const supervisors = useMemo(() =>
     [...new Set(technicians.filter(t => t.supervisor_name).map(t => t.supervisor_name))].sort(),
@@ -126,7 +105,6 @@ export default function TecnicosPage() {
                     <th style={{ textAlign: 'center' }}>↺ Recontagens</th>
                     <th style={{ textAlign: 'center' }}>Itens Diverg.</th>
                     <th style={{ textAlign: 'center', minWidth: '140px' }}>Taxa de Acerto</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -190,22 +168,12 @@ export default function TecnicosPage() {
                             </span>
                           </div>
                         </td>
-                        <td>
-                          <button
-                            className="btn btn-secondary"
-                            style={{ fontSize: '0.65rem', padding: '0.2rem 0.5rem', fontWeight: '800' }}
-                            disabled={dbChecking === t.id}
-                            onClick={(e) => { e.stopPropagation(); checkDatabricks(t.id); }}
-                          >
-                            {dbChecking === t.id ? '...' : 'DB'}
-                          </button>
-                        </td>
                       </tr>
 
                       {/* Linha expandida: inventários do técnico */}
                       {expanded === t.id && (
                         <tr>
-                          <td colSpan={9} style={{ padding: 0, background: '#fafafa', borderBottom: '2px solid #eee' }}>
+                          <td colSpan={8} style={{ padding: 0, background: '#fafafa', borderBottom: '2px solid #eee' }}>
                             <table style={{ width: '100%', fontSize: '0.8rem' }}>
                               <thead>
                                 <tr style={{ background: '#f0f0f0' }}>

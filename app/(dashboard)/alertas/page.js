@@ -12,7 +12,7 @@ const TYPE_LABELS = {
   recount_pending:     'Recontagem',
   divergence_critical: 'Divergência Crítica',
   integration_error:   'Erro de Integração',
-  timeout:             'Timeout',
+  timeout:             'Tempo Esgotado',
   surplus:             'Excedente',
   surplus_subgroup:    'Peça de outro subgrupo',
 };
