@@ -34,7 +34,7 @@ export default function ClientLayout({ children, user }) {
       {/* Conteúdo principal */}
       <main
         className="main-content"
-        style={{ flex: 1, marginLeft: '240px', minHeight: '100vh', overflow: 'auto', background: '#fff', width: 'calc(100% - 240px)' }}
+        style={{ minHeight: '100vh', overflow: 'auto', background: '#fff' }}
       >
         {/* Top bar mobile */}
         <div className="mobile-topbar">
