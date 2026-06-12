@@ -25,10 +25,17 @@ const SHARED_ADMIN_ITEMS = [
   { href: '/cadastro-tecnicos', label: 'Cadastro Técnicos', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>) },
 ];
 
+const FERRAMENTAL_ITEMS = [
+  { href: '/ferramental', label: 'Solicitações', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>) },
+  { href: '/ferramental/estoque', label: 'Estoque por Técnico', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>) },
+];
+
 export default function Sidebar({ user, isOpen }) {
   const pathname = usePathname();
   function isActive(href) { return pathname === href || (href !== '/dashboard' && pathname.startsWith(href)); }
   const isManagement = user?.role === 'admin' || user?.role === 'supervisor' || user?.role === 'coordinator' || user?.role === 'analyst';
+  const isAnalistaCusto = user?.role === 'analista_custo';
+  const hasFerramental = ['admin', 'supervisor', 'analista_custo'].includes(user?.role);
 
   // Estilo comum para os botões da parte inferior
   const bottomButtonStyle = {
@@ -66,19 +73,24 @@ export default function Sidebar({ user, isOpen }) {
       </div>
 
       <nav style={{ flex: 1, padding: '1rem 0.75rem' }}>
-        <div>
-          {NAV_ITEMS.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', marginBottom: '2px', textDecoration: 'none', fontSize: '0.75rem', fontWeight: active ? '700' : '500', color: active ? '#ffffff' : '#888888', background: active ? '#333333' : 'transparent', transition: 'all 0.15s ease' }}>
-                <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>{item.icon}</span>
-                <span style={{ flex: 1 }}>{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
 
-        {isManagement && (
+        {/* Inventário — oculto para analista_custo */}
+        {!isAnalistaCusto && (
+          <div>
+            {NAV_ITEMS.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', marginBottom: '2px', textDecoration: 'none', fontSize: '0.75rem', fontWeight: active ? '700' : '500', color: active ? '#ffffff' : '#888888', background: active ? '#333333' : 'transparent', transition: 'all 0.15s ease' }}>
+                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>{item.icon}</span>
+                  <span style={{ flex: 1 }}>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Gestão — oculto para analista_custo */}
+        {isManagement && !isAnalistaCusto && (
           <div style={{ marginTop: '1.5rem' }}>
             <div style={{ fontSize: '0.6rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#555555', padding: '0 0.75rem', marginBottom: '0.5rem' }}>Gestão</div>
             {SHARED_ADMIN_ITEMS.map((item) => {
@@ -88,6 +100,22 @@ export default function Sidebar({ user, isOpen }) {
             {user?.role === 'admin' && ADMIN_ITEMS.map((item) => {
               const active = isActive(item.href);
               return (<Link key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', marginBottom: '2px', textDecoration: 'none', fontSize: '0.75rem', fontWeight: active ? '700' : '500', color: active ? '#ffffff' : '#888888', background: active ? '#333333' : 'transparent' }}><span>{item.icon}</span><span>{item.label}</span></Link>);
+            })}
+          </div>
+        )}
+
+        {/* Ferramental — visível para admin, supervisor e analista_custo */}
+        {hasFerramental && (
+          <div style={{ marginTop: isAnalistaCusto ? '0' : '1.5rem' }}>
+            <div style={{ fontSize: '0.6rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#555555', padding: '0 0.75rem', marginBottom: '0.5rem' }}>Ferramental</div>
+            {FERRAMENTAL_ITEMS.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', marginBottom: '2px', textDecoration: 'none', fontSize: '0.75rem', fontWeight: active ? '700' : '500', color: active ? '#ffffff' : '#888888', background: active ? '#333333' : 'transparent', transition: 'all 0.15s ease' }}>
+                  <span style={{ color: active ? '#ffffff' : '#666666', flexShrink: 0 }}>{item.icon}</span>
+                  <span style={{ flex: 1 }}>{item.label}</span>
+                </Link>
+              );
             })}
           </div>
         )}
