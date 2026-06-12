@@ -1,9 +1,107 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/ui/PageHeader';
 
+// ── Exportar relatório para Excel ─────────────────────────────
+async function exportToExcel(data, filterBranch) {
+  const { utils, writeFile } = await import('xlsx');
+
+  const rows = [];
+  for (const tool of data) {
+    const branches = filterBranch
+      ? tool.branches.filter(b => b.branch_name === filterBranch)
+      : tool.branches;
+    for (const b of branches) {
+      rows.push({
+        'Ferramenta':            tool.tool_name,
+        'Observação Ferramenta': tool.tool_notes || '',
+        'Filial':                b.branch_name,
+        'Quantidade':            b.quantity,
+        'Armazenado em':         b.storage_location || '',
+        'Observações':           b.notes || '',
+        'Atualizado por':        b.updated_by || '',
+      });
+    }
+    if (branches.length === 0) {
+      rows.push({
+        'Ferramenta': tool.tool_name,
+        'Observação Ferramenta': tool.tool_notes || '',
+        'Filial': filterBranch || '(sem filial)',
+        'Quantidade': 0,
+        'Armazenado em': '',
+        'Observações': '',
+        'Atualizado por': '',
+      });
+    }
+  }
+
+  const ws = utils.json_to_sheet(rows);
+  const wb = utils.book_new();
+  utils.book_append_sheet(wb, ws, 'Estoque Central');
+  const now = new Date();
+  const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  writeFile(wb, `estoque-central-${stamp}.xlsx`);
+}
+
+// ── Modal: Nova Ferramenta no catálogo ────────────────────────
+function ModalNovaFerramenta({ onClose, onSaved }) {
+  const [name, setName] = useState('');
+  const [qty, setQty] = useState(1);
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    if (!name.trim()) { toast.error('Informe o nome da ferramenta'); return; }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/ferramental/tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), default_quantity: qty, notes: notes.trim() || null }),
+      });
+      if (!res.ok) { const d = await res.json(); toast.error(d.error || 'Erro ao salvar'); return; }
+      toast.success('Ferramenta adicionada ao catálogo');
+      onSaved();
+      onClose();
+    } catch { toast.error('Erro de conexão'); }
+    finally { setSaving(false); }
+  }
+
+  const fieldStyle = { width: '100%', padding: '0.65rem 0.85rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit' };
+  const labelStyle = { fontSize: '0.72rem', fontWeight: '800', color: '#555555', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
+      <div style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: '10px', width: '100%', maxWidth: '420px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #eeeeee', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
+          <span style={{ fontSize: '0.9rem', fontWeight: '900', color: '#000000' }}>Nova Ferramenta no Catálogo</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666666' }}>✕</button>
+        </div>
+        <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+          <div>
+            <label style={labelStyle}>Nome da Ferramenta *</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: MULTÍMETRO DIGITAL" style={fieldStyle} autoFocus />
+          </div>
+          <div>
+            <label style={labelStyle}>Quantidade padrão por técnico</label>
+            <input type="number" min={1} value={qty} onChange={e => setQty(parseInt(e.target.value) || 1)} style={fieldStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Observação (ex: aviso de devolução)</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Opcional..." style={{ ...fieldStyle, resize: 'vertical' }} />
+          </div>
+          <button onClick={save} disabled={saving} style={{ width: '100%', padding: '0.8rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '900', cursor: saving ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}>
+            {saving ? 'SALVANDO...' : 'ADICIONAR AO CATÁLOGO'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Modal: Nova Filial para uma ferramenta ────────────────────
 function ModalNovaFilial({ toolId, toolName, existing, onClose, onSaved }) {
   const [branch, setBranch] = useState('');
   const [quantity, setQuantity] = useState(0);
@@ -49,7 +147,7 @@ function ModalNovaFilial({ toolId, toolName, existing, onClose, onSaved }) {
         <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           <div>
             <label style={labelStyle}>Nome da Filial *</label>
-            <input value={branch} onChange={e => setBranch(e.target.value)} placeholder="Ex: Curitiba, São Paulo..." style={fieldStyle} />
+            <input value={branch} onChange={e => setBranch(e.target.value)} placeholder="Ex: Curitiba, São Paulo..." style={fieldStyle} autoFocus />
           </div>
           <div>
             <label style={labelStyle}>Quantidade em Estoque</label>
@@ -72,6 +170,7 @@ function ModalNovaFilial({ toolId, toolName, existing, onClose, onSaved }) {
   );
 }
 
+// ── Linha editável de filial ──────────────────────────────────
 function BranchRow({ entry, onEdit, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [qty, setQty] = useState(entry.quantity);
@@ -155,12 +254,15 @@ function BranchRow({ entry, onEdit, onDelete }) {
   );
 }
 
+// ── Página principal ─────────────────────────────────────────
 export default function EstoqueCentralPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [searchTool, setSearchTool] = useState('');
+  const [filterBranch, setFilterBranch] = useState('');
   const [modal, setModal] = useState(null);
   const [expanded, setExpanded] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -174,22 +276,55 @@ export default function EstoqueCentralPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = data.filter(t => t.tool_name.toLowerCase().includes(search.toLowerCase()));
+  // Todas as filiais únicas para o filtro
+  const allBranches = useMemo(() => {
+    const set = new Set();
+    data.forEach(t => t.branches.forEach(b => set.add(b.branch_name)));
+    return [...set].sort();
+  }, [data]);
 
-  const totalFiliais = data.reduce((s, t) => s + t.branches.length, 0);
-  const totalItens = data.reduce((s, t) => s + t.branches.reduce((ss, b) => ss + b.quantity, 0), 0);
-  const ferramentasComEstoque = data.filter(t => t.branches.some(b => b.quantity > 0)).length;
+  // Filtragem: ferramenta por nome + filial
+  const filtered = useMemo(() => {
+    return data
+      .filter(t => t.tool_name.toLowerCase().includes(searchTool.toLowerCase()))
+      .map(t => ({
+        ...t,
+        branches: filterBranch ? t.branches.filter(b => b.branch_name === filterBranch) : t.branches,
+      }));
+  }, [data, searchTool, filterBranch]);
+
+  const totalFiliais   = allBranches.length;
+  const totalItens     = data.reduce((s, t) => s + t.branches.reduce((ss, b) => ss + b.quantity, 0), 0);
+  const comEstoque     = data.filter(t => t.branches.some(b => b.quantity > 0)).length;
+
+  async function handleExport() {
+    setExporting(true);
+    try { await exportToExcel(filtered, filterBranch); }
+    catch { toast.error('Erro ao gerar relatório'); }
+    finally { setExporting(false); }
+  }
 
   return (
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8' }}>
-      <PageHeader title="Estoque Central" subtitle="Controle de ferramentas disponíveis nas filiais" />
+      <PageHeader
+        title="Estoque Central"
+        subtitle="Controle de ferramentas disponíveis nas filiais"
+        actions={
+          <button
+            onClick={() => setModal({ type: 'nova_ferramenta' })}
+            style={{ padding: '0.6rem 1.1rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase' }}
+          >
+            + Nova Ferramenta
+          </button>
+        }
+      />
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
           { label: 'Filiais cadastradas', value: totalFiliais },
           { label: 'Itens em estoque', value: totalItens, color: totalItens > 0 ? '#22c55e' : '#888888' },
-          { label: 'Ferramentas c/ estoque', value: `${ferramentasComEstoque}/${data.length}` },
+          { label: 'Ferramentas c/ estoque', value: `${comEstoque}/${data.length}` },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem' }}>
             <div style={{ fontSize: '1.8rem', fontWeight: '900', color: kpi.color || '#000000' }}>{kpi.value}</div>
@@ -198,16 +333,27 @@ export default function EstoqueCentralPage() {
         ))}
       </div>
 
-      {/* Barra de busca */}
-      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '0.85rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+      {/* Filtros + Exportar */}
+      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '0.85rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar ferramenta..."
-          style={{ flex: 1, padding: '0.5rem 0.75rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.85rem', outline: 'none' }}
+          value={searchTool}
+          onChange={e => setSearchTool(e.target.value)}
+          placeholder="Filtrar por ferramenta..."
+          style={{ flex: 1, minWidth: '180px', padding: '0.5rem 0.75rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.85rem', outline: 'none' }}
         />
-        <button onClick={load} style={{ padding: '0.5rem 1rem', border: '1px solid #dddddd', borderRadius: '6px', background: 'transparent', color: '#666666', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
+        <select
+          value={filterBranch}
+          onChange={e => setFilterBranch(e.target.value)}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.85rem', outline: 'none', minWidth: '160px', cursor: 'pointer' }}
+        >
+          <option value="">Todas as filiais</option>
+          {allBranches.map(b => <option key={b} value={b}>{b}</option>)}
+        </select>
+        <button onClick={load} style={{ padding: '0.5rem 0.9rem', border: '1px solid #dddddd', borderRadius: '6px', background: 'transparent', color: '#666666', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
           ↻ Atualizar
+        </button>
+        <button onClick={handleExport} disabled={exporting || loading} style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '6px', background: '#16a34a', color: '#ffffff', fontSize: '0.8rem', fontWeight: '800', cursor: exporting ? 'not-allowed' : 'pointer', opacity: exporting ? 0.7 : 1 }}>
+          {exporting ? 'Gerando...' : '↓ Exportar Excel'}
         </button>
       </div>
 
@@ -216,32 +362,34 @@ export default function EstoqueCentralPage() {
         <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888888', fontWeight: '700' }}>Carregando...</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {filtered.length === 0 && (
+            <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '3rem', textAlign: 'center', color: '#888888', fontWeight: '700' }}>
+              Nenhuma ferramenta encontrada.
+            </div>
+          )}
           {filtered.map(tool => {
             const isOpen = expanded === tool.tool_id;
             const totalQty = tool.branches.reduce((s, b) => s + b.quantity, 0);
 
             return (
               <div key={tool.tool_id} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', overflow: 'hidden' }}>
-                {/* Cabeçalho da ferramenta */}
+                {/* Cabeçalho */}
                 <div
                   onClick={() => setExpanded(isOpen ? null : tool.tool_id)}
                   style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', userSelect: 'none' }}
                 >
-                  <span style={{ fontSize: '0.75rem', color: isOpen ? '#000000' : '#888888', fontWeight: '900', transition: 'transform 0.15s', display: 'inline-block', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                  <span style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '900', display: 'inline-block', transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>▶</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: '800', fontSize: '0.88rem', color: '#000000' }}>{tool.tool_name}</div>
                     {tool.tool_notes && <div style={{ fontSize: '0.7rem', color: '#f59e0b', marginTop: '0.15rem' }}>⚠ {tool.tool_notes}</div>}
                   </div>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '600' }}>{tool.branches.length} filial(is)</span>
-                    <span style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '800',
-                      background: totalQty === 0 ? '#fef2f2' : '#f0fdf4',
-                      color: totalQty === 0 ? '#ef4444' : '#22c55e',
-                    }}>
+                    <span style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '800', background: totalQty === 0 ? '#fef2f2' : '#f0fdf4', color: totalQty === 0 ? '#ef4444' : '#22c55e' }}>
                       {totalQty} em estoque
                     </span>
                     <button
-                      onClick={e => { e.stopPropagation(); setModal({ toolId: tool.tool_id, toolName: tool.tool_name, existing: tool.branches }); }}
+                      onClick={e => { e.stopPropagation(); setModal({ type: 'nova_filial', toolId: tool.tool_id, toolName: tool.tool_name, existing: tool.branches }); }}
                       style={{ padding: '0.3rem 0.75rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer' }}
                     >
                       + Filial
@@ -280,7 +428,11 @@ export default function EstoqueCentralPage() {
         </div>
       )}
 
-      {modal && (
+      {/* Modais */}
+      {modal?.type === 'nova_ferramenta' && (
+        <ModalNovaFerramenta onClose={() => setModal(null)} onSaved={load} />
+      )}
+      {modal?.type === 'nova_filial' && (
         <ModalNovaFilial
           toolId={modal.toolId}
           toolName={modal.toolName}
