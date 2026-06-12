@@ -1,0 +1,231 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { formatDate } from '@/lib/utils';
+
+const STATUS_CONFIG = {
+  aguardando_aprovacao: { label: 'Aguard. Aprovação', color: '#f59e0b', bg: '#fef3c7' },
+  aprovado:             { label: 'Aprovado',           color: '#22c55e', bg: '#dcfce7' },
+  reprovado:            { label: 'Reprovado',          color: '#ef4444', bg: '#fee2e2' },
+  aguardando_envio:     { label: 'Aguard. Envio',      color: '#60a5fa', bg: '#dbeafe' },
+  enviando:             { label: 'Enviando',           color: '#a78bfa', bg: '#ede9fe' },
+  pendente:             { label: 'Pendente',           color: '#fb923c', bg: '#ffedd5' },
+  aguardando_compra:    { label: 'Aguard. Compra',     color: '#f472b6', bg: '#fce7f3' },
+  cancelado:            { label: 'Cancelado',          color: '#9ca3af', bg: '#f3f4f6' },
+  entregue:             { label: 'Entregue',           color: '#10b981', bg: '#d1fae5' },
+};
+
+function StatusPill({ status }) {
+  const cfg = STATUS_CONFIG[status] || { label: status, color: '#888888', bg: '#f3f4f6' };
+  return (
+    <span style={{ padding: '0.2rem 0.55rem', borderRadius: '20px', fontSize: '0.68rem', fontWeight: '800', color: cfg.color, background: cfg.bg, whiteSpace: 'nowrap' }}>
+      {cfg.label}
+    </span>
+  );
+}
+
+function KpiCard({ label, value, color, sub, href }) {
+  const inner = (
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', padding: '1.25rem 1.5rem', borderLeft: `4px solid ${color || '#000000'}`, height: '100%', transition: 'box-shadow 0.15s' }}>
+      <div style={{ fontSize: '2rem', fontWeight: '900', color: color || '#000000', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#888888', marginTop: '0.4rem', textTransform: 'uppercase' }}>{label}</div>
+      {sub && <div style={{ fontSize: '0.7rem', color: '#aaaaaa', marginTop: '0.2rem' }}>{sub}</div>}
+    </div>
+  );
+  if (href) return <Link href={href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
+  return inner;
+}
+
+export default function FerramentalDashboardPage() {
+  const { data: session } = useSession();
+  const [requests, setRequests] = useState([]);
+  const [stock, setStock] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [reqRes, stockRes] = await Promise.all([
+        fetch('/api/ferramental/requests'),
+        fetch('/api/ferramental/central-stock'),
+      ]);
+      const [reqData, stockData] = await Promise.all([reqRes.json(), stockRes.json()]);
+      setRequests(Array.isArray(reqData) ? reqData : []);
+      setStock(Array.isArray(stockData) ? stockData : []);
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  // ── KPIs de solicitações ──
+  const total          = requests.length;
+  const aguardando     = requests.filter(r => r.status === 'aguardando_aprovacao').length;
+  const emAndamento    = requests.filter(r => ['aprovado', 'aguardando_envio', 'enviando', 'pendente'].includes(r.status)).length;
+  const entregues      = requests.filter(r => r.status === 'entregue').length;
+  const aguardaCompra  = requests.filter(r => r.status === 'aguardando_compra').length;
+
+  // ── KPIs de estoque central ──
+  const totalItensEstoque = stock.reduce((s, t) => s + t.branches.reduce((ss, b) => ss + b.quantity, 0), 0);
+  const ferramentasSemEstoque = stock.filter(t => t.branches.every(b => b.quantity === 0) || t.branches.length === 0).length;
+
+  // ── Distribuição por status ──
+  const byStatus = Object.entries(
+    requests.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, {})
+  ).sort((a, b) => b[1] - a[1]);
+
+  // ── Últimas 8 solicitações ──
+  const recentes = [...requests]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 8);
+
+  const now = new Date();
+  const greeting = now.getHours() < 12 ? 'Bom dia' : now.getHours() < 18 ? 'Boa tarde' : 'Boa noite';
+
+  return (
+    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: '900', color: '#000000', letterSpacing: '-0.02em' }}>
+          {greeting}, {session?.user?.name?.split(' ')[0] || 'Analista'}
+        </h1>
+        <p style={{ fontSize: '0.85rem', color: '#888888', marginTop: '0.3rem', fontWeight: '500' }}>
+          Dashboard Ferramental — visão geral das solicitações e estoque
+        </p>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '4rem', color: '#888888', fontWeight: '700' }}>Carregando...</div>
+      ) : (
+        <>
+          {/* KPIs principais */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+            <KpiCard label="Total de Solicitações" value={total} color="#000000" href="/ferramental" />
+            <KpiCard label="Aguardando Aprovação" value={aguardando} color="#f59e0b" sub="ação do gestor" href="/ferramental?status=aguardando_aprovacao" />
+            <KpiCard label="Em Andamento" value={emAndamento} color="#60a5fa" sub="aprovadas / enviando" href="/ferramental" />
+            <KpiCard label="Entregues" value={entregues} color="#10b981" href="/ferramental?status=entregue" />
+            <KpiCard label="Aguard. Compra" value={aguardaCompra} color="#f472b6" href="/ferramental?status=aguardando_compra" />
+          </div>
+
+          {/* Linha: status breakdown + estoque central */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.75rem' }}>
+
+            {/* Distribuição por status */}
+            <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>Por Status</span>
+                <Link href="/ferramental" style={{ fontSize: '0.72rem', color: '#888888', textDecoration: 'none', fontWeight: '700' }}>Ver tudo →</Link>
+              </div>
+              {byStatus.length === 0 ? (
+                <div style={{ color: '#bbbbbb', fontSize: '0.82rem', textAlign: 'center', padding: '1.5rem' }}>Sem dados</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {byStatus.map(([status, count]) => {
+                    const cfg = STATUS_CONFIG[status] || { label: status, color: '#888888', bg: '#f3f4f6' };
+                    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                    return (
+                      <div key={status}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#333333' }}>{cfg.label}</span>
+                          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: cfg.color }}>{count}</span>
+                        </div>
+                        <div style={{ height: '4px', borderRadius: '4px', background: '#f0f0f0', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${pct}%`, background: cfg.color, borderRadius: '4px', transition: 'width 0.4s' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Estoque central resumo */}
+            <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>Estoque Central</span>
+                <Link href="/ferramental/estoque-central" style={{ fontSize: '0.72rem', color: '#888888', textDecoration: 'none', fontWeight: '700' }}>Gerenciar →</Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ background: '#f8f8f8', borderRadius: '8px', padding: '0.85rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: totalItensEstoque > 0 ? '#10b981' : '#ef4444' }}>{totalItensEstoque}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#888888', fontWeight: '700', marginTop: '0.2rem', textTransform: 'uppercase' }}>Itens em estoque</div>
+                </div>
+                <div style={{ background: '#f8f8f8', borderRadius: '8px', padding: '0.85rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: ferramentasSemEstoque > 0 ? '#f59e0b' : '#10b981' }}>{ferramentasSemEstoque}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#888888', fontWeight: '700', marginTop: '0.2rem', textTransform: 'uppercase' }}>Ferramentas sem estoque</div>
+                </div>
+              </div>
+              {/* Top ferramentas com estoque */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                {stock.filter(t => t.branches.some(b => b.quantity > 0)).slice(0, 4).map(tool => {
+                  const qty = tool.branches.reduce((s, b) => s + b.quantity, 0);
+                  return (
+                    <div key={tool.tool_id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.35rem 0', borderBottom: '1px solid #f5f5f5' }}>
+                      <span style={{ fontSize: '0.75rem', color: '#333333', fontWeight: '600', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '0.5rem' }}>{tool.tool_name}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#10b981', flexShrink: 0 }}>{qty} un.</span>
+                    </div>
+                  );
+                })}
+                {stock.filter(t => t.branches.some(b => b.quantity > 0)).length === 0 && (
+                  <div style={{ fontSize: '0.78rem', color: '#bbbbbb', textAlign: 'center', padding: '1rem', fontStyle: 'italic' }}>Nenhum estoque registrado</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Últimas solicitações */}
+          <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', overflow: 'hidden' }}>
+            <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>Últimas Solicitações</span>
+              <Link href="/ferramental" style={{ fontSize: '0.72rem', color: '#888888', textDecoration: 'none', fontWeight: '700' }}>Ver todas →</Link>
+            </div>
+            {recentes.length === 0 ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#bbbbbb', fontSize: '0.85rem' }}>Nenhuma solicitação ainda.</div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                  <thead>
+                    <tr style={{ background: '#fafafa' }}>
+                      {['#', 'Técnico', 'Ferramenta', 'Status', 'Data'].map(h => (
+                        <th key={h} style={{ padding: '0.65rem 1rem', textAlign: 'left', fontSize: '0.68rem', fontWeight: '800', color: '#888888', textTransform: 'uppercase', borderBottom: '1px solid #eeeeee' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentes.map((r, i) => (
+                      <tr key={r.id} style={{ borderBottom: '1px solid #f8f8f8', background: i % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                        <td style={{ padding: '0.65rem 1rem', color: '#aaaaaa', fontWeight: '700' }}>#{r.id}</td>
+                        <td style={{ padding: '0.65rem 1rem', fontWeight: '700', color: '#000000' }}>{r.technician_name}</td>
+                        <td style={{ padding: '0.65rem 1rem', color: '#444444', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.tool_name}</td>
+                        <td style={{ padding: '0.65rem 1rem' }}><StatusPill status={r.status} /></td>
+                        <td style={{ padding: '0.65rem 1rem', color: '#888888', whiteSpace: 'nowrap', fontSize: '0.75rem' }}>{formatDate(r.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Links rápidos */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginTop: '1.5rem' }}>
+            {[
+              { href: '/ferramental', label: 'Solicitações', desc: 'Aprovar e atualizar status' },
+              { href: '/ferramental/estoque', label: 'Estoque por Técnico', desc: 'Ferramentas em posse' },
+              { href: '/ferramental/estoque-central', label: 'Estoque Central', desc: 'Filiais e localizações' },
+              { href: '/cadastro-tecnicos', label: 'Cadastro Técnicos', desc: 'Gerenciar técnicos' },
+            ].map(link => (
+              <Link key={link.href} href={link.href} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1rem', textDecoration: 'none', display: 'block', transition: 'border-color 0.15s' }}>
+                <div style={{ fontWeight: '800', fontSize: '0.82rem', color: '#000000' }}>{link.label}</div>
+                <div style={{ fontSize: '0.72rem', color: '#aaaaaa', marginTop: '0.2rem' }}>{link.desc}</div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

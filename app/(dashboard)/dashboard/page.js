@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
@@ -24,6 +26,16 @@ const STATUS_COLORS = {
 };
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session?.user?.role === 'analista_custo') {
+      router.replace('/ferramental/dashboard');
+      return;
+    }
+  }, [session, router]);
+
   const [filters, setFilters] = useState({ from: '', to: '', technicianId: '', status: '' });
   const [technicians, setTechnicians] = useState([]);
   const [data, setData] = useState(null);
