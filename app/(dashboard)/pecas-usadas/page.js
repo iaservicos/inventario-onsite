@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import * as XLSX from 'xlsx';
 import PageHeader from '@/components/ui/PageHeader';
@@ -71,6 +71,62 @@ export default function PecasUsadasPage() {
   const [error,            setError]            = useState('');
   const [syncMessage,      setSyncMessage]      = useState('');
   const [searchFilter,     setSearchFilter]     = useState('');
+  const [filterSupervisor, setFilterSupervisor] = useState('');
+  const [summaryMode,      setSummaryMode]      = useState(false);
+  const [summaryData,      setSummaryData]      = useState(null);
+  const [summaryLoading,   setSummaryLoading]   = useState(false);
+  const [codeSearch,       setCodeSearch]       = useState('');
+  const [codeResults,      setCodeResults]      = useState(null);
+  const [codeLoading,      setCodeLoading]      = useState(false);
+
+  const canSeeSupervisor = ['admin', 'coordinator'].includes(session?.user?.role);
+
+  const supervisors = useMemo(() => {
+    const names = [...new Set(technicians.map(t => t.supervisor_name).filter(Boolean))];
+    return names.sort();
+  }, [technicians]);
+
+  const techsForDropdown = useMemo(() => {
+    if (!filterSupervisor) return technicians;
+    return technicians.filter(t => t.supervisor_name === filterSupervisor);
+  }, [technicians, filterSupervisor]);
+
+  async function loadSupervisorSummary() {
+    if (!filterSupervisor) return;
+    setSummaryLoading(true);
+    setError('');
+    try {
+      const res  = await fetch(`/api/technician-used-items/summary?supervisor=${encodeURIComponent(filterSupervisor)}`);
+      const data = await res.json();
+      if (res.ok) { setSummaryData(data); setSummaryMode(true); }
+      else setError(data.error || 'Erro ao carregar resumo');
+    } catch { setError('Erro de conexão'); }
+    setSummaryLoading(false);
+  }
+
+  function handleSupervisorChange(sup) {
+    setFilterSupervisor(sup);
+    setSummaryMode(false);
+    setSummaryData(null);
+    setSelectedTech('');
+    setSelectedTechName('');
+    setItems([]);
+    setSearchFilter('');
+  }
+
+  async function handleCodeSearch(e) {
+    e.preventDefault();
+    if (!codeSearch.trim()) return;
+    setCodeLoading(true);
+    setError('');
+    try {
+      const res  = await fetch(`/api/technician-used-items/by-code?code=${encodeURIComponent(codeSearch.trim())}`);
+      const data = await res.json();
+      if (res.ok) setCodeResults(data);
+      else setError(data.error || 'Erro na busca');
+    } catch { setError('Erro de conexão'); }
+    setCodeLoading(false);
+  }
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -288,16 +344,27 @@ export default function PecasUsadasPage() {
 
       {/* Seleção de técnico + filtro + exportar */}
       <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap' }}>
+
+        {/* Supervisor (admin/coordinator) */}
+        {canSeeSupervisor && (
+          <div style={{ minWidth: '220px' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#000', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Supervisor
+            </label>
+            <select
+              className="input"
+              value={filterSupervisor}
+              onChange={e => handleSupervisorChange(e.target.value)}
+              style={{ height: '44px', fontSize: '0.9rem', fontWeight: '600' }}
+            >
+              <option value="">— Todos —</option>
+              {supervisors.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        )}
+
         <div style={{ flex: 1, minWidth: '260px' }}>
-          <label style={{
-            display: 'block',
-            fontSize: '0.75rem',
-            fontWeight: '800',
-            color: '#000000',
-            marginBottom: '0.5rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-          }}>
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#000000', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             Selecionar Técnico
           </label>
           <select
@@ -308,11 +375,12 @@ export default function PecasUsadasPage() {
               const tech = technicians.find(t => String(t.id) === e.target.value);
               setSelectedTechName(tech?.name || '');
               setSearchFilter('');
+              setSummaryMode(false);
             }}
             style={{ height: '44px', fontSize: '0.95rem', fontWeight: '600' }}
           >
             <option value="">— Escolha um técnico —</option>
-            {technicians.map(t => (
+            {techsForDropdown.map(t => (
               <option key={t.id} value={t.id}>{t.name} ({t.region})</option>
             ))}
           </select>
@@ -320,15 +388,7 @@ export default function PecasUsadasPage() {
 
         {selectedTech && items.length > 0 && (
           <div style={{ flex: 1, minWidth: '200px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.75rem',
-              fontWeight: '800',
-              color: '#000000',
-              marginBottom: '0.5rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-            }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#000000', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Filtrar peças
             </label>
             <input
@@ -343,16 +403,143 @@ export default function PecasUsadasPage() {
         )}
 
         {selectedTech && filteredItems.length > 0 && (
-          <button
-            className="btn btn-primary"
-            onClick={handleExportExcel}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px' }}
-          >
+          <button className="btn btn-primary" onClick={handleExportExcel} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px' }}>
             <IconDownload />
             Exportar Excel
           </button>
         )}
+
+        {canSeeSupervisor && filterSupervisor && !selectedTech && (
+          <button
+            onClick={loadSupervisorSummary}
+            disabled={summaryLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px', padding: '0 1.25rem', background: summaryLoading ? '#e5e7eb' : '#111', color: summaryLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: summaryLoading ? 'not-allowed' : 'pointer' }}
+          >
+            {summaryLoading ? 'Carregando...' : `Resumo — ${filterSupervisor}`}
+          </button>
+        )}
+
+        {summaryMode && (
+          <button onClick={() => { setSummaryMode(false); setSummaryData(null); }} style={{ height: '44px', padding: '0 1.25rem', background: 'transparent', border: '2px solid #000', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+            ← Voltar
+          </button>
+        )}
       </div>
+
+      {/* Busca por código de peça */}
+      <div className="card" style={{ marginBottom: '2rem' }}>
+        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#000', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          Buscar por Código de Peça
+        </div>
+        <form onSubmit={handleCodeSearch} style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <input
+            type="text"
+            className="input"
+            placeholder="Digite o código da peça..."
+            value={codeSearch}
+            onChange={e => { setCodeSearch(e.target.value); if (!e.target.value) setCodeResults(null); }}
+            style={{ flex: 1, minWidth: '220px', height: '44px', fontWeight: '600', textTransform: 'uppercase' }}
+          />
+          <button type="submit" disabled={codeLoading || !codeSearch.trim()} style={{ height: '44px', padding: '0 1.25rem', background: codeLoading ? '#e5e7eb' : '#111', color: codeLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: codeLoading ? 'not-allowed' : 'pointer' }}>
+            {codeLoading ? 'Buscando...' : 'Buscar'}
+          </button>
+          {codeResults && (
+            <button type="button" onClick={() => { setCodeResults(null); setCodeSearch(''); }} style={{ height: '44px', padding: '0 1rem', background: 'transparent', border: '2px solid #000', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
+              Limpar
+            </button>
+          )}
+        </form>
+      </div>
+
+      {/* Resumo do supervisor */}
+      {summaryMode && summaryData && (
+        <div className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '2rem' }}>
+          <div style={{ padding: '1.25rem 1.5rem', background: '#f0f0f0', borderBottom: '2px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000' }}>
+              Resumo — {filterSupervisor}
+              <span style={{ marginLeft: '0.5rem', background: '#000', color: '#fff', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>{summaryData.total} peça(s)</span>
+              <span style={{ marginLeft: '0.5rem', color: '#555', fontSize: '0.8rem', fontWeight: '600' }}>{summaryData.technicians?.length} técnico(s)</span>
+            </div>
+          </div>
+          <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: '120px' }}>Código</th>
+                  <th>Nome da Peça</th>
+                  <th style={{ width: '90px', textAlign: 'center' }}>Total Qtd</th>
+                  <th style={{ width: '80px', textAlign: 'center' }}>Status</th>
+                  <th style={{ width: '120px' }}>Subgrupo</th>
+                  <th>Técnicos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {summaryData.items.map(item => (
+                  <tr key={item.item_code}>
+                    <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
+                    <td style={{ fontWeight: '700', fontSize: '0.95rem' }}>{item.item_name}</td>
+                    <td style={{ fontWeight: '900', textAlign: 'center', fontSize: '1.05rem' }}>{item.total_quantity}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      {item.status_consumo && <span style={{ background: '#111', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '800' }}>{item.status_consumo}</span>}
+                    </td>
+                    <td style={{ fontWeight: '800', fontSize: '0.85rem' }}>{item.item_subgroup || 'OUTROS'}</td>
+                    <td style={{ fontSize: '0.82rem', color: '#333' }}>{item.technicians.map(t => `${t.name} (${t.quantity})`).join(' · ')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Resultados busca por código */}
+      {codeResults && !summaryMode && (
+        <div className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '2rem' }}>
+          <div style={{ padding: '1.25rem 1.5rem', background: '#f0f0f0', borderBottom: '2px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000' }}>
+              Busca: "{codeSearch.toUpperCase()}"
+              <span style={{ marginLeft: '0.5rem', background: '#000', color: '#fff', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>{codeResults.total} resultado(s)</span>
+              {codeResults.total > 0 && <span style={{ marginLeft: '0.5rem', color: '#555', fontSize: '0.8rem', fontWeight: '600' }}>Total: {codeResults.total_quantity} unidade(s)</span>}
+            </div>
+          </div>
+          {codeResults.total === 0 ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#666', fontWeight: '600' }}>Nenhum técnico possui esta peça usada.</div>
+          ) : (
+            <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{ width: '120px' }}>Código</th>
+                    <th>Nome da Peça</th>
+                    <th style={{ width: '80px', textAlign: 'center' }}>Qtd</th>
+                    <th style={{ width: '130px' }}>Chamado</th>
+                    <th style={{ width: '80px', textAlign: 'center' }}>Status</th>
+                    <th>Técnico</th>
+                    <th style={{ width: '150px' }}>Supervisor</th>
+                    <th style={{ width: '100px' }}>Região</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {codeResults.results.map((r, i) => (
+                    <tr key={i}>
+                      <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{r.item_code}</code></td>
+                      <td style={{ fontWeight: '700', fontSize: '0.95rem' }}>{r.item_name}</td>
+                      <td style={{ fontWeight: '900', textAlign: 'center', fontSize: '1.05rem' }}>{r.item_quantity}</td>
+                      <td style={{ fontWeight: '700', fontSize: '0.85rem' }}>{r.chamado_consumo || '—'}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        {r.status_consumo && <span style={{ background: '#111', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '800' }}>{r.status_consumo}</span>}
+                      </td>
+                      <td style={{ fontWeight: '700' }}>{r.technician_name}</td>
+                      <td style={{ fontSize: '0.85rem', color: '#444' }}>{r.supervisor_name || '—'}</td>
+                      <td style={{ fontSize: '0.85rem', color: '#444' }}>{r.technician_region || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tabela de peças usadas */}
       {selectedTech && !loading && filteredItems.length > 0 && (
