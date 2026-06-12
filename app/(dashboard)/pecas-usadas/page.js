@@ -142,7 +142,7 @@ export default function PecasUsadasPage() {
   function handleExportExcel() {
     if (filteredItems.length === 0) return;
 
-    const rows = [['Código', 'Nome da Peça', 'Quantidade', 'Remessa', 'ATP Centro', 'ATP Nome', 'Chamado', 'Status', 'Subgrupo']];
+    const rows = [['Código', 'Nome da Peça', 'Quantidade', 'Remessa', 'ATP Centro', 'ATP Nome', 'Chamado', 'Encerramento', 'Status', 'Subgrupo']];
     filteredItems.forEach(item => {
       rows.push([
         item.item_code,
@@ -152,13 +152,14 @@ export default function PecasUsadasPage() {
         item.atp_centro || '—',
         item.atp_nome || '—',
         item.chamado_aplicado || '—',
+        item.data_encerramento ? new Date(item.data_encerramento).toLocaleDateString('pt-BR') : '—',
         item.status_consumo || '—',
         item.item_subgroup || 'OUTROS',
       ]);
     });
 
     const ws = XLSX.utils.json_to_sheet(rows.slice(1), { header: rows[0] });
-    ws['!cols'] = [{ wch: 15 }, { wch: 35 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 10 }, { wch: 15 }];
+    ws['!cols'] = [{ wch: 15 }, { wch: 35 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 15 }];
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Peças Usadas');
@@ -424,6 +425,7 @@ export default function PecasUsadasPage() {
                   <th style={{ width: '130px' }}>Remessa</th>
                   <th style={{ width: '170px' }}>ATP</th>
                   <th style={{ width: '130px' }}>Chamado</th>
+                  <th style={{ width: '120px' }}>Encerramento</th>
                   <th style={{ width: '80px', textAlign: 'center' }}>Status</th>
                   <th style={{ width: '120px' }}>Subgrupo</th>
                 </tr>
@@ -459,6 +461,11 @@ export default function PecasUsadasPage() {
                     </td>
                     <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.85rem' }}>
                       {item.chamado_aplicado || '—'}
+                    </td>
+                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.85rem' }}>
+                      {item.data_encerramento
+                        ? new Date(item.data_encerramento).toLocaleDateString('pt-BR')
+                        : '—'}
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       {item.status_consumo ? (
