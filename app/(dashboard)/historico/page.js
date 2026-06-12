@@ -10,7 +10,8 @@ const STATUS_OPTIONS = [
   { value: '', label: 'Todos os status' },
   { value: 'in_progress', label: 'Em andamento' },
   { value: 'completed', label: 'Concluído' },
-  { value: 'recount_pending', label: 'Recontagem' },
+  { value: 'recount_pending', label: '1ª Contagem' },
+  { value: 'dispatched', label: 'Recontagem' },
   { value: 'cancelled', label: 'Cancelado' },
 ];
 

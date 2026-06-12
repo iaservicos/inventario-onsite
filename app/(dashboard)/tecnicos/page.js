@@ -87,14 +87,14 @@ export default function TecnicosPage() {
           </div>
 
           {/* Tabela de técnicos */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '2rem' }}>
-            <div style={{ padding: '1rem 1.5rem', borderBottom: '2px solid #000', background: '#f9f9f9' }}>
+          <div className="card" style={{ padding: 0, marginBottom: '2rem' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '2px solid #000', background: '#f9f9f9', borderRadius: '8px 8px 0 0' }}>
               <span style={{ fontSize: '0.85rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Desempenho por Técnico
               </span>
             </div>
-            <div className="table-wrapper" style={{ border: 'none' }}>
-              <table>
+            <div style={{ overflowX: 'auto', width: '100%' }}>
+              <table style={{ minWidth: '780px' }}>
                 <thead>
                   <tr>
                     <th>Técnico</th>

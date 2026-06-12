@@ -126,8 +126,22 @@ export default function DivergenciasPage() {
       if (ids.length > 0) params.set('technicianIds', ids.join(','));
     }
     const res = await fetch(`/api/divergences?${params}`);
-    const json = await res.json();
-    setDivergences(json);
+    const all = await res.json();
+
+    // Quando há recontagem, ocultar a divergência da 1ª contagem (status 'open')
+    // para o mesmo técnico + item_code
+    if (!filters.status) {
+      const recounted = new Set(
+        all
+          .filter(d => ['recount', 'tratativa', 'validated', 'adjusted'].includes(d.status))
+          .map(d => `${d.technician_id}|${d.item_code}`)
+      );
+      setDivergences(all.filter(d =>
+        !(d.status === 'open' && recounted.has(`${d.technician_id}|${d.item_code}`))
+      ));
+    } else {
+      setDivergences(all);
+    }
     setLoading(false);
   }, [filters]);
 
