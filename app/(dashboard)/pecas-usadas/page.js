@@ -151,7 +151,7 @@ export default function PecasUsadasPage() {
         item.item_num_remessa || '—',
         item.atp_centro || '—',
         item.atp_nome || '—',
-        item.chamado_aplicado || '—',
+        item.chamado_consumo || '—',
         item.data_encerramento ? new Date(item.data_encerramento).toLocaleDateString('pt-BR') : '—',
         item.status_consumo || '—',
         item.item_subgroup || 'OUTROS',
@@ -460,7 +460,7 @@ export default function PecasUsadasPage() {
                       <div style={{ color: '#666666', fontSize: '0.75rem', fontWeight: '600' }}>{item.atp_nome || '—'}</div>
                     </td>
                     <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.85rem' }}>
-                      {item.chamado_aplicado || '—'}
+                      {item.chamado_consumo || '—'}
                     </td>
                     <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.85rem' }}>
                       {item.data_encerramento

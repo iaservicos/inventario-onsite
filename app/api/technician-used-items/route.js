@@ -38,7 +38,7 @@ export async function GET(request) {
 
     const { data: items, error: itemsError } = await supabase
       .from('technician_used_items')
-      .select('id, item_code, item_name, item_subgroup, item_quantity, item_num_remessa, atp_centro, atp_nome, status_consumo, chamado_aplicado, data_encerramento, synced_at, sync_batch_id, active')
+      .select('id, item_code, item_name, item_subgroup, item_quantity, item_num_remessa, atp_centro, atp_nome, status_consumo, chamado_consumo, data_encerramento, synced_at, sync_batch_id, active')
       .eq('technician_id', technicianId)
       .eq('active', true)
       .order('item_code', { ascending: true });
@@ -76,7 +76,7 @@ export async function GET(request) {
       atp_centro:        item.atp_centro,
       atp_nome:          item.atp_nome,
       status_consumo:    item.status_consumo,
-      chamado_aplicado:  item.chamado_aplicado,
+      chamado_consumo:   item.chamado_consumo,
       data_encerramento: item.data_encerramento,
       active:            item.active,
       synced_at:         item.synced_at,

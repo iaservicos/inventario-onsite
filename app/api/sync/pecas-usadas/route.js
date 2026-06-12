@@ -86,7 +86,7 @@ async function runSync(triggeredBy) {
         atp_centro:        String(item.atp_centro || '').trim(),
         atp_nome:          String(item.atp_nome || '').trim(),
         status_consumo:    String(item.status_consumo || '').trim() || null,
-        chamado_aplicado:  String(item.chamado_aplicado || '').trim() || null,
+        chamado_consumo:   String(item.chamado_consumo || '').trim() || null,
         data_encerramento: item.data_encerramento || null,
         active:            true,
         synced_at:         syncedAt,

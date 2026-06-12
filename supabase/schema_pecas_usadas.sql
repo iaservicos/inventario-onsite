@@ -1,4 +1,5 @@
 -- Pecas Usadas - criacao e migracao
+-- View: vw_inventario_onsite_usado_rmdf
 -- Execute no SQL Editor do Supabase
 
 CREATE TABLE IF NOT EXISTS technician_used_items (
@@ -11,6 +12,9 @@ CREATE TABLE IF NOT EXISTS technician_used_items (
   item_num_remessa  TEXT,
   atp_centro        TEXT,
   atp_nome          TEXT,
+  status_consumo    TEXT,
+  chamado_consumo   TEXT,
+  data_encerramento TIMESTAMPTZ,
   active            BOOLEAN DEFAULT true,
   synced_at         TIMESTAMPTZ DEFAULT NOW(),
   sync_batch_id     TEXT,
@@ -20,7 +24,7 @@ CREATE TABLE IF NOT EXISTS technician_used_items (
 
 ALTER TABLE technician_used_items
   ADD COLUMN IF NOT EXISTS status_consumo    TEXT,
-  ADD COLUMN IF NOT EXISTS chamado_aplicado  TEXT,
+  ADD COLUMN IF NOT EXISTS chamado_consumo   TEXT,
   ADD COLUMN IF NOT EXISTS data_encerramento TIMESTAMPTZ;
 
 CREATE INDEX IF NOT EXISTS idx_tu_items_technician_id ON technician_used_items(technician_id);
