@@ -78,6 +78,7 @@ export default function Sidebar({ user, isOpen }) {
         {/* Inventário — oculto para analista_custo */}
         {!isAnalistaCusto && (
           <div>
+            <div style={{ fontSize: '0.6rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#555555', padding: '0 0.75rem', marginBottom: '0.5rem' }}>Gestão de Inventário</div>
             {NAV_ITEMS.map((item) => {
               const active = isActive(item.href);
               return (
