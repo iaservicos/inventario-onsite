@@ -503,44 +503,52 @@ export default function PecasPage() {
 
       {/* ── Resumo do supervisor ─────────────────────────────────────────── */}
       {summaryMode && summaryData && (
-        <div className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '2rem' }}>
-          <div style={{ padding: '1.25rem 1.5rem', background: '#f0f0f0', borderBottom: '2px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000' }}>
-              Resumo — {filterSupervisor}
-              <span style={{ marginLeft: '0.5rem', background: '#000', color: '#fff', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>
-                {summaryData.total} peça(s)
-              </span>
-              <span style={{ marginLeft: '0.5rem', color: '#555', fontSize: '0.8rem', fontWeight: '600' }}>
-                {summaryData.technicians?.length} técnico(s)
-              </span>
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000', marginBottom: '1rem' }}>
+            Resumo — {filterSupervisor}
+          </div>
+
+          {summaryData.technicians?.length === 0 && (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#666', background: '#f9f9f9', borderRadius: '10px', border: '2px dashed #d0d0d0', fontWeight: '600' }}>
+              Nenhum técnico ativo com peças para este supervisor.
             </div>
-          </div>
-          <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ width: '120px' }}>Código</th>
-                  <th>Nome da Peça</th>
-                  <th style={{ width: '90px', textAlign: 'center' }}>Total Qtd</th>
-                  <th style={{ width: '120px' }}>Subgrupo</th>
-                  <th>Técnicos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {summaryData.items.map(item => (
-                  <tr key={item.item_code}>
-                    <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
-                    <td style={{ fontWeight: '700', fontSize: '0.95rem' }}>{item.item_name}</td>
-                    <td style={{ fontWeight: '900', textAlign: 'center', fontSize: '1.05rem' }}>{item.total_quantity}</td>
-                    <td style={{ fontWeight: '800', fontSize: '0.85rem' }}>{item.item_subgroup || 'OUTROS'}</td>
-                    <td style={{ fontSize: '0.82rem', color: '#333' }}>
-                      {item.technicians.map(t => `${t.name} (${t.quantity})`).join(' · ')}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          )}
+
+          {summaryData.technicians?.map(tech => (
+            <div key={tech.id} className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '1.25rem' }}>
+              <div style={{ padding: '0.85rem 1.25rem', background: '#111', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontWeight: '900', fontSize: '0.9rem', color: '#fff' }}>{tech.name}</span>
+                {tech.region && <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: '600' }}>{tech.region}</span>}
+                <span style={{ marginLeft: 'auto', background: '#fff', color: '#000', borderRadius: '10px', padding: '1px 10px', fontSize: '0.75rem', fontWeight: '800' }}>
+                  {tech.items.length} peça(s)
+                </span>
+              </div>
+              <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style={{ width: '120px' }}>Código</th>
+                      <th>Nome da Peça</th>
+                      <th style={{ width: '90px', textAlign: 'center' }}>Qtd</th>
+                      <th style={{ width: '130px' }}>Remessa</th>
+                      <th style={{ width: '120px' }}>Subgrupo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tech.items.map(item => (
+                      <tr key={item.item_code}>
+                        <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
+                        <td style={{ fontWeight: '700', fontSize: '0.9rem' }}>{item.item_name}</td>
+                        <td style={{ fontWeight: '900', textAlign: 'center' }}>{item.item_quantity}</td>
+                        <td style={{ fontSize: '0.85rem', color: '#333' }}>{item.item_num_remessa || '—'}</td>
+                        <td style={{ fontWeight: '700', fontSize: '0.85rem' }}>{item.item_subgroup || 'OUTROS'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

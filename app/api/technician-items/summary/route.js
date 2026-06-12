@@ -1,6 +1,6 @@
 /**
  * GET /api/technician-items/summary?supervisor=NOME
- * Retorna pecas novas agregadas de todos os tecnicos de um supervisor.
+ * Retorna pecas novas agrupadas por tecnico (tecnico-first, ordem alfabetica).
  */
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
@@ -24,51 +24,51 @@ export async function GET(request) {
 
   const { data: techs } = await supabase
     .from('technicians')
-    .select('id, name')
+    .select('id, name, region')
     .eq('supervisor_name', supervisor)
     .eq('active', true)
     .order('name');
 
   if (!techs?.length) {
-    return NextResponse.json({ items: [], technicians: [], total: 0, last_sync: null });
+    return NextResponse.json({ technicians: [], last_sync: null });
   }
 
-  const techIds = techs.map(t => t.id);
-  const techMap = Object.fromEntries(techs.map(t => [t.id, t.name]));
+  const techIds  = techs.map(t => t.id);
+  const techById = Object.fromEntries(techs.map(t => [t.id, t]));
 
   const { data: rows, error } = await supabase
     .from('technician_items')
-    .select('item_code, item_name, item_subgroup, item_quantity, technician_id')
+    .select('item_code, item_name, item_subgroup, item_quantity, item_num_remessa, technician_id')
     .in('technician_id', techIds)
     .eq('active', true)
     .order('item_code');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  // Group by technician (alphabetical order preserved from query)
   const grouped = {};
   for (const row of (rows || [])) {
-    if (!grouped[row.item_code]) {
-      grouped[row.item_code] = {
-        item_code:      row.item_code,
-        item_name:      row.item_name,
-        item_subgroup:  row.item_subgroup,
-        total_quantity: 0,
-        technicians:    [],
-      };
+    const tech = techById[row.technician_id];
+    if (!tech) continue;
+    if (!grouped[tech.name]) {
+      grouped[tech.name] = { id: tech.id, name: tech.name, region: tech.region, items: [] };
     }
-    grouped[row.item_code].total_quantity += row.item_quantity || 0;
-    grouped[row.item_code].technicians.push({
-      name:     techMap[row.technician_id] || '?',
-      quantity: row.item_quantity || 0,
+    grouped[tech.name].items.push({
+      item_code:        row.item_code,
+      item_name:        row.item_name,
+      item_subgroup:    row.item_subgroup,
+      item_quantity:    row.item_quantity,
+      item_num_remessa: row.item_num_remessa,
     });
   }
 
-  const items = Object.values(grouped).sort((a, b) => a.item_code.localeCompare(b.item_code));
+  const technicians = Object.values(grouped)
+    .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
 
   const { data: lastSyncRaw } = await supabase
     .from('v_last_datalake_sync')
-    .select('finished_at, formatted_at, status, items_upserted')
+    .select('finished_at, formatted_at, status')
     .maybeSingle();
 
-  return NextResponse.json({ items, technicians: techs, total: items.length, last_sync: lastSyncRaw });
+  return NextResponse.json({ technicians, last_sync: lastSyncRaw });
 }

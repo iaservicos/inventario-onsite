@@ -1,6 +1,6 @@
 /**
  * GET /api/technician-used-items/summary?supervisor=NOME
- * Retorna pecas usadas agregadas de todos os tecnicos de um supervisor.
+ * Retorna pecas usadas agrupadas por tecnico (tecnico-first, ordem alfabetica).
  */
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
@@ -24,21 +24,21 @@ export async function GET(request) {
 
   const { data: techs } = await supabase
     .from('technicians')
-    .select('id, name')
+    .select('id, name, region')
     .eq('supervisor_name', supervisor)
     .eq('active', true)
     .order('name');
 
   if (!techs?.length) {
-    return NextResponse.json({ items: [], technicians: [], total: 0, last_sync: null });
+    return NextResponse.json({ technicians: [], last_sync: null });
   }
 
-  const techIds = techs.map(t => t.id);
-  const techMap = Object.fromEntries(techs.map(t => [t.id, t.name]));
+  const techIds  = techs.map(t => t.id);
+  const techById = Object.fromEntries(techs.map(t => [t.id, t]));
 
   const { data: rows, error } = await supabase
     .from('technician_used_items')
-    .select('item_code, item_name, item_subgroup, item_quantity, technician_id, status_consumo')
+    .select('item_code, item_name, item_subgroup, item_quantity, status_consumo, chamado_consumo, technician_id')
     .in('technician_id', techIds)
     .eq('active', true)
     .order('item_code');
@@ -47,28 +47,27 @@ export async function GET(request) {
 
   const grouped = {};
   for (const row of (rows || [])) {
-    if (!grouped[row.item_code]) {
-      grouped[row.item_code] = {
-        item_code:      row.item_code,
-        item_name:      row.item_name,
-        item_subgroup:  row.item_subgroup,
-        status_consumo: row.status_consumo,
-        total_quantity: 0,
-        technicians:    [],
-      };
+    const tech = techById[row.technician_id];
+    if (!tech) continue;
+    if (!grouped[tech.name]) {
+      grouped[tech.name] = { id: tech.id, name: tech.name, region: tech.region, items: [] };
     }
-    grouped[row.item_code].total_quantity += row.item_quantity || 0;
-    grouped[row.item_code].technicians.push({
-      name:     techMap[row.technician_id] || '?',
-      quantity: row.item_quantity || 0,
+    grouped[tech.name].items.push({
+      item_code:       row.item_code,
+      item_name:       row.item_name,
+      item_subgroup:   row.item_subgroup,
+      item_quantity:   row.item_quantity,
+      status_consumo:  row.status_consumo,
+      chamado_consumo: row.chamado_consumo,
     });
   }
 
-  const items = Object.values(grouped).sort((a, b) => a.item_code.localeCompare(b.item_code));
+  const technicians = Object.values(grouped)
+    .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
 
   const { data: lastSyncRaw } = await supabase
     .from('datalake_sync_log')
-    .select('finished_at, status, items_upserted')
+    .select('finished_at, status')
     .like('batch_id', 'sync-usadas-%')
     .eq('status', 'success')
     .order('finished_at', { ascending: false })
@@ -79,5 +78,5 @@ export async function GET(request) {
     ? { ...lastSyncRaw, formatted_at: lastSyncRaw.finished_at ? new Date(lastSyncRaw.finished_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : null }
     : null;
 
-  return NextResponse.json({ items, technicians: techs, total: items.length, last_sync: lastSync });
+  return NextResponse.json({ technicians, last_sync: lastSync });
 }
