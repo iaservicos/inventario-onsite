@@ -1,23 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/ui/PageHeader';
+
+const selSt = { width: '100%', padding: '0.65rem 0.9rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.82rem', fontWeight: '600', color: '#000', background: '#fff', cursor: 'pointer', outline: 'none' };
+const labelSt = { fontSize: '0.68rem', fontWeight: '800', color: '#888', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
 function QuantityControl({ value, onChange, disabled }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-      <button
-        onClick={() => onChange(Math.max(0, value - 1))}
-        disabled={disabled || value <= 0}
-        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #dddddd', background: value <= 0 ? '#f8f8f8' : '#ffffff', color: value <= 0 ? '#cccccc' : '#000000', fontSize: '1rem', fontWeight: '900', cursor: value <= 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-      >−</button>
-      <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: '800', fontSize: '0.9rem', color: value > 0 ? '#000000' : '#bbbbbb' }}>{value}</span>
-      <button
-        onClick={() => onChange(value + 1)}
-        disabled={disabled}
-        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #dddddd', background: '#ffffff', color: '#000000', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-      >+</button>
+      <button onClick={() => onChange(Math.max(0, value - 1))} disabled={disabled || value <= 0}
+        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: value <= 0 ? '#f8f8f8' : '#fff', color: value <= 0 ? '#ccc' : '#000', fontSize: '1rem', fontWeight: '900', cursor: value <= 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+      <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: '800', fontSize: '0.9rem', color: value > 0 ? '#000' : '#bbb' }}>{value}</span>
+      <button onClick={() => onChange(value + 1)} disabled={disabled}
+        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
     </div>
   );
 }
@@ -31,14 +28,34 @@ export default function FerramentalEstoquePage() {
   const [saving, setSaving] = useState({});
   const [dirty, setDirty] = useState({});
   const [localQty, setLocalQty] = useState({});
+  const [filterSup, setFilterSup] = useState('');
+  const [filterRegion, setFilterRegion] = useState('');
 
   useEffect(() => {
-    fetch('/api/technicians')
+    fetch('/api/technicians?active=true')
       .then(r => r.json())
-      .then(data => setTechnicians((data || []).filter(t => t.active !== false)))
+      .then(data => setTechnicians(Array.isArray(data) ? data : []))
       .catch(() => toast.error('Erro ao carregar técnicos'))
       .finally(() => setLoadingTechs(false));
   }, []);
+
+  // Listas únicas para os filtros
+  const supervisors = useMemo(() => [...new Set(technicians.map(t => t.supervisor_name).filter(Boolean))].sort(), [technicians]);
+  const regions     = useMemo(() => [...new Set(technicians.map(t => t.region).filter(Boolean))].sort(), [technicians]);
+
+  // Técnicos filtrados pelo supervisor e estado selecionados
+  const filteredTechs = useMemo(() => technicians.filter(t => {
+    if (filterSup    && t.supervisor_name !== filterSup)    return false;
+    if (filterRegion && t.region          !== filterRegion) return false;
+    return true;
+  }), [technicians, filterSup, filterRegion]);
+
+  // Quando o técnico selecionado sair da lista filtrada, limpa a seleção
+  useEffect(() => {
+    if (selectedId && !filteredTechs.find(t => t.id === parseInt(selectedId))) {
+      setSelectedId('');
+    }
+  }, [filteredTechs, selectedId]);
 
   const loadInventory = useCallback(async (techId) => {
     if (!techId) { setInventory([]); return; }
@@ -80,7 +97,7 @@ export default function FerramentalEstoquePage() {
 
   async function saveAll() {
     const dirtyIds = Object.keys(dirty).filter(id => dirty[id]);
-    if (dirtyIds.length === 0) { toast('Nenhuma alteração pendente'); return; }
+    if (!dirtyIds.length) { toast('Nenhuma alteração pendente'); return; }
     for (const id of dirtyIds) await saveItem(parseInt(id));
     toast.success(`${dirtyIds.length} item(s) salvo(s)`);
   }
@@ -93,39 +110,81 @@ export default function FerramentalEstoquePage() {
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader title="Estoque por Técnico" subtitle="Controle de ferramentas em posse de cada técnico" />
 
-      {/* Seletor de técnico */}
-      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: '260px' }}>
-          <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#888888', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
-            Selecionar Técnico
-          </label>
-          {loadingTechs ? (
-            <div style={{ padding: '0.75rem', border: '1px solid #eeeeee', borderRadius: '6px', color: '#888888', fontSize: '0.85rem' }}>Carregando técnicos...</div>
-          ) : (
-            <select
-              value={selectedId}
-              onChange={e => setSelectedId(e.target.value)}
-              style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', color: '#000000', background: '#ffffff', cursor: 'pointer', outline: 'none' }}
-            >
-              <option value="">— Selecione um técnico —</option>
-              {technicians.map(t => (
-                <option key={t.id} value={t.id}>
-                  {t.name}{t.supervisor_name ? ` (${t.supervisor_name})` : ''}
-                </option>
-              ))}
+      {/* Filtros + seletor */}
+      <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
+
+          {/* Filtro Supervisor */}
+          <div>
+            <label style={labelSt}>Supervisor</label>
+            <select value={filterSup} onChange={e => { setFilterSup(e.target.value); setSelectedId(''); }} style={selSt}>
+              <option value="">Todos os supervisores</option>
+              {supervisors.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
+          </div>
+
+          {/* Filtro Estado */}
+          <div>
+            <label style={labelSt}>Estado (UF)</label>
+            <select value={filterRegion} onChange={e => { setFilterRegion(e.target.value); setSelectedId(''); }} style={selSt}>
+              <option value="">Todos os estados</option>
+              {regions.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+
+          {/* Seletor técnico */}
+          <div style={{ gridColumn: 'span 1' }}>
+            <label style={labelSt}>
+              Técnico
+              {filteredTechs.length > 0 && (
+                <span style={{ marginLeft: '0.4rem', fontWeight: '600', color: '#aaa', textTransform: 'none' }}>({filteredTechs.length} disponíveis)</span>
+              )}
+            </label>
+            {loadingTechs ? (
+              <div style={{ padding: '0.65rem 0.9rem', border: '1px solid #eee', borderRadius: '6px', color: '#aaa', fontSize: '0.82rem' }}>Carregando...</div>
+            ) : (
+              <select value={selectedId} onChange={e => setSelectedId(e.target.value)} style={selSt}>
+                <option value="">— Selecione um técnico —</option>
+                {filteredTechs.map(t => (
+                  <option key={t.id} value={t.id}>{t.name}{t.supervisor_name ? ` (${t.supervisor_name})` : ''}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Ações */}
+          {selectedTech && (
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', paddingBottom: '0' }}>
+              {hasDirty && (
+                <button onClick={saveAll} style={{ padding: '0.65rem 1.1rem', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                  Salvar Tudo
+                </button>
+              )}
+              <button onClick={() => loadInventory(selectedId)} style={{ padding: '0.65rem 1rem', background: 'transparent', color: '#666', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                ↻ Recarregar
+              </button>
+            </div>
           )}
         </div>
 
-        {selectedTech && (
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            {hasDirty && (
-              <button onClick={saveAll} style={{ padding: '0.65rem 1.25rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase' }}>
-                Salvar Tudo
-              </button>
+        {/* Limpar filtros */}
+        {(filterSup || filterRegion) && (
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.72rem', color: '#888' }}>Filtros ativos:</span>
+            {filterSup && (
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: '#f0f0f0', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                {filterSup}
+                <button onClick={() => setFilterSup('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
+              </span>
             )}
-            <button onClick={() => loadInventory(selectedId)} style={{ padding: '0.65rem 1.25rem', background: 'transparent', color: '#666666', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
-              ↻ Recarregar
+            {filterRegion && (
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: '#f0f0f0', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                {filterRegion}
+                <button onClick={() => setFilterRegion('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
+              </span>
+            )}
+            <button onClick={() => { setFilterSup(''); setFilterRegion(''); setSelectedId(''); }} style={{ fontSize: '0.72rem', color: '#ef4444', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', marginLeft: '0.25rem' }}>
+              Limpar tudo
             </button>
           </div>
         )}
@@ -133,97 +192,94 @@ export default function FerramentalEstoquePage() {
 
       {/* Info do técnico selecionado */}
       {selectedTech && (
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div>
-            <div style={{ fontSize: '0.7rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase' }}>Técnico</div>
-            <div style={{ fontWeight: '900', fontSize: '1rem', color: '#000000', marginTop: '0.2rem' }}>{selectedTech.name}</div>
+            <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Técnico</div>
+            <div style={{ fontWeight: '900', fontSize: '1rem', color: '#000', marginTop: '0.2rem' }}>{selectedTech.name}</div>
           </div>
           {selectedTech.supervisor_name && (
             <div>
-              <div style={{ fontSize: '0.7rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase' }}>Supervisor</div>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#333333', marginTop: '0.2rem' }}>{selectedTech.supervisor_name}</div>
+              <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Supervisor</div>
+              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#333', marginTop: '0.2rem' }}>{selectedTech.supervisor_name}</div>
             </div>
           )}
           {selectedTech.region && (
             <div>
-              <div style={{ fontSize: '0.7rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase' }}>Região</div>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#333333', marginTop: '0.2rem' }}>{selectedTech.region}</div>
+              <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Estado</div>
+              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#333', marginTop: '0.2rem' }}>{selectedTech.region}</div>
             </div>
           )}
           <div>
-            <div style={{ fontSize: '0.7rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase' }}>Ferramentas em posse</div>
-            <div style={{ fontWeight: '900', fontSize: '1rem', color: totalFerramentas > 0 ? '#22c55e' : '#888888', marginTop: '0.2rem' }}>{totalFerramentas} / {inventory.length}</div>
+            <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Ferramentas em posse</div>
+            <div style={{ fontWeight: '900', fontSize: '1rem', color: totalFerramentas > 0 ? '#22c55e' : '#888', marginTop: '0.2rem' }}>{totalFerramentas} / {inventory.length}</div>
           </div>
         </div>
       )}
 
       {/* Grid de ferramentas */}
       {!selectedId ? (
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888888', fontWeight: '700' }}>
-          Selecione um técnico para visualizar e gerenciar suas ferramentas.
+        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>
+          {filteredTechs.length === 0 && (filterSup || filterRegion)
+            ? 'Nenhum técnico ativo encontrado para os filtros selecionados.'
+            : 'Selecione um técnico para visualizar e gerenciar suas ferramentas.'}
         </div>
       ) : loadingInv ? (
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888888', fontWeight: '700' }}>
+        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>
           Carregando ferramentas...
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-          <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
-              <thead>
-                <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #eeeeee' }}>
-                  <th style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontWeight: '800', color: '#333333', textTransform: 'uppercase', fontSize: '0.7rem' }}>Ferramenta</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333333', textTransform: 'uppercase', fontSize: '0.7rem' }}>Qtd. Padrão</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333333', textTransform: 'uppercase', fontSize: '0.7rem' }}>Em Posse</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333333', textTransform: 'uppercase', fontSize: '0.7rem' }}>Status</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333333', textTransform: 'uppercase', fontSize: '0.7rem' }}>Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inventory.map((item, idx) => {
-                  const qty = localQty[item.tool_id] ?? 0;
-                  const isDirtyItem = dirty[item.tool_id];
-                  const isSaving = saving[item.tool_id];
-                  const temFerramentas = qty > 0;
-                  const temTudo = qty >= item.default_qty;
+        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+            <thead>
+              <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #eee' }}>
+                <th style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ferramenta</th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Qtd. Padrão</th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Em Posse</th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Status</th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {inventory.map((item, idx) => {
+                const qty = localQty[item.tool_id] ?? 0;
+                const isDirtyItem = dirty[item.tool_id];
+                const isSaving = saving[item.tool_id];
+                const temFerramentas = qty > 0;
+                const temTudo = qty >= item.default_qty;
 
-                  return (
-                    <tr key={item.tool_id} style={{ borderBottom: '1px solid #f0f0f0', background: isDirtyItem ? '#fffbeb' : idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                      <td style={{ padding: '0.85rem 1.25rem' }}>
-                        <div style={{ fontWeight: '700', color: '#000000' }}>{item.tool_name}</div>
-                        {item.tool_notes && (
-                          <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>
-                        )}
-                      </td>
-                      <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: '700', color: '#888888' }}>{item.default_qty}</td>
-                      <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
-                        <QuantityControl value={qty} onChange={(v) => handleQtyChange(item.tool_id, v)} disabled={isSaving} />
-                      </td>
-                      <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
-                        <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
-                          color: !temFerramentas ? '#ef4444' : temTudo ? '#22c55e' : '#f59e0b',
-                          background: !temFerramentas ? '#2a0a0a' : temTudo ? '#0a2a0a' : '#2a1a00',
-                        }}>
-                          {!temFerramentas ? 'Sem ferramenta' : temTudo ? 'Completo' : 'Parcial'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
-                        {isDirtyItem ? (
-                          <button onClick={() => saveItem(item.tool_id)} disabled={isSaving} style={{ padding: '0.35rem 0.75rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: isSaving ? 'not-allowed' : 'pointer' }}>
-                            {isSaving ? '...' : 'Salvar'}
-                          </button>
-                        ) : (
-                          <span style={{ fontSize: '0.72rem', color: '#22c55e', fontWeight: '700' }}>
-                            {item.updated_at ? '✓ Salvo' : '—'}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                return (
+                  <tr key={item.tool_id} style={{ borderBottom: '1px solid #f0f0f0', background: isDirtyItem ? '#fffbeb' : idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                    <td style={{ padding: '0.85rem 1.25rem' }}>
+                      <div style={{ fontWeight: '700', color: '#000' }}>{item.tool_name}</div>
+                      {item.tool_notes && <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
+                    </td>
+                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: '700', color: '#888' }}>{item.default_qty}</td>
+                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                      <QuantityControl value={qty} onChange={(v) => handleQtyChange(item.tool_id, v)} disabled={isSaving} />
+                    </td>
+                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                      <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
+                        color: !temFerramentas ? '#ef4444' : temTudo ? '#22c55e' : '#f59e0b',
+                        background: !temFerramentas ? '#2a0a0a' : temTudo ? '#0a2a0a' : '#2a1a00',
+                      }}>
+                        {!temFerramentas ? 'Sem ferramenta' : temTudo ? 'Completo' : 'Parcial'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                      {isDirtyItem ? (
+                        <button onClick={() => saveItem(item.tool_id)} disabled={isSaving}
+                          style={{ padding: '0.35rem 0.75rem', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: isSaving ? 'not-allowed' : 'pointer' }}>
+                          {isSaving ? '...' : 'Salvar'}
+                        </button>
+                      ) : (
+                        <span style={{ fontSize: '0.72rem', color: '#22c55e', fontWeight: '700' }}>{item.updated_at ? '✓ Salvo' : '—'}</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
