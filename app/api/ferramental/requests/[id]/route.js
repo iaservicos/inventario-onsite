@@ -12,7 +12,7 @@ export async function PATCH(req, { params }) {
 
     const { id } = params;
     const body = await req.json();
-    const { status, approval_notes, analyst_notes, technician_id } = body;
+    const { status, approval_notes, analyst_notes, technician_id, delivery_method, tracking_code } = body;
 
     const GESTOR_STATUSES = ['aprovado', 'reprovado'];
     const ANALISTA_STATUSES = ['aguardando_envio', 'enviando', 'pendente', 'aguardando_compra', 'cancelado', 'entregue'];
@@ -36,6 +36,8 @@ export async function PATCH(req, { params }) {
     if (approval_notes !== undefined) fields.approval_notes = approval_notes;
     if (analyst_notes !== undefined) fields.analyst_notes = analyst_notes;
     if (technician_id !== undefined) fields.technician_id = technician_id || null;
+    if (delivery_method !== undefined) fields.delivery_method = delivery_method || null;
+    if (tracking_code !== undefined) fields.tracking_code = tracking_code?.trim() || null;
 
     if (GESTOR_STATUSES.includes(status)) {
       fields.approved_by = session.user.name;
@@ -65,7 +67,7 @@ export async function PATCH(req, { params }) {
   }
 }
 
-export async function GET(req, { params }) {
+export async function GET(_, { params }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !['admin', 'supervisor', 'analista_custo'].includes(session.user.role)) {

@@ -44,10 +44,13 @@ function StatusBadge({ status }) {
 function ModalAcao({ request, role, onClose, onUpdated }) {
   const [status, setStatus] = useState('');
   const [notes, setNotes] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState('');
+  const [trackingCode, setTrackingCode] = useState('');
   const [saving, setSaving] = useState(false);
 
   const isGestor = ['admin', 'supervisor'].includes(role);
   const isAnalista = role === 'analista_custo' || role === 'admin';
+  const showDelivery = isAnalista && status === 'enviando';
 
   const transitions = isGestor && request.status === 'aguardando_aprovacao'
     ? GESTOR_TRANSITIONS
@@ -57,16 +60,23 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
 
   async function save() {
     if (!status) { toast.error('Selecione um status'); return; }
+    if (showDelivery && !deliveryMethod) { toast.error('Selecione o método de envio'); return; }
+    if (showDelivery && deliveryMethod === 'correio' && !trackingCode.trim()) {
+      toast.error('Informe o código de postagem'); return;
+    }
     setSaving(true);
     try {
+      const body = {
+        status,
+        approval_notes:  isGestor ? notes || undefined : undefined,
+        analyst_notes:   isAnalista && !isGestor ? notes || undefined : undefined,
+        delivery_method: showDelivery ? deliveryMethod : undefined,
+        tracking_code:   showDelivery && deliveryMethod === 'correio' ? trackingCode.trim() : undefined,
+      };
       const res = await fetch(`/api/ferramental/requests/${request.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status,
-          approval_notes: isGestor ? notes : undefined,
-          analyst_notes:  isAnalista && !isGestor ? notes : undefined,
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) { const d = await res.json(); toast.error(d.error || 'Erro ao salvar'); return; }
       toast.success('Status atualizado');
@@ -76,41 +86,83 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
     finally { setSaving(false); }
   }
 
+  const fieldStyle = { width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', background: '#222222', border: '1px solid #333333', color: '#ffffff', fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit' };
+  const labelStyle = { fontSize: '0.72rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '12px', width: '100%', maxWidth: '480px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '12px', width: '100%', maxWidth: '500px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
         <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #2a2a2a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#ffffff' }}>Atualizar Solicitação</span>
+          <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#ffffff' }}>Atualizar Solicitação #{request.id}</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
         </div>
 
         <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Info da solicitação */}
+          {/* Info */}
           <div style={{ background: '#111111', border: '1px solid #2a2a2a', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', color: '#aaaaaa', lineHeight: '1.6' }}>
-            <div><strong style={{ color: '#ffffff' }}>{request.technician_name}</strong> — {request.technician_email}</div>
-            <div style={{ marginTop: '0.25rem' }}>{request.tool_name}</div>
-            {request.comment && <div style={{ marginTop: '0.25rem', fontStyle: 'italic', color: '#777777' }}>"{request.comment}"</div>}
+            <div><strong style={{ color: '#ffffff' }}>{request.technician_name}</strong>{request.technician_email ? ` — ${request.technician_email}` : ''}</div>
+            <div style={{ marginTop: '0.2rem', color: '#cccccc', fontWeight: '600' }}>{request.tool_name}</div>
+            {request.comment && <div style={{ marginTop: '0.2rem', fontStyle: 'italic', color: '#666666' }}>"{request.comment}"</div>}
+            {request.delivery_method && (
+              <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: '#60a5fa' }}>
+                Último envio: {request.delivery_method === 'correio' ? `Correio${request.tracking_code ? ` — ${request.tracking_code}` : ''}` : 'Pessoalmente'}
+              </div>
+            )}
           </div>
 
           {transitions.length > 0 ? (
             <>
+              {/* Seletor de status */}
               <div>
-                <label style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>Novo Status *</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <label style={labelStyle}>Novo Status *</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                   {transitions.map(t => (
-                    <button key={t.value} onClick={() => setStatus(t.value)} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: `1px solid ${status === t.value ? '#ffffff' : '#333333'}`, background: status === t.value ? '#ffffff' : 'transparent', color: status === t.value ? '#000000' : '#888888', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
+                    <button key={t.value} onClick={() => { setStatus(t.value); setDeliveryMethod(''); setTrackingCode(''); }}
+                      style={{ padding: '0.45rem 0.9rem', borderRadius: '8px', border: `1px solid ${status === t.value ? '#ffffff' : '#333333'}`, background: status === t.value ? '#ffffff' : 'transparent', color: status === t.value ? '#000000' : '#888888', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
                       {t.label}
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Método de envio — só aparece quando status = enviando */}
+              {showDelivery && (
+                <div style={{ background: '#111111', border: '1px solid #2a2a2a', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div>
+                    <label style={labelStyle}>Método de Envio *</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      {[{ value: 'correio', label: 'Via Correio' }, { value: 'pessoalmente', label: 'Pessoalmente' }].map(m => (
+                        <button key={m.value} onClick={() => setDeliveryMethod(m.value)}
+                          style={{ flex: 1, padding: '0.6rem', borderRadius: '8px', border: `1px solid ${deliveryMethod === m.value ? '#60a5fa' : '#333333'}`, background: deliveryMethod === m.value ? '#0a1a2a' : 'transparent', color: deliveryMethod === m.value ? '#60a5fa' : '#888888', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {deliveryMethod === 'correio' && (
+                    <div>
+                      <label style={labelStyle}>Código de Postagem *</label>
+                      <input
+                        value={trackingCode}
+                        onChange={e => setTrackingCode(e.target.value)}
+                        placeholder="Ex: AA123456789BR"
+                        style={fieldStyle}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Observação */}
               <div>
-                <label style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>Observação</label>
-                <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Opcional..." rows={3} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#222222', border: '1px solid #333333', color: '#ffffff', fontSize: '0.85rem', resize: 'vertical', outline: 'none', fontFamily: 'inherit' }} />
+                <label style={labelStyle}>Observação</label>
+                <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Opcional..." rows={2}
+                  style={{ ...fieldStyle, resize: 'vertical', minHeight: '64px' }} />
               </div>
 
-              <button onClick={save} disabled={saving || !status} style={{ width: '100%', padding: '0.85rem', background: saving || !status ? '#333333' : '#ffffff', color: saving || !status ? '#666666' : '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: saving || !status ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}>
+              <button onClick={save} disabled={saving || !status}
+                style={{ width: '100%', padding: '0.85rem', background: saving || !status ? '#2a2a2a' : '#ffffff', color: saving || !status ? '#555555' : '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: saving || !status ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}>
                 {saving ? 'SALVANDO...' : 'CONFIRMAR'}
               </button>
             </>
