@@ -67,6 +67,7 @@ function ModalUsuario({ usuario, onClose, onSaved, saving, supervisores }) {
                 <option value="supervisor">Supervisor</option>
                 <option value="coordinator">Coordenador</option>
                 <option value="analyst">Analista</option>
+                <option value="analista_custo">Analista de Frota e Custos</option>
               </select>
             </Field>
           </div>
