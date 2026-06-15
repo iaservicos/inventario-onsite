@@ -486,8 +486,8 @@ export default function PecasUsadasPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {tech.items.map(item => (
-                      <tr key={item.item_code}>
+                    {tech.items.map((item, idx) => (
+                      <tr key={`${item.item_code}-${idx}`}>
                         <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
                         <td style={{ fontWeight: '700', fontSize: '0.9rem' }}>{item.item_name}</td>
                         <td style={{ fontWeight: '900', textAlign: 'center' }}>{item.item_quantity}</td>
