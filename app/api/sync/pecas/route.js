@@ -38,6 +38,8 @@ function detectSubgroup(name) {
   if (firstWord === 'LCD') return 'LCD';
   if (firstWord === 'BATER') return 'Bateria';
   if (firstWord === 'PROC') return 'Processador';
+  // Acessórios que contêm palavras de outros subgrupos no nome mas não pertencem a eles
+  if (firstWord === 'CABO' || firstWord === 'HEAT' || firstWord === 'SUPORTE' || firstWord === 'KIT') return 'Outros';
 
   // Fallback para busca por palavras-chave se a primeira palavra não bater
   const n = name.toUpperCase();

@@ -19,6 +19,8 @@ function detectSubgroup(name) {
   if (firstWord === 'LCD') return 'LCD';
   if (firstWord === 'BATER') return 'Bateria';
   if (firstWord === 'PROC') return 'Processador';
+  // Acessórios que contêm palavras de outros subgrupos no nome mas não pertencem a eles
+  if (firstWord === 'CABO' || firstWord === 'HEAT' || firstWord === 'SUPORTE' || firstWord === 'KIT') return 'Outros';
 
   // Fallback para busca por palavras-chave se a primeira palavra não bater
   const n = name.toUpperCase();
@@ -49,6 +51,10 @@ const testCases = [
   { name: 'MOUSE OPTICO USB', expected: 'Outros' },
   { name: 'PLACA MAE DESKTOP', expected: 'PLM' }, // Fallback
   { name: 'DISCO RIGIDO EXTERNO', expected: 'SSD/HD' }, // Fallback
+  { name: 'HEAT SINK PARA SSD M.2 SEA SHARK JEYI', expected: 'Outros' },
+  { name: 'CABO SATA HD GAB POS UFPG01 MINIPRO', expected: 'Outros' },
+  { name: 'SUPORTE PARA HD 2.5', expected: 'Outros' },
+  { name: 'KIT BATERIA LI-ION', expected: 'Outros' },
 ];
 
 console.log('--- INICIANDO TESTES DE SUBGRUPOS ---\n');
