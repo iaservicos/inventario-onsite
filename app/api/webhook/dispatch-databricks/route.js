@@ -14,14 +14,10 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTechnicianItems } from '@/lib/databricks';
 import { getConsolidatedTechnicianItems } from '@/lib/db';
-import crypto from 'crypto';
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
-
-const GPTMAKER_API_URL = 'https://api.gptmaker.ai/v2/send-message';
 
 function getWeekRef(date = new Date()) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -220,82 +216,13 @@ export async function POST(request) {
     .update({ inventory_id: inventory.id, updated_at: new Date().toISOString() })
     .eq('id', schedule_id);
 
-  // Cria sessão GPT Maker
-  const sessionToken = crypto.randomBytes(32).toString('hex');
-  const firstItem = items[0];
-
-  const { error: sessionError } = await supabase
-    .from('gptmaker_sessions')
-    .insert({
-      inventory_id: inventory.id,
-      technician_id: technician.id,
-      phone: technician.phone || '',
-      technician_phone: technician.phone || '',
-      technician_name: technician.name,
-      session_token: sessionToken,
-      current_item_index: 0,
-      status: 'active',
-      last_message_at: new Date().toISOString(),
-      renotify_count: 0,
-      schedule_id: schedule_id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-  if (sessionError) {
-    console.error('[dispatch-databricks] Erro ao criar sessão:', sessionError.message);
-  }
-
-  // Monta e envia a primeira mensagem via GPT Maker
-  const firstName = technician.name.split(' ')[0];
-  const subgroupLabel = scheduledSubgroup ? ` — subgrupo *${scheduledSubgroup}*` : '';
-  const firstMessage =
-    `Olá, ${firstName}! 👋\n\n` +
-    `É hora do inventário semanal — semana *${weekRef}*${subgroupLabel}.\n\n` +
-    `Vamos contar *${items.length} peça(s)*. Responda apenas com o número de cada uma.\n\n` +
-    `📦 *Peça 1 de ${items.length}*\n` +
-    `*${firstItem.item_name}*\n` +
-    `Código: \`${firstItem.item_code}\`\n` +
-    `Quantidade esperada: *${Number(firstItem.item_quantity) || 0}*\n\n` +
-    `Quantas unidades você tem agora?`;
-
-  let dispatched = false;
-  let dispatchError = null;
-
-  if (technician.phone && process.env.GPTMAKER_API_TOKEN) {
-    try {
-      const res = await fetch(GPTMAKER_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.GPTMAKER_API_TOKEN}`,
-        },
-        body: JSON.stringify({
-          phone: technician.phone,
-          message: firstMessage,
-          custom_fields: { session_token: sessionToken },
-        }),
-      });
-      dispatched = res.ok;
-      if (!res.ok) dispatchError = await res.text();
-    } catch (e) {
-      dispatchError = e.message;
-    }
-  } else {
-    dispatchError = !technician.phone
-      ? 'Técnico sem telefone cadastrado'
-      : 'GPTMAKER_API_TOKEN não configurado';
-  }
-
   return NextResponse.json({
-    ok: true,
+    ok:          true,
     inventory_id: inventory.id,
-    technician: technician.name,
-    week_ref: weekRef,
-    subgroup: scheduledSubgroup,
+    technician:  technician.name,
+    week_ref:    weekRef,
+    subgroup:    scheduledSubgroup,
     items_count: items.length,
-    qty_source: databricksSource ? 'databricks' : 'technician_items',
-    dispatched,
-    dispatch_error: dispatchError,
+    qty_source:  databricksSource ? 'databricks' : 'technician_items',
   });
 }

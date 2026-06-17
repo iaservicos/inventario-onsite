@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth/[...nextauth]/route';
 import { createServiceClient } from '@/lib/supabase';
 
-const GPTMAKER_API_URL = 'https://api.gptmaker.ai/v2/send-message';
-
 export async function POST(request, { params }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -63,40 +61,12 @@ export async function POST(request, { params }) {
     .update({ status: 'recount_pending', updated_at: new Date().toISOString() })
     .eq('id', inventoryId);
 
-  // 5. Dispara via GPT Maker
-  let dispatched = false;
-  let dispatchError = null;
-
-  if (tech?.phone && process.env.GPTMAKER_API_TOKEN) {
-    try {
-      const res = await fetch(GPTMAKER_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.GPTMAKER_API_TOKEN}`,
-        },
-        body: JSON.stringify({
-          phone: tech.phone,
-          message,
-        }),
-      });
-      dispatched = res.ok;
-      if (!res.ok) dispatchError = await res.text();
-    } catch (e) {
-      dispatchError = e.message;
-    }
-  } else {
-    dispatchError = !tech?.phone
-      ? 'Técnico sem telefone cadastrado'
-      : 'GPTMAKER_API_TOKEN não configurado';
-  }
-
-  // 6. Alerta para o supervisor
+  // 5. Alerta para o supervisor
   await supabase.from('alerts').insert({
     type:          'recount',
     severity:      'medium',
     title:         `Recontagem iniciada — ${techName}`,
-    description:   `${recountItems.length} peça(s) divergente(s) enviadas para recontagem. ${dispatched ? 'Mensagem enviada ao técnico.' : 'Falha no envio: ' + dispatchError}`,
+    description:   `${recountItems.length} peça(s) divergente(s) aguardando recontagem.`,
     technician_id: inventory.technician_id,
     inventory_id:  inventoryId,
     resolved:      false,
@@ -107,7 +77,5 @@ export async function POST(request, { params }) {
     ok:               true,
     inventory_id:     inventoryId,
     items_to_recount: recountItems.length,
-    dispatched,
-    dispatch_error:   dispatchError,
   });
 }
