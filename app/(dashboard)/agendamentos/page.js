@@ -22,6 +22,16 @@ function formatTime(iso) {
   });
 }
 
+// Calcula semana ISO (ex: "2026-W25") a partir de uma string de data local
+function getWeekRef(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00Z');
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
 // ── Seção: Subgrupos (só carrega estado próprio) ──────────────────────────────
 function SubgruposSection() {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -126,7 +136,8 @@ function SubgruposSection() {
               </thead>
               <tbody>
                 {agendamentos.map(ag => {
-                  const changed = pendingChanges[ag.id] !== undefined;
+                  const isGeneral = ag.inventory_type === 'general';
+                  const changed = !isGeneral && pendingChanges[ag.id] !== undefined;
                   const currentSubgroup = changed ? pendingChanges[ag.id] : ag.scheduled_subgroup;
                   const isSaving = savingId === ag.id;
 
@@ -138,7 +149,9 @@ function SubgruposSection() {
                       <td style={{ fontSize: '0.85rem' }}>{formatTime(ag.scheduled_at)}</td>
                       <td><span className="badge badge-info">{ag.week_ref || '—'}</span></td>
                       <td>
-                        {ag.available_subgroups.length > 0 ? (
+                        {isGeneral ? (
+                          <span className="badge badge-ok" style={{ fontSize: '0.7rem' }}>INVENTÁRIO GERAL</span>
+                        ) : ag.available_subgroups.length > 0 ? (
                           <select
                             value={currentSubgroup || ''}
                             onChange={e => setPendingChanges(prev => ({ ...prev, [ag.id]: e.target.value }))}
@@ -180,6 +193,129 @@ function SubgruposSection() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Seção: Inventário Geral ───────────────────────────────────────────────────
+function InventarioGeralSection({ onMsg }) {
+  const [tecnicos, setTecnicos] = useState([]);
+  const [selectedTech, setSelectedTech] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('09:00');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/technicians?active=true')
+      .then(r => r.json())
+      .then(d => {
+        const list = Array.isArray(d) ? d : [];
+        setTecnicos(list.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')));
+      })
+      .catch(() => {});
+  }, []);
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const handleSubmit = async () => {
+    if (!selectedTech || !date) {
+      onMsg?.({ type: 'error', text: 'SELECIONE O TÉCNICO E A DATA' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const scheduledAt = new Date(`${date}T${time}:00-03:00`).toISOString();
+      const weekRef = getWeekRef(date);
+
+      const res = await fetch('/api/schedules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          technician_id: Number(selectedTech),
+          scheduled_at: scheduledAt,
+          week_ref: weekRef,
+          inventory_type: 'general',
+        }),
+      });
+
+      if (res.ok) {
+        onMsg?.({ type: 'success', text: 'INVENTÁRIO GERAL AGENDADO COM SUCESSO' });
+        setSelectedTech('');
+        setDate('');
+        setTime('09:00');
+      } else {
+        const err = await res.json();
+        onMsg?.({ type: 'error', text: (err.error || 'ERRO AO AGENDAR').toUpperCase() });
+      }
+    } catch {
+      onMsg?.({ type: 'error', text: 'ERRO DE CONEXÃO' });
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: '1rem' }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: '800', margin: 0 }}>Inventário Geral</h2>
+        <p style={{ fontSize: '0.75rem', color: '#666', margin: '0.2rem 0 0' }}>
+          Agenda um inventário completo (todas as peças) para o técnico selecionado
+        </p>
+      </div>
+
+      <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <div style={{ flex: '2', minWidth: '200px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: '700', display: 'block', marginBottom: '0.3rem' }}>
+            Técnico
+          </label>
+          <select
+            value={selectedTech}
+            onChange={e => setSelectedTech(e.target.value)}
+            className="input"
+            style={{ width: '100%' }}
+          >
+            <option value="">— Selecione —</option>
+            {tecnicos.map(t => (
+              <option key={t.id} value={t.id}>{t.name} ({t.region || '—'})</option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ flex: '1', minWidth: '140px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: '700', display: 'block', marginBottom: '0.3rem' }}>
+            Data
+          </label>
+          <input
+            type="date"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            className="input"
+            style={{ width: '100%' }}
+            min={today}
+          />
+        </div>
+
+        <div style={{ flex: '1', minWidth: '100px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: '700', display: 'block', marginBottom: '0.3rem' }}>
+            Horário
+          </label>
+          <input
+            type="time"
+            value={time}
+            onChange={e => setTime(e.target.value)}
+            className="input"
+            style={{ width: '100%' }}
+          />
+        </div>
+
+        <button
+          className="btn btn-primary"
+          onClick={handleSubmit}
+          disabled={loading || !selectedTech || !date}
+          style={{ whiteSpace: 'nowrap' }}
+        >
+          {loading ? 'Agendando...' : 'Agendar Inventário Geral'}
+        </button>
+      </div>
     </div>
   );
 }
@@ -357,7 +493,9 @@ export default function AgendamentosPage() {
     return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
   }
 
-  const isAdmin = session?.user?.role === 'admin';
+  const role = session?.user?.role;
+  const isAdmin = role === 'admin';
+  const isSupervisor = role === 'supervisor';
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -377,6 +515,14 @@ export default function AgendamentosPage() {
         }}>
           {msg.text}
         </div>
+      )}
+
+      {/* Inventário Geral: admin e supervisor */}
+      {(isAdmin || isSupervisor) && (
+        <>
+          <InventarioGeralSection onMsg={showMsg} />
+          <hr style={{ margin: '2.5rem 0', border: 'none', borderTop: '2px solid #eee' }} />
+        </>
       )}
 
       {/* Subgrupos: só admin vê */}

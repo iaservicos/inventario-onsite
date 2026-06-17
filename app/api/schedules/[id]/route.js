@@ -19,12 +19,14 @@ export async function PATCH(request, { params }) {
     const supabase = createServiceClient();
     const { data: sched } = await supabase
       .from('inventory_schedules')
-      .select('technician_id')
+      .select('technician_id, inventory_type')
       .eq('id', params.id)
       .single();
 
     if (sched) {
-      const items = await getConsolidatedTechnicianItems(supabase, sched.technician_id, body.scheduled_subgroup);
+      // General inventories always load all items (null subgroup filter)
+      const subgroupFilter = sched.inventory_type === 'general' ? null : body.scheduled_subgroup;
+      const items = await getConsolidatedTechnicianItems(supabase, sched.technician_id, subgroupFilter);
       body.scheduled_items = items;
       body.items_count = items.length;
     }

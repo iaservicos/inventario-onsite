@@ -65,16 +65,18 @@ export async function POST(req) {
       (sum, r) => sum + (Number(r.item_quantity) || 0), 0
     );
 
-    // Detecta se a peça pertence a subgrupo diferente do agendado para este inventário
+    // Busca dados do agendamento uma vez — reutilizado no check de subgrupo e no total_items
     const { data: scheduleData } = await supabase
       .from('inventory_schedules')
-      .select('scheduled_subgroup')
+      .select('scheduled_subgroup, inventory_type')
       .eq('inventory_id', inventory.id)
       .maybeSingle();
 
     const scheduledSubgroup = scheduleData?.scheduled_subgroup || null;
+    const isGeneralInventory = scheduleData?.inventory_type === 'general';
 
-    if (scheduledSubgroup && techItemRows && techItemRows.length > 0 && physQty > 0) {
+    // Inventario geral: todas as pecas sao validas, sem alerta de subgrupo
+    if (!isGeneralInventory && scheduledSubgroup && techItemRows && techItemRows.length > 0 && physQty > 0) {
       const inCurrentSubgroup = techItemRows.some(
         (r) => (r.item_subgroup || '').trim().toLowerCase() === scheduledSubgroup.trim().toLowerCase()
       );
@@ -184,14 +186,9 @@ export async function POST(req) {
     // Define total_items na primeira contagem (quando ainda não foi definido)
     if (!inventory.total_items) {
       try {
-        const { data: schedule } = await supabase
-          .from('inventory_schedules')
-          .select('scheduled_subgroup')
-          .eq('inventory_id', inventory.id)
-          .maybeSingle();
-
-        const subgroup = schedule?.scheduled_subgroup || null;
-        const allItems = await getConsolidatedTechnicianItems(supabase, tech.id, subgroup);
+        // Inventario geral: subgrupo null -> retorna todas as pecas
+        const subgroupForTotal = isGeneralInventory ? null : scheduledSubgroup;
+        const allItems = await getConsolidatedTechnicianItems(supabase, tech.id, subgroupForTotal);
         if (allItems && allItems.length > 0) {
           inventoryUpdate.total_items = allItems.length;
         }

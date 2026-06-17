@@ -25,7 +25,7 @@ export async function GET() {
   let schedulesQuery = supabase
     .from('inventory_schedules')
     .select(`
-      id, scheduled_at, week_ref, scheduled_subgroup, items_count, status,
+      id, scheduled_at, week_ref, scheduled_subgroup, items_count, status, inventory_type,
       technicians(id, name, region)
     `)
     .in('status', ['pending', 'dispatched', 'in_progress'])
@@ -80,6 +80,7 @@ export async function GET() {
     technician_id: s.technicians?.id,
     technician_name: s.technicians?.name,
     technician_region: s.technicians?.region,
+    inventory_type: s.inventory_type || 'subgroup',
     available_subgroups: [...(subgroupsByTech[s.technicians?.id] || [])].sort(),
   }));
 
