@@ -4,8 +4,8 @@ const STATUS_MAP = {
   completed:       { label: 'Concluído',    cls: 'badge-success' },
   in_progress:     { label: 'Em Andamento', cls: 'badge-info' },
   abandoned:       { label: 'Abandonado',   cls: 'badge-error' },
-  recount_pending: { label: '1ª Contagem',  cls: 'badge-warning' },
-  pending:         { label: 'Divergente',   cls: 'badge-neutral' },
+  recount_pending: { label: 'Aguarda Recontagem', cls: 'badge-warning' },
+  pending:         { label: 'Agendado',          cls: 'badge-neutral' },
   cancelled:       { label: 'Cancelado',    cls: 'badge-neutral' },
   dispatched:      { label: 'Recontagem',   cls: 'badge-info' },
   // Divergências

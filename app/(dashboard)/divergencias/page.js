@@ -24,7 +24,6 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
 
   async function submit(e) {
     e.preventDefault();
-    if (!ticket.trim()) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/divergences/${divergencia.id}`, {
@@ -59,14 +58,13 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-              Número do Chamado *
+              Número do Chamado GLPI (opcional)
             </label>
             <input
               type="text"
               value={ticket}
               onChange={e => setTicket(e.target.value)}
               placeholder="Ex: INC0012345"
-              required
               autoFocus
               className="input"
               style={{ border: '1px solid #000', borderRadius: '4px', fontWeight: '600', width: '100%' }}
@@ -87,7 +85,7 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={saving || !ticket.trim()} style={{ background: '#000', border: 'none', fontWeight: '900' }}>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000', border: 'none', fontWeight: '900' }}>
               {saving ? 'Salvando...' : 'Confirmar Tratativa'}
             </button>
           </div>
@@ -161,7 +159,7 @@ export default function DivergenciasPage() {
         'Qtd. Sistema':  d.system_qty,
         'Qtd. Física':   d.physical_qty,
         'Diferença':     d.difference,
-        'Variação (%)':  d.percentage_diff,
+
         'Status':        { open: 'Aberta', recount: 'Recontagem', tratativa: 'Em Tratativa', validated: 'Validada', adjusted: 'Ajustada' }[d.status] || d.status,
         'Chamado':       d.ticket_number || '',
         'Obs. Tratativa': d.ticket_note || '',
@@ -226,7 +224,6 @@ export default function DivergenciasPage() {
                       <th style={{ textAlign: 'right' }}>Sistema</th>
                       <th style={{ textAlign: 'right' }}>Físico</th>
                       <th style={{ textAlign: 'right' }}>Diferença</th>
-                      <th style={{ textAlign: 'right' }}>Variação</th>
                       <th>Status</th>
                       <th>Chamado</th>
                       <th>Ações</th>
@@ -250,18 +247,6 @@ export default function DivergenciasPage() {
                           <td style={{ textAlign: 'right', color: '#666' }}>{d.physical_qty}</td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: Number(d.difference) < 0 ? '#000' : '#555' }}>
                             {Number(d.difference) > 0 ? '+' : ''}{d.difference}
-                          </td>
-                          <td style={{ textAlign: 'right' }}>
-                            <span style={{
-                              fontWeight: '800',
-                              fontSize: '0.8rem',
-                              color: isCritical ? '#fff' : '#000',
-                              background: isCritical ? '#000' : 'transparent',
-                              padding: isCritical ? '1px 6px' : '0',
-                              borderRadius: '4px',
-                            }}>
-                              {pct.toFixed(1)}%
-                            </span>
                           </td>
                           <td><StatusBadge status={d.status} /></td>
                           <td>
