@@ -14,7 +14,8 @@ export async function PATCH(request) {
 
     const supabase = createServiceClient();
     const updateData = {};
-    if (updates.supervisor_name !== undefined) updateData.supervisor_name = updates.supervisor_name;
+    if (updates.coordinator_name !== undefined) updateData.coordinator_name = updates.coordinator_name || null;
+    if (updates.supervisor_name !== undefined) updateData.supervisor_name = updates.supervisor_name || null;
     if (updates.active !== undefined) updateData.active = updates.active;
     if (updates.region !== undefined) updateData.region = updates.region || null;
     updateData.updated_at = new Date().toISOString();

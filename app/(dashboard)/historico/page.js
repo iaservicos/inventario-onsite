@@ -34,16 +34,42 @@ function formatDateOnly(val) {
   return new Date(val).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 }
 
+/* Remove zeros à esquerda para normalizar código */
+function normalizeCode(code) {
+  return String(code || '').replace(/^0+/, '') || '0';
+}
+
 /* ─── Modal: peças de um inventário ──────────────────────────────────────── */
 function ModalItens({ inventory, onClose }) {
-  const [items, setItems]     = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [rawItems, setRawItems] = useState([]);
+  const [loading, setLoading]   = useState(true);
 
   useEffect(() => {
     fetch(`/api/inventories/${inventory.id}/items`)
       .then(r => r.json())
-      .then(data => { setItems(Array.isArray(data) ? data : []); setLoading(false); });
+      .then(data => { setRawItems(Array.isArray(data) ? data : []); setLoading(false); });
   }, [inventory.id]);
+
+  // Deduplica por código normalizado, mantendo o registro mais recente (counted_at)
+  const items = useMemo(() => {
+    const map = {};
+    rawItems.forEach(item => {
+      const key = normalizeCode(item.item_code);
+      const prev = map[key];
+      const currDate = new Date(item.counted_at || 0).getTime();
+      const prevDate = prev ? new Date(prev.counted_at || 0).getTime() : -1;
+      if (!prev || currDate > prevDate) {
+        map[key] = item;
+      }
+    });
+    return Object.values(map).sort((a, b) => {
+      // Divergências primeiro, depois agendados, depois ok
+      const scoreA = a.has_divergence ? 2 : a.physical_qty === null ? 1 : 0;
+      const scoreB = b.has_divergence ? 2 : b.physical_qty === null ? 1 : 0;
+      if (scoreA !== scoreB) return scoreB - scoreA;
+      return (a.item_name || '').localeCompare(b.item_name || '', 'pt-BR');
+    });
+  }, [rawItems]);
 
   const total   = items.length;
   const ok      = items.filter(i => !i.has_divergence && i.physical_qty !== null).length;
