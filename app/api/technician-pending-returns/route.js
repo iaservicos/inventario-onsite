@@ -20,7 +20,7 @@ export async function GET(request) {
   const { data: items, error } = await supabase
     .from('technician_pending_returns')
     .select(`
-      id, lote_dev_tecnico_id, peca_fisica_id, status_devolucao, status_consumo,
+      id, lote_dev_tecnico_id, cod_peca, descr_peca, status_devolucao, status_consumo,
       data_montagem_lote, data_envio_lote, data_recebimento_atp, data_recusado_atp,
       data_recebimento_tecnico, dias_aguardando, dt_materializacao, synced_at, sync_batch_id
     `)

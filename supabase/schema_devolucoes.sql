@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS technician_pending_returns (
   technician_id             INTEGER NOT NULL REFERENCES technicians(id) ON DELETE CASCADE,
   lote_dev_tecnico_id       TEXT,
   peca_fisica_id            TEXT,
+  cod_peca                  TEXT,
+  descr_peca                TEXT,
   status_devolucao          TEXT,
   status_consumo            TEXT,
   data_montagem_lote        TIMESTAMPTZ,
@@ -23,3 +25,8 @@ CREATE TABLE IF NOT EXISTS technician_pending_returns (
 
 CREATE INDEX IF NOT EXISTS idx_pending_returns_technician ON technician_pending_returns(technician_id);
 CREATE INDEX IF NOT EXISTS idx_pending_returns_status     ON technician_pending_returns(status_devolucao);
+
+-- Se a tabela ja existia sem estas colunas, adiciona:
+ALTER TABLE technician_pending_returns
+  ADD COLUMN IF NOT EXISTS cod_peca   TEXT,
+  ADD COLUMN IF NOT EXISTS descr_peca TEXT;

@@ -56,6 +56,8 @@ async function runSync(triggeredBy) {
         technician_id:            techId,
         lote_dev_tecnico_id:      item.lote_dev_tecnico_id || null,
         peca_fisica_id:           item.peca_fisica_id || null,
+        cod_peca:                 item.cod_peca || null,
+        descr_peca:               item.descr_peca || null,
         status_devolucao:         item.status_devolucao || null,
         status_consumo:           item.status_consumo || null,
         data_montagem_lote:       item.data_montagem_lote || null,

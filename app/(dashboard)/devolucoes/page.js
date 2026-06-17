@@ -347,7 +347,8 @@ export default function DevolucoesPage() {
                     <tr>
                       <th>Status</th>
                       <th>Lote</th>
-                      <th>Peça Física</th>
+                      <th>Código</th>
+                      <th>Descrição</th>
                       <th>Tipo</th>
                       <th>Data Montagem</th>
                       <th>Data Envio</th>
@@ -356,7 +357,7 @@ export default function DevolucoesPage() {
                   </thead>
                   <tbody>
                     {filteredItems.map((item, idx) => (
-                      <tr key={`${item.lote_dev_tecnico_id}-${item.peca_fisica_id}-${idx}`}>
+                      <tr key={`${item.lote_dev_tecnico_id}-${item.cod_peca}-${idx}`}>
                         <td>
                           {item.status_devolucao === 'MONTADO'
                             ? <span className="badge badge-not-ok">MONTADO</span>
@@ -364,7 +365,8 @@ export default function DevolucoesPage() {
                           }
                         </td>
                         <td style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{item.lote_dev_tecnico_id || '—'}</td>
-                        <td style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{item.peca_fisica_id || '—'}</td>
+                        <td style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{item.cod_peca || '—'}</td>
+                        <td style={{ fontSize: '0.85rem' }}>{item.descr_peca || '—'}</td>
                         <td>
                           {item.status_consumo
                             ? <span className="badge badge-info">{item.status_consumo}</span>
