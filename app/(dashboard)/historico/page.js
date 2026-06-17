@@ -75,7 +75,10 @@ function ModalItens({ inventory, onClose }) {
   // OK / DIVERGÊNCIAS / PENDENTES = contagem de itens (códigos)
   const sumQty = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
   const total   = sumQty(items);
-  const ok      = sumQty(items.filter(i => !i.has_divergence && i.physical_qty !== null));
+  // OK = soma de min(físico, sistema) por item: inclui a parte correta mesmo quando há excesso
+  const ok      = items
+    .filter(i => i.physical_qty !== null)
+    .reduce((s, i) => s + Math.min(Number(i.physical_qty) || 0, Number(i.system_qty) || 0), 0);
   const diverg  = items
     .filter(i => i.has_divergence)
     .reduce((s, i) => s + Math.abs((Number(i.physical_qty) || 0) - (Number(i.system_qty) || 0)), 0);
