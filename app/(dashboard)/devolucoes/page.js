@@ -1,0 +1,399 @@
+'use client';
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
+import PageHeader from '@/components/ui/PageHeader';
+
+function formatDate(val) {
+  if (!val) return '—';
+  return new Date(val).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+}
+
+// ── Página principal ──────────────────────────────────────────────────────────
+export default function DevolucoesPage() {
+  const { data: session, status } = useSession();
+
+  const [technicians, setTechnicians]     = useState([]);
+  const [selectedTech, setSelectedTech]   = useState('');
+  const [items, setItems]                 = useState([]);
+  const [loading, setLoading]             = useState(false);
+  const [lastSync, setLastSync]           = useState(null);
+  const [syncing, setSyncing]             = useState(false);
+  const [syncMsg, setSyncMsg]             = useState('');
+  const [filterStatus, setFilterStatus]   = useState('TODOS');
+
+  // Supervisor filter (admin/coordinator only)
+  const [filterSupervisor, setFilterSupervisor] = useState('');
+
+  // Summary mode (admin/coordinator only)
+  const [summaryMode, setSummaryMode]     = useState(false);
+  const [summaryData, setSummaryData]     = useState([]);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+
+  const role            = session?.user?.role;
+  const canSeeAdmin     = role === 'admin' || role === 'coordinator';
+  const canSync         = role === 'admin';
+
+  // Load active technicians
+  useEffect(() => {
+    fetch('/api/technicians?active=true')
+      .then(r => r.json())
+      .then(d => setTechnicians(Array.isArray(d) ? d : []))
+      .catch(() => {});
+  }, []);
+
+  const supervisors = useMemo(
+    () => [...new Set(technicians.map(t => t.supervisor_name).filter(Boolean))].sort(),
+    [technicians]
+  );
+
+  const techsForDropdown = useMemo(
+    () => filterSupervisor
+      ? technicians.filter(t => t.supervisor_name === filterSupervisor)
+      : technicians,
+    [technicians, filterSupervisor]
+  );
+
+  const handleSupervisorChange = (sup) => {
+    setFilterSupervisor(sup);
+    setSelectedTech('');
+    setItems([]);
+    setSummaryMode(false);
+    setSummaryData([]);
+  };
+
+  // Load items for selected technician
+  const loadItems = useCallback(async (techId) => {
+    if (!techId) return;
+    setLoading(true);
+    setItems([]);
+    try {
+      const res = await fetch(`/api/technician-pending-returns?technicianId=${techId}`);
+      const data = await res.json();
+      setItems(data.items || []);
+      setLastSync(data.last_sync || null);
+    } catch {
+      setItems([]);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (selectedTech) loadItems(selectedTech);
+  }, [selectedTech, loadItems]);
+
+  // Summary mode
+  const handleShowSummary = async () => {
+    if (!filterSupervisor) return;
+    setSummaryMode(true);
+    setSummaryLoading(true);
+    setSummaryData([]);
+    try {
+      const res = await fetch(
+        `/api/technician-pending-returns/summary?supervisor=${encodeURIComponent(filterSupervisor)}`
+      );
+      const data = await res.json();
+      setSummaryData(data.technicians || []);
+      setLastSync(data.last_sync || null);
+    } catch {
+      setSummaryData([]);
+    }
+    setSummaryLoading(false);
+  };
+
+  // Manual sync
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncMsg('');
+    try {
+      const res = await fetch('/api/sync/devolucoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ triggered_by: 'manual' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSyncMsg(`Sincronizado: ${data.total_gravado} registros`);
+        if (selectedTech) loadItems(selectedTech);
+      } else {
+        setSyncMsg(`Erro: ${data.error}`);
+      }
+    } catch {
+      setSyncMsg('Erro de conexão');
+    }
+    setSyncing(false);
+  };
+
+  // Filtered items
+  const filteredItems = useMemo(() => {
+    if (filterStatus === 'TODOS') return items;
+    return items.filter(i => i.status_devolucao === filterStatus);
+  }, [items, filterStatus]);
+
+  const montadoCount = useMemo(() => items.filter(i => i.status_devolucao === 'MONTADO').length, [items]);
+  const enviadoCount = useMemo(() => items.filter(i => i.status_devolucao === 'ENVIADO').length, [items]);
+
+  if (status === 'loading') {
+    return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
+  }
+
+  return (
+    <div style={{ padding: '2rem', width: '100%' }}>
+      <PageHeader
+        title="Devoluções Pendentes"
+        subtitle="Lotes de devolução montados ou enviados pelo técnico aguardando confirmação da ATP"
+      />
+
+      {/* ── Filtros ──────────────────────────────────────────────────────────── */}
+      <div className="card" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+
+        {canSeeAdmin && (
+          <div style={{ minWidth: '200px' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', display: 'block', marginBottom: '0.3rem' }}>
+              Supervisor
+            </label>
+            <select
+              value={filterSupervisor}
+              onChange={e => handleSupervisorChange(e.target.value)}
+              className="input"
+              style={{ width: '100%' }}
+            >
+              <option value="">Todos os supervisores</option>
+              {supervisors.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        )}
+
+        <div style={{ flex: 1, minWidth: '220px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: '700', display: 'block', marginBottom: '0.3rem' }}>
+            Técnico
+          </label>
+          <select
+            value={selectedTech}
+            onChange={e => { setSelectedTech(e.target.value); setSummaryMode(false); }}
+            className="input"
+            style={{ width: '100%' }}
+          >
+            <option value="">— Selecione um técnico —</option>
+            {techsForDropdown.map(t => (
+              <option key={t.id} value={t.id}>{t.name} ({t.region || '—'})</option>
+            ))}
+          </select>
+        </div>
+
+        {canSeeAdmin && filterSupervisor && (
+          <button
+            className="btn"
+            onClick={handleShowSummary}
+            disabled={summaryLoading}
+            style={{ fontWeight: '700', whiteSpace: 'nowrap' }}
+          >
+            {summaryLoading ? 'Carregando...' : 'Ver Resumo'}
+          </button>
+        )}
+
+        {canSync && (
+          <button
+            className="btn"
+            onClick={handleSync}
+            disabled={syncing}
+            style={{ fontWeight: '700', whiteSpace: 'nowrap' }}
+          >
+            {syncing ? 'Sincronizando...' : 'Sincronizar'}
+          </button>
+        )}
+      </div>
+
+      {syncMsg && (
+        <div style={{
+          padding: '0.6rem 0.75rem', background: '#f0f0f0', color: '#000',
+          border: '1px solid #000', borderRadius: '4px', marginBottom: '1rem',
+          fontSize: '0.8rem', fontWeight: '700',
+        }}>
+          {syncMsg}
+        </div>
+      )}
+
+      {lastSync && (
+        <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '1rem' }}>
+          Última sincronização: {lastSync.formatted_at || lastSync.finished_at}
+        </p>
+      )}
+
+      {/* ── Resumo por Supervisor ─────────────────────────────────────────────── */}
+      {summaryMode && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '0.95rem', fontWeight: '800', margin: 0 }}>
+              Resumo — {filterSupervisor}
+            </h2>
+            <button
+              className="btn"
+              style={{ fontSize: '0.75rem' }}
+              onClick={() => setSummaryMode(false)}
+            >
+              Fechar Resumo
+            </button>
+          </div>
+
+          {summaryLoading ? (
+            <div style={{ textAlign: 'center', padding: '2rem', fontWeight: '700' }}>Carregando...</div>
+          ) : summaryData.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#666', fontSize: '0.85rem', border: '1px solid #eee', borderRadius: '8px' }}>
+              Nenhum técnico com devoluções pendentes
+            </div>
+          ) : (
+            <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '1.5rem' }}>
+              <div className="table-wrapper" style={{ border: 'none' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Técnico</th>
+                      <th>UF</th>
+                      <th style={{ textAlign: 'center' }}>Montado</th>
+                      <th style={{ textAlign: 'center' }}>Enviado (aguard. ATP)</th>
+                      <th style={{ textAlign: 'center' }}>Total</th>
+                      <th style={{ textAlign: 'center' }}>Máx. Dias Aguardando</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summaryData.map(t => (
+                      <tr key={t.id}>
+                        <td style={{ fontWeight: '800', color: '#000' }}>{t.name}</td>
+                        <td><span className="badge badge-info">{t.region || '—'}</span></td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>
+                          {t.montado > 0
+                            ? <span className="badge badge-not-ok">{t.montado}</span>
+                            : <span style={{ color: '#999' }}>—</span>}
+                        </td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>
+                          {t.enviado > 0
+                            ? <span className="badge badge-info">{t.enviado}</span>
+                            : <span style={{ color: '#999' }}>—</span>}
+                        </td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>{t.montado + t.enviado}</td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>
+                          {t.max_dias > 0 ? `${t.max_dias}d` : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Visão Individual ─────────────────────────────────────────────────── */}
+      {!summaryMode && selectedTech && (
+        <div>
+          {/* Stats */}
+          {!loading && (items.length > 0) && (
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <div className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000' }}>{montadoCount}</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginTop: '0.25rem' }}>
+                  MONTADO<br /><span style={{ fontWeight: '400' }}>aguardando envio</span>
+                </div>
+              </div>
+              <div className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000' }}>{enviadoCount}</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginTop: '0.25rem' }}>
+                  ENVIADO<br /><span style={{ fontWeight: '400' }}>aguardando ATP</span>
+                </div>
+              </div>
+              <div className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000' }}>{items.length}</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginTop: '0.25rem' }}>
+                  TOTAL<br /><span style={{ fontWeight: '400' }}>pendentes</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Filter tabs */}
+          {!loading && items.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              {['TODOS', 'MONTADO', 'ENVIADO'].map(s => (
+                <button
+                  key={s}
+                  className={filterStatus === s ? 'btn btn-primary' : 'btn'}
+                  style={{ fontSize: '0.75rem', fontWeight: '700', padding: '0.3rem 0.75rem' }}
+                  onClick={() => setFilterStatus(s)}
+                >
+                  {s === 'TODOS' ? `Todos (${items.length})` : s === 'MONTADO' ? `Montado (${montadoCount})` : `Enviado (${enviadoCount})`}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
+          ) : filteredItems.length === 0 ? (
+            <div style={{
+              textAlign: 'center', padding: '3rem', color: '#666', fontSize: '0.85rem',
+              border: '1px solid #eee', borderRadius: '8px',
+            }}>
+              {items.length === 0
+                ? 'Nenhuma devolução pendente para este técnico'
+                : 'Nenhum item para o filtro selecionado'}
+            </div>
+          ) : (
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="table-wrapper" style={{ border: 'none' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Lote</th>
+                      <th>Peça Física</th>
+                      <th>Tipo</th>
+                      <th>Data Montagem</th>
+                      <th>Data Envio</th>
+                      <th style={{ textAlign: 'center' }}>Dias Aguardando</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredItems.map((item, idx) => (
+                      <tr key={`${item.lote_dev_tecnico_id}-${item.peca_fisica_id}-${idx}`}>
+                        <td>
+                          {item.status_devolucao === 'MONTADO'
+                            ? <span className="badge badge-not-ok">MONTADO</span>
+                            : <span className="badge badge-info">ENVIADO</span>
+                          }
+                        </td>
+                        <td style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{item.lote_dev_tecnico_id || '—'}</td>
+                        <td style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{item.peca_fisica_id || '—'}</td>
+                        <td>
+                          {item.status_consumo
+                            ? <span className="badge badge-info">{item.status_consumo}</span>
+                            : '—'}
+                        </td>
+                        <td style={{ fontSize: '0.85rem' }}>{formatDate(item.data_montagem_lote)}</td>
+                        <td style={{ fontSize: '0.85rem' }}>{formatDate(item.data_envio_lote)}</td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>
+                          {item.dias_aguardando != null ? `${item.dias_aguardando}d` : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Estado inicial */}
+      {!summaryMode && !selectedTech && (
+        <div style={{
+          textAlign: 'center', padding: '3rem', color: '#666', fontSize: '0.85rem',
+          border: '1px solid #eee', borderRadius: '8px',
+        }}>
+          Selecione um técnico para visualizar as devoluções pendentes
+        </div>
+      )}
+    </div>
+  );
+}
