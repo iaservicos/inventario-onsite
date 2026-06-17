@@ -195,6 +195,20 @@ export default function HistoricoPage() {
     setLoading(false);
   }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Expande inventários com recontagem em duas linhas: 1ª contagem + recontagem
+  const rows = useMemo(() =>
+    inventories.flatMap(inv => {
+      if (inv.is_recount === true) {
+        return [
+          { ...inv, _rowPhase: 'first' },
+          { ...inv, _rowPhase: 'recount' },
+        ];
+      }
+      return [{ ...inv, _rowPhase: null }];
+    }),
+    [inventories]
+  );
+
   useEffect(() => { load(); }, [load]);
 
   return (
@@ -231,37 +245,72 @@ export default function HistoricoPage() {
                 </tr>
               </thead>
               <tbody>
-                {inventories.map(inv => {
-                  const sched = inv.inventory_schedules?.[0];
-                  const fase  = getFaseLabel(inv);
-                  const hasDiv = (inv.divergence_count || 0) > 0;
+                {rows.map(inv => {
+                  const sched      = inv.inventory_schedules?.[0];
+                  const isFirst    = inv._rowPhase === 'first';
+                  const isRecount  = inv._rowPhase === 'recount';
+
+                  // Fase label
+                  const faseText   = isFirst   ? '1ª Contagem'
+                                   : isRecount ? 'Recontagem'
+                                   : getFaseLabel(inv).text;
+                  const faseAccent = isFirst   ? '#aaa'
+                                   : isRecount ? '#000'
+                                   : getFaseLabel(inv).accent;
+
+                  // Status exibido
+                  const displayStatus = isFirst ? 'recount_pending' : inv.status;
+
+                  // Data: 1ª contagem usa scheduled_at; recontagem/conclusão usa updated_at
+                  const displayDate = isFirst
+                    ? formatDateOnly(sched?.scheduled_at || inv.created_at)
+                    : formatDateOnly(inv.updated_at || inv.created_at);
+
+                  // Peças e divergências: 1ª contagem não tem dados separados
+                  const displayPecas = isFirst ? '—' : (inv.total_items ?? '—');
+                  const hasDiv = !isFirst && (inv.divergence_count || 0) > 0;
+
                   return (
-                    <tr key={inv.id}>
-                      <td style={{ fontWeight: '800', color: '#000' }}>{inv.technicians?.name || '—'}</td>
+                    <tr
+                      key={`${inv.id}-${inv._rowPhase || 'main'}`}
+                      style={{
+                        background:    isFirst ? '#fafafa' : undefined,
+                        borderBottom:  isFirst ? '1px dashed #e4e4e7' : '1px solid #e4e4e7',
+                        opacity:       isFirst ? 0.75 : 1,
+                      }}
+                    >
+                      <td style={{ fontWeight: '800', color: '#000', paddingLeft: isRecount ? '1.5rem' : undefined }}>
+                        {inv.technicians?.name || '—'}
+                      </td>
                       <td style={{ color: '#666', fontSize: '0.8rem' }}>{inv.technicians?.region || '—'}</td>
                       <td style={{ fontWeight: '700' }}>{inv.week_ref || '—'}</td>
                       <td style={{ color: '#666', fontSize: '0.8rem' }}>{sched?.scheduled_subgroup || '—'}</td>
                       <td>
-                        <span style={{ fontSize: '0.7rem', fontWeight: '700', color: fase.accent, borderLeft: `3px solid ${fase.accent}`, paddingLeft: '0.4rem' }}>
-                          {fase.text}
+                        <span style={{ fontSize: '0.7rem', fontWeight: '700', color: faseAccent, borderLeft: `3px solid ${faseAccent}`, paddingLeft: '0.4rem' }}>
+                          {faseText}
                         </span>
                       </td>
-                      <td style={{ textAlign: 'center', fontWeight: '700', color: '#333' }}>{inv.total_items ?? '—'}</td>
+                      <td style={{ textAlign: 'center', fontWeight: '700', color: '#333' }}>{displayPecas}</td>
                       <td style={{ textAlign: 'center', fontWeight: '800' }}>
-                        {hasDiv
-                          ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{inv.divergence_count}</span>
-                          : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>0</span>}
+                        {isFirst
+                          ? <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>
+                          : hasDiv
+                            ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{inv.divergence_count}</span>
+                            : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>0</span>
+                        }
                       </td>
-                      <td><StatusBadge status={inv.status} /></td>
-                      <td style={{ color: '#888', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>{formatDateOnly(inv.created_at)}</td>
+                      <td><StatusBadge status={displayStatus} /></td>
+                      <td style={{ color: '#888', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>{displayDate}</td>
                       <td>
-                        <button
-                          className="btn btn-secondary"
-                          style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', border: '1px solid #ccc', fontWeight: '700', whiteSpace: 'nowrap' }}
-                          onClick={() => setSelected(inv)}
-                        >
-                          Ver peças
-                        </button>
+                        {!isFirst && (
+                          <button
+                            className="btn btn-secondary"
+                            style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', border: '1px solid #ccc', fontWeight: '700', whiteSpace: 'nowrap' }}
+                            onClick={() => setSelected(inv)}
+                          >
+                            Ver peças
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );

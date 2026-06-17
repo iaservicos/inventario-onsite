@@ -12,6 +12,14 @@ export async function GET(request, { params }) {
   const supabase = createServiceClient();
   const inventoryId = parseInt(params.id);
 
+  // Verifica se o inventário passou por recontagem (usa * para não errar se coluna não existir)
+  const { data: inv } = await supabase
+    .from('inventories')
+    .select('*')
+    .eq('id', inventoryId)
+    .maybeSingle();
+  const isRecount = inv?.is_recount === true;
+
   const { data, error } = await supabase
     .from('inventory_items')
     .select('id, item_code, item_name, item_subgroup, system_qty, physical_qty, status, has_divergence, counted_at')
@@ -20,12 +28,20 @@ export async function GET(request, { params }) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  let rows = data || [];
+
+  // Se houve recontagem: exclui itens com system_qty=0 (escaneados errado na 1ª contagem,
+  // não estão no sistema e não foram indicados na recontagem)
+  if (isRecount) {
+    rows = rows.filter(item => Number(item.system_qty || 0) > 0 || item.physical_qty === null);
+  }
+
   // Deduplica por código normalizado (sem zeros à esquerda), mantendo o mais recente
   const normalize = (c) => String(c || '').replace(/^0+/, '') || '0';
   const map = {};
-  for (const item of (data || [])) {
+  for (const item of rows) {
     const key = normalize(item.item_code);
-    if (!map[key]) map[key] = item; // already ordered by counted_at desc nulls last → first = most recent
+    if (!map[key]) map[key] = item; // já ordenado por counted_at desc → primeiro = mais recente
   }
 
   const deduped = Object.values(map).sort((a, b) => {
