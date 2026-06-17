@@ -238,7 +238,7 @@ function BranchRow({ entry, onEdit, onDelete }) {
     <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
       <td style={{ ...cellStyle, fontWeight: '700', fontSize: '0.82rem', color: '#222222' }}>{entry.branch_name}</td>
       <td style={{ ...cellStyle, textAlign: 'center' }}>
-        <span style={{ fontWeight: '800', fontSize: '0.9rem', color: qty === 0 ? '#ef4444' : '#22c55e' }}>{qty}</span>
+        <span style={{ fontWeight: '800', fontSize: '0.9rem', color: qty === 0 ? '#999' : '#000' }}>{qty}</span>
       </td>
       <td style={{ ...cellStyle, fontSize: '0.8rem', color: loc ? '#333333' : '#bbbbbb', fontStyle: loc ? 'normal' : 'italic' }}>
         {loc || 'Não informado'}
@@ -248,7 +248,7 @@ function BranchRow({ entry, onEdit, onDelete }) {
       </td>
       <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>
         <button onClick={() => setEditing(true)} style={{ padding: '0.3rem 0.7rem', background: 'transparent', color: '#000000', border: '1px solid #dddddd', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', marginRight: '0.35rem' }}>Editar</button>
-        <button onClick={remove} style={{ padding: '0.3rem 0.7rem', background: 'transparent', color: '#ef4444', border: '1px solid #fecaca', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}>Remover</button>
+        <button onClick={remove} style={{ padding: '0.3rem 0.7rem', background: 'transparent', color: '#666', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}>Remover</button>
       </td>
     </tr>
   );
@@ -323,11 +323,11 @@ export default function EstoqueCentralPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
           { label: 'Filiais cadastradas', value: totalFiliais },
-          { label: 'Itens em estoque', value: totalItens, color: totalItens > 0 ? '#22c55e' : '#888888' },
+          { label: 'Itens em estoque', value: totalItens },
           { label: 'Ferramentas c/ estoque', value: `${comEstoque}/${data.length}` },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: kpi.color || '#000000' }}>{kpi.value}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#000' }}>{kpi.value}</div>
             <div style={{ fontSize: '0.72rem', color: '#888888', fontWeight: '700', marginTop: '0.25rem', textTransform: 'uppercase' }}>{kpi.label}</div>
           </div>
         ))}
@@ -352,7 +352,7 @@ export default function EstoqueCentralPage() {
         <button onClick={load} style={{ padding: '0.5rem 0.9rem', border: '1px solid #dddddd', borderRadius: '6px', background: 'transparent', color: '#666666', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
           ↻ Atualizar
         </button>
-        <button onClick={handleExport} disabled={exporting || loading} style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '6px', background: '#16a34a', color: '#ffffff', fontSize: '0.8rem', fontWeight: '800', cursor: exporting ? 'not-allowed' : 'pointer', opacity: exporting ? 0.7 : 1 }}>
+        <button onClick={handleExport} disabled={exporting || loading} style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '6px', background: '#000', color: '#fff', fontSize: '0.8rem', fontWeight: '800', cursor: exporting ? 'not-allowed' : 'pointer', opacity: exporting ? 0.7 : 1 }}>
           {exporting ? 'Gerando...' : '↓ Exportar Excel'}
         </button>
       </div>
@@ -381,11 +381,11 @@ export default function EstoqueCentralPage() {
                   <span style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '900', display: 'inline-block', transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>▶</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: '800', fontSize: '0.88rem', color: '#000000' }}>{tool.tool_name}</div>
-                    {tool.tool_notes && <div style={{ fontSize: '0.7rem', color: '#f59e0b', marginTop: '0.15rem' }}>⚠ {tool.tool_notes}</div>}
+                    {tool.tool_notes && <div style={{ fontSize: '0.7rem', color: '#555', marginTop: '0.15rem' }}>⚠ {tool.tool_notes}</div>}
                   </div>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '600' }}>{tool.branches.length} filial(is)</span>
-                    <span style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '800', background: totalQty === 0 ? '#fef2f2' : '#f0fdf4', color: totalQty === 0 ? '#ef4444' : '#22c55e' }}>
+                    <span style={{ padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800', background: totalQty === 0 ? '#000' : '#f0f0f0', color: totalQty === 0 ? '#fff' : '#000' }}>
                       {totalQty} em estoque
                     </span>
                     <button

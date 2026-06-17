@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'Inventário Onsite',
+  title: 'Portal Onsite',
   description: 'Dashboard de monitoramento de inventário cíclico de técnicos',
 };
 

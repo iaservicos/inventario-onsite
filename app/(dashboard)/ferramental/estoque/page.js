@@ -183,7 +183,7 @@ export default function FerramentalEstoquePage() {
                 <button onClick={() => setFilterRegion('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
               </span>
             )}
-            <button onClick={() => { setFilterSup(''); setFilterRegion(''); setSelectedId(''); }} style={{ fontSize: '0.72rem', color: '#ef4444', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', marginLeft: '0.25rem' }}>
+            <button onClick={() => { setFilterSup(''); setFilterRegion(''); setSelectedId(''); }} style={{ fontSize: '0.72rem', color: '#000', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', marginLeft: '0.25rem', textDecoration: 'underline' }}>
               Limpar tudo
             </button>
           </div>
@@ -211,7 +211,7 @@ export default function FerramentalEstoquePage() {
           )}
           <div>
             <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Ferramentas em posse</div>
-            <div style={{ fontWeight: '900', fontSize: '1rem', color: totalFerramentas > 0 ? '#22c55e' : '#888', marginTop: '0.2rem' }}>{totalFerramentas} / {inventory.length}</div>
+            <div style={{ fontWeight: '900', fontSize: '1rem', color: '#000', marginTop: '0.2rem' }}>{totalFerramentas} / {inventory.length}</div>
           </div>
         </div>
       )}
@@ -248,19 +248,19 @@ export default function FerramentalEstoquePage() {
                 const temTudo = qty >= item.default_qty;
 
                 return (
-                  <tr key={item.tool_id} style={{ borderBottom: '1px solid #f0f0f0', background: isDirtyItem ? '#fffbeb' : idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                  <tr key={item.tool_id} style={{ borderBottom: '1px solid #f0f0f0', background: isDirtyItem ? '#f5f5f5' : idx % 2 === 0 ? '#fff' : '#fafafa' }}>
                     <td style={{ padding: '0.85rem 1.25rem' }}>
                       <div style={{ fontWeight: '700', color: '#000' }}>{item.tool_name}</div>
-                      {item.tool_notes && <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
+                      {item.tool_notes && <div style={{ fontSize: '0.7rem', color: '#555', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
                     </td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: '700', color: '#888' }}>{item.default_qty}</td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                       <QuantityControl value={qty} onChange={(v) => handleQtyChange(item.tool_id, v)} disabled={isSaving} />
                     </td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
-                      <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
-                        color: !temFerramentas ? '#ef4444' : temTudo ? '#22c55e' : '#f59e0b',
-                        background: !temFerramentas ? '#2a0a0a' : temTudo ? '#0a2a0a' : '#2a1a00',
+                      <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
+                        color: !temFerramentas ? '#fff' : '#000',
+                        background: !temFerramentas ? '#000' : temTudo ? '#e0e0e0' : '#f0f0f0',
                       }}>
                         {!temFerramentas ? 'Sem ferramenta' : temTudo ? 'Completo' : 'Parcial'}
                       </span>
@@ -272,7 +272,7 @@ export default function FerramentalEstoquePage() {
                           {isSaving ? '...' : 'Salvar'}
                         </button>
                       ) : (
-                        <span style={{ fontSize: '0.72rem', color: '#22c55e', fontWeight: '700' }}>{item.updated_at ? '✓ Salvo' : '—'}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#555', fontWeight: '700' }}>{item.updated_at ? '✓ Salvo' : '—'}</span>
                       )}
                     </td>
                   </tr>

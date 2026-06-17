@@ -224,6 +224,34 @@ export default function PecasUsadasPage() {
     XLSX.writeFile(wb, fileName);
   }
 
+  function handleExportSummaryExcel() {
+    if (!summaryData?.technicians?.length) return;
+
+    const rows = [];
+    summaryData.technicians.forEach(tech => {
+      tech.items.forEach(item => {
+        rows.push({
+          'Técnico':      tech.name,
+          'Região':       tech.region || '—',
+          'Código':       item.item_code,
+          'Nome':         item.item_name,
+          'Quantidade':   item.item_quantity ?? '—',
+          'Remessa':      item.item_num_remessa || '—',
+          'Chamado':      item.chamado_consumo || '—',
+          'Encerramento': item.data_encerramento ? new Date(item.data_encerramento).toLocaleDateString('pt-BR') : '—',
+          'Status':       item.status_consumo || '—',
+          'Subgrupo':     item.item_subgroup || 'OUTROS',
+        });
+      });
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 15 }, { wch: 35 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 15 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Resumo Supervisor');
+    XLSX.writeFile(wb, `pecas_usadas_resumo_${filterSupervisor.replace(/\s/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
   const filteredItems = items.filter(item => {
     if (!searchFilter) return true;
     const q = searchFilter.toLowerCase();
@@ -250,8 +278,8 @@ export default function PecasUsadasPage() {
       <div style={{
         marginBottom: '1.5rem',
         padding: '0.75rem 1.25rem',
-        background: '#f0f7ff',
-        border: '1px solid #bfdbfe',
+        background: '#f0f0f0',
+        border: '1px solid #ddd',
         borderRadius: '8px',
         display: 'flex',
         alignItems: 'center',
@@ -259,13 +287,13 @@ export default function PecasUsadasPage() {
         flexWrap: 'wrap',
         gap: '0.75rem',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#1e40af' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#333' }}>
           <IconDatabase />
           <span style={{ fontWeight: '700' }}>Fonte:</span>
           <span>Dados sincronizados do sistema</span>
           {lastSync?.formatted_at && (
             <>
-              <span style={{ color: '#93c5fd', margin: '0 0.25rem' }}>·</span>
+              <span style={{ color: '#aaa', margin: '0 0.25rem' }}>·</span>
               <IconClock />
               <span>
                 <strong>Última atualização:</strong> {lastSync.formatted_at}
@@ -274,34 +302,22 @@ export default function PecasUsadasPage() {
           )}
           {!lastSync && (
             <>
-              <span style={{ color: '#93c5fd', margin: '0 0.25rem' }}>·</span>
-              <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Aguardando primeira sincronização</span>
+              <span style={{ color: '#aaa', margin: '0 0.25rem' }}>·</span>
+              <span style={{ color: '#888', fontStyle: 'italic' }}>Aguardando primeira sincronização</span>
             </>
           )}
         </div>
 
         {session?.user?.role === 'admin' && (
           <button
+            className="btn"
             onClick={handleManualSync}
             disabled={syncing}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.4rem 0.9rem',
-              background: syncing ? '#e5e7eb' : '#1d4ed8',
-              color: syncing ? '#6b7280' : '#ffffff',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '0.8rem',
-              fontWeight: '700',
-              cursor: syncing ? 'not-allowed' : 'pointer',
-              transition: 'background 0.2s',
-            }}
+            style={{ fontWeight: '700', whiteSpace: 'nowrap' }}
             title="Sincronizar agora (fora do horário automático das 08h)"
           >
             <IconRefresh spinning={syncing} />
-            {syncing ? 'Sincronizando...' : 'Sincronizar agora'}
+            {syncing ? 'Sincronizando...' : 'Sincronizar'}
           </button>
         )}
       </div>
@@ -310,13 +326,13 @@ export default function PecasUsadasPage() {
       {syncMessage && (
         <div style={{
           marginBottom: '1rem',
-          padding: '0.75rem 1rem',
-          background: syncMessage.startsWith('✓') ? '#f0fdf4' : '#fff7ed',
-          border: `1px solid ${syncMessage.startsWith('✓') ? '#86efac' : '#fed7aa'}`,
-          borderRadius: '6px',
-          fontSize: '0.85rem',
-          fontWeight: '600',
-          color: syncMessage.startsWith('✓') ? '#166534' : '#9a3412',
+          padding: '0.6rem 0.75rem',
+          background: '#f0f0f0',
+          border: '1px solid #000',
+          borderRadius: '4px',
+          fontSize: '0.8rem',
+          fontWeight: '700',
+          color: '#000',
         }}>
           {syncMessage}
         </div>
@@ -416,6 +432,17 @@ export default function PecasUsadasPage() {
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px', padding: '0 1.25rem', background: summaryLoading ? '#e5e7eb' : '#111', color: summaryLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: summaryLoading ? 'not-allowed' : 'pointer' }}
           >
             {summaryLoading ? 'Carregando...' : `Resumo — ${filterSupervisor}`}
+          </button>
+        )}
+
+        {summaryMode && summaryData?.technicians?.length > 0 && (
+          <button
+            className="btn btn-primary"
+            onClick={handleExportSummaryExcel}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px' }}
+          >
+            <IconDownload />
+            Exportar Excel
           </button>
         )}
 

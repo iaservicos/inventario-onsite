@@ -7,15 +7,15 @@ import { formatDate } from '@/lib/utils';
 import PageHeader from '@/components/ui/PageHeader';
 
 const STATUS_CONFIG = {
-  aguardando_aprovacao: { label: 'Aguardando Aprovação', color: '#f59e0b', bg: '#2a1f00' },
-  aprovado:             { label: 'Aprovado',             color: '#22c55e', bg: '#0a2a0a' },
-  reprovado:            { label: 'Reprovado',            color: '#ef4444', bg: '#2a0a0a' },
-  aguardando_envio:     { label: 'Aguardando Envio',     color: '#60a5fa', bg: '#0a1a2a' },
-  enviando:             { label: 'Enviando',             color: '#a78bfa', bg: '#1a0a2a' },
-  pendente:             { label: 'Pendente',             color: '#fb923c', bg: '#2a1200' },
-  aguardando_compra:    { label: 'Aguardando Compra',    color: '#f472b6', bg: '#2a0a1a' },
-  cancelado:            { label: 'Cancelado',            color: '#6b7280', bg: '#1a1a1a' },
-  entregue:             { label: 'Entregue',             color: '#34d399', bg: '#0a2a1a' },
+  aguardando_aprovacao: { label: 'Aguardando Aprovação', color: '#000', bg: '#f0f0f0' },
+  aprovado:             { label: 'Aprovado',             color: '#000', bg: '#e0e0e0' },
+  reprovado:            { label: 'Reprovado',            color: '#fff', bg: '#000' },
+  aguardando_envio:     { label: 'Aguardando Envio',     color: '#000', bg: '#e8e8e8' },
+  enviando:             { label: 'Enviando',             color: '#000', bg: '#d8d8d8' },
+  pendente:             { label: 'Pendente',             color: '#000', bg: '#ebebeb' },
+  aguardando_compra:    { label: 'Aguardando Compra',    color: '#000', bg: '#e4e4e4' },
+  cancelado:            { label: 'Cancelado',            color: '#888', bg: '#f5f5f5' },
+  entregue:             { label: 'Entregue',             color: '#fff', bg: '#333' },
 };
 
 const GESTOR_TRANSITIONS = [
@@ -33,7 +33,7 @@ const ANALISTA_TRANSITIONS = [
 ];
 
 function StatusBadge({ status }) {
-  const cfg = STATUS_CONFIG[status] || { label: status, color: '#888888', bg: '#1a1a1a' };
+  const cfg = STATUS_CONFIG[status] || { label: status, color: '#888', bg: '#f0f0f0' };
   return (
     <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', color: cfg.color, background: cfg.bg, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
       {cfg.label}
@@ -86,25 +86,25 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
     finally { setSaving(false); }
   }
 
-  const fieldStyle = { width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', background: '#222222', border: '1px solid #333333', color: '#ffffff', fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit' };
-  const labelStyle = { fontSize: '0.72rem', color: '#888888', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
+  const fieldStyle = { width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', background: '#fff', border: '1px solid #ccc', color: '#000', fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit' };
+  const labelStyle = { fontSize: '0.72rem', color: '#555', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#1a1a1a', border: '1px solid #333333', borderRadius: '12px', width: '100%', maxWidth: '500px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #2a2a2a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#ffffff' }}>Atualizar Solicitação #{request.id}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
+      <div style={{ background: '#fff', border: '2px solid #000', borderRadius: '8px', width: '100%', maxWidth: '500px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#000' }}>Atualizar Solicitação #{request.id}</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900' }}>✕</button>
         </div>
 
         <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {/* Info */}
-          <div style={{ background: '#111111', border: '1px solid #2a2a2a', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', color: '#aaaaaa', lineHeight: '1.6' }}>
-            <div><strong style={{ color: '#ffffff' }}>{request.technician_name}</strong>{request.technician_email ? ` — ${request.technician_email}` : ''}</div>
-            <div style={{ marginTop: '0.2rem', color: '#cccccc', fontWeight: '600' }}>{request.tool_name}</div>
-            {request.comment && <div style={{ marginTop: '0.2rem', fontStyle: 'italic', color: '#666666' }}>"{request.comment}"</div>}
+          <div style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', color: '#555', lineHeight: '1.6' }}>
+            <div><strong style={{ color: '#000' }}>{request.technician_name}</strong>{request.technician_email ? ` — ${request.technician_email}` : ''}</div>
+            <div style={{ marginTop: '0.2rem', color: '#333', fontWeight: '600' }}>{request.tool_name}</div>
+            {request.comment && <div style={{ marginTop: '0.2rem', fontStyle: 'italic', color: '#666' }}>"{request.comment}"</div>}
             {request.delivery_method && (
-              <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: '#60a5fa' }}>
+              <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: '#444', fontWeight: '600' }}>
                 Último envio: {request.delivery_method === 'correio' ? `Correio${request.tracking_code ? ` — ${request.tracking_code}` : ''}` : 'Pessoalmente'}
               </div>
             )}
@@ -118,22 +118,22 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                   {transitions.map(t => (
                     <button key={t.value} onClick={() => { setStatus(t.value); setDeliveryMethod(''); setTrackingCode(''); }}
-                      style={{ padding: '0.45rem 0.9rem', borderRadius: '8px', border: `1px solid ${status === t.value ? '#ffffff' : '#333333'}`, background: status === t.value ? '#ffffff' : 'transparent', color: status === t.value ? '#000000' : '#888888', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ padding: '0.45rem 0.9rem', borderRadius: '8px', border: `1px solid ${status === t.value ? '#000' : '#ccc'}`, background: status === t.value ? '#000' : 'transparent', color: status === t.value ? '#fff' : '#666', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}>
                       {t.label}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Método de envio — só aparece quando status = enviando */}
+              {/* Método de envio */}
               {showDelivery && (
-                <div style={{ background: '#111111', border: '1px solid #2a2a2a', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   <div>
                     <label style={labelStyle}>Método de Envio *</label>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       {[{ value: 'correio', label: 'Via Correio' }, { value: 'pessoalmente', label: 'Pessoalmente' }].map(m => (
                         <button key={m.value} onClick={() => setDeliveryMethod(m.value)}
-                          style={{ flex: 1, padding: '0.6rem', borderRadius: '8px', border: `1px solid ${deliveryMethod === m.value ? '#60a5fa' : '#333333'}`, background: deliveryMethod === m.value ? '#0a1a2a' : 'transparent', color: deliveryMethod === m.value ? '#60a5fa' : '#888888', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
+                          style={{ flex: 1, padding: '0.6rem', borderRadius: '8px', border: `1px solid ${deliveryMethod === m.value ? '#000' : '#ccc'}`, background: deliveryMethod === m.value ? '#000' : 'transparent', color: deliveryMethod === m.value ? '#fff' : '#666', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
                           {m.label}
                         </button>
                       ))}
@@ -143,12 +143,7 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
                   {deliveryMethod === 'correio' && (
                     <div>
                       <label style={labelStyle}>Código de Postagem *</label>
-                      <input
-                        value={trackingCode}
-                        onChange={e => setTrackingCode(e.target.value)}
-                        placeholder="Ex: AA123456789BR"
-                        style={fieldStyle}
-                      />
+                      <input value={trackingCode} onChange={e => setTrackingCode(e.target.value)} placeholder="Ex: AA123456789BR" style={fieldStyle} />
                     </div>
                   )}
                 </div>
@@ -162,12 +157,12 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
               </div>
 
               <button onClick={save} disabled={saving || !status}
-                style={{ width: '100%', padding: '0.85rem', background: saving || !status ? '#2a2a2a' : '#ffffff', color: saving || !status ? '#555555' : '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: saving || !status ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}>
+                style={{ width: '100%', padding: '0.85rem', background: saving || !status ? '#e0e0e0' : '#000', color: saving || !status ? '#888' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: saving || !status ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}>
                 {saving ? 'SALVANDO...' : 'CONFIRMAR'}
               </button>
             </>
           ) : (
-            <div style={{ textAlign: 'center', padding: '1rem', color: '#666666', fontSize: '0.85rem' }}>
+            <div style={{ textAlign: 'center', padding: '1rem', color: '#666', fontSize: '0.85rem' }}>
               Nenhuma ação disponível para este status com seu perfil.
             </div>
           )}
@@ -217,14 +212,14 @@ export default function FerramentalPage() {
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
-          { label: 'Total', value: total, color: '#000000' },
-          { label: 'Aguard. Aprovação', value: aguardando, color: '#f59e0b' },
-          { label: 'Aprovados', value: aprovados, color: '#22c55e' },
-          { label: 'Entregues', value: entregues, color: '#34d399' },
+          { label: 'Total', value: total },
+          { label: 'Aguard. Aprovação', value: aguardando },
+          { label: 'Aprovados', value: aprovados },
+          { label: 'Entregues', value: entregues },
         ].map(kpi => (
-          <div key={kpi.label} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem', borderTop: `3px solid ${kpi.color}` }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: kpi.color }}>{kpi.value}</div>
-            <div style={{ fontSize: '0.75rem', color: '#888888', fontWeight: '700', marginTop: '0.25rem', textTransform: 'uppercase' }}>{kpi.label}</div>
+          <div key={kpi.label} className="card">
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#000', lineHeight: 1 }}>{kpi.value}</div>
+            <div style={{ fontSize: '0.75rem', color: '#888', fontWeight: '700', marginTop: '0.4rem', textTransform: 'uppercase' }}>{kpi.label}</div>
           </div>
         ))}
       </div>

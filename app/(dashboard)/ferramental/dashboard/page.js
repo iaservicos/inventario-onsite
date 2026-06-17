@@ -6,32 +6,32 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 
 const STATUS_CONFIG = {
-  aguardando_aprovacao: { label: 'Aguard. Aprovação', color: '#f59e0b', bg: '#fef3c7' },
-  aprovado:             { label: 'Aprovado',           color: '#22c55e', bg: '#dcfce7' },
-  reprovado:            { label: 'Reprovado',          color: '#ef4444', bg: '#fee2e2' },
-  aguardando_envio:     { label: 'Aguard. Envio',      color: '#60a5fa', bg: '#dbeafe' },
-  enviando:             { label: 'Enviando',           color: '#a78bfa', bg: '#ede9fe' },
-  pendente:             { label: 'Pendente',           color: '#fb923c', bg: '#ffedd5' },
-  aguardando_compra:    { label: 'Aguard. Compra',     color: '#f472b6', bg: '#fce7f3' },
-  cancelado:            { label: 'Cancelado',          color: '#9ca3af', bg: '#f3f4f6' },
-  entregue:             { label: 'Entregue',           color: '#10b981', bg: '#d1fae5' },
+  aguardando_aprovacao: { label: 'Aguard. Aprovação', color: '#000', bg: '#f0f0f0' },
+  aprovado:             { label: 'Aprovado',           color: '#000', bg: '#e0e0e0' },
+  reprovado:            { label: 'Reprovado',          color: '#fff', bg: '#000' },
+  aguardando_envio:     { label: 'Aguard. Envio',      color: '#000', bg: '#e8e8e8' },
+  enviando:             { label: 'Enviando',           color: '#000', bg: '#d8d8d8' },
+  pendente:             { label: 'Pendente',           color: '#000', bg: '#ebebeb' },
+  aguardando_compra:    { label: 'Aguard. Compra',     color: '#000', bg: '#e4e4e4' },
+  cancelado:            { label: 'Cancelado',          color: '#888', bg: '#f5f5f5' },
+  entregue:             { label: 'Entregue',           color: '#fff', bg: '#333' },
 };
 
 function StatusPill({ status }) {
-  const cfg = STATUS_CONFIG[status] || { label: status, color: '#888888', bg: '#f3f4f6' };
+  const cfg = STATUS_CONFIG[status] || { label: status, color: '#888', bg: '#f0f0f0' };
   return (
-    <span style={{ padding: '0.2rem 0.55rem', borderRadius: '20px', fontSize: '0.68rem', fontWeight: '800', color: cfg.color, background: cfg.bg, whiteSpace: 'nowrap' }}>
+    <span style={{ padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.68rem', fontWeight: '800', color: cfg.color, background: cfg.bg, whiteSpace: 'nowrap' }}>
       {cfg.label}
     </span>
   );
 }
 
-function KpiCard({ label, value, color, sub, href }) {
+function KpiCard({ label, value, sub, href }) {
   const inner = (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', padding: '1.25rem 1.5rem', borderLeft: `4px solid ${color || '#000000'}`, height: '100%', transition: 'box-shadow 0.15s' }}>
-      <div style={{ fontSize: '2rem', fontWeight: '900', color: color || '#000000', lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#888888', marginTop: '0.4rem', textTransform: 'uppercase' }}>{label}</div>
-      {sub && <div style={{ fontSize: '0.7rem', color: '#aaaaaa', marginTop: '0.2rem' }}>{sub}</div>}
+    <div className="card" style={{ height: '100%' }}>
+      <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#888', marginTop: '0.4rem', textTransform: 'uppercase' }}>{label}</div>
+      {sub && <div style={{ fontSize: '0.7rem', color: '#aaa', marginTop: '0.2rem' }}>{sub}</div>}
     </div>
   );
   if (href) return <Link href={href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>;
@@ -103,11 +103,11 @@ export default function FerramentalDashboardPage() {
         <>
           {/* KPIs principais */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
-            <KpiCard label="Total de Solicitações" value={total} color="#000000" href="/ferramental" />
-            <KpiCard label="Aguardando Aprovação" value={aguardando} color="#f59e0b" sub="ação do gestor" href="/ferramental?status=aguardando_aprovacao" />
-            <KpiCard label="Em Andamento" value={emAndamento} color="#60a5fa" sub="aprovadas / enviando" href="/ferramental" />
-            <KpiCard label="Entregues" value={entregues} color="#10b981" href="/ferramental?status=entregue" />
-            <KpiCard label="Aguard. Compra" value={aguardaCompra} color="#f472b6" href="/ferramental?status=aguardando_compra" />
+            <KpiCard label="Total de Solicitações" value={total} href="/ferramental" />
+            <KpiCard label="Aguardando Aprovação" value={aguardando} sub="ação do gestor" href="/ferramental?status=aguardando_aprovacao" />
+            <KpiCard label="Em Andamento" value={emAndamento} sub="aprovadas / enviando" href="/ferramental" />
+            <KpiCard label="Entregues" value={entregues} href="/ferramental?status=entregue" />
+            <KpiCard label="Aguard. Compra" value={aguardaCompra} href="/ferramental?status=aguardando_compra" />
           </div>
 
           {/* Linha: status breakdown + estoque central */}
@@ -130,10 +130,10 @@ export default function FerramentalDashboardPage() {
                       <div key={status}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
                           <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#333333' }}>{cfg.label}</span>
-                          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: cfg.color }}>{count}</span>
+                          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#000' }}>{count}</span>
                         </div>
                         <div style={{ height: '4px', borderRadius: '4px', background: '#f0f0f0', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, background: cfg.color, borderRadius: '4px', transition: 'width 0.4s' }} />
+                          <div style={{ height: '100%', width: `${pct}%`, background: '#000', borderRadius: '4px', transition: 'width 0.4s' }} />
                         </div>
                       </div>
                     );
@@ -150,11 +150,11 @@ export default function FerramentalDashboardPage() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
                 <div style={{ background: '#f8f8f8', borderRadius: '8px', padding: '0.85rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: totalItensEstoque > 0 ? '#10b981' : '#ef4444' }}>{totalItensEstoque}</div>
-                  <div style={{ fontSize: '0.68rem', color: '#888888', fontWeight: '700', marginTop: '0.2rem', textTransform: 'uppercase' }}>Itens em estoque</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#000' }}>{totalItensEstoque}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '700', marginTop: '0.2rem', textTransform: 'uppercase' }}>Itens em estoque</div>
                 </div>
                 <div style={{ background: '#f8f8f8', borderRadius: '8px', padding: '0.85rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: ferramentasSemEstoque > 0 ? '#f59e0b' : '#10b981' }}>{ferramentasSemEstoque}</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#000' }}>{ferramentasSemEstoque}</div>
                   <div style={{ fontSize: '0.68rem', color: '#888888', fontWeight: '700', marginTop: '0.2rem', textTransform: 'uppercase' }}>Ferramentas sem estoque</div>
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function FerramentalDashboardPage() {
                   return (
                     <div key={tool.tool_id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.35rem 0', borderBottom: '1px solid #f5f5f5' }}>
                       <span style={{ fontSize: '0.75rem', color: '#333333', fontWeight: '600', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '0.5rem' }}>{tool.tool_name}</span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#10b981', flexShrink: 0 }}>{qty} un.</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#000', flexShrink: 0 }}>{qty} un.</span>
                     </div>
                   );
                 })}

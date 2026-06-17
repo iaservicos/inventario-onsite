@@ -208,6 +208,7 @@ export async function POST(req) {
       .from('inventories')
       .update({
         status:           newStatus,
+        is_recount:       eraRecontagem,
         completed_at:     new Date().toISOString(),
         total_items:      countedItems.length,
         counted_items:    countedItems.length,

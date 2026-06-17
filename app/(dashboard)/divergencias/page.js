@@ -128,20 +128,20 @@ export default function DivergenciasPage() {
     const res = await fetch(`/api/divergences?${params}`);
     const all = await res.json();
 
-    // Quando há recontagem, ocultar a divergência da 1ª contagem (status 'open')
-    // para o mesmo técnico + item_code
-    if (!filters.status) {
-      const recounted = new Set(
-        all
-          .filter(d => ['recount', 'tratativa', 'validated', 'adjusted'].includes(d.status))
-          .map(d => `${d.technician_id}|${d.item_code}`)
-      );
-      setDivergences(all.filter(d =>
-        !(d.status === 'open' && recounted.has(`${d.technician_id}|${d.item_code}`))
-      ));
-    } else {
-      setDivergences(all);
+    // Mantém apenas a divergência mais recente por técnico+item (recontagem supera 1ª contagem)
+    const latestByKey = {};
+    for (const d of all) {
+      const key = `${d.technician_id}|${d.item_code}`;
+      if (!latestByKey[key] || new Date(d.created_at) > new Date(latestByKey[key].created_at)) {
+        latestByKey[key] = d;
+      }
     }
+    const deduplicated = Object.values(latestByKey);
+
+    // Aplica filtro de status depois da deduplicação
+    setDivergences(
+      filters.status ? deduplicated.filter(d => d.status === filters.status) : deduplicated
+    );
     setLoading(false);
   }, [filters]);
 

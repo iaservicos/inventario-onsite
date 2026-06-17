@@ -47,6 +47,11 @@ function ModalItens({ inventory, onClose }) {
             </div>
             <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px', fontWeight: '600' }}>
               Semana {inventory.week_ref} &nbsp;·&nbsp; {inventory.technicians?.region} &nbsp;·&nbsp; {inventory.inventory_schedules?.[0]?.scheduled_subgroup || '—'}
+              {inventory.is_recount != null && (
+                <span style={{ marginLeft: '0.5rem', background: '#000', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.65rem', fontWeight: '800', letterSpacing: '0.06em' }}>
+                  {inventory.is_recount ? 'RECONTAGEM' : '1ª CONTAGEM'}
+                </span>
+              )}
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900', color: '#000' }}>✕</button>
@@ -197,6 +202,7 @@ export default function HistoricoPage() {
                   <th>Região</th>
                   <th>Semana</th>
                   <th>Subgrupo</th>
+                  <th>Fase</th>
                   <th style={{ textAlign: 'center' }}>Peças</th>
                   <th style={{ textAlign: 'center' }}>Divergências</th>
                   <th>Status</th>
@@ -213,6 +219,11 @@ export default function HistoricoPage() {
                       <td style={{ color: '#666' }}>{inv.technicians?.region || '—'}</td>
                       <td style={{ fontWeight: '700' }}>{inv.week_ref}</td>
                       <td style={{ color: '#666', fontSize: '0.8rem' }}>{sched?.scheduled_subgroup || '—'}</td>
+                      <td>
+                        {inv.is_recount != null
+                          ? <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>{inv.is_recount ? 'Recontagem' : '1ª Contagem'}</span>
+                          : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>}
+                      </td>
                       <td style={{ textAlign: 'center', fontWeight: '700' }}>{inv.total_items ?? '—'}</td>
                       <td style={{ textAlign: 'center', fontWeight: '800' }}>
                         {inv.divergence_count > 0

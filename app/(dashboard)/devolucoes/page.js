@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
+import * as XLSX from 'xlsx';
 import PageHeader from '@/components/ui/PageHeader';
 
 function formatDate(val) {
@@ -133,6 +134,63 @@ export default function DevolucoesPage() {
   const montadoCount = useMemo(() => items.filter(i => i.status_devolucao === 'MONTADO').length, [items]);
   const enviadoCount = useMemo(() => items.filter(i => i.status_devolucao === 'ENVIADO').length, [items]);
 
+  function handleExportExcel() {
+    if (items.length === 0) return;
+
+    const wb = XLSX.utils.book_new();
+
+    // Aba 1: Resumo por status
+    const montadoLotes = new Set(items.filter(i => i.status_devolucao === 'MONTADO').map(i => i.lote_dev_tecnico_id)).size;
+    const enviadoLotes = new Set(items.filter(i => i.status_devolucao === 'ENVIADO').map(i => i.lote_dev_tecnico_id)).size;
+    const totalLotes   = new Set(items.map(i => i.lote_dev_tecnico_id)).size;
+    const summaryRows = [
+      ['Status', 'Qtd Lotes', 'Qtd Peças'],
+      ['MONTADO', montadoLotes, montadoCount],
+      ['ENVIADO', enviadoLotes, enviadoCount],
+      ['TOTAL',   totalLotes,   items.length],
+    ];
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+    wsSummary['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 12 }];
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumo');
+
+    // Aba 2: Detalhes por peça
+    const techName = techsForDropdown.find(t => String(t.id) === selectedTech)?.name || selectedTech;
+    const detailRows = items.map(i => ({
+      'Técnico':         techName,
+      'Lote':            i.lote_dev_tecnico_id || '—',
+      'Código':          i.cod_peca || '—',
+      'Descrição':       i.descr_peca || '—',
+      'Status Lote':     i.status_devolucao || '—',
+      'Tipo':            i.status_consumo || '—',
+      'Data Montagem':   i.data_montagem_lote ? new Date(i.data_montagem_lote).toLocaleDateString('pt-BR') : '—',
+      'Data Envio':      i.data_envio_lote    ? new Date(i.data_envio_lote).toLocaleDateString('pt-BR')    : '—',
+      'Dias Aguardando': i.dias_aguardando ?? '—',
+    }));
+    const wsDetail = XLSX.utils.json_to_sheet(detailRows);
+    wsDetail['!cols'] = [{ wch: 25 }, { wch: 12 }, { wch: 14 }, { wch: 35 }, { wch: 12 }, { wch: 8 }, { wch: 15 }, { wch: 12 }, { wch: 16 }];
+    XLSX.utils.book_append_sheet(wb, wsDetail, 'Detalhes');
+
+    const date = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `lotes_montados_${techName.replace(/\s/g, '_')}_${date}.xlsx`);
+  }
+
+  function handleExportSummaryExcel() {
+    if (!summaryData.length) return;
+    const wb = XLSX.utils.book_new();
+
+    // Aba Resumo: técnico × status × lotes × peças
+    const summaryRows = [['Técnico', 'Região', 'Montado (lotes)', 'Montado (peças)', 'Enviado (lotes)', 'Enviado (peças)', 'Total Peças', 'Max Dias']];
+    summaryData.forEach(t => {
+      summaryRows.push([t.name, t.region || '—', t.montado_lotes ?? t.montado, t.montado, t.enviado_lotes ?? t.enviado, t.enviado, t.montado + t.enviado, t.max_dias ?? '—']);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(summaryRows);
+    ws['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 }];
+    XLSX.utils.book_append_sheet(wb, ws, 'Resumo');
+
+    const date = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `lotes_resumo_${filterSupervisor.replace(/\s/g, '_')}_${date}.xlsx`);
+  }
+
   if (status === 'loading') {
     return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
   }
@@ -189,6 +247,26 @@ export default function DevolucoesPage() {
             style={{ fontWeight: '700', whiteSpace: 'nowrap' }}
           >
             {summaryLoading ? 'Carregando...' : 'Ver Resumo'}
+          </button>
+        )}
+
+        {selectedTech && items.length > 0 && (
+          <button
+            className="btn btn-primary"
+            onClick={handleExportExcel}
+            style={{ fontWeight: '700', whiteSpace: 'nowrap' }}
+          >
+            Exportar Excel
+          </button>
+        )}
+
+        {summaryMode && summaryData.length > 0 && (
+          <button
+            className="btn btn-primary"
+            onClick={handleExportSummaryExcel}
+            style={{ fontWeight: '700', whiteSpace: 'nowrap' }}
+          >
+            Exportar Excel
           </button>
         )}
 
