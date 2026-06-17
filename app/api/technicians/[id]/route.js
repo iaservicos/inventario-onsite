@@ -111,6 +111,40 @@ export async function POST(request, context) {
   }
 }
 
+export async function DELETE(request, context) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (session.user.role !== 'admin') return NextResponse.json({ error: 'Apenas administradores podem excluir técnicos' }, { status: 403 });
+
+    const params = await context.params;
+    const { id } = params;
+    if (!id || id === 'undefined') return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+
+    const supabase = createServiceClient();
+
+    // Verifica se o técnico tem inventários associados
+    const { count } = await supabase
+      .from('inventories')
+      .select('id', { count: 'exact', head: true })
+      .eq('technician_id', id);
+
+    if (count > 0) {
+      return NextResponse.json(
+        { error: 'Este técnico possui inventários registrados e não pode ser excluído. Use a opção de inativar.' },
+        { status: 409 }
+      );
+    }
+
+    const { error } = await supabase.from('technicians').delete().eq('id', id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
 export async function PATCH(request, context) {
   try {
     const session = await getServerSession(authOptions);

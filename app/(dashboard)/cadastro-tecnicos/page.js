@@ -268,6 +268,8 @@ export default function CadastroTecnicosPage() {
   const [coordinatorFlt, setCoordinatorFlt] = useState('');
   const [modal,         setModal]         = useState(null);
   const [selecionados,  setSelecionados]  = useState([]);
+  const [confirmDelete, setConfirmDelete] = useState(null); // id do tecnico aguardando confirmação
+  const [deleting,      setDeleting]      = useState(false);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -333,6 +335,22 @@ export default function CadastroTecnicosPage() {
   const toggleAll = () => {
     if (selecionados.length === filteredTecnicos.length) setSelecionados([]);
     else setSelecionados(filteredTecnicos.map(t => t.id));
+  };
+
+  const handleDelete = async (id) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/technicians/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao excluir');
+      setConfirmDelete(null);
+      load();
+      toast.success('Técnico excluído.');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (status === 'loading') return null;
@@ -432,9 +450,44 @@ export default function CadastroTecnicosPage() {
                       )}
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <button className="btn btn-secondary" onClick={() => setModal({ type: 'edit', data: t })} style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid #000' }}>
-                        EDITAR
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        {confirmDelete === t.id ? (
+                          <>
+                            <span style={{ fontSize: '0.7rem', fontWeight: '700', color: '#000' }}>Confirmar exclusão?</span>
+                            <button
+                              className="btn"
+                              onClick={() => handleDelete(t.id)}
+                              disabled={deleting}
+                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem', fontWeight: '800', background: '#000', color: '#fff', border: '1px solid #000' }}
+                            >
+                              {deleting ? '...' : 'SIM'}
+                            </button>
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => setConfirmDelete(null)}
+                              disabled={deleting}
+                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #ccc' }}
+                            >
+                              NÃO
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button className="btn btn-secondary" onClick={() => setModal({ type: 'edit', data: t })} style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid #000' }}>
+                              EDITAR
+                            </button>
+                            {isAdmin && (
+                              <button
+                                className="btn btn-secondary"
+                                onClick={() => setConfirmDelete(t.id)}
+                                style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid #ccc', color: '#666' }}
+                              >
+                                EXCLUIR
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
