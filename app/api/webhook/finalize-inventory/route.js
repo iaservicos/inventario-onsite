@@ -90,18 +90,40 @@ export async function POST(req) {
           const sysQty = Number(expected.item_quantity) || 0;
           if (sysQty === 0) continue; // sem quantidade no sistema, ignora
 
-          // Insere linha como não contada (physical_qty = 0)
-          await supabase.from('inventory_items').insert({
-            inventory_id:  invId,
-            item_code:     expected.item_code,
-            item_name:     expected.item_name,
-            item_subgroup: expected.item_subgroup || subgroup || null,
-            system_qty:    sysQty,
-            physical_qty:  0,
-            has_divergence: true,
-            status:        'recount',
-            counted_at:    new Date().toISOString(),
-          });
+          // Atualiza linha pendente existente (physical_qty=null do dispatch) ou insere se não existir
+          const { data: existingPending } = await supabase
+            .from('inventory_items')
+            .select('id')
+            .eq('inventory_id', invId)
+            .ilike('item_code', `%${normalizedCode}`)
+            .is('physical_qty', null)
+            .limit(1)
+            .maybeSingle();
+
+          if (existingPending) {
+            await supabase
+              .from('inventory_items')
+              .update({
+                system_qty:    sysQty,
+                physical_qty:  0,
+                has_divergence: true,
+                status:        'recount',
+                counted_at:    new Date().toISOString(),
+              })
+              .eq('id', existingPending.id);
+          } else {
+            await supabase.from('inventory_items').insert({
+              inventory_id:  invId,
+              item_code:     expected.item_code,
+              item_name:     expected.item_name,
+              item_subgroup: expected.item_subgroup || subgroup || null,
+              system_qty:    sysQty,
+              physical_qty:  0,
+              has_divergence: true,
+              status:        'recount',
+              counted_at:    new Date().toISOString(),
+            });
+          }
 
           // Adiciona como item contado para entrar na comparação abaixo
           countedItems.push({
