@@ -133,6 +133,9 @@ export default function DevolucoesPage() {
 
   const montadoCount = useMemo(() => items.filter(i => i.status_devolucao === 'MONTADO').length, [items]);
   const enviadoCount = useMemo(() => items.filter(i => i.status_devolucao === 'ENVIADO').length, [items]);
+  const montadoLotes = useMemo(() => new Set(items.filter(i => i.status_devolucao === 'MONTADO').map(i => i.lote_dev_tecnico_id).filter(Boolean)).size, [items]);
+  const enviadoLotes = useMemo(() => new Set(items.filter(i => i.status_devolucao === 'ENVIADO').map(i => i.lote_dev_tecnico_id).filter(Boolean)).size, [items]);
+  const totalLotes   = useMemo(() => new Set(items.map(i => i.lote_dev_tecnico_id).filter(Boolean)).size, [items]);
 
   function handleExportExcel() {
     if (items.length === 0) return;
@@ -181,7 +184,7 @@ export default function DevolucoesPage() {
     // Aba Resumo: técnico × status × lotes × peças
     const summaryRows = [['Técnico', 'Região', 'Montado (lotes)', 'Montado (peças)', 'Enviado (lotes)', 'Enviado (peças)', 'Total Peças', 'Max Dias']];
     summaryData.forEach(t => {
-      summaryRows.push([t.name, t.region || '—', t.montado_lotes ?? t.montado, t.montado, t.enviado_lotes ?? t.enviado, t.enviado, t.montado + t.enviado, t.max_dias ?? '—']);
+      summaryRows.push([t.name, t.region || '—', t.montado_lotes, t.montado_pecas, t.enviado_lotes, t.enviado_pecas, t.montado_pecas + t.enviado_pecas, t.max_dias ?? '—']);
     });
     const ws = XLSX.utils.aoa_to_sheet(summaryRows);
     ws['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 }];
@@ -328,10 +331,10 @@ export default function DevolucoesPage() {
                     <tr>
                       <th>Técnico</th>
                       <th>UF</th>
-                      <th style={{ textAlign: 'center' }}>Montado</th>
-                      <th style={{ textAlign: 'center' }}>Enviado (aguard. ATP)</th>
-                      <th style={{ textAlign: 'center' }}>Total</th>
-                      <th style={{ textAlign: 'center' }}>Máx. Dias Aguardando</th>
+                      <th style={{ textAlign: 'center' }}>Montado<br /><span style={{ fontWeight: '400', fontSize: '0.62rem' }}>lotes / peças</span></th>
+                      <th style={{ textAlign: 'center' }}>Enviado<br /><span style={{ fontWeight: '400', fontSize: '0.62rem' }}>lotes / peças</span></th>
+                      <th style={{ textAlign: 'center' }}>Total peças</th>
+                      <th style={{ textAlign: 'center' }}>Máx. Dias</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -340,16 +343,16 @@ export default function DevolucoesPage() {
                         <td style={{ fontWeight: '800', color: '#000' }}>{t.name}</td>
                         <td><span className="badge badge-info">{t.region || '—'}</span></td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>
-                          {t.montado > 0
-                            ? <span className="badge badge-not-ok">{t.montado}</span>
+                          {t.montado_pecas > 0
+                            ? <span className="badge badge-not-ok">{t.montado_lotes}L / {t.montado_pecas}P</span>
                             : <span style={{ color: '#999' }}>—</span>}
                         </td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>
-                          {t.enviado > 0
-                            ? <span className="badge badge-info">{t.enviado}</span>
+                          {t.enviado_pecas > 0
+                            ? <span className="badge badge-info">{t.enviado_lotes}L / {t.enviado_pecas}P</span>
                             : <span style={{ color: '#999' }}>—</span>}
                         </td>
-                        <td style={{ textAlign: 'center', fontWeight: '700' }}>{t.montado + t.enviado}</td>
+                        <td style={{ textAlign: 'center', fontWeight: '700' }}>{t.montado_pecas + t.enviado_pecas}</td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>
                           {t.max_dias > 0 ? `${t.max_dias}d` : '—'}
                         </td>
@@ -369,24 +372,21 @@ export default function DevolucoesPage() {
           {/* Stats */}
           {!loading && (items.length > 0) && (
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-              <div className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
-                <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000' }}>{montadoCount}</div>
-                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginTop: '0.25rem' }}>
-                  MONTADO<br /><span style={{ fontWeight: '400' }}>aguardando envio</span>
+              {[
+                { label: 'MONTADO', sub: 'aguardando envio', lotes: montadoLotes, pecas: montadoCount },
+                { label: 'ENVIADO', sub: 'aguardando ATP',   lotes: enviadoLotes, pecas: enviadoCount },
+                { label: 'TOTAL',   sub: 'pendentes',        lotes: totalLotes,   pecas: items.length  },
+              ].map(c => (
+                <div key={c.label} className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#000', lineHeight: 1 }}>{c.lotes}</div>
+                  <div style={{ fontSize: '0.62rem', fontWeight: '700', color: '#888', textTransform: 'uppercase', marginTop: '0.2rem' }}>lotes</div>
+                  <div style={{ fontSize: '1rem', fontWeight: '800', color: '#333', marginTop: '0.5rem', lineHeight: 1 }}>{c.pecas}</div>
+                  <div style={{ fontSize: '0.62rem', fontWeight: '700', color: '#888', textTransform: 'uppercase', marginTop: '0.2rem' }}>peças</div>
+                  <div style={{ fontSize: '0.65rem', fontWeight: '700', color: '#aaa', marginTop: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {c.label}<br /><span style={{ fontWeight: '400', textTransform: 'none' }}>{c.sub}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
-                <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000' }}>{enviadoCount}</div>
-                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginTop: '0.25rem' }}>
-                  ENVIADO<br /><span style={{ fontWeight: '400' }}>aguardando ATP</span>
-                </div>
-              </div>
-              <div className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
-                <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000' }}>{items.length}</div>
-                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginTop: '0.25rem' }}>
-                  TOTAL<br /><span style={{ fontWeight: '400' }}>pendentes</span>
-                </div>
-              </div>
+              ))}
             </div>
           )}
 
