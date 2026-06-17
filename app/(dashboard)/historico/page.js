@@ -71,10 +71,12 @@ function ModalItens({ inventory, onClose }) {
     });
   }, [rawItems]);
 
-  const total   = items.length;
-  const ok      = items.filter(i => !i.has_divergence && i.physical_qty !== null).length;
-  const diverg  = items.filter(i => i.has_divergence).length;
-  const pending = items.filter(i => i.physical_qty === null).length;
+  // KPIs por QUANTIDADE (soma de system_qty), não por contagem de linhas
+  const sumQty  = (arr) => arr.reduce((acc, i) => acc + (Number(i.system_qty) || 0), 0);
+  const total   = sumQty(items);
+  const ok      = sumQty(items.filter(i => !i.has_divergence && i.physical_qty !== null));
+  const diverg  = sumQty(items.filter(i => i.has_divergence));
+  const pending = sumQty(items.filter(i => i.physical_qty === null));
   const fase    = getFaseLabel(inventory);
 
   return (
@@ -145,8 +147,14 @@ function ModalItens({ inventory, onClose }) {
                       <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '800' }}>
                         {diff === null ? '—' : diff > 0 ? `+${diff}` : diff === 0 ? '✓' : diff}
                       </td>
-                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'center' }}>
-                        <StatusBadge status={isPend ? 'pending' : item.has_divergence ? 'recount' : 'counted'} />
+                      <td style={{ padding: '0.55rem 0.75rem' }}>
+                        {isPend ? (
+                          <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#888', background: '#f4f4f5', border: '1px solid #ddd', borderRadius: '4px', padding: '2px 7px' }}>PENDENTE</span>
+                        ) : item.has_divergence ? (
+                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#fff', background: '#000', borderRadius: '4px', padding: '2px 7px' }}>DIVERGENTE</span>
+                        ) : (
+                          <span style={{ fontSize: '0.9rem', fontWeight: '900', color: '#000' }}>✓</span>
+                        )}
                       </td>
                     </tr>
                   );
