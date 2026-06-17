@@ -226,7 +226,8 @@ export async function POST(req) {
     // (evita loop infinito de recontagem → recontagem → recontagem)
     const newStatus = (!eraRecontagem && recountItems.length > 0) ? 'recount_pending' : 'completed';
 
-    const sumSysQty = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
+    const sumSysQty  = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
+    const sumAbsDiff = (arr) => arr.reduce((s, i) => s + Math.abs(Number(i.difference) || 0), 0);
 
     await supabase
       .from('inventories')
@@ -238,7 +239,7 @@ export async function POST(req) {
         counted_items:        countedItems.length,
         divergence_count:     divergencesToInsert.length,
         total_quantity:       sumSysQty(countedItems),
-        divergence_quantity:  sumSysQty(divergencesToInsert),
+        divergence_quantity:  sumAbsDiff(divergencesToInsert),
         updated_at:           new Date().toISOString(),
       })
       .eq('id', invId);

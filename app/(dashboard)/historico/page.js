@@ -76,7 +76,9 @@ function ModalItens({ inventory, onClose }) {
   const sumQty = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
   const total   = sumQty(items);
   const ok      = sumQty(items.filter(i => !i.has_divergence && i.physical_qty !== null));
-  const diverg  = sumQty(items.filter(i => i.has_divergence));
+  const diverg  = items
+    .filter(i => i.has_divergence)
+    .reduce((s, i) => s + Math.abs((Number(i.physical_qty) || 0) - (Number(i.system_qty) || 0)), 0);
   const pending = sumQty(items.filter(i => i.physical_qty === null));
   const fase    = getFaseLabel(inventory);
 
