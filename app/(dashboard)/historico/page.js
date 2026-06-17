@@ -71,12 +71,12 @@ function ModalItens({ inventory, onClose }) {
     });
   }, [rawItems]);
 
-  // KPIs por QUANTIDADE (soma de system_qty), não por contagem de linhas
-  const sumQty  = (arr) => arr.reduce((acc, i) => acc + (Number(i.system_qty) || 0), 0);
-  const total   = sumQty(items);
-  const ok      = sumQty(items.filter(i => !i.has_divergence && i.physical_qty !== null));
-  const diverg  = sumQty(items.filter(i => i.has_divergence));
-  const pending = sumQty(items.filter(i => i.physical_qty === null));
+  // TOTAL = soma de quantidades (unidades físicas em escopo)
+  // OK / DIVERGÊNCIAS / PENDENTES = contagem de itens (códigos)
+  const total   = items.reduce((acc, i) => acc + (Number(i.system_qty) || 0), 0);
+  const ok      = items.filter(i => !i.has_divergence && i.physical_qty !== null).length;
+  const diverg  = items.filter(i => i.has_divergence).length;
+  const pending = items.filter(i => i.physical_qty === null).length;
   const fase    = getFaseLabel(inventory);
 
   return (
@@ -104,7 +104,7 @@ function ModalItens({ inventory, onClose }) {
         {/* KPIs */}
         <div style={{ display: 'flex', borderBottom: '1px solid #e4e4e7' }}>
           {[
-            { label: 'Total',        value: total   },
+            { label: 'Unidades',     value: total   },
             { label: 'OK',           value: ok      },
             { label: 'Divergências', value: diverg  },
             { label: 'Pendentes',    value: pending },
@@ -274,8 +274,11 @@ export default function HistoricoPage() {
                     ? formatDateOnly(sched?.scheduled_at || inv.created_at)
                     : formatDateOnly(inv.updated_at || inv.created_at);
 
-                  // Peças e divergências: 1ª contagem não tem dados separados
-                  const displayPecas = isFirst ? '—' : (inv.total_items ?? '—');
+                  // Peças: pending usa qtd agendada (sched.items_count); concluído usa total_items
+                  const rawPecas = (!isFirst && (inv.status === 'pending' || !inv.total_items))
+                    ? (sched?.items_count ?? inv.total_items)
+                    : inv.total_items;
+                  const displayPecas = isFirst ? '—' : (rawPecas ?? '—');
                   const hasDiv = !isFirst && (inv.divergence_count || 0) > 0;
 
                   return (

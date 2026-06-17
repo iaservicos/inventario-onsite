@@ -51,8 +51,7 @@ export async function POST(req) {
 
     const { id: invId, technician_id: techId } = inventory;
 
-    // Limpa divergências anteriores deste inventário (para recontagem não duplicar)
-    await supabase.from('divergences').delete().eq('inventory_id', invId);
+    // Não apaga divergências antigas — cada finalização insere com is_recount para rastrear a fase
 
     // 2. Busca apenas itens contados — system_qty já correto, gravado pelo record-count
     const { data: countedItems } = await supabase
@@ -188,6 +187,7 @@ export async function POST(req) {
           difference:      diff,
           percentage_diff: pct,
           status:          'open',
+          is_recount:      eraRecontagem,
         });
 
         if (diff < 0) {
