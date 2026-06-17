@@ -73,8 +73,8 @@ function ModalNovaFerramenta({ onClose, onSaved }) {
   const labelStyle = { fontSize: '0.72rem', fontWeight: '800', color: '#555555', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: '10px', width: '100%', maxWidth: '420px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: '10px', width: '100%', maxWidth: '420px', overflow: 'hidden' }}>
         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #eeeeee', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
           <span style={{ fontSize: '0.9rem', fontWeight: '900', color: '#000000' }}>Nova Ferramenta no Catálogo</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666666' }}>✕</button>
@@ -135,8 +135,8 @@ function ModalNovaFilial({ toolId, toolName, existing, onClose, onSaved }) {
   const labelStyle = { fontSize: '0.72rem', fontWeight: '800', color: '#555555', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: '10px', width: '100%', maxWidth: '440px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: '10px', width: '100%', maxWidth: '440px', overflow: 'hidden' }}>
         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #eeeeee', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
           <div>
             <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#000000' }}>Nova Filial</div>

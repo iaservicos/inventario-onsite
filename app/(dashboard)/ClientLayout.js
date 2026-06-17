@@ -2,15 +2,36 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import Sidebar from '@/components/layout/Sidebar';
+
+const INACTIVITY_MS = 60 * 60 * 1000; // 1 hora
 
 export default function ClientLayout({ children, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const lastLogged = useRef('');
+  const lastLogged   = useRef('');
+  const inactivityTimer = useRef(null);
 
   // Fecha o sidebar ao navegar (mobile)
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
+
+  // Logout por inatividade após 1 hora sem interação
+  useEffect(() => {
+    const reset = () => {
+      clearTimeout(inactivityTimer.current);
+      inactivityTimer.current = setTimeout(() => {
+        signOut({ callbackUrl: '/login' });
+      }, INACTIVITY_MS);
+    };
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+    reset();
+    return () => {
+      clearTimeout(inactivityTimer.current);
+      events.forEach(e => window.removeEventListener(e, reset));
+    };
+  }, []);
 
   // Log de página visitada (debounce: só loga se mudou de rota)
   useEffect(() => {

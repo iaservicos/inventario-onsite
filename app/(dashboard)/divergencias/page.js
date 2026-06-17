@@ -41,8 +41,8 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#fff', width: '100%', maxWidth: '480px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+      <div style={{ background: '#fff', width: '100%', maxWidth: '480px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000' }}>
         <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: '900', fontSize: '0.95rem', textTransform: 'uppercase' }}>Em Tratativa</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900' }}>✕</button>

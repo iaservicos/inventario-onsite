@@ -90,8 +90,8 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
   const labelStyle = { fontSize: '0.72rem', color: '#555', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={onClose}>
-      <div style={{ background: '#fff', border: '2px solid #000', borderRadius: '8px', width: '100%', maxWidth: '500px', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+      <div style={{ background: '#fff', border: '2px solid #000', borderRadius: '8px', width: '100%', maxWidth: '500px', overflow: 'hidden' }}>
         <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#000' }}>Atualizar Solicitação #{request.id}</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900' }}>✕</button>

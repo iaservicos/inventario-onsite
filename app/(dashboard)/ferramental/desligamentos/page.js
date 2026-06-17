@@ -30,10 +30,8 @@ const thSt    = { padding: '0.65rem 0.9rem', textAlign: 'left', fontSize: '0.65r
 // ── Overlay genérico ─────────────────────────────────────────
 function Overlay({ children, onClose, maxWidth = '760px' }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem', overflowY: 'auto' }}
-      onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: '10px', width: '100%', maxWidth, maxHeight: '94vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid #e0e0e0', boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}
-        onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem', overflowY: 'auto' }}>
+      <div style={{ background: '#fff', borderRadius: '10px', width: '100%', maxWidth, maxHeight: '94vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid #e0e0e0', boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
         {children}
       </div>
     </div>
