@@ -127,17 +127,17 @@ export default function DivergenciasPage() {
     const raw = await res.json();
     const all = Array.isArray(raw) ? raw : [];
 
-    // Por inventário: se existe is_recount=true → mostra só essas (resultado da recontagem)
-    //                  se não existe is_recount=true → mostra as da 1ª contagem (is_recount=false)
-    const byInventory = {};
+    // Dedup: por inventário+código, mantém a divergência mais recente (recontagem supera 1ª contagem)
+    // Exclui system_qty=0 (código errado escaneado na 1ª contagem, não existe no sistema)
+    const latestMap = {};
     for (const d of all) {
-      if (!byInventory[d.inventory_id]) byInventory[d.inventory_id] = { hasRecount: false, items: [] };
-      if (d.is_recount) byInventory[d.inventory_id].hasRecount = true;
-      byInventory[d.inventory_id].items.push(d);
+      if ((d.system_qty || 0) === 0) continue;
+      const key = `${d.inventory_id}|${d.item_code}`;
+      if (!latestMap[key] || new Date(d.created_at) > new Date(latestMap[key].created_at)) {
+        latestMap[key] = d;
+      }
     }
-    const deduplicated = Object.values(byInventory).flatMap(group =>
-      group.hasRecount ? group.items.filter(d => d.is_recount) : group.items
-    );
+    const deduplicated = Object.values(latestMap);
 
     // Aplica filtro de status depois da deduplicação
     setDivergences(

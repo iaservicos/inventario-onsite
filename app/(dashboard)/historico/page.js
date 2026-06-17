@@ -73,10 +73,11 @@ function ModalItens({ inventory, onClose }) {
 
   // TOTAL = soma de quantidades (unidades físicas em escopo)
   // OK / DIVERGÊNCIAS / PENDENTES = contagem de itens (códigos)
-  const total   = items.reduce((acc, i) => acc + (Number(i.system_qty) || 0), 0);
-  const ok      = items.filter(i => !i.has_divergence && i.physical_qty !== null).length;
-  const diverg  = items.filter(i => i.has_divergence).length;
-  const pending = items.filter(i => i.physical_qty === null).length;
+  const sumQty = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
+  const total   = sumQty(items);
+  const ok      = sumQty(items.filter(i => !i.has_divergence && i.physical_qty !== null));
+  const diverg  = sumQty(items.filter(i => i.has_divergence));
+  const pending = sumQty(items.filter(i => i.physical_qty === null));
   const fase    = getFaseLabel(inventory);
 
   return (
@@ -274,12 +275,13 @@ export default function HistoricoPage() {
                     ? formatDateOnly(sched?.scheduled_at || inv.created_at)
                     : formatDateOnly(inv.updated_at || inv.created_at);
 
-                  // Peças: pending usa qtd agendada (sched.items_count); concluído usa total_items
-                  const rawPecas = (!isFirst && (inv.status === 'pending' || !inv.total_items))
+                  // Peças: pending usa qtd agendada; concluído usa total_quantity (soma de system_qty)
+                  const rawPecas = (!isFirst && (inv.status === 'pending' || !inv.total_quantity))
                     ? (sched?.items_count ?? inv.total_items)
-                    : inv.total_items;
+                    : inv.total_quantity;
                   const displayPecas = isFirst ? '—' : (rawPecas ?? '—');
-                  const hasDiv = !isFirst && (inv.divergence_count || 0) > 0;
+                  const divQty  = inv.divergence_quantity ?? inv.divergence_count ?? 0;
+                  const hasDiv  = !isFirst && divQty > 0;
 
                   return (
                     <tr
@@ -306,7 +308,7 @@ export default function HistoricoPage() {
                         {isFirst
                           ? <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>
                           : hasDiv
-                            ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{inv.divergence_count}</span>
+                            ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{divQty}</span>
                             : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>0</span>
                         }
                       </td>
