@@ -3,11 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
-
 function getIP(req) {
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -18,6 +13,10 @@ function getIP(req) {
 
 export async function POST(req) {
   try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    );
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ ok: false }, { status: 401 });
 
