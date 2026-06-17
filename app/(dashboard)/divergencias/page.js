@@ -126,7 +126,8 @@ export default function DivergenciasPage() {
       if (ids.length > 0) params.set('technicianIds', ids.join(','));
     }
     const res = await fetch(`/api/divergences?${params}`);
-    const all = await res.json();
+    const raw = await res.json();
+    const all = Array.isArray(raw) ? raw : [];
 
     // Mantém apenas a divergência mais recente por técnico+item (recontagem supera 1ª contagem)
     const latestByKey = {};

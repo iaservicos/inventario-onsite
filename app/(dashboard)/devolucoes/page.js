@@ -373,17 +373,32 @@ export default function DevolucoesPage() {
           {!loading && (items.length > 0) && (
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
               {[
-                { label: 'MONTADO', sub: 'aguardando envio', lotes: montadoLotes, pecas: montadoCount },
-                { label: 'ENVIADO', sub: 'aguardando ATP',   lotes: enviadoLotes, pecas: enviadoCount },
-                { label: 'TOTAL',   sub: 'pendentes',        lotes: totalLotes,   pecas: items.length  },
+                { label: 'Montado',  sub: 'aguardando envio', lotes: montadoLotes, pecas: montadoCount, accent: '#000' },
+                { label: 'Enviado',  sub: 'aguardando ATP',   lotes: enviadoLotes, pecas: enviadoCount, accent: '#555' },
+                { label: 'Total',    sub: 'pendentes',        lotes: totalLotes,   pecas: items.length,  accent: '#aaa' },
               ].map(c => (
-                <div key={c.label} className="card" style={{ flex: 1, minWidth: '160px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#000', lineHeight: 1 }}>{c.lotes}</div>
-                  <div style={{ fontSize: '0.62rem', fontWeight: '700', color: '#888', textTransform: 'uppercase', marginTop: '0.2rem' }}>lotes</div>
-                  <div style={{ fontSize: '1rem', fontWeight: '800', color: '#333', marginTop: '0.5rem', lineHeight: 1 }}>{c.pecas}</div>
-                  <div style={{ fontSize: '0.62rem', fontWeight: '700', color: '#888', textTransform: 'uppercase', marginTop: '0.2rem' }}>peças</div>
-                  <div style={{ fontSize: '0.65rem', fontWeight: '700', color: '#aaa', marginTop: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {c.label}<br /><span style={{ fontWeight: '400', textTransform: 'none' }}>{c.sub}</span>
+                <div key={c.label} style={{
+                  flex: 1, minWidth: '180px',
+                  background: '#fff',
+                  border: '1px solid #e8e8e8',
+                  borderTop: `4px solid ${c.accent}`,
+                  borderRadius: '6px',
+                  padding: '1.1rem 1.25rem',
+                }}>
+                  <div style={{ marginBottom: '0.85rem' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: '800', color: c.accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.label}</div>
+                    <div style={{ fontSize: '0.62rem', color: '#bbb', marginTop: '1px', fontWeight: '500' }}>{c.sub}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0' }}>
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000', lineHeight: 1 }}>{c.lotes}</div>
+                      <div style={{ fontSize: '0.58rem', fontWeight: '700', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '0.3rem' }}>lotes</div>
+                    </div>
+                    <div style={{ width: '1px', height: '48px', background: '#ebebeb', marginBottom: '2px' }} />
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#444', lineHeight: 1 }}>{c.pecas}</div>
+                      <div style={{ fontSize: '0.58rem', fontWeight: '700', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '0.3rem' }}>peças</div>
+                    </div>
                   </div>
                 </div>
               ))}

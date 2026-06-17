@@ -169,7 +169,8 @@ export default function HistoricoPage() {
       if (ids.length > 0) params.set('technicianIds', ids.join(','));
     }
     const res = await fetch(`/api/inventories?${params}`);
-    setInventories(await res.json());
+    const raw = await res.json();
+    setInventories(Array.isArray(raw) ? raw : []);
     setLoading(false);
   }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
