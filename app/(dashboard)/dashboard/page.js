@@ -196,7 +196,7 @@ export default function DashboardPage() {
                   ) : (
                     recent.map((inv) => {
                       const pct = inv.total_items > 0
-                        ? Math.round((inv.counted_items / inv.total_items) * 100)
+                        ? Math.min(100, Math.round((inv.counted_items / inv.total_items) * 100))
                         : 0;
                       const scheduledAt = inv.inventory_schedules?.[0]?.scheduled_at;
                       const isPending   = inv.status === 'pending';
@@ -215,8 +215,8 @@ export default function DashboardPage() {
                               <span style={{ fontSize: '0.75rem', fontWeight: '800' }}>{pct}%</span>
                             </div>
                           </td>
-                          <td style={{ fontWeight: '900', color: inv.divergence_count > 0 ? '#000000' : '#888888' }}>
-                            {inv.divergence_count}
+                          <td style={{ fontWeight: '900', color: (inv.divergence_quantity ?? inv.divergence_count) > 0 ? '#000000' : '#888888' }}>
+                            {inv.divergence_quantity ?? inv.divergence_count}
                           </td>
                           <td>
                             {scheduledAt ? (

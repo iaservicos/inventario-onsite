@@ -179,8 +179,6 @@ export default function DivergenciasPage() {
     setExporting(false);
   }
 
-  const critical   = divergences.filter((d) => Math.abs(d.percentage_diff) >= 30).length;
-  const tratativas = divergences.filter((d) => d.status === 'tratativa').length;
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -202,15 +200,6 @@ export default function DivergenciasPage() {
         <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            <KpiCard label="Total"         value={divergences.length}                                              alert={divergences.length > 0} />
-            <KpiCard label="Críticas ≥30%" value={critical}                                                      alert={critical > 0} />
-            <KpiCard label="Abertas"       value={divergences.filter((d) => d.status === 'open').length}          alert />
-            <KpiCard label="Recontagem"    value={divergences.filter((d) => d.status === 'recount').length} />
-            <KpiCard label="Em Tratativa"  value={tratativas}                                                     alert={tratativas > 0} />
-            <KpiCard label="Validadas"     value={divergences.filter((d) => d.status === 'validated').length} />
-          </div>
-
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div className="table-wrapper" style={{ border: 'none' }}>
               {divergences.length === 0 ? (
@@ -294,18 +283,3 @@ export default function DivergenciasPage() {
   );
 }
 
-function KpiCard({ label, value, alert: isAlert }) {
-  return (
-    <div className="card" style={{
-      border: `1px solid ${isAlert && value > 0 ? '#000' : '#e8e8e8'}`,
-      background: isAlert && value > 0 ? '#000' : '#fff',
-    }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert && value > 0 ? '#fff' : '#888', marginBottom: '0.4rem' }}>
-        {label}
-      </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert && value > 0 ? '#fff' : '#000', lineHeight: 1 }}>
-        {value}
-      </div>
-    </div>
-  );
-}
