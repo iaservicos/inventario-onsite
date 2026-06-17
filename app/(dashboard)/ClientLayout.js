@@ -1,15 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 
 export default function ClientLayout({ children, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const lastLogged = useRef('');
 
   // Fecha o sidebar ao navegar (mobile)
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
+
+  // Log de página visitada (debounce: só loga se mudou de rota)
+  useEffect(() => {
+    if (!pathname || pathname === lastLogged.current) return;
+    lastLogged.current = pathname;
+    fetch('/api/log-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event_type: 'page_view', page_path: pathname }),
+    }).catch(() => {});
+  }, [pathname]);
 
   // Bloqueia scroll do body quando sidebar aberto no mobile
   useEffect(() => {

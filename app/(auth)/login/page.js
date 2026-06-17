@@ -22,6 +22,11 @@ function LoginForm() {
       setError('E-mail ou senha inválidos.');
       setLoading(false);
     } else {
+      fetch('/api/log-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_type: 'login' }),
+      }).catch(() => {});
       router.push(callbackUrl);
     }
   }

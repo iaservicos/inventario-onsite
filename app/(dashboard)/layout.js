@@ -4,7 +4,7 @@ import { authOptions } from '../api/auth/[...nextauth]/route';
 import ClientLayout from './ClientLayout';
 
 export const metadata = {
-  title: 'Inventário Onsite - Dashboard',
+  title: 'Portal Onsite',
 };
 
 export default async function DashboardLayout({ children }) {
