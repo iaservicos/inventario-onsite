@@ -198,7 +198,7 @@ export default function DevolucoesPage() {
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
-        title="Devoluções Pendentes"
+        title="Lotes Montados"
         subtitle="Lotes de devolução montados ou enviados pelo técnico aguardando confirmação da ATP"
       />
 
