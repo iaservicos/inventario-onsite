@@ -69,7 +69,7 @@ export default function FrotasPage() {
   ];
 
   return (
-    <div>
+    <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader title="Gestão de Frotas" subtitle="Gerencie todos os veículos da frota" />
 
       {/* KPI Cards */}
