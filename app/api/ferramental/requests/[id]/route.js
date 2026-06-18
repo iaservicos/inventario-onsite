@@ -12,13 +12,27 @@ export async function PATCH(req, { params }) {
 
     const { id } = params;
     const body = await req.json();
-    const { status, approval_notes, analyst_notes, technician_id, delivery_method, tracking_code } = body;
-
-    const GESTOR_STATUSES = ['aprovado', 'reprovado'];
-    const ANALISTA_STATUSES = ['aguardando_envio', 'enviando', 'pendente', 'aguardando_compra', 'cancelado', 'entregue'];
+    const { status, approval_notes, analyst_notes, technician_id, delivery_method, tracking_code, termo_ok } = body;
 
     const isGestor = ['admin', 'supervisor'].includes(session.user.role);
     const isAnalista = session.user.role === 'analista_custo' || session.user.role === 'admin';
+    const supabase = createServiceClient();
+
+    // ── Confirmar termo DocSign ────────────────────────────────────────────────
+    if (termo_ok) {
+      if (!isAnalista) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+      const { data, error } = await supabase
+        .from('ferramental_requests')
+        .update({ termo_emitido_em: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return NextResponse.json(data);
+    }
+
+    const GESTOR_STATUSES = ['aprovado', 'reprovado'];
+    const ANALISTA_STATUSES = ['aguardando_envio', 'enviando', 'pendente', 'aguardando_compra', 'cancelado', 'entregue'];
 
     if (GESTOR_STATUSES.includes(status) && !isGestor) {
       return NextResponse.json({ error: 'Apenas gestores podem aprovar/reprovar' }, { status: 403 });
@@ -26,8 +40,6 @@ export async function PATCH(req, { params }) {
     if (ANALISTA_STATUSES.includes(status) && !isAnalista) {
       return NextResponse.json({ error: 'Apenas analistas podem atualizar este status' }, { status: 403 });
     }
-
-    const supabase = createServiceClient();
 
     const fields = {
       status,

@@ -331,14 +331,30 @@ export default function FerramentalPage() {
       ]);
       const [data, termos] = await Promise.all([res.json(), resTermos.json()]);
       setRequests(Array.isArray(data) ? data : []);
-      setTermosPendentes(Array.isArray(termos) ? termos : []);
+      // só os entregues que ainda não tiveram o termo confirmado
+      setTermosPendentes((Array.isArray(termos) ? termos : []).filter(r => !r.termo_emitido_em));
     } catch { toast.error('Erro ao carregar solicitações'); }
     finally { setLoading(false); }
   }, [filterStatus]);
 
   useEffect(() => { load(); }, [load]);
 
-  // Termos pendentes agrupados por técnico
+  async function confirmarTermo(id) {
+    try {
+      const res = await fetch(`/api/ferramental/requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ termo_ok: true }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success('Termo confirmado!');
+      load();
+    } catch {
+      toast.error('Erro ao confirmar termo');
+    }
+  }
+
+  // Termos pendentes agrupados por técnico (apenas sem termo)
   const termosByTech = termosPendentes.reduce((acc, r) => {
     const key = r.technician_name;
     if (!acc[key]) acc[key] = { name: r.technician_name, supervisor: r.technicians?.supervisor_name, tools: [] };
@@ -351,7 +367,7 @@ export default function FerramentalPage() {
   const total      = requests.length;
   const aguardando = requests.filter(r => r.status === 'aguardando_aprovacao').length;
   const aprovados  = requests.filter(r => r.status === 'aprovado').length;
-  const entregues  = termosPendentes.length;
+  const entregues  = requests.filter(r => r.status === 'entregue').length;
 
   return (
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -385,21 +401,20 @@ export default function FerramentalPage() {
 
       {/* Painel Termos Pendentes */}
       {termoEntries.length > 0 && (
-        <div style={{ background: '#fffbeb', border: '1px solid #fbbf24', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: '900', color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>⚠</span>
+        <div style={{ background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: '900', color: '#333', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>Termos Pendentes no DocSign — {termoEntries.length} técnico{termoEntries.length > 1 ? 's' : ''} / {termosPendentes.length} entrega{termosPendentes.length > 1 ? 's' : ''}</span>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
             {termoEntries.map(entry => (
-              <div key={entry.name} style={{ background: '#ffffff', border: '1px solid #fde68a', borderRadius: '8px', padding: '0.65rem 0.9rem', minWidth: '200px' }}>
+              <div key={entry.name} style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: '8px', padding: '0.65rem 0.9rem', minWidth: '200px' }}>
                 <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#000', marginBottom: '2px' }}>{entry.name}</div>
                 {entry.supervisor && (
                   <div style={{ fontSize: '0.68rem', color: '#888', marginBottom: '0.35rem' }}>Sup: {entry.supervisor}</div>
                 )}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                   {entry.tools.map(t => (
-                    <span key={t.id} style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '4px', padding: '0.1rem 0.45rem', fontSize: '0.7rem', fontWeight: '600', color: '#78350f' }}>
+                    <span key={t.id} style={{ background: '#eeeeee', border: '1px solid #dddddd', borderRadius: '4px', padding: '0.1rem 0.45rem', fontSize: '0.7rem', fontWeight: '600', color: '#333' }}>
                       {t.name}
                     </span>
                   ))}
@@ -444,6 +459,9 @@ export default function FerramentalPage() {
                   const canAct =
                     (isGestor && r.status === 'aguardando_aprovacao') ||
                     (isAnalista && ['aprovado', 'aguardando_envio', 'enviando', 'pendente', 'aguardando_compra'].includes(r.status));
+                  const faltaTermo = r.status === 'entregue' && !r.termo_emitido_em;
+                  const canConcluirTermo = isAnalista && r.status === 'entregue' && !r.termo_emitido_em;
+
                   return (
                     <tr key={r.id} style={{ borderBottom: '1px solid #f0f0f0', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
                       <td style={{ padding: '0.75rem 1rem', color: '#999999', fontWeight: '700' }}>#{r.id}</td>
@@ -463,22 +481,35 @@ export default function FerramentalPage() {
                       <td style={{ padding: '0.75rem 1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', alignItems: 'flex-start' }}>
                           <StatusBadge status={r.status} />
-                          {r.status === 'entregue' && (
-                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', color: '#92400e', background: '#fef3c7', border: '1px solid #fde68a', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
+                          {faltaTermo && (
+                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', color: '#555', background: '#eeeeee', border: '1px solid #dddddd', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
                               Falta Termo
+                            </span>
+                          )}
+                          {r.termo_emitido_em && (
+                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', color: '#555', background: '#f4f4f5', border: '1px solid #e4e4e7', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
+                              Termo OK
                             </span>
                           )}
                         </div>
                       </td>
                       <td style={{ padding: '0.75rem 1rem', color: '#888888', whiteSpace: 'nowrap' }}>{formatDate(r.created_at)}</td>
                       <td style={{ padding: '0.75rem 1rem' }}>
-                        {canAct ? (
-                          <button onClick={() => setSelected(r)} style={{ padding: '0.35rem 0.75rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}>
-                            Atualizar
-                          </button>
-                        ) : (
-                          <span style={{ fontSize: '0.75rem', color: '#cccccc' }}>—</span>
-                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', alignItems: 'flex-start' }}>
+                          {canAct && (
+                            <button onClick={() => setSelected(r)} style={{ padding: '0.3rem 0.7rem', background: '#000000', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.73rem', fontWeight: '700', cursor: 'pointer' }}>
+                              Atualizar
+                            </button>
+                          )}
+                          {canConcluirTermo && (
+                            <button onClick={() => confirmarTermo(r.id)} style={{ padding: '0.3rem 0.7rem', background: 'transparent', color: '#000', border: '1px solid #999', borderRadius: '6px', fontSize: '0.73rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                              Termo Concluído
+                            </button>
+                          )}
+                          {!canAct && !canConcluirTermo && (
+                            <span style={{ fontSize: '0.75rem', color: '#cccccc' }}>—</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
