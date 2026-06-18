@@ -183,6 +183,7 @@ export default function DashboardPage() {
                     <th>Técnico</th>
                     <th>Região</th>
                     <th>Semana</th>
+                    <th>Tipo</th>
                     <th>Status</th>
                     <th>Progresso</th>
                     <th>Divergências</th>
@@ -192,20 +193,31 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {recent.length === 0 ? (
-                    <tr><td colSpan={8} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
+                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
                   ) : (
                     recent.map((inv) => {
                       const pct = inv.total_items > 0
                         ? Math.min(100, Math.round((inv.counted_items / inv.total_items) * 100))
                         : 0;
-                      const scheduledAt = inv.inventory_schedules?.[0]?.scheduled_at;
+                      const sched       = inv.inventory_schedules?.[0];
+                      const scheduledAt = sched?.scheduled_at;
                       const isPending   = inv.status === 'pending';
                       const isOverdue   = isPending && scheduledAt && new Date(scheduledAt) < new Date();
+                      const isGeral     = sched?.inventory_type === 'general';
+                      const subgrupo    = sched?.scheduled_subgroup;
                       return (
                         <tr key={inv.id}>
                           <td style={{ fontWeight: '800', color: '#000000' }}>{inv.technicians?.name}</td>
                           <td style={{ fontWeight: '600' }}>{inv.technicians?.region || '—'}</td>
                           <td style={{ fontWeight: '600' }}>{inv.week_ref || '—'}</td>
+                          <td>
+                            {isGeral
+                              ? <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>GERAL</span>
+                              : subgrupo
+                                ? <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>{subgrupo}</span>
+                                : <span style={{ color: '#bbb', fontSize: '0.75rem' }}>—</span>
+                            }
+                          </td>
                           <td><StatusBadge status={inv.status} /></td>
                           <td>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
