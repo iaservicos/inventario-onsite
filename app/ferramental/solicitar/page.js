@@ -29,7 +29,8 @@ const LABEL_STYLE = {
 export default function SolicitarFerramentalPage() {
   const [tools, setTools] = useState([]);
   const [form, setForm] = useState({ technician_name: '', technician_email: '', comment: '' });
-  const [selectedIds, setSelectedIds] = useState([]);
+  // { [toolId]: quantity }
+  const [selectedTools, setSelectedTools] = useState({});
   const [loading, setLoading] = useState(false);
   const [loadingTools, setLoadingTools] = useState(true);
   const [submitted, setSubmitted] = useState(false);
@@ -49,33 +50,50 @@ export default function SolicitarFerramentalPage() {
   }
 
   function toggleTool(id) {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
+    setSelectedTools(prev => {
+      if (prev[id] !== undefined) {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      }
+      return { ...prev, [id]: 1 };
+    });
   }
+
+  function setQty(id, value) {
+    const qty = Math.max(1, parseInt(value) || 1);
+    setSelectedTools(prev => ({ ...prev, [id]: qty }));
+  }
+
+  const selectedCount = Object.keys(selectedTools).length;
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (selectedIds.length === 0) { setError('Selecione ao menos uma ferramenta.'); return; }
+    if (selectedCount === 0) { setError('Selecione ao menos uma ferramenta.'); return; }
 
     setLoading(true);
     try {
-      for (const toolId of selectedIds) {
+      for (const [toolId, quantity] of Object.entries(selectedTools)) {
         const res = await fetch('/api/ferramental/requests', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             technician_name:  form.technician_name.trim(),
             technician_email: form.technician_email.trim(),
-            tool_id:          toolId,
+            tool_id:          parseInt(toolId),
+            quantity,
             comment:          form.comment.trim() || null,
           }),
         });
         const data = await res.json();
         if (!res.ok) { setError(data.error || 'Erro ao enviar solicitação.'); return; }
       }
-      setSubmittedTools(tools.filter(t => selectedIds.includes(t.id)));
+      setSubmittedTools(
+        tools
+          .filter(t => selectedTools[t.id] !== undefined)
+          .map(t => ({ ...t, quantity: selectedTools[t.id] }))
+      );
       setSubmitted(true);
     } catch {
       setError('Erro de conexão. Tente novamente.');
@@ -84,8 +102,7 @@ export default function SolicitarFerramentalPage() {
     }
   }
 
-  const selectedTools = tools.filter(t => selectedIds.includes(t.id));
-  const notesForSelected = selectedTools.filter(t => t.notes);
+  const notesForSelected = tools.filter(t => selectedTools[t.id] !== undefined && t.notes);
 
   if (submitted) {
     return (
@@ -99,15 +116,18 @@ export default function SolicitarFerramentalPage() {
           </h2>
           <p style={{ color: '#888888', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
             {submittedTools.length === 1
-              ? <><strong style={{ color: '#cccccc' }}>{submittedTools[0].name}</strong> foi registrada com sucesso.</>
+              ? <><strong style={{ color: '#cccccc' }}>{submittedTools[0].name}</strong> ({submittedTools[0].quantity} unidade{submittedTools[0].quantity > 1 ? 's' : ''}) foi registrada com sucesso.</>
               : <>{submittedTools.length} ferramentas solicitadas com sucesso.</>
             }
           </p>
           {submittedTools.length > 1 && (
             <div style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.25rem', textAlign: 'left' }}>
               {submittedTools.map(t => (
-                <div key={t.id} style={{ fontSize: '0.82rem', color: '#cccccc', fontWeight: '600', padding: '0.2rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ color: '#4a9a4a' }}>✓</span> {t.name}
+                <div key={t.id} style={{ fontSize: '0.82rem', color: '#cccccc', fontWeight: '600', padding: '0.2rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ color: '#4a9a4a' }}>✓</span> {t.name}
+                  </span>
+                  <span style={{ color: '#888888', fontSize: '0.75rem' }}>{t.quantity} un.</span>
                 </div>
               ))}
             </div>
@@ -116,7 +136,7 @@ export default function SolicitarFerramentalPage() {
             Sua solicitação será avaliada pelo seu gestor em breve.
           </p>
           <button
-            onClick={() => { setSubmitted(false); setForm({ technician_name: '', technician_email: '', comment: '' }); setSelectedIds([]); setSubmittedTools([]); }}
+            onClick={() => { setSubmitted(false); setForm({ technician_name: '', technician_email: '', comment: '' }); setSelectedTools({}); setSubmittedTools([]); }}
             style={{ padding: '0.8rem 2rem', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}
           >
             Nova Solicitação
@@ -172,10 +192,10 @@ export default function SolicitarFerramentalPage() {
 
             <div>
               <label style={LABEL_STYLE}>
-                Ferramentas solicitadas *
-                {selectedIds.length > 0 && (
+                Ferramentas e quantidades *
+                {selectedCount > 0 && (
                   <span style={{ marginLeft: '0.5rem', color: '#aaaaaa', textTransform: 'none', fontSize: '0.72rem' }}>
-                    ({selectedIds.length} selecionada{selectedIds.length > 1 ? 's' : ''})
+                    ({selectedCount} selecionada{selectedCount > 1 ? 's' : ''})
                   </span>
                 )}
               </label>
@@ -187,54 +207,79 @@ export default function SolicitarFerramentalPage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {tools.map(tool => {
-                    const isSelected = selectedIds.includes(tool.id);
+                    const isSelected = selectedTools[tool.id] !== undefined;
+                    const qty = selectedTools[tool.id] ?? 1;
                     return (
-                      <button
+                      <div
                         key={tool.id}
-                        type="button"
-                        onClick={() => toggleTool(tool.id)}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.85rem',
-                          padding: '0.85rem 1rem',
                           borderRadius: '10px',
                           background: isSelected ? '#1a2e1a' : '#222222',
                           border: `1px solid ${isSelected ? '#3a6a3a' : '#333333'}`,
-                          color: '#ffffff',
-                          cursor: 'pointer',
-                          textAlign: 'left',
+                          overflow: 'hidden',
                           transition: 'all 0.15s',
-                          width: '100%',
                         }}
                       >
-                        <div style={{
-                          width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
-                          background: isSelected ? '#2d5a2d' : 'transparent',
-                          border: `2px solid ${isSelected ? '#4a8a4a' : '#555555'}`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '0.7rem', color: '#ffffff', fontWeight: '900',
-                        }}>
-                          {isSelected ? '✓' : ''}
-                        </div>
-                        <div style={{ flex: 1 }}>
+                        {/* Linha de seleção */}
+                        <button
+                          type="button"
+                          onClick={() => toggleTool(tool.id)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '0.85rem',
+                            padding: '0.85rem 1rem', width: '100%',
+                            background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left',
+                          }}
+                        >
+                          <div style={{
+                            width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
+                            background: isSelected ? '#2d5a2d' : 'transparent',
+                            border: `2px solid ${isSelected ? '#4a8a4a' : '#555555'}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '0.7rem', color: '#ffffff', fontWeight: '900',
+                          }}>
+                            {isSelected ? '✓' : ''}
+                          </div>
                           <div style={{ fontSize: '0.9rem', fontWeight: '700', color: isSelected ? '#aaddaa' : '#ffffff' }}>
                             {tool.name}
                           </div>
-                          {tool.default_quantity > 1 && (
-                            <div style={{ fontSize: '0.72rem', color: '#888888', marginTop: '2px' }}>
-                              {tool.default_quantity} unidades
+                        </button>
+
+                        {/* Input de quantidade (só aparece quando selecionado) */}
+                        {isSelected && (
+                          <div style={{ padding: '0 1rem 0.85rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                            onClick={e => e.stopPropagation()}>
+                            <span style={{ fontSize: '0.72rem', color: '#888', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
+                              Quantidade:
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0', background: '#111', borderRadius: '8px', border: '1px solid #444', overflow: 'hidden' }}>
+                              <button
+                                type="button"
+                                onClick={() => setQty(tool.id, qty - 1)}
+                                style={{ width: '32px', height: '32px', background: 'transparent', border: 'none', color: '#aaa', fontSize: '1rem', cursor: 'pointer', fontWeight: '700' }}
+                              >−</button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={qty}
+                                onChange={e => setQty(tool.id, e.target.value)}
+                                style={{ width: '48px', background: 'transparent', border: 'none', color: '#fff', fontSize: '0.9rem', fontWeight: '800', textAlign: 'center', outline: 'none', fontFamily: 'inherit', padding: '0' }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setQty(tool.id, qty + 1)}
+                                style={{ width: '32px', height: '32px', background: 'transparent', border: 'none', color: '#aaa', fontSize: '1rem', cursor: 'pointer', fontWeight: '700' }}
+                              >+</button>
                             </div>
-                          )}
-                        </div>
-                      </button>
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
               )}
             </div>
 
-            {/* Avisos das ferramentas selecionadas que têm notas */}
+            {/* Avisos de ferramentas selecionadas com notas */}
             {notesForSelected.map(t => (
               <div key={t.id} style={{ background: '#2a1a00', border: '1px solid #5a3500', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.78rem', color: '#ffaa44', fontWeight: '600', lineHeight: '1.5' }}>
                 ⚠ <strong>{t.name}:</strong> {t.notes}
@@ -261,21 +306,21 @@ export default function SolicitarFerramentalPage() {
 
             <button
               type="submit"
-              disabled={loading || loadingTools || selectedIds.length === 0}
+              disabled={loading || loadingTools || selectedCount === 0}
               style={{
                 width: '100%', padding: '1rem',
-                background: (loading || selectedIds.length === 0) ? '#333333' : '#ffffff',
-                color: (loading || selectedIds.length === 0) ? '#888888' : '#000000',
+                background: (loading || selectedCount === 0) ? '#333333' : '#ffffff',
+                color: (loading || selectedCount === 0) ? '#888888' : '#000000',
                 border: 'none', borderRadius: '10px', fontSize: '0.9rem', fontWeight: '900',
-                cursor: (loading || selectedIds.length === 0) ? 'not-allowed' : 'pointer',
+                cursor: (loading || selectedCount === 0) ? 'not-allowed' : 'pointer',
                 textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'all 0.15s',
               }}
             >
               {loading
                 ? 'ENVIANDO...'
-                : selectedIds.length === 0
+                : selectedCount === 0
                 ? 'SELECIONE AO MENOS UMA FERRAMENTA'
-                : `ENVIAR SOLICITAÇÃO${selectedIds.length > 1 ? ` (${selectedIds.length})` : ''}`}
+                : `ENVIAR SOLICITAÇÃO${selectedCount > 1 ? ` (${selectedCount})` : ''}`}
             </button>
           </form>
         </div>

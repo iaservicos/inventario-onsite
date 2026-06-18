@@ -83,7 +83,7 @@ export async function POST(req) {
           technician_id:    technician_id || null,
           tool_id:          tool.id,
           tool_name:        tool.name,
-          quantity:         tool.default_quantity,
+          quantity:         body.quantity || tool.default_quantity,
           comment:          comment?.trim() || null,
           status:           'entregue',
           approved_by:      session.user.name,
@@ -131,7 +131,7 @@ export async function POST(req) {
         technician_id:    tech?.id || null,
         tool_id:          tool.id,
         tool_name:        tool.name,
-        quantity:         tool.default_quantity,
+        quantity:         body.quantity || tool.default_quantity,
         comment:          comment?.trim() || null,
         status:           'aguardando_aprovacao',
       })
