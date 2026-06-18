@@ -56,13 +56,13 @@ export default function AgendamentosPage() {
     { value: 'Concluído', label: 'Concluído' }
   ];
 
-  const getStatusColor = (status) => {
-    const colors = {
-      'Confirmado': { bg: 'rgba(5,150,105,.1)', text: '#059669' },
-      'Pendente': { bg: 'rgba(217,119,6,.1)', text: '#d97706' },
-      'Concluído': { bg: 'rgba(3,105,161,.1)', text: '#0369a1' }
+  const getStatusStyle = (status) => {
+    const styles = {
+      'Confirmado': { bg: '#000000', text: '#ffffff' },
+      'Pendente': { bg: '#666666', text: '#ffffff' },
+      'Concluído': { bg: '#999999', text: '#ffffff' }
     };
-    return colors[status] || { bg: '#f5f5f5', text: '#666' };
+    return styles[status] || { bg: '#cccccc', text: '#000000' };
   };
 
   return (
@@ -71,9 +71,9 @@ export default function AgendamentosPage() {
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <KPICard label="Confirmados" value={stats.confirmados} color="#059669" />
-        <KPICard label="Pendentes" value={stats.pendentes} color="#d97706" />
-        <KPICard label="Concluídos" value={stats.concluidos} color="#0369a1" />
+        <KPICard label="Confirmados" value={stats.confirmados} />
+        <KPICard label="Pendentes" value={stats.pendentes} />
+        <KPICard label="Concluídos" value={stats.concluidos} />
       </div>
 
       {/* Filtro */}
@@ -85,43 +85,43 @@ export default function AgendamentosPage() {
       />
 
       {/* Tabela */}
-      <div style={{ background: '#fff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e5e7eb', marginTop: '1rem' }}>
+      <div style={{ background: '#ffffff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Nenhum agendamento encontrado</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum agendamento encontrado</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Oficina</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Agendada</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Oficina</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Agendada</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((a) => {
-                  const color = getStatusColor(a.status);
+                  const style = getStatusStyle(a.status);
                   return (
-                    <tr key={a.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <td style={{ padding: '1rem', fontWeight: '700', color: '#0369a1' }}>{a.placa}</td>
-                      <td style={{ padding: '1rem', color: '#0f172a' }}>{a.tipo}</td>
-                      <td style={{ padding: '1rem', color: '#475569' }}>{a.oficina}</td>
-                      <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9rem' }}>
+                    <tr key={a.id} style={{ borderBottom: '1px solid #eeeeee' }}>
+                      <td style={{ padding: '1rem', fontWeight: '700', color: '#333333' }}>{a.placa}</td>
+                      <td style={{ padding: '1rem', color: '#333333' }}>{a.tipo}</td>
+                      <td style={{ padding: '1rem', color: '#666666' }}>{a.oficina}</td>
+                      <td style={{ padding: '1rem', color: '#666666', fontSize: '0.9rem' }}>
                         {new Date(a.dataAgendada).toLocaleDateString('pt-BR')}
                       </td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{
                           display: 'inline-block',
                           padding: '0.25rem 0.75rem',
-                          borderRadius: '20px',
+                          borderRadius: '3px',
                           fontSize: '0.75rem',
                           fontWeight: '600',
-                          background: color.bg,
-                          color: color.text
+                          background: style.bg,
+                          color: style.text
                         }}>
                           {a.status}
                         </span>
@@ -138,13 +138,13 @@ export default function AgendamentosPage() {
   );
 }
 
-function KPICard({ label, value, color }) {
+function KPICard({ label, value }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
         {value}
       </div>
     </div>

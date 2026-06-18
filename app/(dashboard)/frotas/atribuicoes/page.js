@@ -57,9 +57,9 @@ export default function AtribuicoesPage() {
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <KPICard label="Ativos" value={stats.ativos} color="#059669" />
-        <KPICard label="Disponíveis" value={stats.disponiveis} color="#0369a1" />
-        <KPICard label="Total" value={stats.total} color="#666" />
+        <KPICard label="Ativos" value={stats.ativos} />
+        <KPICard label="Disponíveis" value={stats.disponiveis} />
+        <KPICard label="Total" value={stats.total} />
       </div>
 
       {/* Filtro */}
@@ -70,41 +70,41 @@ export default function AtribuicoesPage() {
       />
 
       {/* Tabela */}
-      <div style={{ background: '#fff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e5e7eb', marginTop: '1rem' }}>
+      <div style={{ background: '#ffffff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Nenhum registro encontrado</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum registro encontrado</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Responsável</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Atribuição</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Responsável</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Atribuição</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((a) => (
-                  <tr key={a.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '1rem', fontWeight: '700', color: '#0369a1' }}>{a.placa}</td>
-                    <td style={{ padding: '1rem', color: '#0f172a' }}>{a.modelo}</td>
-                    <td style={{ padding: '1rem', color: '#475569' }}>{a.tecnico}</td>
-                    <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9rem' }}>
+                  <tr key={a.id} style={{ borderBottom: '1px solid #eeeeee' }}>
+                    <td style={{ padding: '1rem', fontWeight: '700', color: '#333333' }}>{a.placa}</td>
+                    <td style={{ padding: '1rem', color: '#333333' }}>{a.modelo}</td>
+                    <td style={{ padding: '1rem', color: '#666666' }}>{a.tecnico}</td>
+                    <td style={{ padding: '1rem', color: '#666666', fontSize: '0.9rem' }}>
                       {new Date(a.dataAtribuicao).toLocaleDateString('pt-BR')}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <span style={{
                         display: 'inline-block',
                         padding: '0.25rem 0.75rem',
-                        borderRadius: '20px',
+                        borderRadius: '3px',
                         fontSize: '0.75rem',
                         fontWeight: '600',
-                        background: a.status === 'Ativo' ? 'rgba(5,150,105,.1)' : 'rgba(3,105,161,.1)',
-                        color: a.status === 'Ativo' ? '#059669' : '#0369a1'
+                        background: a.status === 'Ativo' ? '#000000' : '#999999',
+                        color: '#ffffff'
                       }}>
                         {a.status}
                       </span>
@@ -120,13 +120,13 @@ export default function AtribuicoesPage() {
   );
 }
 
-function KPICard({ label, value, color }) {
+function KPICard({ label, value }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
         {value}
       </div>
     </div>

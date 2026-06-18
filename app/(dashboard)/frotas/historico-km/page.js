@@ -68,37 +68,37 @@ export default function HistoricoKmPage() {
       />
 
       {/* Tabela */}
-      <div style={{ background: '#fff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e5e7eb', marginTop: '1rem' }}>
+      <div style={{ background: '#ffffff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Nenhum registro encontrado</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum registro encontrado</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motorista</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KM</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consumo (L)</th>
+                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motorista</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KM</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consumo (L)</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((h) => (
-                  <tr key={`${h.placa}-${h.data}`} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9rem' }}>
+                  <tr key={`${h.placa}-${h.data}`} style={{ borderBottom: '1px solid #eeeeee' }}>
+                    <td style={{ padding: '1rem', color: '#666666', fontSize: '0.9rem' }}>
                       {new Date(h.data).toLocaleDateString('pt-BR')}
                     </td>
-                    <td style={{ padding: '1rem', fontWeight: '700', color: '#0369a1' }}>{h.placa}</td>
-                    <td style={{ padding: '1rem', color: '#0f172a' }}>{h.modelo}</td>
-                    <td style={{ padding: '1rem', color: '#475569' }}>{h.motorista}</td>
-                    <td style={{ padding: '1rem', color: '#475569', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem', fontWeight: '700', color: '#333333' }}>{h.placa}</td>
+                    <td style={{ padding: '1rem', color: '#333333' }}>{h.modelo}</td>
+                    <td style={{ padding: '1rem', color: '#666666' }}>{h.motorista}</td>
+                    <td style={{ padding: '1rem', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
                       {h.kmAtual.toLocaleString('pt-BR')}
                     </td>
-                    <td style={{ padding: '1rem', color: '#475569', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
                       {h.consumo}
                     </td>
                   </tr>
@@ -114,11 +114,11 @@ export default function HistoricoKmPage() {
 
 function KPICard({ label, value }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#0f172a' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
         {value}
       </div>
     </div>

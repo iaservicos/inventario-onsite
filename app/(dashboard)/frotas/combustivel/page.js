@@ -79,41 +79,41 @@ export default function CombustvelPage() {
       />
 
       {/* Tabela */}
-      <div style={{ background: '#fff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e5e7eb', marginTop: '1rem' }}>
+      <div style={{ background: '#ffffff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Nenhum registro encontrado</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum registro encontrado</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Litros</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KM Rodado</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consumo (km/L)</th>
+                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Litros</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KM Rodado</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consumo (km/L)</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((c) => (
-                  <tr key={c.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9rem' }}>
+                  <tr key={c.id} style={{ borderBottom: '1px solid #eeeeee' }}>
+                    <td style={{ padding: '1rem', color: '#666666', fontSize: '0.9rem' }}>
                       {new Date(c.data).toLocaleDateString('pt-BR')}
                     </td>
-                    <td style={{ padding: '1rem', fontWeight: '700', color: '#0369a1' }}>{c.placa}</td>
-                    <td style={{ padding: '1rem', color: '#0f172a', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem', fontWeight: '700', color: '#333333' }}>{c.placa}</td>
+                    <td style={{ padding: '1rem', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
                       {parseFloat(c.litros).toFixed(1)}L
                     </td>
-                    <td style={{ padding: '1rem', color: '#0f172a', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
                       R$ {parseFloat(c.valor).toFixed(2)}
                     </td>
-                    <td style={{ padding: '1rem', color: '#0f172a', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
                       {c.kmRodado}
                     </td>
-                    <td style={{ padding: '1rem', color: '#0f172a', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
                       {c.consumoMedio}
                     </td>
                   </tr>
@@ -129,11 +129,11 @@ export default function CombustvelPage() {
 
 function KPICard({ label, value }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#0f172a' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
         {value}
       </div>
     </div>
