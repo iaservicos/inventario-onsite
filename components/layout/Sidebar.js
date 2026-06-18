@@ -39,14 +39,11 @@ const FERRAMENTAL_ITEMS = [
 ];
 
 const FROTAS_ITEMS = [
-  { href: '/frotas', label: 'Dashboard', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>) },
-  { href: '/frotas/veiculos', label: 'Veículos', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>) },
+  { href: '/frotas', label: 'Gestão de Frotas', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>) },
 ];
 
 const TECNICO_ITEMS = [
-  { href: '/tecnico', label: 'Login', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>) },
-  { href: '/tecnico/dashboard', label: 'Dashboard', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>) },
-  { href: '/tecnico/historico', label: 'Histórico', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>) },
+  { href: '/tecnico-campo', label: 'Técnico de Campo', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>) },
 ];
 
 function Chevron({ open }) {
@@ -95,7 +92,9 @@ export default function Sidebar({ user, isOpen }) {
   const isAdmin         = user?.role === 'admin';
   const hasFerramental  = ['admin', 'supervisor', 'analista_custo'].includes(user?.role);
 
-  const [open, setOpen] = useState({ inventario: true, estoque: true, gestao: true, ferramental: true, frotas: true, tecnico: false });
+  const hasFrotas = ['admin', 'supervisor', 'coordinator', 'analyst'].includes(user?.role);
+
+  const [open, setOpen] = useState({ inventario: true, estoque: true, gestao: true, ferramental: true, frotas: true });
   const toggle = (key) => setOpen(p => ({ ...p, [key]: !p[key] }));
 
   const bottomButtonStyle = {
@@ -146,11 +145,9 @@ export default function Sidebar({ user, isOpen }) {
           <NavSection label="Ferramental" items={FERRAMENTAL_ITEMS} isActive={isActive} open={open.ferramental} onToggle={() => toggle('ferramental')} />
         )}
 
-        {(isManagement && !isAnalistaCusto) && (
+        {hasFrotas && (
           <NavSection label="Frotas" items={FROTAS_ITEMS} isActive={isActive} open={open.frotas} onToggle={() => toggle('frotas')} />
         )}
-
-        <NavSection label="Técnico de Campo" items={TECNICO_ITEMS} isActive={isActive} open={open.tecnico} onToggle={() => toggle('tecnico')} />
       </nav>
 
       {/* Rodapé do usuário */}
