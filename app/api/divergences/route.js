@@ -21,6 +21,7 @@ export async function GET(request) {
     technicianId: searchParams.get('technicianId') || '',
     status: searchParams.get('status') || '',
     technicianIds: effectiveIds,
+    inventoryId: searchParams.get('inventoryId') || '',
   });
 
   return NextResponse.json(data);

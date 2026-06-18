@@ -75,11 +75,13 @@ export async function POST(req) {
     try {
       const { data: schedule } = await supabase
         .from('inventory_schedules')
-        .select('scheduled_subgroup')
+        .select('scheduled_subgroup, inventory_type')
         .eq('inventory_id', invId)
         .maybeSingle();
 
-      const subgroup = schedule?.scheduled_subgroup || null;
+      // Inventário geral: passa null para retornar TODAS as peças do técnico
+      const isGen = schedule?.inventory_type === 'general';
+      const subgroup = isGen ? null : (schedule?.scheduled_subgroup || null);
       const expectedItems = await getConsolidatedTechnicianItems(supabase, techId, subgroup);
 
       if (expectedItems && expectedItems.length > 0) {

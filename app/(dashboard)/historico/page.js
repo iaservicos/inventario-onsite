@@ -40,15 +40,35 @@ function normalizeCode(code) {
 }
 
 /* ─── Modal: peças de um inventário ──────────────────────────────────────── */
-function ModalItens({ inventory, onClose }) {
-  const [rawItems, setRawItems] = useState([]);
-  const [loading, setLoading]   = useState(true);
+function ModalItens({ inventory, phase, onClose }) {
+  const [rawItems, setRawItems]   = useState([]);
+  const [rawDivs,  setRawDivs]    = useState([]);
+  const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
-    fetch(`/api/inventories/${inventory.id}/items`)
-      .then(r => r.json())
-      .then(data => { setRawItems(Array.isArray(data) ? data : []); setLoading(false); });
-  }, [inventory.id]);
+    setLoading(true);
+    const fetchItems = fetch(`/api/inventories/${inventory.id}/items`).then(r => r.json());
+    // Para a 1ª contagem, também busca as divergências dessa fase para mostrar valores originais
+    const fetchDivs = phase === 'first'
+      ? fetch(`/api/divergences?inventoryId=${inventory.id}`).then(r => r.json())
+      : Promise.resolve([]);
+
+    Promise.all([fetchItems, fetchDivs]).then(([items, divs]) => {
+      setRawItems(Array.isArray(items) ? items : []);
+      setRawDivs(Array.isArray(divs) ? divs : []);
+      setLoading(false);
+    });
+  }, [inventory.id, phase]);
+
+  // Mapa de divergências da 1ª contagem (is_recount=false) por código normalizado
+  const firstCountDivMap = useMemo(() => {
+    if (phase !== 'first') return {};
+    const map = {};
+    rawDivs.filter(d => !d.is_recount).forEach(d => {
+      map[normalizeCode(d.item_code)] = d;
+    });
+    return map;
+  }, [rawDivs, phase]);
 
   // Deduplica por código normalizado, mantendo o registro mais recente (counted_at)
   const items = useMemo(() => {
@@ -62,20 +82,28 @@ function ModalItens({ inventory, onClose }) {
         map[key] = item;
       }
     });
-    return Object.values(map).sort((a, b) => {
-      // Divergências primeiro, depois agendados, depois ok
+    // Para 1ª contagem: substitui quantidades pelas da divergência original (se houver)
+    return Object.values(map).map(item => {
+      if (phase !== 'first') return item;
+      const div = firstCountDivMap[normalizeCode(item.item_code)];
+      if (!div) return item;
+      return {
+        ...item,
+        physical_qty:   div.physical_qty,
+        system_qty:     div.system_qty,
+        has_divergence: true,
+        _from_div:      true,
+      };
+    }).sort((a, b) => {
       const scoreA = a.has_divergence ? 2 : a.physical_qty === null ? 1 : 0;
       const scoreB = b.has_divergence ? 2 : b.physical_qty === null ? 1 : 0;
       if (scoreA !== scoreB) return scoreB - scoreA;
       return (a.item_name || '').localeCompare(b.item_name || '', 'pt-BR');
     });
-  }, [rawItems]);
+  }, [rawItems, firstCountDivMap, phase]);
 
-  // TOTAL = soma de quantidades (unidades físicas em escopo)
-  // OK / DIVERGÊNCIAS / PENDENTES = contagem de itens (códigos)
   const sumQty = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
   const total   = sumQty(items);
-  // OK = soma de min(físico, sistema) por item: inclui a parte correta mesmo quando há excesso
   const ok      = items
     .filter(i => i.physical_qty !== null)
     .reduce((s, i) => s + Math.min(Number(i.physical_qty) || 0, Number(i.system_qty) || 0), 0);
@@ -84,6 +112,7 @@ function ModalItens({ inventory, onClose }) {
     .reduce((s, i) => s + Math.abs((Number(i.physical_qty) || 0) - (Number(i.system_qty) || 0)), 0);
   const pending = sumQty(items.filter(i => i.physical_qty === null));
   const fase    = getFaseLabel(inventory);
+  const faseLabel = phase === 'first' ? '1ª Contagem' : phase === 'recount' ? 'Recontagem' : fase.text;
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
@@ -100,7 +129,7 @@ function ModalItens({ inventory, onClose }) {
                 <> &nbsp;·&nbsp; {inventory.inventory_schedules[0].scheduled_subgroup}</>
               )}
               <span style={{ background: '#000', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.62rem', fontWeight: '800' }}>
-                {fase.text}
+                {faseLabel}
               </span>
             </div>
           </div>
@@ -328,15 +357,13 @@ export default function HistoricoPage() {
                       <td><StatusBadge status={displayStatus} /></td>
                       <td style={{ color: '#888', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>{displayDate}</td>
                       <td>
-                        {!isFirst && (
-                          <button
-                            className="btn btn-secondary"
-                            style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', border: '1px solid #ccc', fontWeight: '700', whiteSpace: 'nowrap' }}
-                            onClick={() => setSelected(inv)}
-                          >
-                            Ver peças
-                          </button>
-                        )}
+                        <button
+                          className="btn btn-secondary"
+                          style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', border: '1px solid #ccc', fontWeight: '700', whiteSpace: 'nowrap' }}
+                          onClick={() => setSelected({ inv, phase: isFirst ? 'first' : isRecount ? 'recount' : null })}
+                        >
+                          Ver peças
+                        </button>
                       </td>
                     </tr>
                   );
@@ -347,7 +374,7 @@ export default function HistoricoPage() {
         </div>
       )}
 
-      {selected && <ModalItens inventory={selected} onClose={() => setSelected(null)} />}
+      {selected && <ModalItens inventory={selected.inv} phase={selected.phase} onClose={() => setSelected(null)} />}
     </div>
   );
 }

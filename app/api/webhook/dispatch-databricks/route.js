@@ -64,6 +64,7 @@ export async function POST(request) {
       technician_id,
       week_ref,
       scheduled_subgroup,
+      inventory_type,
       status,
       technicians (
         id,
@@ -93,7 +94,9 @@ export async function POST(request) {
 
   const searchName = technician.databricks_name || technician.name;
   const weekRef = schedule.week_ref || getWeekRef();
-  const scheduledSubgroup = schedule.scheduled_subgroup || null;
+  const isGeneralInventory = schedule.inventory_type === 'general';
+  // Inventário geral: null força getConsolidatedTechnicianItems a retornar TODAS as peças
+  const scheduledSubgroup = isGeneralInventory ? null : (schedule.scheduled_subgroup || null);
 
   // "Claim" atômico: marca como dispatched ANTES de criar o inventário.
   // Usa WHERE status='pending' como condição — se dois requests chegarem ao mesmo tempo,

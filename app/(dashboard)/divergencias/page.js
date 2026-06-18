@@ -127,11 +127,24 @@ export default function DivergenciasPage() {
     const raw = await res.json();
     const all = Array.isArray(raw) ? raw : [];
 
-    // Dedup: por inventário+código, mantém a divergência mais recente (recontagem supera 1ª contagem)
-    // Exclui system_qty=0 (código errado escaneado na 1ª contagem, não existe no sistema)
+    // Regra de exibição por fase:
+    // - recount_pending: NÃO mostra (item ainda vai ser recontado)
+    // - completed + is_recount=true: mostra APENAS divergências da recontagem (is_recount=true)
+    //   → itens que passaram na recontagem não têm divergência is_recount=true → somem automaticamente
+    // - completed + is_recount=false: mostra divergências da 1ª contagem (só excesso, pois déficit vai pra recontagem)
     const latestMap = {};
     for (const d of all) {
       if ((d.system_qty || 0) === 0) continue;
+
+      const invStatus    = d.inventories?.status;
+      const invIsRecount = d.inventories?.is_recount;
+
+      // Inventário aguardando recontagem: ainda não é o resultado final
+      if (invStatus === 'recount_pending') continue;
+
+      // Inventário que passou por recontagem: só mostra o resultado da recontagem
+      if (invIsRecount === true && d.is_recount !== true) continue;
+
       const key = `${d.inventory_id}|${d.item_code}`;
       if (!latestMap[key] || new Date(d.created_at) > new Date(latestMap[key].created_at)) {
         latestMap[key] = d;
