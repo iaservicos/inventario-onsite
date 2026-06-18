@@ -1,72 +1,27 @@
-'use client';
-
-import { NextResponse } from 'next/server';
-
-// Mock database - substituir com real DB
-const frotasMock = [
-  {
-    id: '1',
-    placa: 'ABC-1234',
-    modelo: 'Ford Transit',
-    ano: 2022,
-    marca: 'Ford',
-    kmAtual: 45000,
-    status: 'Ativo',
-    tecnicoAssignado: null,
-    ultimaManutencao: new Date('2024-05-15'),
-    proximaManutencao: new Date('2024-12-15'),
-    combustivel: 60,
-    observacoes: 'Veículo em bom estado'
-  },
-  {
-    id: '2',
-    placa: 'XYZ-5678',
-    modelo: 'Volkswagen Kombi',
-    ano: 2021,
-    marca: 'Volkswagen',
-    kmAtual: 32000,
-    status: 'Manutenção',
-    tecnicoAssignado: null,
-    ultimaManutencao: new Date('2024-01-20'),
-    proximaManutencao: new Date('2024-07-20'),
-    combustivel: 30,
-    observacoes: 'Aguardando revisão'
-  }
+const mockFrotas = [
+  { id: '1', placa: 'ABC-1234', modelo: 'Ford Transit', ano: 2022, marca: 'Ford', kmAtual: 45000, status: 'Ativo', combustivel: 60, ultimaManutencao: '2026-05-20', observacoes: 'Veículo em bom estado' },
+  { id: '2', placa: 'XYZ-5678', modelo: 'Iveco Daily', ano: 2021, marca: 'Iveco', kmAtual: 62000, status: 'Parado', combustivel: 30, ultimaManutencao: '2026-04-10', observacoes: 'Aguardando manutenção' }
 ];
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const search = searchParams.get('search');
+    const search = searchParams.get('search')?.toUpperCase() || '';
+    const status = searchParams.get('status') || '';
 
-    let frotas = [...frotasMock];
+    let resultado = mockFrotas;
 
-    // Filtrar por status
-    if (status) {
-      frotas = frotas.filter((f) => f.status === status);
-    }
-
-    // Buscar por placa ou modelo
     if (search) {
-      const query = search.toLowerCase();
-      frotas = frotas.filter(
-        (f) =>
-          f.placa.toLowerCase().includes(query) ||
-          f.modelo.toLowerCase().includes(query)
-      );
+      resultado = resultado.filter((f) => f.placa.includes(search) || f.modelo.toUpperCase().includes(search));
     }
 
-    return NextResponse.json({
-      success: true,
-      data: frotas,
-      total: frotas.length
-    });
+    if (status) {
+      resultado = resultado.filter((f) => f.status === status);
+    }
+
+    return Response.json({ success: true, data: resultado, total: resultado.length });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
@@ -74,39 +29,20 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    // Validações básicas
-    if (!body.placa || !body.modelo) {
-      return NextResponse.json(
-        { success: false, error: 'Placa e modelo são obrigatórios' },
-        { status: 400 }
-      );
-    }
-
-    // Verificar placa duplicada
-    if (frotasMock.some((f) => f.placa === body.placa)) {
-      return NextResponse.json(
-        { success: false, error: 'Placa já existe no sistema' },
-        { status: 409 }
-      );
+    const existe = mockFrotas.some((f) => f.placa === body.placa);
+    if (existe) {
+      return Response.json({ success: false, error: 'Placa já existe' }, { status: 400 });
     }
 
     const novaFrota = {
-      id: Date.now().toString(),
+      id: String(Math.max(...mockFrotas.map((f) => parseInt(f.id)), 0) + 1),
       ...body,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      ultimaManutencao: body.ultimaManutencao || new Date().toISOString().split('T')[0]
     };
 
-    frotasMock.push(novaFrota);
-
-    return NextResponse.json(
-      { success: true, data: novaFrota },
-      { status: 201 }
-    );
+    mockFrotas.push(novaFrota);
+    return Response.json({ success: true, data: novaFrota }, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }
