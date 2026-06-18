@@ -38,6 +38,8 @@ function SubgruposSection() {
   const [loading, setLoading] = useState(true);
   const [pendingChanges, setPendingChanges] = useState({});
   const [savingId, setSavingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [filterUF, setFilterUF] = useState('');
   const [msg, setMsg] = useState({ type: '', text: '' });
 
   const load = useCallback(async () => {
@@ -53,6 +55,12 @@ function SubgruposSection() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const ufsDisponiveis = [...new Set(agendamentos.map(ag => ag.technician_region).filter(Boolean))].sort();
+
+  const agendamentosFiltrados = filterUF
+    ? agendamentos.filter(ag => ag.technician_region === filterUF)
+    : agendamentos;
 
   const handleSave = async (scheduleId, newSubgroup) => {
     setSavingId(scheduleId);
@@ -80,6 +88,24 @@ function SubgruposSection() {
     setSavingId(null);
   };
 
+  const handleDelete = async (scheduleId, techName) => {
+    if (!confirm(`Excluir agendamento de ${techName}?`)) return;
+    setDeletingId(scheduleId);
+    try {
+      const res = await fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setAgendamentos(prev => prev.filter(ag => ag.id !== scheduleId));
+        setMsg({ type: 'success', text: 'AGENDAMENTO EXCLUÍDO' });
+        setTimeout(() => setMsg({ type: '', text: '' }), 4000);
+      } else {
+        setMsg({ type: 'error', text: 'ERRO AO EXCLUIR' });
+      }
+    } catch {
+      setMsg({ type: 'error', text: 'ERRO DE CONEXÃO' });
+    }
+    setDeletingId(null);
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -89,14 +115,27 @@ function SubgruposSection() {
             Próximos 14 dias — ajuste o subgrupo antes do disparo D-1
           </p>
         </div>
-        <button
-          className="btn"
-          style={{ fontSize: '0.75rem', fontWeight: '700', padding: '0.4rem 0.9rem' }}
-          onClick={load}
-          disabled={loading}
-        >
-          {loading ? 'Atualizando...' : 'Atualizar'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <select
+            value={filterUF}
+            onChange={e => setFilterUF(e.target.value)}
+            className="input"
+            style={{ fontSize: '0.75rem', fontWeight: '700', padding: '0.35rem 0.6rem', minWidth: '90px' }}
+          >
+            <option value="">Todas UFs</option>
+            {ufsDisponiveis.map(uf => (
+              <option key={uf} value={uf}>{uf}</option>
+            ))}
+          </select>
+          <button
+            className="btn"
+            style={{ fontSize: '0.75rem', fontWeight: '700', padding: '0.4rem 0.9rem' }}
+            onClick={load}
+            disabled={loading}
+          >
+            {loading ? 'Atualizando...' : 'Atualizar'}
+          </button>
+        </div>
       </div>
 
       {msg.text && (
@@ -111,12 +150,12 @@ function SubgruposSection() {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '2rem', fontWeight: '700' }}>Carregando...</div>
-      ) : agendamentos.length === 0 ? (
+      ) : agendamentosFiltrados.length === 0 ? (
         <div style={{
           textAlign: 'center', padding: '2rem', color: '#666', fontSize: '0.85rem',
           border: '1px solid #eee', borderRadius: '8px',
         }}>
-          Nenhum agendamento pendente nos próximos 14 dias
+          {filterUF ? `Nenhum agendamento para UF ${filterUF}` : 'Nenhum agendamento pendente nos próximos 14 dias'}
         </div>
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '1rem' }}>
@@ -135,11 +174,12 @@ function SubgruposSection() {
                 </tr>
               </thead>
               <tbody>
-                {agendamentos.map(ag => {
+                {agendamentosFiltrados.map(ag => {
                   const isGeneral = ag.inventory_type === 'general';
                   const changed = !isGeneral && pendingChanges[ag.id] !== undefined;
                   const currentSubgroup = changed ? pendingChanges[ag.id] : ag.scheduled_subgroup;
                   const isSaving = savingId === ag.id;
+                  const isDeleting = deletingId === ag.id;
 
                   return (
                     <tr key={ag.id}>
@@ -157,7 +197,7 @@ function SubgruposSection() {
                             onChange={e => setPendingChanges(prev => ({ ...prev, [ag.id]: e.target.value }))}
                             className="input"
                             style={{ width: '100%', maxWidth: '160px', fontWeight: '700' }}
-                            disabled={isSaving}
+                            disabled={isSaving || isDeleting}
                           >
                             <option value="">— Selecione —</option>
                             {ag.available_subgroups.map(s => (
@@ -174,16 +214,26 @@ function SubgruposSection() {
                         {changed ? <span style={{ color: '#999' }}>?</span> : (ag.items_count ?? '—')}
                       </td>
                       <td>
-                        {changed && (
+                        <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                          {changed && (
+                            <button
+                              className="btn btn-primary"
+                              style={{ fontSize: '0.7rem', padding: '0.25rem 0.75rem', whiteSpace: 'nowrap' }}
+                              disabled={isSaving || isDeleting}
+                              onClick={() => handleSave(ag.id, pendingChanges[ag.id])}
+                            >
+                              {isSaving ? '...' : 'Salvar'}
+                            </button>
+                          )}
                           <button
-                            className="btn btn-primary"
-                            style={{ fontSize: '0.7rem', padding: '0.25rem 0.75rem', whiteSpace: 'nowrap' }}
-                            disabled={isSaving}
-                            onClick={() => handleSave(ag.id, pendingChanges[ag.id])}
+                            className="btn"
+                            style={{ fontSize: '0.7rem', padding: '0.25rem 0.6rem', color: '#cc0000', borderColor: '#cc0000', whiteSpace: 'nowrap' }}
+                            disabled={isSaving || isDeleting}
+                            onClick={() => handleDelete(ag.id, ag.technician_name)}
                           >
-                            {isSaving ? '...' : 'Salvar'}
+                            {isDeleting ? '...' : 'Excluir'}
                           </button>
-                        )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -392,7 +442,7 @@ function EscalonamentoSection({ onMsg }) {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1rem', fontWeight: '800', margin: 0 }}>Gestão de Escalonamento</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: '800', margin: 0 }}>Inventário Semanal Cíclico (Parcial)</h2>
           <p style={{ fontSize: '0.75rem', color: '#666', margin: '0.2rem 0 0' }}>
             Defina o dia e horário do inventário para cada técnico ativo
           </p>
