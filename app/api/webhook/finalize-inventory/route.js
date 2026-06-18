@@ -35,14 +35,20 @@ export async function POST(req) {
         .single();
       if (!tech) return NextResponse.json({ error: 'Técnico não encontrado' }, { status: 404 });
 
-      const { data, error } = await supabase
-        .from('inventories')
-        .select('id, technician_id, week_ref, status, technicians(id, name, phone, email)')
-        .eq('technician_id', tech.id)
-        .in('status', ['in_progress', 'pending', 'recount_pending'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+      // Prioriza: in_progress > recount_pending > pending (evita pegar inventário antigo de outra semana)
+      let data = null;
+      for (const st of ['in_progress', 'recount_pending', 'pending']) {
+        const { data: found } = await supabase
+          .from('inventories')
+          .select('id, technician_id, week_ref, status, technicians(id, name, phone, email)')
+          .eq('technician_id', tech.id)
+          .eq('status', st)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (found) { data = found; break; }
+      }
+      const error = !data;
       if (error || !data) return NextResponse.json({ error: 'Inventário ativo não encontrado' }, { status: 404 });
       inventory = data;
     } else {
@@ -250,6 +256,13 @@ export async function POST(req) {
       .from('inventories')
       .update(inventoryUpdate)
       .eq('id', invId);
+
+    // Sincroniza status do agendamento com o resultado da finalização
+    await supabase
+      .from('inventory_schedules')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('inventory_id', invId)
+      .not('status', 'in', '(cancelled,abandoned)');
 
     // 6. Alerta de excesso para supervisor
     if (surplusItems.length > 0) {
