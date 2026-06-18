@@ -27,6 +27,11 @@ const STATUS_MAP = {
   error:           { label: 'Erro',         cls: 'badge-error' },
   active:          { label: 'Ativo',        cls: 'badge-active' },
   inactive:        { label: 'Inativo',      cls: 'badge-inactive' },
+  // Frotas
+  'Ativo':         { label: 'Ativo',        cls: 'badge-success' },
+  'Parado':        { label: 'Parado',       cls: 'badge-warning' },
+  'Manutenção':    { label: 'Manutenção',   cls: 'badge-warning' },
+  'Descartado':    { label: 'Descartado',   cls: 'badge-error' },
 };
 
 export default function StatusBadge({ status, size }) {
