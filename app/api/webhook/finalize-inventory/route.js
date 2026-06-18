@@ -229,19 +229,26 @@ export async function POST(req) {
     const sumSysQty  = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
     const sumAbsDiff = (arr) => arr.reduce((s, i) => s + Math.abs(Number(i.difference) || 0), 0);
 
+    const inventoryUpdate = {
+      status:               newStatus,
+      is_recount:           eraRecontagem,
+      completed_at:         new Date().toISOString(),
+      total_items:          countedItems.length,
+      counted_items:        countedItems.length,
+      divergence_count:     divergencesToInsert.length,
+      total_quantity:       sumSysQty(countedItems),
+      divergence_quantity:  sumAbsDiff(divergencesToInsert),
+      updated_at:           new Date().toISOString(),
+    };
+
+    // Guarda divergência da 1ª contagem separadamente para rastreabilidade no histórico
+    if (!eraRecontagem) {
+      inventoryUpdate.first_count_divergence_quantity = sumAbsDiff(divergencesToInsert);
+    }
+
     await supabase
       .from('inventories')
-      .update({
-        status:               newStatus,
-        is_recount:           eraRecontagem,
-        completed_at:         new Date().toISOString(),
-        total_items:          countedItems.length,
-        counted_items:        countedItems.length,
-        divergence_count:     divergencesToInsert.length,
-        total_quantity:       sumSysQty(countedItems),
-        divergence_quantity:  sumAbsDiff(divergencesToInsert),
-        updated_at:           new Date().toISOString(),
-      })
+      .update(inventoryUpdate)
       .eq('id', invId);
 
     // 6. Alerta de excesso para supervisor

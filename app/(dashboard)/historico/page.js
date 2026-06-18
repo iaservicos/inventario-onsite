@@ -280,13 +280,21 @@ export default function HistoricoPage() {
                     ? formatDateOnly(sched?.scheduled_at || inv.created_at)
                     : formatDateOnly(inv.updated_at || inv.created_at);
 
-                  // Peças: pending usa qtd agendada; concluído usa total_quantity (soma de system_qty)
-                  const rawPecas = (!isFirst && (inv.status === 'pending' || !inv.total_quantity))
-                    ? (sched?.items_count ?? inv.total_items)
-                    : inv.total_quantity;
-                  const displayPecas = isFirst ? '—' : (rawPecas ?? '—');
-                  const divQty  = inv.divergence_quantity ?? inv.divergence_count ?? 0;
-                  const hasDiv  = !isFirst && divQty > 0;
+                  // Peças e Div por fase
+                  let displayPecas, divQty;
+                  if (isFirst) {
+                    // 1ª contagem: mostra total de itens e divergências da 1ª fase
+                    displayPecas = inv.total_items ?? '—';
+                    divQty = inv.first_count_divergence_quantity ?? null;
+                  } else {
+                    // Recontagem ou inventário simples
+                    const rawPecas = (inv.status === 'pending' || !inv.total_quantity)
+                      ? (sched?.items_count ?? inv.total_items)
+                      : inv.total_quantity;
+                    displayPecas = rawPecas ?? '—';
+                    divQty = inv.divergence_quantity ?? inv.divergence_count ?? 0;
+                  }
+                  const hasDiv = divQty !== null && divQty > 0;
 
                   return (
                     <tr
@@ -310,7 +318,7 @@ export default function HistoricoPage() {
                       </td>
                       <td style={{ textAlign: 'center', fontWeight: '700', color: '#333' }}>{displayPecas}</td>
                       <td style={{ textAlign: 'center', fontWeight: '800' }}>
-                        {isFirst
+                        {divQty === null
                           ? <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>
                           : hasDiv
                             ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{divQty}</span>
