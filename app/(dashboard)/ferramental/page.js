@@ -180,6 +180,7 @@ export default function FerramentalPage() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [selected, setSelected] = useState(null);
+  const [termosPendentes, setTermosPendentes] = useState([]);
 
   const role = session?.user?.role;
   const isGestor = ['admin', 'supervisor'].includes(role);
@@ -190,20 +191,33 @@ export default function FerramentalPage() {
     try {
       const params = new URLSearchParams();
       if (filterStatus !== 'all') params.set('status', filterStatus);
-      const res = await fetch(`/api/ferramental/requests?${params}`);
-      const data = await res.json();
+      const [res, resTermos] = await Promise.all([
+        fetch(`/api/ferramental/requests?${params}`),
+        fetch('/api/ferramental/requests?status=entregue'),
+      ]);
+      const [data, termos] = await Promise.all([res.json(), resTermos.json()]);
       setRequests(Array.isArray(data) ? data : []);
+      setTermosPendentes(Array.isArray(termos) ? termos : []);
     } catch { toast.error('Erro ao carregar solicitações'); }
     finally { setLoading(false); }
   }, [filterStatus]);
 
   useEffect(() => { load(); }, [load]);
 
+  // Termos pendentes agrupados por técnico
+  const termosByTech = termosPendentes.reduce((acc, r) => {
+    const key = r.technician_name;
+    if (!acc[key]) acc[key] = { name: r.technician_name, supervisor: r.technicians?.supervisor_name, tools: [] };
+    acc[key].tools.push({ id: r.id, name: r.tool_name, date: r.created_at });
+    return acc;
+  }, {});
+  const termoEntries = Object.values(termosByTech);
+
   // KPIs
   const total      = requests.length;
   const aguardando = requests.filter(r => r.status === 'aguardando_aprovacao').length;
   const aprovados  = requests.filter(r => r.status === 'aprovado').length;
-  const entregues  = requests.filter(r => r.status === 'entregue').length;
+  const entregues  = termosPendentes.length;
 
   return (
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -223,6 +237,33 @@ export default function FerramentalPage() {
           </div>
         ))}
       </div>
+
+      {/* Painel Termos Pendentes */}
+      {termoEntries.length > 0 && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fbbf24', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: '900', color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>⚠</span>
+            <span>Termos Pendentes no DocSign — {termoEntries.length} técnico{termoEntries.length > 1 ? 's' : ''} / {termosPendentes.length} entrega{termosPendentes.length > 1 ? 's' : ''}</span>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+            {termoEntries.map(entry => (
+              <div key={entry.name} style={{ background: '#ffffff', border: '1px solid #fde68a', borderRadius: '8px', padding: '0.65rem 0.9rem', minWidth: '200px' }}>
+                <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#000', marginBottom: '2px' }}>{entry.name}</div>
+                {entry.supervisor && (
+                  <div style={{ fontSize: '0.68rem', color: '#888', marginBottom: '0.35rem' }}>Sup: {entry.supervisor}</div>
+                )}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                  {entry.tools.map(t => (
+                    <span key={t.id} style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '4px', padding: '0.1rem 0.45rem', fontSize: '0.7rem', fontWeight: '600', color: '#78350f' }}>
+                      {t.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filtros */}
       <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -274,7 +315,16 @@ export default function FerramentalPage() {
                       <td style={{ padding: '0.75rem 1rem', color: '#777777', maxWidth: '200px', fontStyle: r.comment ? 'italic' : 'normal' }}>
                         {r.comment ? `"${r.comment}"` : '—'}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem' }}><StatusBadge status={r.status} /></td>
+                      <td style={{ padding: '0.75rem 1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', alignItems: 'flex-start' }}>
+                          <StatusBadge status={r.status} />
+                          {r.status === 'entregue' && (
+                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', color: '#92400e', background: '#fef3c7', border: '1px solid #fde68a', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
+                              Falta Termo
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td style={{ padding: '0.75rem 1rem', color: '#888888', whiteSpace: 'nowrap' }}>{formatDate(r.created_at)}</td>
                       <td style={{ padding: '0.75rem 1rem' }}>
                         {canAct ? (
