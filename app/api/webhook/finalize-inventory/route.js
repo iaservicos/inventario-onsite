@@ -201,7 +201,11 @@ export async function POST(req) {
     });
 
     if (divergencesToInsert.length > 0) {
-      await supabase.from('divergences').insert(divergencesToInsert);
+      const { error: divError } = await supabase.from('divergences').insert(divergencesToInsert);
+      if (divError) {
+        console.error('[finalize-inventory] Falha ao inserir divergências:', divError.message);
+        return NextResponse.json({ error: 'Falha ao inserir divergências: ' + divError.message }, { status: 500 });
+      }
     }
 
     // Recontagem sempre fecha como completed — evita loop infinito de recontagens
@@ -236,11 +240,14 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Falha ao atualizar inventário: ' + updateError.message }, { status: 500 });
     }
 
-    await supabase
+    const { error: schedError } = await supabase
       .from('inventory_schedules')
       .update({ status: newStatus, updated_at: now })
       .eq('inventory_id', invId)
       .not('status', 'in', '(cancelled,abandoned)');
+    if (schedError) {
+      console.warn('[finalize-inventory] Falha ao sincronizar schedule:', schedError.message);
+    }
 
     if (surplusItems.length > 0) {
       const techName = inventory.technicians?.name || 'Técnico';

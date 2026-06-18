@@ -70,7 +70,7 @@ export async function POST(request) {
       ? `Recontagem agendada para ${dataAgend} não foi realizada e foi marcada como abandonada.`
       : `Inventário agendado para ${dataAgend} não foi realizado e foi marcado como abandonado.`;
 
-    await supabase.from('alerts').insert({
+    const { error: alertError } = await supabase.from('alerts').insert({
       type:          'abandonment',
       severity:      'high',
       title:         `Inventário não realizado — ${techName}`,
@@ -80,8 +80,9 @@ export async function POST(request) {
       resolved:      false,
       created_at:    now.toISOString(),
     });
+    if (alertError) console.warn('[check-abandoned] Falha ao criar alerta:', alertError.message);
 
-    results.push({ schedule_id: sched.id, technician: techName, scheduled_at: sched.scheduled_at, action: 'abandoned' });
+    results.push({ schedule_id: sched.id, technician: techName, scheduled_at: sched.scheduled_at, action: 'abandoned', alert_error: alertError?.message || null });
   }
 
   const tresDiasAtras = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
@@ -99,7 +100,7 @@ export async function POST(request) {
       .update({ status: 'abandoned', updated_at: now.toISOString() })
       .eq('id', inv.id);
 
-    await supabase.from('alerts').insert({
+    const { error: alertOrfaoError } = await supabase.from('alerts').insert({
       type:          'abandonment',
       severity:      'high',
       title:         `Recontagem não concluída — ${techName}`,
@@ -109,8 +110,9 @@ export async function POST(request) {
       resolved:      false,
       created_at:    now.toISOString(),
     });
+    if (alertOrfaoError) console.warn('[check-abandoned] Falha ao criar alerta órfão:', alertOrfaoError.message);
 
-    results.push({ inventory_id: inv.id, technician: techName, week_ref: inv.week_ref, action: 'abandoned_recount_orphan' });
+    results.push({ inventory_id: inv.id, technician: techName, week_ref: inv.week_ref, action: 'abandoned_recount_orphan', alert_error: alertOrfaoError?.message || null });
   }
 
   return NextResponse.json({ ok: true, processed: results.length, results });
