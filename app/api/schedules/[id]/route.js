@@ -52,7 +52,7 @@ export async function DELETE(request, { params }) {
     .eq('id', params.id)
     .maybeSingle();
 
-  // Se o inventário vinculado ainda não foi iniciado (pending), exclui do banco
+  // Marca o inventário vinculado como cancelled se ainda não foi iniciado
   if (sched?.inventory_id) {
     const { data: inv } = await supabase
       .from('inventories')
@@ -60,9 +60,11 @@ export async function DELETE(request, { params }) {
       .eq('id', sched.inventory_id)
       .maybeSingle();
 
-    if (inv && inv.status === 'pending') {
-      await supabase.from('inventory_items').delete().eq('inventory_id', sched.inventory_id);
-      await supabase.from('inventories').delete().eq('id', sched.inventory_id);
+    if (inv && ['pending'].includes(inv.status)) {
+      await supabase
+        .from('inventories')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', sched.inventory_id);
     }
   }
 
