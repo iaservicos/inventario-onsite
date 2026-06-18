@@ -204,7 +204,7 @@ export async function POST(req) {
       const { error: divError } = await supabase.from('divergences').insert(divergencesToInsert);
       if (divError) {
         console.error('[finalize-inventory] Falha ao inserir divergências:', divError.message);
-        return NextResponse.json({ error: 'Falha ao inserir divergências: ' + divError.message }, { status: 500 });
+        return NextResponse.json({ error: 'Falha ao registrar divergências' }, { status: 500 });
       }
     }
 
@@ -237,7 +237,7 @@ export async function POST(req) {
 
     if (updateError) {
       console.error('[finalize-inventory] Falha ao atualizar inventário:', updateError.message);
-      return NextResponse.json({ error: 'Falha ao atualizar inventário: ' + updateError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Falha ao atualizar inventário' }, { status: 500 });
     }
 
     const { error: schedError } = await supabase

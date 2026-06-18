@@ -152,7 +152,8 @@ export async function POST(request) {
     .single();
 
   if (invError) {
-    return NextResponse.json({ error: invError.message }, { status: 500 });
+    console.error('[dispatch-databricks] Falha ao criar inventário:', invError.message);
+    return NextResponse.json({ error: 'Falha ao criar inventário' }, { status: 500 });
   }
 
   const inventoryItems = items.map(item => ({
@@ -170,8 +171,9 @@ export async function POST(request) {
     .insert(inventoryItems);
 
   if (itemsError) {
+    console.error('[dispatch-databricks] Falha ao inserir itens:', itemsError.message);
     await supabase.from('inventories').delete().eq('id', inventory.id);
-    return NextResponse.json({ error: itemsError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Falha ao inserir itens do inventário' }, { status: 500 });
   }
 
   await supabase

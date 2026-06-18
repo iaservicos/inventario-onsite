@@ -26,7 +26,7 @@ export async function POST(request) {
 
   if (error) {
     console.error('[check-abandoned]', error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Falha ao buscar agendamentos' }, { status: 500 });
   }
 
   const results = [];
