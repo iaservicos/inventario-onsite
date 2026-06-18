@@ -1,19 +1,8 @@
-/**
- * POST /api/webhook/dispatch-databricks
- * Versão aprimorada com seleção inteligente de peças por histórico de contagens.
- *
- * Lógica de seleção das 10 peças:
- * 1ª prioridade — peças que NUNCA foram contadas no sistema
- * 2ª prioridade — peças contadas há mais tempo (mais antigas no histórico)
- * 3ª prioridade — aleatório entre as restantes
- *
- * Autenticação: header x-dispatch-secret
- */
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTechnicianItems } from '@/lib/databricks';
 import { getConsolidatedTechnicianItems } from '@/lib/db';
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -28,11 +17,6 @@ function getWeekRef(date = new Date()) {
   return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
-/**
- * Monta mapa item_code → quantidade total consolidando remessas do Databricks.
- * Usado apenas para enriquecer as quantidades do sistema — a lista definitiva
- * de peças vem sempre de technician_items (que tem o subgrupo).
- */
 function buildDatabricksQtyMap(databricksItems) {
   const map = {};
   for (const item of (databricksItems || [])) {
@@ -43,7 +27,6 @@ function buildDatabricksQtyMap(databricksItems) {
 }
 
 export async function POST(request) {
-  // Autenticação
   const secret = request.headers.get('x-dispatch-secret');
   if (secret !== process.env.DISPATCH_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -56,23 +39,11 @@ export async function POST(request) {
     return NextResponse.json({ error: 'schedule_id é obrigatório' }, { status: 400 });
   }
 
-  // Busca o agendamento com dados do técnico
   const { data: schedule, error: schedError } = await supabase
     .from('inventory_schedules')
     .select(`
-      id,
-      technician_id,
-      week_ref,
-      scheduled_subgroup,
-      inventory_type,
-      status,
-      technicians (
-        id,
-        name,
-        phone,
-        databricks_name,
-        active
-      )
+      id, technician_id, week_ref, scheduled_subgroup, inventory_type, status,
+      technicians ( id, name, phone, databricks_name, active )
     `)
     .eq('id', schedule_id)
     .single();
@@ -95,13 +66,9 @@ export async function POST(request) {
   const searchName = technician.databricks_name || technician.name;
   const weekRef = schedule.week_ref || getWeekRef();
   const isGeneralInventory = schedule.inventory_type === 'general';
-  // Inventário geral: null força getConsolidatedTechnicianItems a retornar TODAS as peças
   const scheduledSubgroup = isGeneralInventory ? null : (schedule.scheduled_subgroup || null);
 
-  // "Claim" atômico: marca como dispatched ANTES de criar o inventário.
-  // Usa WHERE status='pending' como condição — se dois requests chegarem ao mesmo tempo,
-  // apenas um consegue fazer o update; o outro recebe 0 linhas e aborta.
-  // Agendamentos já em 'dispatched' (retry após falha parcial) passam para o check de inventário.
+  // Claim atômico — evita inventário duplicado em requests simultâneos
   if (schedule.status === 'pending') {
     const { data: claimed } = await supabase
       .from('inventory_schedules')
@@ -120,7 +87,6 @@ export async function POST(request) {
     }
   }
 
-  // Verifica se já existe inventário para esta semana (protege retries)
   const { data: existing } = await supabase
     .from('inventories')
     .select('id, status')
@@ -135,7 +101,6 @@ export async function POST(request) {
     }, { status: 409 });
   }
 
-  // 1. Lista definitiva: todas as peças do subgrupo agendado (vem de technician_items)
   const subgroupItems = await getConsolidatedTechnicianItems(supabase, technician.id, scheduledSubgroup);
 
   if (!subgroupItems || subgroupItems.length === 0) {
@@ -150,7 +115,6 @@ export async function POST(request) {
     }, { status: 404 });
   }
 
-  // 2. Enriquece quantidades com Databricks (melhor esforço — não bloqueia se falhar)
   let databricksQtyMap = {};
   let databricksSource = false;
   try {
@@ -160,10 +124,9 @@ export async function POST(request) {
       databricksSource = true;
     }
   } catch (e) {
-    console.warn('[dispatch-databricks] Databricks indisponível, usando quantidades de technician_items:', e.message);
+    console.warn('[dispatch-databricks] Databricks indisponível, usando technician_items:', e.message);
   }
 
-  // 3. Monta a lista final: todas as peças do subgrupo com qty do Databricks quando disponível
   const items = subgroupItems.map(item => ({
     item_code:     item.item_code,
     item_name:     item.item_name,
@@ -174,17 +137,16 @@ export async function POST(request) {
       : (Number(item.item_quantity) || 0),
   }));
 
-  // Cria o inventário
   const { data: inventory, error: invError } = await supabase
     .from('inventories')
     .insert({
       technician_id: technician.id,
-      week_ref: weekRef,
-      status: 'in_progress',
-      total_items: items.length,
+      week_ref:      weekRef,
+      status:        'in_progress',
+      total_items:   items.length,
       counted_items: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at:    new Date().toISOString(),
+      updated_at:    new Date().toISOString(),
     })
     .select()
     .single();
@@ -193,15 +155,14 @@ export async function POST(request) {
     return NextResponse.json({ error: invError.message }, { status: 500 });
   }
 
-  // Insere as peças selecionadas no inventário
   const inventoryItems = items.map(item => ({
-    inventory_id: inventory.id,
-    item_code: item.item_code,
-    item_name: item.item_name,
+    inventory_id:  inventory.id,
+    item_code:     item.item_code,
+    item_name:     item.item_name,
     item_subgroup: item.item_subgroup || null,
-    system_qty: Number(item.item_quantity) || 0,
-    physical_qty: null,
-    status: 'pending',
+    system_qty:    Number(item.item_quantity) || 0,
+    physical_qty:  null,
+    status:        'pending',
   }));
 
   const { error: itemsError } = await supabase
@@ -213,7 +174,6 @@ export async function POST(request) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  // Vincula o inventory_id ao agendamento (status já foi para 'dispatched' no claim acima)
   await supabase
     .from('inventory_schedules')
     .update({ inventory_id: inventory.id, updated_at: new Date().toISOString() })

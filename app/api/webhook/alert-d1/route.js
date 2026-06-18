@@ -22,33 +22,29 @@ export async function POST(req) {
     const supabase = createServiceClient();
 
     const { searchParams } = new URL(req.url);
-    const diaParam = searchParams.get('dia'); // 'hoje' gera para hoje; padrão = amanhã
+    const diaParam = searchParams.get('dia');
 
-    // 1. Descobre o dia alvo no horário de Brasília (UTC-3)
     const agora = new Date();
     const agoraSP = new Date(agora.getTime() - 3 * 60 * 60 * 1000);
 
     const alvoDiaSP = new Date(agoraSP);
     if (diaParam !== 'hoje') {
-      alvoDiaSP.setUTCDate(alvoDiaSP.getUTCDate() + 1); // padrão: amanhã
+      alvoDiaSP.setUTCDate(alvoDiaSP.getUTCDate() + 1);
     }
 
-    const diaAlvo = alvoDiaSP.getUTCDay(); // 0=Dom … 6=Sáb
+    const diaAlvo = alvoDiaSP.getUTCDay();
 
-    // 00:00 SP = 03:00 UTC do mesmo dia calendário
     const amanhaInicio = new Date(Date.UTC(
       alvoDiaSP.getUTCFullYear(), alvoDiaSP.getUTCMonth(), alvoDiaSP.getUTCDate(),
       3, 0, 0, 0,
     ));
     const amanhaFim = new Date(amanhaInicio.getTime() + 24 * 60 * 60 * 1000 - 1);
 
-    // Base de data (meia-noite UTC do dia alvo SP) usada para montar scheduled_at
     const amanha = new Date(Date.UTC(
       alvoDiaSP.getUTCFullYear(), alvoDiaSP.getUTCMonth(), alvoDiaSP.getUTCDate(),
       0, 0, 0, 0,
     ));
 
-    // 2. Busca técnicos que fazem inventário amanhã
     const { data: tecnicos } = await supabase
       .from('technicians')
       .select('*')
@@ -63,8 +59,6 @@ export async function POST(req) {
     for (const tech of tecnicos) {
       const weekRef = getWeekRef(amanha);
 
-      // Verifica PRIMEIRO se já existe agendamento para amanhã.
-      // Se existir, não recalcula o subgrupo (evita trocar lcd→ssd em execuções repetidas do cron).
       const { data: existente } = await supabase
         .from('inventory_schedules')
         .select('id, inventory_id, scheduled_subgroup, scheduled_at')
@@ -75,22 +69,17 @@ export async function POST(req) {
         .maybeSingle();
 
       if (existente) {
-        // Calcula o scheduled_at correto (SP → UTC)
         const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
         const scheduledCorreto = new Date(amanha);
         scheduledCorreto.setUTCHours(h + 3, m, 0, 0);
 
         const updates = {};
 
-        // Corrige horário se mudou
         if (existente.scheduled_at !== scheduledCorreto.toISOString()) {
           updates.scheduled_at = scheduledCorreto.toISOString();
         }
 
-        // Só troca o subgrupo se o atual ficou sem peças no saldo.
-        // NÃO recalcular incondicionalmente: getSubgroupForTechnician usa o histórico de
-        // inventory_schedules, que já contém o agendamento atual. Recalcular causaria um
-        // "flip" a cada execução do cron (SSD → Bateria → SSD → ...).
+        // Só recalcula subgrupo se o atual ficou sem peças — evita flip a cada execução do cron
         const pecasSubgrupoAtual = await getConsolidatedTechnicianItems(
           supabase, tech.id, existente.scheduled_subgroup
         );
@@ -99,7 +88,6 @@ export async function POST(req) {
           if (subgrupoAtual) updates.scheduled_subgroup = subgrupoAtual;
         }
 
-        // Vincula inventário se ainda não foi vinculado
         if (!existente.inventory_id) {
           const { data: inv } = await supabase
             .from('inventories')
@@ -114,20 +102,14 @@ export async function POST(req) {
         }
 
         const subgrupoFinal = updates.scheduled_subgroup || existente.scheduled_subgroup || 'Geral';
-        respostaPowerAutomate.push({
-          nome:     tech.name,
-          telefone: tech.phone,
-          subgrupo: subgrupoFinal,
-        });
+        respostaPowerAutomate.push({ nome: tech.name, telefone: tech.phone, subgrupo: subgrupoFinal });
         continue;
       }
 
-      // Nenhum agendamento existe ainda — calcula subgrupo e cria
       const subgrupo = await getSubgroupForTechnician(supabase, tech.id, weekSubgroup);
       const pecas = await getConsolidatedTechnicianItems(supabase, tech.id, subgrupo);
       if (pecas.length === 0) continue;
 
-      // Horário do técnico em SP (UTC-3) → converte para UTC somando 3h
       const [h, m] = (tech.inventory_time || '08:00').split(':').map(Number);
       const agendar = new Date(amanha);
       agendar.setUTCHours(h + 3, m, 0, 0);
@@ -149,11 +131,7 @@ export async function POST(req) {
         inventory_id:       inv?.id || null,
       });
 
-      respostaPowerAutomate.push({
-        nome: tech.name,
-        telefone: tech.phone,
-        subgrupo: subgrupo || 'Geral',
-      });
+      respostaPowerAutomate.push({ nome: tech.name, telefone: tech.phone, subgrupo: subgrupo || 'Geral' });
     }
 
     return NextResponse.json({ content: respostaPowerAutomate });

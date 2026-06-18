@@ -13,10 +13,8 @@ export default function ClientLayout({ children, user }) {
   const lastLogged   = useRef('');
   const inactivityTimer = useRef(null);
 
-  // Fecha o sidebar ao navegar (mobile)
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
-  // Logout por inatividade após 1 hora sem interação
   useEffect(() => {
     const reset = () => {
       clearTimeout(inactivityTimer.current);
@@ -33,7 +31,6 @@ export default function ClientLayout({ children, user }) {
     };
   }, []);
 
-  // Log de página visitada (debounce: só loga se mudou de rota)
   useEffect(() => {
     if (!pathname || pathname === lastLogged.current) return;
     lastLogged.current = pathname;
@@ -44,7 +41,6 @@ export default function ClientLayout({ children, user }) {
     }).catch(() => {});
   }, [pathname]);
 
-  // Bloqueia scroll do body quando sidebar aberto no mobile
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = 'hidden';

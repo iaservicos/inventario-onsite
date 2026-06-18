@@ -25,7 +25,6 @@ function getFaseLabel(inv) {
   if (inv.is_recount === false) {
     return { text: '1ª Contagem', accent: '#000' };
   }
-  // is_recount ainda não existe no banco
   return { text: '—', accent: '#ccc' };
 }
 
@@ -48,7 +47,6 @@ function ModalItens({ inventory, phase, onClose }) {
   useEffect(() => {
     setLoading(true);
     const fetchItems = fetch(`/api/inventories/${inventory.id}/items`).then(r => r.json());
-    // Para a 1ª contagem, também busca as divergências dessa fase para mostrar valores originais
     const fetchDivs = phase === 'first'
       ? fetch(`/api/divergences?inventoryId=${inventory.id}`).then(r => r.json())
       : Promise.resolve([]);
@@ -60,7 +58,6 @@ function ModalItens({ inventory, phase, onClose }) {
     });
   }, [inventory.id, phase]);
 
-  // Mapa de divergências da 1ª contagem (is_recount=false) por código normalizado
   const firstCountDivMap = useMemo(() => {
     if (phase !== 'first') return {};
     const map = {};
@@ -70,7 +67,6 @@ function ModalItens({ inventory, phase, onClose }) {
     return map;
   }, [rawDivs, phase]);
 
-  // Deduplica por código normalizado, mantendo o registro mais recente (counted_at)
   const items = useMemo(() => {
     const map = {};
     rawItems.forEach(item => {
@@ -82,7 +78,6 @@ function ModalItens({ inventory, phase, onClose }) {
         map[key] = item;
       }
     });
-    // Para 1ª contagem: substitui quantidades pelas da divergência original (se houver)
     return Object.values(map).map(item => {
       if (phase !== 'first') return item;
       const div = firstCountDivMap[normalizeCode(item.item_code)];
@@ -238,7 +233,6 @@ export default function HistoricoPage() {
     setLoading(false);
   }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Expande inventários com recontagem em duas linhas: 1ª contagem + recontagem
   const rows = useMemo(() =>
     inventories.flatMap(inv => {
       if (inv.is_recount === true) {
@@ -293,7 +287,6 @@ export default function HistoricoPage() {
                   const isFirst    = inv._rowPhase === 'first';
                   const isRecount  = inv._rowPhase === 'recount';
 
-                  // Fase label
                   const faseText   = isFirst   ? '1ª Contagem'
                                    : isRecount ? 'Recontagem'
                                    : getFaseLabel(inv).text;
@@ -301,22 +294,17 @@ export default function HistoricoPage() {
                                    : isRecount ? '#000'
                                    : getFaseLabel(inv).accent;
 
-                  // Status exibido
                   const displayStatus = isFirst ? 'recount_pending' : inv.status;
 
-                  // Data: 1ª contagem usa scheduled_at; recontagem/conclusão usa updated_at
                   const displayDate = isFirst
                     ? formatDateOnly(sched?.scheduled_at || inv.created_at)
                     : formatDateOnly(inv.updated_at || inv.created_at);
 
-                  // Peças e Div por fase
                   let displayPecas, divQty;
                   if (isFirst) {
-                    // 1ª contagem: mostra total de itens e divergências da 1ª fase
                     displayPecas = inv.total_items ?? '—';
                     divQty = inv.first_count_divergence_quantity ?? null;
                   } else {
-                    // Recontagem ou inventário simples
                     const rawPecas = (inv.status === 'pending' || !inv.total_quantity)
                       ? (sched?.items_count ?? inv.total_items)
                       : inv.total_quantity;

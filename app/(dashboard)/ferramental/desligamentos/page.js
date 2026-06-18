@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
 import PageHeader from '@/components/ui/PageHeader';
 
-// ── Status (monocromático) ────────────────────────────────────
 const STATUS_CFG = {
   aguardando_validacao: { label: 'Aguard. Validação', color: '#555', bg: '#eeeeee' },
   em_validacao:         { label: 'Em Validação',      color: '#222', bg: '#dddddd' },
@@ -27,7 +26,6 @@ const inputSt = { padding: '0.55rem 0.75rem', border: '1px solid #ddd', borderRa
 const labelSt = { fontSize: '0.68rem', fontWeight: '800', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem', letterSpacing: '0.05em' };
 const thSt    = { padding: '0.65rem 0.9rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' };
 
-// ── Overlay genérico ─────────────────────────────────────────
 function Overlay({ children, onClose, maxWidth = '760px' }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem', overflowY: 'auto' }}>
@@ -50,7 +48,6 @@ function ModalHeader({ title, subtitle, onClose }) {
   );
 }
 
-// ── Modal: Nova Devolução (Supervisor) ────────────────────────
 function ModalNovaDevolucao({ onClose, onSaved }) {
   const [technicians, setTechnicians] = useState([]);
   const [selectedTech, setSelectedTech] = useState('');
@@ -117,7 +114,6 @@ function ModalNovaDevolucao({ onClose, onSaved }) {
       <ModalHeader title="Registrar Devolução de Ferramentas" subtitle="Informe as ferramentas recebidas do técnico. A analista irá validar as quantidades." onClose={onClose} />
 
       <div style={{ padding: '1.5rem 1.75rem', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {/* Técnico */}
         <div>
           <label style={labelSt}>Técnico *</label>
           {loadingTech
@@ -132,7 +128,6 @@ function ModalNovaDevolucao({ onClose, onSaved }) {
             )}
         </div>
 
-        {/* Ferramentas */}
         {selectedTech && (
           loadingInv ? (
             <div style={{ textAlign: 'center', padding: '2rem', color: '#aaa', fontSize: '0.82rem' }}>Carregando ferramentas do técnico...</div>
@@ -187,7 +182,6 @@ function ModalNovaDevolucao({ onClose, onSaved }) {
           )
         )}
 
-        {/* Observações */}
         <div>
           <label style={labelSt}>Observações</label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Opcional..."
@@ -205,7 +199,6 @@ function ModalNovaDevolucao({ onClose, onSaved }) {
   );
 }
 
-// ── Modal: Validação (Analista de Custos) ─────────────────────
 function ModalValidacao({ devolucao, onClose, onSaved }) {
   const [branches, setBranches] = useState([]);
   const [novaBranchIdx, setNovaBranchIdx] = useState(null);
@@ -283,23 +276,19 @@ function ModalValidacao({ devolucao, onClose, onSaved }) {
               const showDivergenceObs = isDivergent || naoDevolvido > 0;
               return (
                 <tr key={v.devolucao_id} style={{ borderBottom: '1px solid #f0f0f0', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                  {/* Ferramenta */}
                   <td style={{ padding: '0.85rem 0.9rem' }}>
                     <div style={{ fontWeight: '700', color: '#000' }}>{v.tool_name}</div>
                     {v.tool_notes && <div style={{ fontSize: '0.65rem', color: '#888', fontStyle: 'italic', marginTop: '0.1rem' }}>⚠ {v.tool_notes}</div>}
                     {naoDevolvido > 0 && <div style={{ fontSize: '0.65rem', fontWeight: '700', color: '#555', marginTop: '0.15rem' }}>⚑ {naoDevolvido} não entregue(s) pelo técnico</div>}
                   </td>
 
-                  {/* Em posse */}
                   <td style={{ padding: '0.85rem 0.9rem', textAlign: 'center', fontWeight: '700', color: '#666' }}>{v.expected_quantity}</td>
 
-                  {/* Supervisor recebeu */}
                   <td style={{ padding: '0.85rem 0.9rem', textAlign: 'center', fontWeight: '800', color: naoDevolvido > 0 ? '#000' : '#444' }}>
                     {v.returned_quantity}
                     {naoDevolvido > 0 && <div style={{ fontSize: '0.62rem', fontWeight: '600', color: '#888' }}>faltam {naoDevolvido}</div>}
                   </td>
 
-                  {/* Qtd. validada */}
                   <td style={{ padding: '0.85rem 0.9rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'center' }}>
                       <button onClick={() => update(i, 'validated_quantity', Math.max(0, v.validated_quantity - 1))}
@@ -311,7 +300,6 @@ function ModalValidacao({ devolucao, onClose, onSaved }) {
                     {isDivergent && <div style={{ fontSize: '0.62rem', fontWeight: '700', color: '#555', textAlign: 'center', marginTop: '0.2rem', fontStyle: 'italic' }}>divergência</div>}
                   </td>
 
-                  {/* Filial de destino */}
                   <td style={{ padding: '0.85rem 0.9rem' }}>
                     {v.validated_quantity > 0 ? (
                       <>
@@ -334,7 +322,6 @@ function ModalValidacao({ devolucao, onClose, onSaved }) {
                     ) : <span style={{ fontSize: '0.75rem', color: '#ccc' }}>—</span>}
                   </td>
 
-                  {/* Obs. divergência */}
                   <td style={{ padding: '0.85rem 0.9rem' }}>
                     {showDivergenceObs ? (
                       <input value={v.divergence_notes} onChange={e => update(i, 'divergence_notes', e.target.value)}
@@ -359,7 +346,6 @@ function ModalValidacao({ devolucao, onClose, onSaved }) {
   );
 }
 
-// ── Modal: Detalhe (somente leitura) ──────────────────────────
 function ModalDetalhe({ devolucao, onClose }) {
   const itens = devolucao.ferramental_devolucoes || [];
   const itemStatusLabel = { pendente: 'Pendente', validado: 'Validado', divergencia: 'Divergência' };
@@ -430,7 +416,6 @@ function ModalDetalhe({ devolucao, onClose }) {
   );
 }
 
-// ── Página principal ──────────────────────────────────────────
 export default function DevolucoesPage() {
   const { data: session } = useSession();
   const [devolucoes, setDevolucoes] = useState([]);
@@ -477,7 +462,6 @@ export default function DevolucoesPage() {
         )}
       />
 
-      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {kpis.map(k => (
           <div key={k.label} style={{ background: '#fff', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1.1rem 1.25rem' }}>
@@ -487,7 +471,6 @@ export default function DevolucoesPage() {
         ))}
       </div>
 
-      {/* Tabela */}
       <div style={{ background: '#fff', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: '4rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>Carregando...</div>

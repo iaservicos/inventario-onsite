@@ -98,7 +98,6 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
         </div>
 
         <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Info */}
           <div style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', color: '#555', lineHeight: '1.6' }}>
             <div><strong style={{ color: '#000' }}>{request.technician_name}</strong>{request.technician_email ? ` — ${request.technician_email}` : ''}</div>
             <div style={{ marginTop: '0.2rem', color: '#333', fontWeight: '600' }}>{request.tool_name}</div>
@@ -112,7 +111,6 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
 
           {transitions.length > 0 ? (
             <>
-              {/* Seletor de status */}
               <div>
                 <label style={labelStyle}>Novo Status *</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
@@ -125,7 +123,6 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
                 </div>
               </div>
 
-              {/* Método de envio */}
               {showDelivery && (
                 <div style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   <div>
@@ -149,7 +146,6 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
                 </div>
               )}
 
-              {/* Observação */}
               <div>
                 <label style={labelStyle}>Observação</label>
                 <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Opcional..." rows={2}
@@ -238,7 +234,6 @@ function ModalSolicitarTecnico({ onClose, onSaved }) {
             <div style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>Carregando...</div>
           ) : (
             <>
-              {/* Técnico */}
               <div>
                 <label style={ls}>Técnico *</label>
                 <select value={techId} onChange={e => setTechId(e.target.value)} style={{ ...fs, cursor: 'pointer' }}>
@@ -250,7 +245,6 @@ function ModalSolicitarTecnico({ onClose, onSaved }) {
                 )}
               </div>
 
-              {/* Ferramentas */}
               <div>
                 <label style={ls}>
                   Ferramentas e quantidades *
@@ -286,7 +280,6 @@ function ModalSolicitarTecnico({ onClose, onSaved }) {
                 </div>
               </div>
 
-              {/* Observação */}
               <div>
                 <label style={ls}>Observação</label>
                 <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Motivo da solicitação, urgência, etc." rows={2}
@@ -331,7 +324,6 @@ export default function FerramentalPage() {
       ]);
       const [data, termos] = await Promise.all([res.json(), resTermos.json()]);
       setRequests(Array.isArray(data) ? data : []);
-      // só os entregues que ainda não tiveram o termo confirmado
       setTermosPendentes((Array.isArray(termos) ? termos : []).filter(r => !r.termo_emitido_em));
     } catch { toast.error('Erro ao carregar solicitações'); }
     finally { setLoading(false); }
@@ -340,6 +332,7 @@ export default function FerramentalPage() {
   useEffect(() => { load(); }, [load]);
 
   async function confirmarTermo(id) {
+
     try {
       const res = await fetch(`/api/ferramental/requests/${id}`, {
         method: 'PATCH',
@@ -354,7 +347,6 @@ export default function FerramentalPage() {
     }
   }
 
-  // Termos pendentes agrupados por técnico (apenas sem termo)
   const termosByTech = termosPendentes.reduce((acc, r) => {
     const key = r.technician_name;
     if (!acc[key]) acc[key] = { name: r.technician_name, supervisor: r.technicians?.supervisor_name, tools: [] };
@@ -363,7 +355,6 @@ export default function FerramentalPage() {
   }, {});
   const termoEntries = Object.values(termosByTech);
 
-  // KPIs
   const total      = requests.length;
   const aguardando = requests.filter(r => r.status === 'aguardando_aprovacao').length;
   const aprovados  = requests.filter(r => r.status === 'aprovado').length;
@@ -384,7 +375,6 @@ export default function FerramentalPage() {
         )}
       />
 
-      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
           { label: 'Total', value: total },
@@ -399,7 +389,6 @@ export default function FerramentalPage() {
         ))}
       </div>
 
-      {/* Painel Termos Pendentes */}
       {termoEntries.length > 0 && (
         <div style={{ background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
           <div style={{ fontSize: '0.72rem', fontWeight: '900', color: '#333', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -425,7 +414,6 @@ export default function FerramentalPage() {
         </div>
       )}
 
-      {/* Filtros */}
       <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#888888', textTransform: 'uppercase' }}>Status:</span>
         {[{ value: 'all', label: 'Todos' }, ...ALL_STATUSES].map(opt => (
@@ -438,7 +426,6 @@ export default function FerramentalPage() {
         </button>
       </div>
 
-      {/* Tabela */}
       <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: '4rem', textAlign: 'center', color: '#888888', fontWeight: '700' }}>Carregando...</div>

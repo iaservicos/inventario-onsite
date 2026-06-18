@@ -60,23 +60,19 @@ export default function FerramentalDashboardPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // ── KPIs de solicitações ──
   const total          = requests.length;
   const aguardando     = requests.filter(r => r.status === 'aguardando_aprovacao').length;
   const emAndamento    = requests.filter(r => ['aprovado', 'aguardando_envio', 'enviando', 'pendente'].includes(r.status)).length;
   const entregues      = requests.filter(r => r.status === 'entregue').length;
   const aguardaCompra  = requests.filter(r => r.status === 'aguardando_compra').length;
 
-  // ── KPIs de estoque central ──
   const totalItensEstoque = stock.reduce((s, t) => s + t.branches.reduce((ss, b) => ss + b.quantity, 0), 0);
   const ferramentasSemEstoque = stock.filter(t => t.branches.every(b => b.quantity === 0) || t.branches.length === 0).length;
 
-  // ── Distribuição por status ──
   const byStatus = Object.entries(
     requests.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, {})
   ).sort((a, b) => b[1] - a[1]);
 
-  // ── Últimas 8 solicitações ──
   const recentes = [...requests]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 8);
@@ -87,7 +83,6 @@ export default function FerramentalDashboardPage() {
   return (
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
 
-      {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: '900', color: '#000000', letterSpacing: '-0.02em' }}>
           {greeting}, {session?.user?.name?.split(' ')[0] || 'Analista'}
@@ -101,7 +96,6 @@ export default function FerramentalDashboardPage() {
         <div style={{ textAlign: 'center', padding: '4rem', color: '#888888', fontWeight: '700' }}>Carregando...</div>
       ) : (
         <>
-          {/* KPIs principais */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
             <KpiCard label="Total de Solicitações" value={total} href="/ferramental" />
             <KpiCard label="Aguardando Aprovação" value={aguardando} sub="ação do gestor" href="/ferramental?status=aguardando_aprovacao" />
@@ -110,10 +104,8 @@ export default function FerramentalDashboardPage() {
             <KpiCard label="Aguard. Compra" value={aguardaCompra} href="/ferramental?status=aguardando_compra" />
           </div>
 
-          {/* Linha: status breakdown + estoque central */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.75rem' }}>
 
-            {/* Distribuição por status */}
             <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', padding: '1.25rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>Por Status</span>
@@ -142,7 +134,6 @@ export default function FerramentalDashboardPage() {
               )}
             </div>
 
-            {/* Estoque central resumo */}
             <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', padding: '1.25rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>Estoque Central</span>
@@ -158,7 +149,6 @@ export default function FerramentalDashboardPage() {
                   <div style={{ fontSize: '0.68rem', color: '#888888', fontWeight: '700', marginTop: '0.2rem', textTransform: 'uppercase' }}>Ferramentas sem estoque</div>
                 </div>
               </div>
-              {/* Top ferramentas com estoque */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 {stock.filter(t => t.branches.some(b => b.quantity > 0)).slice(0, 4).map(tool => {
                   const qty = tool.branches.reduce((s, b) => s + b.quantity, 0);
@@ -176,7 +166,6 @@ export default function FerramentalDashboardPage() {
             </div>
           </div>
 
-          {/* Últimas solicitações */}
           <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '10px', overflow: 'hidden' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>Últimas Solicitações</span>
@@ -210,7 +199,6 @@ export default function FerramentalDashboardPage() {
             )}
           </div>
 
-          {/* Links rápidos */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginTop: '1.5rem' }}>
             {[
               { href: '/ferramental', label: 'Solicitações', desc: 'Aprovar e atualizar status' },

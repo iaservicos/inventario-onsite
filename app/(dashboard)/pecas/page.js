@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react';
 import * as XLSX from 'xlsx';
 import PageHeader from '@/components/ui/PageHeader';
 
-// ── Ícones inline (sem dependência extra) ─────────────────────────────────────
 function IconDownload() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -59,7 +58,6 @@ function IconError() {
   );
 }
 
-// ── Componente principal ──────────────────────────────────────────────────────
 
 export default function PecasPage() {
   const { data: session, status } = useSession();
@@ -131,7 +129,6 @@ export default function PecasPage() {
     setCodeLoading(false);
   }
 
-  // Carrega técnicos ao autenticar
   useEffect(() => {
     if (status === 'authenticated') {
       fetch('/api/technicians')
@@ -140,7 +137,6 @@ export default function PecasPage() {
     }
   }, [status]);
 
-  // Carrega peças ao selecionar técnico
   useEffect(() => {
     if (selectedTech) fetchItems();
     else { setItems([]); setLastSync(null); }
@@ -154,7 +150,6 @@ export default function PecasPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // A API agora retorna { items, last_sync, total }
         const itemList = Array.isArray(data) ? data : (data.items || []);
         setItems(itemList);
         setLastSync(data.last_sync || null);
@@ -169,7 +164,6 @@ export default function PecasPage() {
     setLoading(false);
   }, [selectedTech]);
 
-  // Dispara sincronização manual
   async function handleManualSync() {
     if (syncing) return;
     setSyncing(true);
@@ -190,7 +184,6 @@ export default function PecasPage() {
         setSyncMessage(
           `✓ Sincronização concluída: ${data.items_upserted} peça(s) atualizadas em ${data.technicians_ok} técnico(s).`
         );
-        // Recarrega as peças do técnico selecionado
         if (selectedTech) await fetchItems();
       } else {
         setSyncMessage(`✗ Erro na sincronização: ${data.error || 'Erro desconhecido'}`);
@@ -200,7 +193,6 @@ export default function PecasPage() {
     }
 
     setSyncing(false);
-    // Limpa a mensagem após 8 segundos
     setTimeout(() => setSyncMessage(''), 8000);
   }
 
@@ -255,7 +247,6 @@ export default function PecasPage() {
     XLSX.writeFile(wb, `pecas_resumo_${filterSupervisor.replace(/\s/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
-  // Filtragem local por código ou nome ou subgrupo
   const filteredItems = items.filter(item => {
     if (!searchFilter) return true;
     const q = searchFilter.toLowerCase();
@@ -266,12 +257,10 @@ export default function PecasPage() {
     );
   });
 
-  // ── Estados de carregamento ───────────────────────────────────────────────
   if (status === 'loading') {
     return <div style={{ padding: '2rem', color: '#000', fontWeight: '600' }}>Carregando...</div>;
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
 

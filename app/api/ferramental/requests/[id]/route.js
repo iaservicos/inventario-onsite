@@ -18,7 +18,6 @@ export async function PATCH(req, { params }) {
     const isAnalista = session.user.role === 'analista_custo' || session.user.role === 'admin';
     const supabase = createServiceClient();
 
-    // ── Confirmar termo DocSign ────────────────────────────────────────────────
     if (termo_ok) {
       if (!isAnalista) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
       const { data, error } = await supabase

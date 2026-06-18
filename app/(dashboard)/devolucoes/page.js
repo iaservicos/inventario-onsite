@@ -10,7 +10,6 @@ function formatDate(val) {
   return new Date(val).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 }
 
-// ── Página principal ──────────────────────────────────────────────────────────
 export default function DevolucoesPage() {
   const { data: session, status } = useSession();
 
@@ -23,10 +22,8 @@ export default function DevolucoesPage() {
   const [syncMsg, setSyncMsg]             = useState('');
   const [filterStatus, setFilterStatus]   = useState('TODOS');
 
-  // Supervisor filter (admin/coordinator only)
   const [filterSupervisor, setFilterSupervisor] = useState('');
 
-  // Summary mode (admin/coordinator only)
   const [summaryMode, setSummaryMode]     = useState(false);
   const [summaryData, setSummaryData]     = useState([]);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -35,7 +32,6 @@ export default function DevolucoesPage() {
   const canSeeAdmin     = role === 'admin' || role === 'coordinator';
   const canSync         = role === 'admin';
 
-  // Load active technicians
   useEffect(() => {
     fetch('/api/technicians?active=true')
       .then(r => r.json())
@@ -63,7 +59,6 @@ export default function DevolucoesPage() {
     setSummaryData([]);
   };
 
-  // Load items for selected technician
   const loadItems = useCallback(async (techId) => {
     if (!techId) return;
     setLoading(true);
@@ -83,7 +78,6 @@ export default function DevolucoesPage() {
     if (selectedTech) loadItems(selectedTech);
   }, [selectedTech, loadItems]);
 
-  // Summary mode
   const handleShowSummary = async () => {
     if (!filterSupervisor) return;
     setSummaryMode(true);
@@ -102,7 +96,6 @@ export default function DevolucoesPage() {
     setSummaryLoading(false);
   };
 
-  // Manual sync
   const handleSync = async () => {
     setSyncing(true);
     setSyncMsg('');
@@ -125,7 +118,6 @@ export default function DevolucoesPage() {
     setSyncing(false);
   };
 
-  // Filtered items
   const filteredItems = useMemo(() => {
     if (filterStatus === 'TODOS') return items;
     return items.filter(i => i.status_devolucao === filterStatus);
@@ -142,7 +134,6 @@ export default function DevolucoesPage() {
 
     const wb = XLSX.utils.book_new();
 
-    // Aba 1: Resumo por status
     const montadoLotes = new Set(items.filter(i => i.status_devolucao === 'MONTADO').map(i => i.lote_dev_tecnico_id)).size;
     const enviadoLotes = new Set(items.filter(i => i.status_devolucao === 'ENVIADO').map(i => i.lote_dev_tecnico_id)).size;
     const totalLotes   = new Set(items.map(i => i.lote_dev_tecnico_id)).size;
@@ -156,7 +147,6 @@ export default function DevolucoesPage() {
     wsSummary['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 12 }];
     XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumo');
 
-    // Aba 2: Detalhes por peça
     const techName = techsForDropdown.find(t => String(t.id) === selectedTech)?.name || selectedTech;
     const detailRows = items.map(i => ({
       'Técnico':         techName,
@@ -181,7 +171,6 @@ export default function DevolucoesPage() {
     if (!summaryData.length) return;
     const wb = XLSX.utils.book_new();
 
-    // Aba Resumo: técnico × status × lotes × peças
     const summaryRows = [['Técnico', 'Região', 'Montado (lotes)', 'Montado (peças)', 'Enviado (lotes)', 'Enviado (peças)', 'Total Peças', 'Max Dias']];
     summaryData.forEach(t => {
       summaryRows.push([t.name, t.region || '—', t.montado_lotes, t.montado_pecas, t.enviado_lotes, t.enviado_pecas, t.montado_pecas + t.enviado_pecas, t.max_dias ?? '—']);
@@ -205,7 +194,6 @@ export default function DevolucoesPage() {
         subtitle="Lotes de devolução montados ou enviados pelo técnico aguardando confirmação da ATP"
       />
 
-      {/* ── Filtros ──────────────────────────────────────────────────────────── */}
       <div className="card" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
 
         {canSeeAdmin && (
@@ -301,7 +289,6 @@ export default function DevolucoesPage() {
         </p>
       )}
 
-      {/* ── Resumo por Supervisor ─────────────────────────────────────────────── */}
       {summaryMode && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -366,10 +353,8 @@ export default function DevolucoesPage() {
         </div>
       )}
 
-      {/* ── Visão Individual ─────────────────────────────────────────────────── */}
       {!summaryMode && selectedTech && (
         <div>
-          {/* Stats */}
           {!loading && (items.length > 0) && (
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
               {[
@@ -405,7 +390,6 @@ export default function DevolucoesPage() {
             </div>
           )}
 
-          {/* Filter tabs */}
           {!loading && items.length > 0 && (
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               {['TODOS', 'MONTADO', 'ENVIADO'].map(s => (
@@ -480,7 +464,6 @@ export default function DevolucoesPage() {
         </div>
       )}
 
-      {/* Estado inicial */}
       {!summaryMode && !selectedTech && (
         <div style={{
           textAlign: 'center', padding: '3rem', color: '#666', fontSize: '0.85rem',

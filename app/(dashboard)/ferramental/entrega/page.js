@@ -15,7 +15,6 @@ export default function EntregaFerramentalPage() {
   const [loadingDeliveries, setLoadingDeliveries] = useState(true);
 
   const [techId, setTechId] = useState('');
-  // { [toolId]: quantity }
   const [selectedTools, setSelectedTools] = useState({});
   const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);

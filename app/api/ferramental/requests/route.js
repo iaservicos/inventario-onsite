@@ -23,7 +23,6 @@ export async function GET(req) {
     if (status && status !== 'all') query = query.eq('status', status);
     if (technicianId) query = query.eq('technician_id', technicianId);
 
-    // Supervisor only sees requests from their technicians
     if (session.user.role === 'supervisor') {
       const { data: techs } = await supabase
         .from('technicians')
@@ -43,7 +42,6 @@ export async function GET(req) {
   }
 }
 
-// POST público (técnico) ou autenticado (entrega direta pelo gestor/analista)
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -51,7 +49,6 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
 
-    // ── Entrega direta (gestor/analista registra entrega presencial) ──────────
     if (direct_delivery) {
       const session = await getServerSession(authOptions);
       if (!session || !['admin', 'supervisor', 'analista_custo'].includes(session.user.role)) {
@@ -103,7 +100,6 @@ export async function POST(req) {
       return NextResponse.json({ id: request.id }, { status: 201 });
     }
 
-    // ── Solicitação pelo supervisor para um técnico ───────────────────────────
     if (supervisor_request) {
       const session = await getServerSession(authOptions);
       if (!session || !['admin', 'supervisor'].includes(session.user.role)) {
@@ -156,7 +152,6 @@ export async function POST(req) {
       return NextResponse.json({ id: request.id }, { status: 201 });
     }
 
-    // ── Fluxo público — técnico solicita ─────────────────────────────────────
     if (!technician_name?.trim()) return NextResponse.json({ error: 'Nome obrigatório' }, { status: 400 });
     if (!technician_email?.trim()) return NextResponse.json({ error: 'E-mail obrigatório' }, { status: 400 });
     if (!tool_id) return NextResponse.json({ error: 'Ferramenta obrigatória' }, { status: 400 });

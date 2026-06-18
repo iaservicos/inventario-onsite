@@ -16,7 +16,6 @@ export async function POST(req) {
 
     const supabase = createServiceClient();
 
-    // 1. Localizar o inventário
     let inventory;
     if (inventory_id) {
       const { data, error } = await supabase
@@ -35,7 +34,7 @@ export async function POST(req) {
         .single();
       if (!tech) return NextResponse.json({ error: 'Técnico não encontrado' }, { status: 404 });
 
-      // Prioriza: in_progress > recount_pending > pending (evita pegar inventário antigo de outra semana)
+      // Prioriza in_progress > recount_pending > pending para não pegar semana antiga
       let data = null;
       for (const st of ['in_progress', 'recount_pending', 'pending']) {
         const { data: found } = await supabase
@@ -48,8 +47,7 @@ export async function POST(req) {
           .maybeSingle();
         if (found) { data = found; break; }
       }
-      const error = !data;
-      if (error || !data) return NextResponse.json({ error: 'Inventário ativo não encontrado' }, { status: 404 });
+      if (!data) return NextResponse.json({ error: 'Inventário ativo não encontrado' }, { status: 404 });
       inventory = data;
     } else {
       return NextResponse.json({ error: 'Informe inventory_id ou nome' }, { status: 400 });
@@ -57,9 +55,6 @@ export async function POST(req) {
 
     const { id: invId, technician_id: techId } = inventory;
 
-    // Não apaga divergências antigas — cada finalização insere com is_recount para rastrear a fase
-
-    // 2. Busca apenas itens contados — system_qty já correto, gravado pelo record-count
     const { data: countedItems } = await supabase
       .from('inventory_items')
       .select('id, item_code, item_name, physical_qty, system_qty, counted_at')
@@ -70,8 +65,6 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Nenhum item foi contado ainda' }, { status: 400 });
     }
 
-    // 3. Detectar peças do subgrupo que não foram contadas (physical_qty ausente)
-    //    Busca todas as peças esperadas e compara com o que foi contado
     try {
       const { data: schedule } = await supabase
         .from('inventory_schedules')
@@ -79,25 +72,22 @@ export async function POST(req) {
         .eq('inventory_id', invId)
         .maybeSingle();
 
-      // Inventário geral: passa null para retornar TODAS as peças do técnico
       const isGen = schedule?.inventory_type === 'general';
       const subgroup = isGen ? null : (schedule?.scheduled_subgroup || null);
       const expectedItems = await getConsolidatedTechnicianItems(supabase, techId, subgroup);
 
       if (expectedItems && expectedItems.length > 0) {
-        // Normaliza os códigos contados (remove zeros à esquerda) para comparação
         const countedCodes = new Set(
           countedItems.map(i => String(i.item_code).replace(/^0+/, '') || '0')
         );
 
         for (const expected of expectedItems) {
           const normalizedCode = String(expected.item_code).replace(/^0+/, '') || '0';
-          if (countedCodes.has(normalizedCode)) continue; // já foi contada
+          if (countedCodes.has(normalizedCode)) continue;
 
           const sysQty = Number(expected.item_quantity) || 0;
-          if (sysQty === 0) continue; // sem quantidade no sistema, ignora
+          if (sysQty === 0) continue;
 
-          // Atualiza linha pendente existente (physical_qty=null do dispatch) ou insere se não existir
           const { data: existingPending } = await supabase
             .from('inventory_items')
             .select('id')
@@ -110,13 +100,7 @@ export async function POST(req) {
           if (existingPending) {
             await supabase
               .from('inventory_items')
-              .update({
-                system_qty:    sysQty,
-                physical_qty:  0,
-                has_divergence: true,
-                status:        'recount',
-                counted_at:    new Date().toISOString(),
-              })
+              .update({ system_qty: sysQty, physical_qty: 0, has_divergence: true, status: 'recount', counted_at: new Date().toISOString() })
               .eq('id', existingPending.id);
           } else {
             await supabase.from('inventory_items').insert({
@@ -132,14 +116,9 @@ export async function POST(req) {
             });
           }
 
-          // Adiciona como item contado para entrar na comparação abaixo
           countedItems.push({
-            id:           null,
-            item_code:    expected.item_code,
-            item_name:    expected.item_name,
-            physical_qty: 0,
-            system_qty:   sysQty,
-            counted_at:   new Date().toISOString(),
+            id: null, item_code: expected.item_code, item_name: expected.item_name,
+            physical_qty: 0, system_qty: sysQty, counted_at: new Date().toISOString(),
             _already_saved: true,
           });
         }
@@ -148,7 +127,6 @@ export async function POST(req) {
       console.warn('[finalize-inventory] Falha ao verificar peças não contadas:', e.message);
     }
 
-    // 4. Comparar e classificar
     const eraRecontagem = inventory.status === 'recount_pending';
 
     const divergencesToInsert = [];
@@ -169,9 +147,9 @@ export async function POST(req) {
       if (!item._already_saved && item.id) {
         const needsRecount = !eraRecontagem && diff < 0;
         itemUpdates.push({
-          id:            item.id,
+          id:             item.id,
           has_divergence: hasDiv,
-          status:        needsRecount ? 'recount' : 'counted',
+          status:         needsRecount ? 'recount' : 'counted',
         });
       }
 
@@ -206,7 +184,6 @@ export async function POST(req) {
       }
     }
 
-    // Atualiza itens em paralelo (cada um com has_divergence correto)
     const now = new Date().toISOString();
     if (itemUpdates.length > 0) {
       await Promise.all(
@@ -218,38 +195,33 @@ export async function POST(req) {
       );
     }
 
-    // Ordena: divergências primeiro, depois itens ok
     itensSummary.sort((a, b) => {
       const order = { falta: 0, excesso: 1, ok: 2 };
       return (order[a.status_item] ?? 3) - (order[b.status_item] ?? 3);
     });
 
-    // 4. Gravar divergências
     if (divergencesToInsert.length > 0) {
       await supabase.from('divergences').insert(divergencesToInsert);
     }
 
-    // 5. Atualizar inventário
-    // Se já era recontagem, fecha como completed independente de divergências
-    // (evita loop infinito de recontagem → recontagem → recontagem)
+    // Recontagem sempre fecha como completed — evita loop infinito de recontagens
     const newStatus = (!eraRecontagem && recountItems.length > 0) ? 'recount_pending' : 'completed';
 
     const sumSysQty  = (arr) => arr.reduce((s, i) => s + (Number(i.system_qty) || 0), 0);
     const sumAbsDiff = (arr) => arr.reduce((s, i) => s + Math.abs(Number(i.difference) || 0), 0);
 
     const inventoryUpdate = {
-      status:               newStatus,
-      is_recount:           eraRecontagem,
-      completed_at:         new Date().toISOString(),
-      total_items:          countedItems.length,
-      counted_items:        countedItems.length,
-      divergence_count:     divergencesToInsert.length,
-      total_quantity:       sumSysQty(countedItems),
-      divergence_quantity:  sumAbsDiff(divergencesToInsert),
-      updated_at:           new Date().toISOString(),
+      status:              newStatus,
+      is_recount:          eraRecontagem,
+      completed_at:        now,
+      total_items:         countedItems.length,
+      counted_items:       countedItems.length,
+      divergence_count:    divergencesToInsert.length,
+      total_quantity:      sumSysQty(countedItems),
+      divergence_quantity: sumAbsDiff(divergencesToInsert),
+      updated_at:          now,
     };
 
-    // Guarda divergência da 1ª contagem separadamente para rastreabilidade no histórico
     if (!eraRecontagem) {
       inventoryUpdate.first_count_divergence_quantity = sumAbsDiff(divergencesToInsert);
     }
@@ -264,14 +236,12 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Falha ao atualizar inventário: ' + updateError.message }, { status: 500 });
     }
 
-    // Sincroniza status do agendamento com o resultado da finalização
     await supabase
       .from('inventory_schedules')
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .update({ status: newStatus, updated_at: now })
       .eq('inventory_id', invId)
       .not('status', 'in', '(cancelled,abandoned)');
 
-    // 6. Alerta de excesso para supervisor
     if (surplusItems.length > 0) {
       const techName = inventory.technicians?.name || 'Técnico';
       await supabase.from('alerts').insert({
@@ -282,11 +252,10 @@ export async function POST(req) {
         technician_id: techId,
         inventory_id:  invId,
         resolved:      false,
-        created_at:    new Date().toISOString(),
+        created_at:    now,
       });
     }
 
-    // Se era recontagem, não gera nova mensagem de recontagem (retorna recontagem: 0)
     const mensagemRecontagem = (!eraRecontagem && recountItems.length > 0)
       ? `Encontrei *${recountItems.length}* peça(s) com divergência:\n\n` +
         recountItems.map(i =>

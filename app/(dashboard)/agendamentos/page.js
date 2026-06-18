@@ -22,7 +22,6 @@ function formatTime(iso) {
   });
 }
 
-// Calcula semana ISO (ex: "2026-W25") a partir de uma string de data local
 function getWeekRef(dateStr) {
   const d = new Date(dateStr + 'T12:00:00Z');
   const dayNum = d.getUTCDay() || 7;
@@ -32,7 +31,6 @@ function getWeekRef(dateStr) {
   return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
-// ── Seção: Subgrupos (só carrega estado próprio) ──────────────────────────────
 function SubgruposSection() {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -247,7 +245,6 @@ function SubgruposSection() {
   );
 }
 
-// ── Seção: Inventário Geral ───────────────────────────────────────────────────
 function InventarioGeralSection({ onMsg }) {
   const [tecnicos, setTecnicos] = useState([]);
   const [selectedTech, setSelectedTech] = useState('');
@@ -415,7 +412,6 @@ function InventarioGeralSection({ onMsg }) {
   );
 }
 
-// ── Seção: Escalonamento (carrega técnicos) ───────────────────────────────────
 function EscalonamentoSection({ onMsg }) {
   const [tecnicos, setTecnicos] = useState([]);
   const [originalData, setOriginalData] = useState([]);
@@ -606,7 +602,6 @@ function EscalonamentoSection({ onMsg }) {
   );
 }
 
-// ── Página principal ──────────────────────────────────────────────────────────
 export default function AgendamentosPage() {
   const { data: session, status } = useSession();
   const [msg, setMsg] = useState({ type: '', text: '' });
@@ -644,7 +639,6 @@ export default function AgendamentosPage() {
         </div>
       )}
 
-      {/* Inventário Geral: admin e supervisor */}
       {(isAdmin || isSupervisor) && (
         <>
           <InventarioGeralSection onMsg={showMsg} />
@@ -652,7 +646,6 @@ export default function AgendamentosPage() {
         </>
       )}
 
-      {/* Subgrupos: só admin vê */}
       {isAdmin && (
         <>
           <SubgruposSection />
@@ -660,7 +653,6 @@ export default function AgendamentosPage() {
         </>
       )}
 
-      {/* Escalonamento: todos veem */}
       <EscalonamentoSection onMsg={showMsg} />
     </div>
   );

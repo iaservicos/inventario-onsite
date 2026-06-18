@@ -39,18 +39,15 @@ export default function FerramentalEstoquePage() {
       .finally(() => setLoadingTechs(false));
   }, []);
 
-  // Listas únicas para os filtros
   const supervisors = useMemo(() => [...new Set(technicians.map(t => t.supervisor_name).filter(Boolean))].sort(), [technicians]);
   const regions     = useMemo(() => [...new Set(technicians.map(t => t.region).filter(Boolean))].sort(), [technicians]);
 
-  // Técnicos filtrados pelo supervisor e estado selecionados
   const filteredTechs = useMemo(() => technicians.filter(t => {
     if (filterSup    && t.supervisor_name !== filterSup)    return false;
     if (filterRegion && t.region          !== filterRegion) return false;
     return true;
   }), [technicians, filterSup, filterRegion]);
 
-  // Quando o técnico selecionado sair da lista filtrada, limpa a seleção
   useEffect(() => {
     if (selectedId && !filteredTechs.find(t => t.id === parseInt(selectedId))) {
       setSelectedId('');
@@ -110,11 +107,9 @@ export default function FerramentalEstoquePage() {
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader title="Estoque por Técnico" subtitle="Controle de ferramentas em posse de cada técnico" />
 
-      {/* Filtros + seletor */}
       <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
 
-          {/* Filtro Supervisor */}
           <div>
             <label style={labelSt}>Supervisor</label>
             <select value={filterSup} onChange={e => { setFilterSup(e.target.value); setSelectedId(''); }} style={selSt}>
@@ -123,7 +118,6 @@ export default function FerramentalEstoquePage() {
             </select>
           </div>
 
-          {/* Filtro Estado */}
           <div>
             <label style={labelSt}>Estado (UF)</label>
             <select value={filterRegion} onChange={e => { setFilterRegion(e.target.value); setSelectedId(''); }} style={selSt}>
@@ -132,7 +126,6 @@ export default function FerramentalEstoquePage() {
             </select>
           </div>
 
-          {/* Seletor técnico */}
           <div style={{ gridColumn: 'span 1' }}>
             <label style={labelSt}>
               Técnico
@@ -152,7 +145,6 @@ export default function FerramentalEstoquePage() {
             )}
           </div>
 
-          {/* Ações */}
           {selectedTech && (
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', paddingBottom: '0' }}>
               {hasDirty && (
@@ -167,7 +159,6 @@ export default function FerramentalEstoquePage() {
           )}
         </div>
 
-        {/* Limpar filtros */}
         {(filterSup || filterRegion) && (
           <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <span style={{ fontSize: '0.72rem', color: '#888' }}>Filtros ativos:</span>
@@ -190,7 +181,6 @@ export default function FerramentalEstoquePage() {
         )}
       </div>
 
-      {/* Info do técnico selecionado */}
       {selectedTech && (
         <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div>
@@ -216,7 +206,6 @@ export default function FerramentalEstoquePage() {
         </div>
       )}
 
-      {/* Grid de ferramentas */}
       {!selectedId ? (
         <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>
           {filteredTechs.length === 0 && (filterSup || filterRegion)

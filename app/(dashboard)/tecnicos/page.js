@@ -55,7 +55,6 @@ export default function TecnicosPage() {
     return { ...t, invs, corretos, comDiv, recontagens, totalDiv, rate };
   }).filter((t) => t.invs.length > 0 || !filters.technicianId);
 
-  // KPIs globais
   const totalTecnicos  = byTech.length;
   const totalInvs      = byTech.reduce((s, t) => s + t.invs.length, 0);
   const totalCorretos  = byTech.reduce((s, t) => s + t.corretos, 0);

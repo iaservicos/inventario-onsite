@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/ui/PageHeader';
 
-// ── Exportar relatório para Excel ─────────────────────────────
 async function exportToExcel(data, filterBranch) {
   const { utils, writeFile } = await import('xlsx');
 
@@ -45,7 +44,6 @@ async function exportToExcel(data, filterBranch) {
   writeFile(wb, `estoque-central-${stamp}.xlsx`);
 }
 
-// ── Modal: Nova Ferramenta no catálogo ────────────────────────
 function ModalNovaFerramenta({ onClose, onSaved }) {
   const [name, setName] = useState('');
   const [qty, setQty] = useState(1);
@@ -101,7 +99,6 @@ function ModalNovaFerramenta({ onClose, onSaved }) {
   );
 }
 
-// ── Modal: Nova Filial para uma ferramenta ────────────────────
 function ModalNovaFilial({ toolId, toolName, existing, onClose, onSaved }) {
   const [branch, setBranch] = useState('');
   const [quantity, setQuantity] = useState(0);
@@ -170,7 +167,6 @@ function ModalNovaFilial({ toolId, toolName, existing, onClose, onSaved }) {
   );
 }
 
-// ── Linha editável de filial ──────────────────────────────────
 function BranchRow({ entry, onEdit, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [qty, setQty] = useState(entry.quantity);
@@ -254,7 +250,6 @@ function BranchRow({ entry, onEdit, onDelete }) {
   );
 }
 
-// ── Página principal ─────────────────────────────────────────
 export default function EstoqueCentralPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -276,14 +271,12 @@ export default function EstoqueCentralPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Todas as filiais únicas para o filtro
   const allBranches = useMemo(() => {
     const set = new Set();
     data.forEach(t => t.branches.forEach(b => set.add(b.branch_name)));
     return [...set].sort();
   }, [data]);
 
-  // Filtragem: ferramenta por nome + filial
   const filtered = useMemo(() => {
     return data
       .filter(t => t.tool_name.toLowerCase().includes(searchTool.toLowerCase()))
@@ -319,7 +312,6 @@ export default function EstoqueCentralPage() {
         }
       />
 
-      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
           { label: 'Filiais cadastradas', value: totalFiliais },
@@ -333,7 +325,6 @@ export default function EstoqueCentralPage() {
         ))}
       </div>
 
-      {/* Filtros + Exportar */}
       <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '0.85rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           value={searchTool}
@@ -357,7 +348,6 @@ export default function EstoqueCentralPage() {
         </button>
       </div>
 
-      {/* Lista de ferramentas */}
       {loading ? (
         <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888888', fontWeight: '700' }}>Carregando...</div>
       ) : (
@@ -373,7 +363,6 @@ export default function EstoqueCentralPage() {
 
             return (
               <div key={tool.tool_id} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', overflow: 'hidden' }}>
-                {/* Cabeçalho */}
                 <div
                   onClick={() => setExpanded(isOpen ? null : tool.tool_id)}
                   style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', userSelect: 'none' }}
@@ -397,7 +386,6 @@ export default function EstoqueCentralPage() {
                   </div>
                 </div>
 
-                {/* Tabela de filiais */}
                 {isOpen && (
                   <div style={{ borderTop: '1px solid #f0f0f0' }}>
                     {tool.branches.length === 0 ? (
@@ -428,7 +416,6 @@ export default function EstoqueCentralPage() {
         </div>
       )}
 
-      {/* Modais */}
       {modal?.type === 'nova_ferramenta' && (
         <ModalNovaFerramenta onClose={() => setModal(null)} onSaved={load} />
       )}
