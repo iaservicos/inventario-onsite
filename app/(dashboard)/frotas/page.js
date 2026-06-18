@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import FilterBar from '@/components/ui/FilterBar';
@@ -33,6 +34,24 @@ export default function FrotasPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function deletarVeiculo(id) {
+    if (!window.confirm('Tem certeza que deseja deletar este veículo?')) return;
+
+    try {
+      const res = await fetch(`/api/frotas/${id}`, { method: 'DELETE' });
+      const dados = await res.json();
+
+      if (dados.success) {
+        setFrotas(frotas.filter((v) => v.id !== id));
+      } else {
+        alert('Erro ao deletar veículo');
+      }
+    } catch (error) {
+      console.error('Erro ao deletar:', error);
+      alert('Erro ao deletar veículo');
+    }
+  }
 
   const stats = {
     total: frotas.length,
@@ -95,6 +114,9 @@ export default function FrotasPage() {
                   <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Status
                   </th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -114,6 +136,36 @@ export default function FrotasPage() {
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <StatusBadge status={frota.status} />
+                    </td>
+                    <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
+                      <Link href={`/frotas/veiculos/${frota.id}`}>
+                        <button style={{
+                          padding: '0.4rem 0.8rem',
+                          background: '#0369a1',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer',
+                          fontWeight: '600'
+                        }}>
+                          Editar
+                        </button>
+                      </Link>
+                      <button
+                        onClick={() => deletarVeiculo(frota.id)}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          background: 'rgba(220,38,38,0.1)',
+                          color: '#dc2626',
+                          border: '1px solid rgba(220,38,38,0.2)',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer',
+                          fontWeight: '600'
+                        }}>
+                        Deletar
+                      </button>
                     </td>
                   </tr>
                 ))}
