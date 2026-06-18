@@ -43,6 +43,29 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
+  const supabase = createServiceClient();
+
+  // Busca o inventário vinculado ao agendamento
+  const { data: sched } = await supabase
+    .from('inventory_schedules')
+    .select('inventory_id')
+    .eq('id', params.id)
+    .maybeSingle();
+
+  // Se o inventário vinculado ainda não foi iniciado (pending), exclui do banco
+  if (sched?.inventory_id) {
+    const { data: inv } = await supabase
+      .from('inventories')
+      .select('status')
+      .eq('id', sched.inventory_id)
+      .maybeSingle();
+
+    if (inv && inv.status === 'pending') {
+      await supabase.from('inventory_items').delete().eq('inventory_id', sched.inventory_id);
+      await supabase.from('inventories').delete().eq('id', sched.inventory_id);
+    }
+  }
+
   await updateSchedule(params.id, { status: 'cancelled' });
   return NextResponse.json({ ok: true });
 }
