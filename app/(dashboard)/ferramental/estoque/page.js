@@ -233,7 +233,6 @@ export default function FerramentalEstoquePage() {
             <thead>
               <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #eee' }}>
                 <th style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ferramenta</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Qtd. Padrão</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Em Posse</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Status</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ação</th>
@@ -245,7 +244,6 @@ export default function FerramentalEstoquePage() {
                 const isDirtyItem = dirty[item.tool_id];
                 const isSaving = saving[item.tool_id];
                 const temFerramentas = qty > 0;
-                const temTudo = qty >= item.default_qty;
 
                 return (
                   <tr key={item.tool_id} style={{ borderBottom: '1px solid #f0f0f0', background: isDirtyItem ? '#f5f5f5' : idx % 2 === 0 ? '#fff' : '#fafafa' }}>
@@ -253,16 +251,15 @@ export default function FerramentalEstoquePage() {
                       <div style={{ fontWeight: '700', color: '#000' }}>{item.tool_name}</div>
                       {item.tool_notes && <div style={{ fontSize: '0.7rem', color: '#555', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: '700', color: '#888' }}>{item.default_qty}</td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                       <QuantityControl value={qty} onChange={(v) => handleQtyChange(item.tool_id, v)} disabled={isSaving} />
                     </td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                       <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
-                        color: !temFerramentas ? '#fff' : '#000',
-                        background: !temFerramentas ? '#000' : temTudo ? '#e0e0e0' : '#f0f0f0',
+                        color: temFerramentas ? '#000' : '#fff',
+                        background: temFerramentas ? '#e0e0e0' : '#000',
                       }}>
-                        {!temFerramentas ? 'Sem ferramenta' : temTudo ? 'Completo' : 'Parcial'}
+                        {temFerramentas ? 'Em Posse' : 'Sem Ferramenta'}
                       </span>
                     </td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>

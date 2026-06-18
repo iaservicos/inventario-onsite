@@ -172,6 +172,139 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
   );
 }
 
+function ModalSolicitarTecnico({ onClose, onSaved }) {
+  const [technicians, setTechnicians] = useState([]);
+  const [tools, setTools]             = useState([]);
+  const [techId, setTechId]           = useState('');
+  const [selectedTools, setSelectedTools] = useState({});
+  const [comment, setComment]         = useState('');
+  const [loading, setLoading]         = useState(true);
+  const [saving, setSaving]           = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/technicians').then(r => r.json()),
+      fetch('/api/ferramental/tools').then(r => r.json()),
+    ]).then(([techs, toolsList]) => {
+      setTechnicians(Array.isArray(techs) ? techs : []);
+      setTools(Array.isArray(toolsList) ? toolsList : []);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  function toggleTool(id) {
+    setSelectedTools(prev => {
+      if (prev[id] !== undefined) { const n = { ...prev }; delete n[id]; return n; }
+      return { ...prev, [id]: 1 };
+    });
+  }
+  function setQty(id, v) { setSelectedTools(prev => ({ ...prev, [id]: Math.max(1, parseInt(v) || 1) })); }
+
+  const selectedCount = Object.keys(selectedTools).length;
+
+  async function save() {
+    if (!techId)           { toast.error('Selecione o técnico'); return; }
+    if (!selectedCount)    { toast.error('Selecione ao menos uma ferramenta'); return; }
+    setSaving(true);
+    let errors = 0;
+    try {
+      for (const [toolId, quantity] of Object.entries(selectedTools)) {
+        const res = await fetch('/api/ferramental/requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ technician_id: parseInt(techId), tool_id: parseInt(toolId), quantity, comment: comment.trim() || null, supervisor_request: true }),
+        });
+        if (!res.ok) errors++;
+      }
+      if (errors === 0) { toast.success(`${selectedCount} solicitação(ões) criada(s) com aprovação`); onSaved(); onClose(); }
+      else toast.error(`${errors} item(s) com erro`);
+    } catch { toast.error('Erro de conexão'); }
+    finally { setSaving(false); }
+  }
+
+  const selectedTech = technicians.find(t => t.id === parseInt(techId));
+  const fs = { width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', background: '#fff', border: '1px solid #ccc', color: '#000', fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit' };
+  const ls = { fontSize: '0.72rem', color: '#555', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+      <div style={{ background: '#fff', border: '2px solid #000', borderRadius: '8px', width: '100%', maxWidth: '520px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+          <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#000' }}>Solicitar Ferramentas para Técnico</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900' }}>✕</button>
+        </div>
+
+        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto', flex: 1 }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>Carregando...</div>
+          ) : (
+            <>
+              {/* Técnico */}
+              <div>
+                <label style={ls}>Técnico *</label>
+                <select value={techId} onChange={e => setTechId(e.target.value)} style={{ ...fs, cursor: 'pointer' }}>
+                  <option value="">Selecione o técnico</option>
+                  {technicians.map(t => <option key={t.id} value={t.id}>{t.name}{t.region ? ` — ${t.region}` : ''}</option>)}
+                </select>
+                {selectedTech?.supervisor_name && (
+                  <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.3rem' }}>Supervisor: {selectedTech.supervisor_name}</div>
+                )}
+              </div>
+
+              {/* Ferramentas */}
+              <div>
+                <label style={ls}>
+                  Ferramentas e quantidades *
+                  {selectedCount > 0 && <span style={{ marginLeft: '0.4rem', color: '#000', fontWeight: '900' }}>({selectedCount})</span>}
+                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {tools.map(tool => {
+                    const isSelected = selectedTools[tool.id] !== undefined;
+                    const qty = selectedTools[tool.id] ?? 1;
+                    return (
+                      <div key={tool.id} style={{ borderRadius: '8px', border: `1px solid ${isSelected ? '#4a8a4a' : '#e4e4e7'}`, background: isSelected ? '#f0f7f0' : '#fafafa', overflow: 'hidden' }}>
+                        <button type="button" onClick={() => toggleTool(tool.id)}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.6rem 0.85rem', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                          <div style={{ width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0, background: isSelected ? '#2d6a2d' : 'transparent', border: `2px solid ${isSelected ? '#2d6a2d' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', color: '#fff', fontWeight: '900' }}>
+                            {isSelected ? '✓' : ''}
+                          </div>
+                          <span style={{ fontSize: '0.82rem', fontWeight: '700', color: isSelected ? '#1a4a1a' : '#333' }}>{tool.name}</span>
+                        </button>
+                        {isSelected && (
+                          <div style={{ padding: '0 0.85rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }} onClick={e => e.stopPropagation()}>
+                            <span style={{ fontSize: '0.68rem', color: '#666', fontWeight: '700', textTransform: 'uppercase' }}>Qtd:</span>
+                            <div style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid #ccc', borderRadius: '6px', overflow: 'hidden' }}>
+                              <button type="button" onClick={() => setQty(tool.id, qty - 1)} style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: '#555', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}>−</button>
+                              <input type="number" min="1" value={qty} onChange={e => setQty(tool.id, e.target.value)}
+                                style={{ width: '44px', background: 'transparent', border: 'none', color: '#000', fontSize: '0.85rem', fontWeight: '800', textAlign: 'center', outline: 'none', fontFamily: 'inherit', padding: '0' }} />
+                              <button type="button" onClick={() => setQty(tool.id, qty + 1)} style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: '#555', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}>+</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Observação */}
+              <div>
+                <label style={ls}>Observação</label>
+                <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Motivo da solicitação, urgência, etc." rows={2}
+                  style={{ ...fs, resize: 'vertical', minHeight: '64px' }} />
+              </div>
+
+              <button onClick={save} disabled={saving || !techId || !selectedCount}
+                style={{ width: '100%', padding: '0.85rem', background: saving || !techId || !selectedCount ? '#e0e0e0' : '#000', color: saving || !techId || !selectedCount ? '#888' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: saving || !techId || !selectedCount ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}>
+                {saving ? 'ENVIANDO...' : `SOLICITAR${selectedCount > 1 ? ` (${selectedCount})` : ''}`}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const ALL_STATUSES = Object.entries(STATUS_CONFIG).map(([value, cfg]) => ({ value, label: cfg.label }));
 
 export default function FerramentalPage() {
@@ -181,6 +314,7 @@ export default function FerramentalPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selected, setSelected] = useState(null);
   const [termosPendentes, setTermosPendentes] = useState([]);
+  const [showSolicitar, setShowSolicitar] = useState(false);
 
   const role = session?.user?.role;
   const isGestor = ['admin', 'supervisor'].includes(role);
@@ -221,7 +355,18 @@ export default function FerramentalPage() {
 
   return (
     <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <PageHeader title="Ferramental" subtitle="Controle de solicitações e entrega de ferramentas" />
+      <PageHeader
+        title="Ferramental"
+        subtitle="Controle de solicitações e entrega de ferramentas"
+        actions={isGestor && (
+          <button
+            onClick={() => setShowSolicitar(true)}
+            style={{ padding: '0.55rem 1rem', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+          >
+            + Solicitar para Técnico
+          </button>
+        )}
+      />
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -350,6 +495,13 @@ export default function FerramentalPage() {
           role={role}
           onClose={() => setSelected(null)}
           onUpdated={load}
+        />
+      )}
+
+      {showSolicitar && (
+        <ModalSolicitarTecnico
+          onClose={() => setShowSolicitar(false)}
+          onSaved={load}
         />
       )}
     </div>

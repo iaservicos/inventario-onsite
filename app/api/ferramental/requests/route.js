@@ -47,7 +47,7 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { technician_name, technician_email, tool_id, comment, direct_delivery, technician_id } = body;
+    const { technician_name, technician_email, tool_id, comment, direct_delivery, supervisor_request, technician_id } = body;
 
     const supabase = createServiceClient();
 
@@ -98,6 +98,59 @@ export async function POST(req) {
         status:     'entregue',
         changed_by: session.user.name,
         notes:      'Entrega direta registrada pelo gestor/analista',
+      });
+
+      return NextResponse.json({ id: request.id }, { status: 201 });
+    }
+
+    // ── Solicitação pelo supervisor para um técnico ───────────────────────────
+    if (supervisor_request) {
+      const session = await getServerSession(authOptions);
+      if (!session || !['admin', 'supervisor'].includes(session.user.role)) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+      }
+      if (!tool_id) return NextResponse.json({ error: 'Ferramenta obrigatória' }, { status: 400 });
+      if (!technician_id) return NextResponse.json({ error: 'Técnico obrigatório' }, { status: 400 });
+
+      const { data: tool } = await supabase
+        .from('ferramental_tools')
+        .select('id, name, default_quantity')
+        .eq('id', tool_id)
+        .eq('active', true)
+        .single();
+      if (!tool) return NextResponse.json({ error: 'Ferramenta não encontrada' }, { status: 404 });
+
+      let techName = technician_name || '';
+      let techEmail = technician_email || '';
+      if (!techName) {
+        const { data: t } = await supabase.from('technicians').select('name, email').eq('id', technician_id).single();
+        if (t) { techName = t.name; techEmail = t.email || ''; }
+      }
+
+      const { data: request, error } = await supabase
+        .from('ferramental_requests')
+        .insert({
+          requester_type:   'admin',
+          technician_name:  techName,
+          technician_email: techEmail?.toLowerCase() || '',
+          technician_id:    parseInt(technician_id),
+          tool_id:          tool.id,
+          tool_name:        tool.name,
+          quantity:         body.quantity || tool.default_quantity,
+          comment:          comment?.trim() || null,
+          status:           'aprovado',
+          approved_by:      session.user.name,
+          approved_at:      new Date().toISOString(),
+        })
+        .select()
+        .single();
+      if (error) throw error;
+
+      await supabase.from('ferramental_request_history').insert({
+        request_id: request.id,
+        status:     'aprovado',
+        changed_by: session.user.name,
+        notes:      `Solicitação criada pelo supervisor ${session.user.name} para o técnico`,
       });
 
       return NextResponse.json({ id: request.id }, { status: 201 });
