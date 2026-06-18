@@ -254,6 +254,15 @@ function InventarioGeralSection({ onMsg }) {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('09:00');
   const [loading, setLoading] = useState(false);
+  const [agendadosGeral, setAgendadosGeral] = useState([]);
+
+  const loadAgendados = useCallback(async () => {
+    try {
+      const res = await fetch('/api/schedules/upcoming');
+      const data = await res.json();
+      setAgendadosGeral((Array.isArray(data) ? data : []).filter(a => a.inventory_type === 'general'));
+    } catch { /* silencioso */ }
+  }, []);
 
   useEffect(() => {
     fetch('/api/technicians?active=true')
@@ -263,7 +272,8 @@ function InventarioGeralSection({ onMsg }) {
         setTecnicos(list.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')));
       })
       .catch(() => {});
-  }, []);
+    loadAgendados();
+  }, [loadAgendados]);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -293,6 +303,7 @@ function InventarioGeralSection({ onMsg }) {
         setSelectedTech('');
         setDate('');
         setTime('09:00');
+        loadAgendados();
       } else {
         const err = await res.json();
         onMsg?.({ type: 'error', text: (err.error || 'ERRO AO AGENDAR').toUpperCase() });
@@ -366,6 +377,40 @@ function InventarioGeralSection({ onMsg }) {
           {loading ? 'Agendando...' : 'Agendar Inventário Geral'}
         </button>
       </div>
+
+      {agendadosGeral.length > 0 && (
+        <div style={{ marginTop: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Inventários gerais agendados (próximos 14 dias)
+          </div>
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div className="table-wrapper" style={{ border: 'none' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Técnico</th>
+                    <th>UF</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Semana</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agendadosGeral.map(ag => (
+                    <tr key={ag.id}>
+                      <td style={{ fontWeight: '800', color: '#000' }}>{ag.technician_name}</td>
+                      <td><span className="badge badge-info">{ag.technician_region || '—'}</span></td>
+                      <td style={{ fontSize: '0.85rem' }}>{formatDate(ag.scheduled_at)}</td>
+                      <td style={{ fontSize: '0.85rem' }}>{formatTime(ag.scheduled_at)}</td>
+                      <td><span className="badge badge-info">{ag.week_ref || '—'}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -378,6 +423,8 @@ function EscalonamentoSection({ onMsg }) {
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [search, setSearch] = useState('');
+  const [filterUF, setFilterUF] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -433,10 +480,19 @@ function EscalonamentoSection({ onMsg }) {
     setSaving(false);
   };
 
-  const filtered = tecnicos.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    (t.region && t.region.toLowerCase().includes(search.toLowerCase()))
-  );
+  const ufsDisponiveis = [...new Set(tecnicos.map(t => t.region).filter(Boolean))].sort();
+
+  const filtered = tecnicos.filter(t => {
+    const matchSearch = !search ||
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      (t.region && t.region.toLowerCase().includes(search.toLowerCase()));
+    const matchUF = !filterUF || t.region === filterUF;
+    const configurado = !!t.inventory_day;
+    const matchStatus = !filterStatus ||
+      (filterStatus === 'configurado' && configurado) ||
+      (filterStatus === 'pendente' && !configurado);
+    return matchSearch && matchUF && matchStatus;
+  });
 
   return (
     <div>
@@ -454,15 +510,36 @@ function EscalonamentoSection({ onMsg }) {
         )}
       </div>
 
-      <div className="card" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div className="card" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           type="text"
-          placeholder="Buscar técnico ou região..."
+          placeholder="Buscar técnico..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="input"
-          style={{ flex: 1 }}
+          style={{ flex: 1, minWidth: '160px' }}
         />
+        <select
+          value={filterUF}
+          onChange={e => setFilterUF(e.target.value)}
+          className="input"
+          style={{ fontSize: '0.75rem', fontWeight: '700', minWidth: '110px' }}
+        >
+          <option value="">Todas UFs</option>
+          {ufsDisponiveis.map(uf => (
+            <option key={uf} value={uf}>{uf}</option>
+          ))}
+        </select>
+        <select
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value)}
+          className="input"
+          style={{ fontSize: '0.75rem', fontWeight: '700', minWidth: '130px' }}
+        >
+          <option value="">Todos os status</option>
+          <option value="configurado">Configurado</option>
+          <option value="pendente">Pendente</option>
+        </select>
         {hasChanges && (
           <span className="badge badge-not-ok" style={{ padding: '0.5rem 1rem' }}>
             ALTERAÇÕES PENDENTES
