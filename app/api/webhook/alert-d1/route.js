@@ -71,6 +71,7 @@ export async function POST(req) {
         .eq('technician_id', tech.id)
         .gte('scheduled_at', amanhaInicio.toISOString())
         .lte('scheduled_at', amanhaFim.toISOString())
+        .not('status', 'in', '(cancelled,abandoned)')
         .maybeSingle();
 
       if (existente) {
