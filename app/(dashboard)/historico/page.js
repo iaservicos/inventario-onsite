@@ -180,7 +180,7 @@ function ModalItens({ inventory, phase, onClose }) {
                       <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', color: '#666' }}>{item.system_qty ?? '—'}</td>
                       <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '700', color: isPend ? '#888' : '#000' }}>{isPend ? '—' : item.physical_qty}</td>
                       <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '800' }}>
-                        {diff === null ? '—' : diff > 0 ? `+${diff}` : diff === 0 ? '✓' : diff}
+                        {diff === null ? '—' : diff > 0 ? `+${diff}` : diff === 0 ? '0' : diff}
                       </td>
                       <td style={{ padding: '0.55rem 0.75rem' }}>
                         {isPend ? (
@@ -188,7 +188,7 @@ function ModalItens({ inventory, phase, onClose }) {
                         ) : item.has_divergence ? (
                           <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#fff', background: '#000', borderRadius: '4px', padding: '2px 7px' }}>DIVERGENTE</span>
                         ) : (
-                          <span style={{ fontSize: '0.9rem', fontWeight: '900', color: '#000' }}>✓</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#000', background: '#e8f5e9', border: '1px solid #c8e6c9', borderRadius: '4px', padding: '2px 7px' }}>OK</span>
                         )}
                       </td>
                     </tr>
