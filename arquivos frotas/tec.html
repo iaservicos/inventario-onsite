@@ -1,0 +1,2824 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EnerFine | Técnico</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EnerFine">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+[data-theme="light"]{--bg:#f0f4f8;--surface:#fff;--surface2:#f5f7fa;--border:rgba(0,0,0,0.08);--accent:#0369a1;--accent2:#0ea5e9;--accent-glow:rgba(3,105,161,0.12);--success:#059669;--warning:#d97706;--danger:#dc2626;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--shadow:0 1px 4px rgba(0,0,0,0.07),0 4px 16px rgba(0,0,0,0.05);--header-bg:#0f172a;}
+[data-theme="dark"]{--bg:#080d14;--surface:#0e1620;--surface2:#141e2d;--border:rgba(255,255,255,0.07);--accent:#0ea5e9;--accent2:#38bdf8;--accent-glow:rgba(14,165,233,0.18);--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--text:#f0f6ff;--text2:#8ba3c0;--text3:#4d6480;--shadow:none;--header-bg:#070c12;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px;}
+
+
+.header{background:var(--header-bg);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.header-left{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,#0ea5e9,#0369a1);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.logo-icon svg{color:#fff;}
+.logo-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.logo-text span{color:#38bdf8;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.user-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.08);border-radius:20px;padding:4px 11px 4px 5px;}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;}
+.user-name{font-size:12px;font-weight:600;color:rgba(255,255,255,0.9);}
+.theme-btn{background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.7);cursor:pointer;border-radius:6px;padding:5px;display:flex;align-items:center;}
+.theme-btn:hover{background:rgba(255,255,255,0.15);color:#fff;}
+.logout-btn{background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.7);cursor:pointer;border-radius:6px;padding:5px 9px;display:flex;align-items:center;gap:5px;font-family:inherit;font-size:11px;font-weight:600;transition:all .15s;}
+.logout-btn:hover{background:rgba(239,68,68,.2);color:#fca5a5;}
+
+.main{max-width:500px;margin:0 auto;padding:18px 16px 40px;}
+
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow);}
+.card-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;margin-bottom:16px;}
+.card-title svg{color:var(--accent);}
+
+
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:20px;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 28px;width:100%;max-width:380px;box-shadow:var(--shadow);text-align:center;}
+.login-logo{width:48px;height:48px;background:linear-gradient(135deg,#0ea5e9,#0369a1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 20px rgba(14,165,233,0.3);}
+.login-title{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text);}
+.login-sub{font-size:12px;color:var(--text3);margin-bottom:24px;}
+
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--accent);border-radius:12px;padding:12px 10px;color:#fff;}
+.stat-card.sec{background:var(--surface);border:1px solid var(--border);}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;opacity:.8;margin-bottom:3px;}
+.stat-card.sec .stat-label{color:var(--text3);opacity:1;}
+.stat-value{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-1px;}
+.stat-card.sec .stat-value{color:var(--accent);}
+.stat-atp-txt{font-size:11px;font-weight:700;margin-top:2px;line-height:1.3;}
+.stat-sub{font-size:9px;opacity:.7;margin-top:2px;}
+.stat-card.sec .stat-sub{color:var(--text3);opacity:1;}
+
+
+.form-group{margin-bottom:12px;}
+.form-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:5px;}
+input,select,textarea{width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+input::placeholder{color:var(--text3);}
+
+
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;transition:all .15s;}
+.btn svg{flex-shrink:0;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-success{background:var(--success);color:#fff;}
+.btn-success:hover{filter:brightness(1.08);}
+.btn-warning{background:var(--warning);color:#fff;}
+.btn-warning:hover{filter:brightness(1.08);}
+.btn-danger-s{background:rgba(220,38,38,.1);color:var(--danger);border:1px solid rgba(220,38,38,.2);}
+.btn-danger-s:hover{background:rgba(220,38,38,.18);}
+.btn-neutral{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.btn-neutral:hover{background:var(--surface);color:var(--text);}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none;}
+
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.badge-green{background:rgba(5,150,105,.1);color:var(--success);}
+.badge-green::before{background:var(--success);}
+.badge-amber{background:rgba(217,119,6,.1);color:var(--warning);}
+.badge-amber::before{background:var(--warning);}
+.badge-blue{background:rgba(3,105,161,.1);color:var(--accent);}
+.badge-blue::before{background:var(--accent);}
+.badge-red{background:rgba(220,38,38,.1);color:var(--danger);}
+.badge-red::before{background:var(--danger);}
+.badge-gray{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.badge-gray::before{background:var(--text3);}
+[data-theme="dark"] .badge-green{background:rgba(16,185,129,.12);}
+[data-theme="dark"] .badge-amber{background:rgba(245,158,11,.12);}
+[data-theme="dark"] .badge-blue{background:rgba(14,165,233,.12);}
+
+
+.status-msg{text-align:center;font-size:13px;font-weight:600;padding:10px;border-radius:8px;margin-top:10px;}
+.status-ok{background:rgba(5,150,105,.1);color:var(--success);}
+.status-err{background:rgba(220,38,38,.1);color:var(--danger);}
+.status-loading{color:var(--text3);}
+[data-theme="dark"] .status-ok{background:rgba(16,185,129,.12);}
+[data-theme="dark"] .status-err{background:rgba(239,68,68,.12);}
+
+
+.ponto-status-bar{display:flex;gap:8px;margin-bottom:14px;}
+.ponto-pill{flex:1;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:600;text-align:center;border:1.5px solid var(--border);}
+.ponto-pill.done{background:rgba(5,150,105,.08);color:var(--success);border-color:rgba(5,150,105,.25);}
+.ponto-pill.pending{background:var(--surface2);color:var(--text3);}
+[data-theme="dark"] .ponto-pill.done{background:rgba(16,185,129,.1);}
+
+
+.veiculo-bar{background:linear-gradient(135deg,var(--accent),#0284c7);border-radius:12px;padding:14px 16px;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.veiculo-bar svg{flex-shrink:0;opacity:.85;}
+.veiculo-placa{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:800;letter-spacing:1px;}
+.veiculo-detalhe{font-size:11px;opacity:.8;margin-top:2px;}
+
+
+.chamado-ativo-wrap{background:linear-gradient(135deg,rgba(5,150,105,.12),rgba(5,150,105,.05));border:1.5px solid rgba(5,150,105,.3);border-radius:14px;padding:18px;margin-bottom:16px;}
+[data-theme="dark"] .chamado-ativo-wrap{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.03));border-color:rgba(16,185,129,.25);}
+.chamado-ativo-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--success);margin-bottom:4px;}
+.chamado-ativo-num{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--success);}
+.chamado-timer{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:800;color:var(--text);letter-spacing:-1px;margin:6px 0 2px;}
+.chamado-checkin-meta{font-size:11px;color:var(--text3);margin-bottom:14px;}
+
+
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);}
+tbody td{padding:10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;}
+.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;}
+.search-wrap input{padding-left:34px;}
+.pagination{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:12px;flex-wrap:wrap;}
+.page-btn{min-width:30px;height:30px;padding:0 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.page-btn:hover{background:var(--surface);color:var(--text);}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.page-btn:disabled{opacity:.4;cursor:default;}
+
+
+.chart-container{position:relative;height:180px;width:100%;}
+.period-tabs{display:flex;gap:4px;margin-bottom:14px;}
+.period-tab{flex:1;padding:6px 8px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text3);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;}
+.period-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+
+.modal-over{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-over.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:480px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:popIn .2s ease;}
+.modal-box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.modal-box-title{font-size:15px;font-weight:800;color:var(--text);}
+.mclose{background:var(--surface2);border:1px solid var(--border);color:var(--text3);cursor:pointer;border-radius:6px;padding:5px;display:flex;}
+.mclose:hover{color:var(--text);}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+
+
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center;}
+.confirm-overlay.open{display:flex;}
+#modal-abastecimento>div{transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+#modal-abastecimento.open>div{transform:translateY(0);}
+.confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:320px;max-width:94vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:popIn .2s ease;}
+.confirm-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.confirm-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.confirm-desc{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:flex;gap:10px;}
+
+
+.gps-block{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+.gps-block.show{display:flex;}
+.gps-icon-wrap{width:72px;height:72px;border-radius:50%;background:rgba(220,38,38,.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.gps-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.gps-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px;max-width:300px;}
+
+
+.reg-item{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.reg-item-tipo{font-size:11px;font-weight:700;color:var(--text);}
+.reg-item-hora{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.solicit-item{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;}
+
+
+.bkl-item{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;margin-bottom:10px;}
+.bkl-item.prio{background:rgba(139,92,246,.04);border-color:rgba(139,92,246,.18);}
+.bkl-item.atend{background:rgba(5,150,105,.04);border-color:rgba(5,150,105,.18);}
+.bkl-item.atras{border-color:rgba(220,38,38,.18);}
+.bkl-item-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);}
+.bkl-timeline{background:rgba(0,0,0,.03);border-radius:8px;padding:8px;margin:8px 0;}
+[data-theme="dark"] .bkl-timeline{background:rgba(255,255,255,.03);}
+.bkl-timeline-row{display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border);}
+.bkl-timeline-row:last-child{border-bottom:none;}
+.bkl-timeline-ts{font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
+.bkl-timeline-acao{font-size:11px;color:var(--text2);}
+</style>
+</head>
+<body>
+
+
+<div class="gps-block" id="gps-block">
+  <div class="gps-icon-wrap">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+  </div>
+  <div class="gps-title">Localização Necessária</div>
+  <div class="gps-desc">O EnerFine precisa da sua localização para registrar atendimentos e aparecer no mapa. Ative nas configurações do celular e toque em <strong>Tentar Novamente</strong>.</div>
+  <button class="btn btn-primary" onclick="verificarGPS()" style="max-width:260px;">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    Tentar Novamente
+  </button>
+</div>
+
+
+<div id="area-login" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+    <div class="login-title">EnerFine</div>
+    <div class="login-sub">Acesso Técnico de Campo</div>
+    <div class="form-group"><label class="form-label">Matrícula</label><input type="text" id="mat" placeholder="Sua matrícula" inputmode="numeric" onkeydown="if(event.key==='Enter')document.getElementById('pass').focus()"></div>
+    <div class="form-group"><label class="form-label">Senha</label><input type="password" id="pass" placeholder="Sua senha" onkeydown="if(event.key==='Enter')fazerLogin()"></div>
+    <button class="btn btn-primary" onclick="fazerLogin()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Entrar
+    </button>
+    <div id="login-status"></div>
+    <button onclick="toggleTheme()" style="margin-top:16px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;gap:5px;margin-left:auto;margin-right:auto;">
+      <svg id="lt-moon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg id="lt-sun" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      Alternar tema
+    </button>
+  </div>
+</div>
+
+
+<div id="area-nova-senha" class="login-wrap" style="display:none;">
+  <div class="login-card">
+    <div class="login-logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <div class="login-title">Nova Senha</div>
+    <div class="login-sub" id="nova-senha-sub">Senha temporária detectada. Defina uma senha definitiva.</div>
+    <div class="form-group"><label class="form-label">Nova Senha</label><input type="password" id="nova-pass" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group"><label class="form-label">Confirmar</label><input type="password" id="nova-pass-conf" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')confirmarNovaSenha()"></div>
+    <button class="btn btn-primary" onclick="confirmarNovaSenha()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Salvar Nova Senha
+    </button>
+    <div id="nova-senha-status"></div>
+  </div>
+</div>
+
+
+<div id="area-servico" style="display:none;">
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <span class="logo-text">Ener<span>Fine</span></span>
+    </div>
+    <div class="header-right">
+
+      <div class="user-chip"><div class="user-avatar" id="user-avatar">?</div><span class="user-name" id="user-nome-header">—</span></div>
+      
+      <button id="btn-sino-avisos" onclick="verAvisos()" style="position:relative;background:none;border:none;cursor:pointer;padding:6px;color:var(--header-text,#fff);display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span id="badge-avisos" style="display:none;position:absolute;top:0;right:0;background:#dc2626;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;align-items:center;justify-content:center;">0</span>
+      </button>
+      <button class="theme-btn" onclick="toggleTheme()">
+        <svg id="hdr-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg id="hdr-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="logout-btn" onclick="fazerLogout()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </div>
+
+
+
+  <div class="main">
+
+    
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">ATP</div>
+        <div class="stat-atp-txt" id="stat-atp">—</div>
+      </div>
+      <div class="stat-card sec">
+        <div class="stat-label">Hoje</div>
+        <div class="stat-value" id="stat-hoje">0</div>
+        <div class="stat-sub">chamados</div>
+      </div>
+      <div class="stat-card sec">
+        <div class="stat-label">Mês</div>
+        <div class="stat-value" id="stat-mes">0</div>
+        <div class="stat-sub" id="stat-tma">TMA: —</div>
+      </div>
+    </div>
+
+    
+    <div id="card-veiculo" style="display:none;">
+      <div class="veiculo-bar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <div style="flex:1;">
+          <div class="veiculo-placa" id="veiculo-placa-display">—</div>
+          <div class="veiculo-detalhe" id="veiculo-detalhe-display">Veículo atual</div>
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px;">
+        <button onclick="abrirModalIncidente()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:8px 4px;font-size:11px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Incidente</span>
+        </button>
+        <button onclick="abrirModalAbastecimento()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:8px 4px;font-size:11px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h12"/><path d="M4 9h10"/><rect x="4" y="3" width="10" height="19" rx="1"/><path d="M14 7h2a2 2 0 012 2v3a2 2 0 002 2h0a2 2 0 002-2V7.5L18 4"/></svg>
+          <span>Abastecer</span>
+        </button>
+        <button onclick="abrirModalDevolucao()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:8px 4px;font-size:11px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 00-.84-.99L16 11l-2.7-3.6a1 1 0 00-.8-.4H5a2 2 0 00-2 2v8h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+          <span>Reg. Veículo</span>
+        </button>
+      </div>
+      <div id="card-manutencoes-veiculo" style="display:none;margin-top:8px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#d97706;margin-bottom:6px;">Manutenções Previstas</div>
+        <div id="lista-manutencoes-veiculo"></div>
+      </div>
+    </div>
+
+   
+    <div id="card-chamado-ativo" style="display:none;">
+      <div class="chamado-ativo-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div class="chamado-ativo-label" id="chamado-ativo-label">Em Atendimento</div>
+          <span class="badge badge-green" id="badge-chamado-ativo">Ativo</span>
+        </div>
+        <div class="chamado-ativo-num" id="chamado-ativo-num">—</div>
+        <div class="chamado-timer" id="chamado-timer">00:00:00</div>
+        <div class="chamado-checkin-meta" id="chamado-checkin-meta">Check-in: —</div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-warning" onclick="acaoPausarTimer()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            Pausar
+          </button>
+          <button class="btn btn-danger-s" onclick="acaoFinalizarTimer()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Finalizar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="card">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Registro de Ponto
+      </div>
+      <div class="ponto-status-bar">
+        <div class="ponto-pill pending" id="pill-entrada">Entrada: pendente</div>
+        <div class="ponto-pill pending" id="pill-saida">Saída: pendente</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-success" id="btn-entrada" onclick="gravarPonto('ENTRADA DIA')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Entrada
+        </button>
+        <button class="btn btn-neutral" id="btn-saida" onclick="gravarPonto('SAÍDA DIA')" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Saída
+        </button>
+      </div>
+      <div id="status-ponto"></div>
+      <button onclick="abrirHistoricoPonto()" style="margin-top:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;gap:5px;text-decoration:underline;text-underline-offset:3px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Ver registros mensais e solicitar ajuste
+      </button>
+    </div>
+
+   
+    <div class="card" id="card-novo-chamado">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        Iniciar Chamado
+      </div>
+      <div class="form-group">
+        <label class="form-label">Número do Chamado</label>
+        <input type="tel" id="num-chamado" inputmode="numeric" placeholder="Ex: 50014582863">
+      </div>
+      <button class="btn btn-success" onclick="gravarCheckin()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Check-in | Iniciar Atendimento
+      </button>
+      <div id="status"></div>
+    </div>
+
+    
+    <div class="card" id="card-bkl" style="display:none;">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Backlog | Meus Chamados
+        <span id="bkl-badge-tec" style="margin-left:auto;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;display:none;">0</span>
+      </div>
+      <div class="ponto-status-bar">
+        <div class="ponto-pill pending" id="bkl-pill-total">Total: 0</div>
+        <div class="ponto-pill pending" id="bkl-pill-pend">Pendentes: 0</div>
+        <div class="ponto-pill pending" id="bkl-pill-atras">Atrasados: 0</div>
+      </div>
+      <div class="period-tabs">
+        <button class="period-tab active" id="bkl-tab-btn-ativos"   onclick="bklMostrarTab('ativos',this)">Ativos</button>
+        <button class="period-tab"        id="bkl-tab-btn-sla"      onclick="bklMostrarTab('sla',this)">SLA</button>
+        <button class="period-tab"        id="bkl-tab-btn-pp"       onclick="bklMostrarTab('pp',this)">Peças PP</button>
+        <button class="period-tab"        id="bkl-tab-btn-perdidos" onclick="bklMostrarTab('perdidos',this)">Perdidos</button>
+      </div>
+      <div id="bkl-tab-ativos">
+        <div style="overflow-x:auto;">
+          <table id="bkl-table-ativos">
+            <thead><tr><th>Chamado</th><th>Situação</th><th>Ações</th></tr></thead>
+            <tbody id="bkl-lista-tec"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="bkl-tab-sla" style="display:none;">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Chamado</th><th>Limite</th><th>Prazo</th></tr></thead>
+            <tbody id="bkl-lista-sla"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="bkl-tab-pp" style="display:none;">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Chamado</th><th>PP em</th><th>Status</th></tr></thead>
+            <tbody id="bkl-lista-pp"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="bkl-tab-perdidos" style="display:none;">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Chamado</th><th>SLA</th><th>Endereço</th></tr></thead>
+            <tbody id="bkl-lista-perdidos"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="card">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Meus Chamados
+      </div>
+      <div class="period-tabs">
+        <button class="period-tab active" onclick="setPeriodoTec('semanal',this)">Semanal</button>
+        <button class="period-tab" onclick="setPeriodoTec('mensal',this)">Mensal</button>
+        <button class="period-tab" onclick="setPeriodoTec('anual',this)">Anual</button>
+      </div>
+      <div class="chart-container"><canvas id="chart-tec"></canvas></div>
+      <div id="chart-total" style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px;"></div>
+    </div>
+
+    
+    <div class="card">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Histórico de Chamados
+      </div>
+      <div class="search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="busca" placeholder="Filtrar por número…" onkeyup="filtrar()">
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Nº Chamado</th><th>Check-in</th><th>Check-out</th><th>Duração</th></tr></thead>
+          <tbody id="lista-atendimentos"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="paginacao"></div>
+      <div id="pag-info" style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;"></div>
+    </div>
+
+    
+    <div class="card" id="card-hist-incidentes" style="display:none;">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Meus Incidentes
+      </div>
+      <div id="lista-incidentes-tec"></div>
+    </div>
+
+    
+    <div class="card" id="card-avisos" style="display:none;">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        Central de Avisos
+        <button onclick="marcarTodosLidos()" style="margin-left:auto;background:none;border:none;color:var(--accent);font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;">Marcar todos como lidos</button>
+      </div>
+      <div id="lista-avisos-tec"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="confirm-overlay" id="confirm-ponto">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon"></div>
+    <div class="confirm-title" id="confirm-title">Confirmar</div>
+    <div class="confirm-desc" id="confirm-desc"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-neutral" onclick="cancelarConfirmPonto()" style="flex:1;padding:10px;">Cancelar</button>
+      <button class="btn btn-success" id="confirm-btn-ok" onclick="gravarPontoConfirmado()" style="flex:1;padding:10px;">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-over" id="modal-historico-ponto">
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <div class="modal-box-title">Registros de Ponto</div>
+      <button class="mclose" onclick="fecharHistoricoPonto()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <input type="month" id="mes-hist-ponto" style="margin-bottom:14px;" onchange="carregarHistMensal()">
+    <div id="hist-ponto-lista" style="margin-bottom:20px;"></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin-bottom:16px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Solicitar Ajuste
+    </div>
+    <div class="form-group"><label class="form-label">Data</label><input type="date" id="ajuste-data"></div>
+    <div class="form-group"><label class="form-label">Tipo</label><select id="ajuste-tipo"><option value="ENTRADA DIA">Entrada</option><option value="SAÍDA DIA">Saída</option></select></div>
+    <div class="form-group"><label class="form-label">Horário correto</label><input type="time" id="ajuste-hora"></div>
+    <div class="form-group"><label class="form-label">Justificativa</label><input type="text" id="ajuste-justif" placeholder="Descreva o motivo…"></div>
+    <button class="btn btn-primary" onclick="enviarSolicitacaoAjuste()" style="margin-bottom:16px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Enviar Solicitação
+    </button>
+    <div id="ajuste-result"></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 16px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Minhas Solicitações</div>
+    <div id="lista-solicitacoes"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, addDoc, onSnapshot, query, orderBy, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyASoshFf58eAGq7rwmuELWnFhVCUTtRcPM",
+  authDomain: "sistemarastreio-e9734.firebaseapp.com",
+  projectId: "sistemarastreio-e9734",
+  storageBucket: "sistemarastreio-e9734.firebasestorage.app",
+  messagingSenderId: "621240013789",
+  appId: "1:621240013789:web:fd6f02b4ee0d4e339b5c34"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const SESSION_KEY = 'enerfine_tec_v2';
+let tech = null;
+let todosRegistros = [];
+let chamadosAgrupados = [];
+let filtradosChamados = [];
+let pontoHoje = { entrada: null, saida: null };
+let paginaAtual = 1;
+const POR_PAGINA = 10;
+let chartTec = null;
+let periodoAtualTec = 'semanal';
+let watchId = null;
+let pontoTipoConfirm = '';
+let chamadoAtivoNum = null;
+let chamadoIsRetorno = false;
+let chamadoAtivoTs = null;
+let chamadoBklId = null; 
+let timerInterv = null;
+
+const ini = n => n ? n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '??';
+const hashSimples = s => { let h=0; for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;} return h.toString(16); };
+const fmt = dt => dt ? dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR').slice(0,5) : '—';
+const durMin = (d1,d2) => { if(!d1||!d2) return '—'; const m=Math.floor((d2-d1)/60000); return m<60 ? m+'min' : Math.floor(m/60)+'h '+(m%60)+'min'; };
+
+const apenasNums = s => s.replace(/\D/g,'');
+
+const saveSession = d => { try{ localStorage.setItem(SESSION_KEY, JSON.stringify(d)); }catch(e){} };
+const loadSession = () => { try{ const s=localStorage.getItem(SESSION_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } };
+const clearSession = () => { try{ localStorage.removeItem(SESSION_KEY); }catch(e){} };
+
+window.toggleTheme = () => {
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  ['lt-moon','hdr-moon'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=dark?'block':'none'; });
+  ['lt-sun','hdr-sun'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=dark?'none':'block'; });
+  if(chartTec) renderGraficoTec(todosRegistros);
+};
+
+window.verificarGPS = async () => {
+  if(!navigator.geolocation){
+    // Sem suporte a GPS — mostrar aviso mas não bloquear
+    const b=document.getElementById('gps-block');
+    b.querySelector('.gps-desc').innerHTML='Este navegador não suporta geolocalização. Alguns recursos de mapa não estarão disponíveis, mas você pode continuar usando o sistema.';
+    b.querySelector('button').outerHTML='<button class="btn btn-ghost" onclick="document.getElementById(\'gps-block\').classList.remove(\'show\')" style="max-width:260px;">Continuar sem GPS</button>';
+    return;
+  }
+
+  // Verificar estado da permissão se disponível
+  if(navigator.permissions){
+    try{
+      const perm = await navigator.permissions.query({name:'geolocation'});
+      if(perm.state === 'denied'){
+        const b=document.getElementById('gps-block');
+        b.querySelector('.gps-desc').innerHTML='A permissão de localização foi <strong>negada</strong>. Para ativar: <br>• <strong>Android</strong>: Configurações → Apps → Navegador → Permissões → Localização<br>• <strong>iPhone</strong>: Ajustes → Privacidade → Serviços de Localização → Navegador<br><br>Após ativar, toque em Tentar Novamente.';
+        b.querySelector('button').innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Tentar Novamente';
+        return;
+      }
+    }catch(e){}
+  }
+
+  // Solicitar posição com timeout maior
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      document.getElementById('gps-block').classList.remove('show');
+      // Salvar última posição conhecida
+      window._lastKnownPos = pos;
+    },
+    (err) => {
+      const b=document.getElementById('gps-block');
+      let msg='Não foi possível obter a localização.';
+      if(err.code === 1) msg='Permissão de localização negada. Ative nas configurações do dispositivo e tente novamente.';
+      else if(err.code === 2) msg='Localização indisponível. Verifique se o GPS está ativado no dispositivo.';
+      else if(err.code === 3) msg='Tempo esgotado. Vá para um local com melhor sinal e tente novamente.';
+      b.querySelector('.gps-desc').innerHTML=msg+'<br><br><small style="color:var(--text3);">Você pode continuar sem GPS, mas o registro de atendimento não incluirá coordenadas.</small>';
+      // Adicionar botão para continuar sem GPS
+      const existeContinuar = b.querySelector('.btn-sem-gps');
+      if(!existeContinuar){
+        const btnCont=document.createElement('button');
+        btnCont.className='btn btn-ghost btn-sem-gps';
+        btnCont.style.maxWidth='260px';
+        btnCont.style.marginTop='8px';
+        btnCont.textContent='Continuar sem GPS';
+        btnCont.onclick=()=>document.getElementById('gps-block').classList.remove('show');
+        b.appendChild(btnCont);
+      }
+    },
+    { timeout: 15000, enableHighAccuracy: false, maximumAge: 30000 }
+  );
+};
+
+window.fazerLogin = async () => {
+  const m = document.getElementById('mat').value.trim();
+  const p = document.getElementById('pass').value;
+  const stEl = document.getElementById('login-status');
+  if(!m||!p){ stEl.innerHTML='<div class="status-msg status-err">Preencha matrícula e senha.</div>'; return; }
+  stEl.innerHTML='<div class="status-msg status-loading">Verificando…</div>';
+  try{
+    const snap = await getDoc(doc(db,'tecnicos',m));
+    if(!snap.exists()){ stEl.innerHTML='<div class="status-msg status-err">Matrícula não encontrada.</div>'; return; }
+    const data = snap.data();
+    if(data.senhaTempAtiva && p === data.senhaTemp){
+      tech = data;
+      document.getElementById('area-login').style.display='none';
+      document.getElementById('area-nova-senha').style.display='flex';
+      document.getElementById('nova-senha-sub').innerText=`Olá, ${data.nome.split(' ')[0]}! Senha temporária detectada. Defina uma senha definitiva.`;
+      return;
+    }
+    if(!data.senha){ stEl.innerHTML='<div class="status-msg status-err">Sem senha. Solicite senha temporária ao administrador.</div>'; return; }
+    if(data.senha !== hashSimples(p)){ stEl.innerHTML='<div class="status-msg status-err">Senha incorreta.</div>'; return; }
+    tech = data;
+    saveSession({ matricula: m });
+    entrarSistema();
+  }catch(e){ stEl.innerHTML='<div class="status-msg status-err">Erro de conexão. Tente novamente.</div>'; }
+};
+
+window.confirmarNovaSenha = async () => {
+  const np = document.getElementById('nova-pass').value;
+  const nc = document.getElementById('nova-pass-conf').value;
+  const res = document.getElementById('nova-senha-status');
+  if(np.length<6){ res.innerHTML='<div class="status-msg status-err">Mínimo 6 caracteres.</div>'; return; }
+  if(np!==nc){ res.innerHTML='<div class="status-msg status-err">As senhas não coincidem.</div>'; return; }
+  await setDoc(doc(db,'tecnicos',tech.matricula.toString()),{senha:hashSimples(np),senhaTemp:'',senhaTempAtiva:false},{merge:true});
+  tech.senha=hashSimples(np); tech.senhaTempAtiva=false;
+  saveSession({ matricula: tech.matricula.toString() });
+  res.innerHTML='<div class="status-msg status-ok">Senha salva!</div>';
+  setTimeout(()=>{ document.getElementById('area-nova-senha').style.display='none'; entrarSistema(); }, 1000);
+};
+
+async function tentarAutoLogin(){
+  const sess = loadSession();
+  if(!sess?.matricula) return;
+  try{
+    const snap = await getDoc(doc(db,'tecnicos',sess.matricula));
+    if(snap.exists()){ tech = snap.data(); entrarSistema(); }
+    else { clearSession(); }
+  }catch(e){ clearSession(); }
+}
+
+function entrarSistema(){
+  document.getElementById('area-login').style.display='none';
+  document.getElementById('area-nova-senha').style.display='none';
+  document.getElementById('area-servico').style.display='block';
+  document.getElementById('user-nome-header').innerText = tech.nome.split(' ')[0];
+  document.getElementById('user-avatar').innerText = ini(tech.nome);
+  document.getElementById('stat-atp').innerText = tech.atp || '—';
+  
+  buscarVeiculoTec();
+  carregarDados();
+  iniciarRastreamento();
+  carregarHistIncidentes();
+  carregarAvisos();
+  carregarBklTec();
+  verificarGPS();
+  _iniciarListenerPPCR();
+}
+
+async function buscarVeiculoTec(){
+  try{
+    const snap = await getDocs(query(collection(db,'veiculos'),where('tecMatricula','==',tech.matricula.toString())));
+    if(!snap.empty){
+      const veic = snap.docs[0].data();
+      tech.veiculo = veic.placa;
+      tech.veiculoModelo = veic.modelo||'';
+      tech.veiculoDesde = veic.updatedAt||null;
+      document.getElementById('card-veiculo').style.display='block';
+      document.getElementById('veiculo-placa-display').innerText = veic.placa;
+      document.getElementById('veiculo-detalhe-display').innerText = veic.modelo
+        ? `${veic.modelo}${veic.ano?' · '+veic.ano:''}`
+        : 'Veículo atual';
+      carregarManutencoes(veic.placa);
+    } else {
+      document.getElementById('card-veiculo').style.display='none';
+    }
+  }catch(e){
+    
+    if(tech.veiculo){
+      document.getElementById('card-veiculo').style.display='block';
+      document.getElementById('veiculo-placa-display').innerText = tech.veiculo;
+      document.getElementById('veiculo-detalhe-display').innerText = 'Veículo atual';
+      carregarManutencoes(tech.veiculo);
+    }
+  }
+}
+
+window.fazerLogout = () => {
+  clearSession();
+  if(watchId!==null){ navigator.geolocation.clearWatch(watchId); watchId=null; }
+  pararTimer();
+  tech=null; todosRegistros=[]; chamadosAgrupados=[]; filtradosChamados=[]; pontoHoje={entrada:null,saida:null};
+  paginaAtual=1; chamadoAtivoNum=null; chamadoAtivoTs=null;
+  document.getElementById('area-servico').style.display='none';
+  document.getElementById('card-chamado-ativo').style.display='none';
+  document.getElementById('area-login').style.display='flex';
+  document.getElementById('mat').value=''; document.getElementById('pass').value='';
+  document.getElementById('login-status').innerHTML='';
+};
+
+let ultimaPosCache = null;
+
+function iniciarRastreamento(){
+  if(!navigator.geolocation) return;
+  if(watchId!==null) navigator.geolocation.clearWatch(watchId);
+  watchId = navigator.geolocation.watchPosition(pos=>{
+    ultimaPosCache = pos;
+    if(!tech) return;
+    setDoc(doc(db,'tracking',tech.matricula.toString()),{
+      matricula:tech.matricula.toString(), nome:tech.nome, atp:tech.atp,
+      lat:pos.coords.latitude, lng:pos.coords.longitude,
+      ultimaAtualizacao:serverTimestamp(), status:'online'
+    },{merge:true});
+  }, ()=>{}, { enableHighAccuracy:true, maximumAge:15000, timeout:20000 });
+}
+
+function obterPosicao(cb, errCb){
+  // Usar última posição em cache se recente (menos de 2 minutos)
+  if(ultimaPosCache){
+    const age = Date.now() - (ultimaPosCache.timestamp||0);
+    if(age < 120000){ cb(ultimaPosCache); return; }
+  }
+  // Fallback: usar window._lastKnownPos se disponível
+  const fallback = window._lastKnownPos;
+
+  if(!navigator.geolocation){
+    if(fallback){ cb(fallback); return; }
+    if(errCb) errCb({code:2,message:'GPS não suportado'});
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ ultimaPosCache=pos; window._lastKnownPos=pos; cb(pos); },
+    err=>{
+      // Se tem posição anterior, usar como fallback em vez de falhar
+      if(fallback){
+        console.warn('GPS falhou, usando posição anterior como fallback');
+        cb(fallback);
+        return;
+      }
+      if(errCb) errCb(err);
+      else {
+        const stEl=document.getElementById('status');
+        if(stEl) stEl.innerHTML='<div class="status-msg status-err">GPS indisponível. Ative a localização e tente novamente.</div>';
+        setTimeout(()=>{if(stEl)stEl.innerHTML='';},4000);
+      }
+    },
+    { enableHighAccuracy:false, maximumAge:60000, timeout:10000 }
+  );
+}
+
+window.gravarPonto = async tipo => {
+  const stEl = document.getElementById('status-ponto');
+  if(tipo==='ENTRADA DIA'&&pontoHoje.entrada){ stEl.innerHTML='<div class="status-msg status-err">Entrada já registrada hoje.</div>'; setTimeout(()=>stEl.innerHTML='',3000); return; }
+  if(tipo==='SAÍDA DIA'&&pontoHoje.saida){ stEl.innerHTML='<div class="status-msg status-err">Saída já registrada hoje.</div>'; setTimeout(()=>stEl.innerHTML='',3000); return; }
+  if(tipo==='SAÍDA DIA'&&!pontoHoje.entrada){ stEl.innerHTML='<div class="status-msg status-err">Registre a entrada primeiro.</div>'; setTimeout(()=>stEl.innerHTML='',3000); return; }
+  pontoTipoConfirm = tipo;
+  const isE = tipo==='ENTRADA DIA';
+  const agora = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+  document.getElementById('confirm-title').innerText = isE ? 'Confirmar Entrada' : 'Confirmar Saída';
+  document.getElementById('confirm-desc').innerHTML = `Deseja registrar sua ${isE?'entrada':'saída'} agora?<br><span style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--accent);">${agora}</span>`;
+  document.getElementById('confirm-icon').style.background = isE ? 'rgba(5,150,105,.12)' : 'rgba(217,119,6,.12)';
+  document.getElementById('confirm-icon').innerHTML = isE
+    ? `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`
+    : `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+  document.getElementById('confirm-btn-ok').className = isE ? 'btn btn-success' : 'btn btn-warning';
+  document.getElementById('confirm-ponto').classList.add('open');
+};
+
+window.cancelarConfirmPonto = () => { document.getElementById('confirm-ponto').classList.remove('open'); pontoTipoConfirm=''; };
+
+// Executa cb sempre — com GPS se disponível, com coords null se não
+function obterPosicaoOpcional(cb, stEl, msgAcao){
+  const semGps={coords:{latitude:null,longitude:null}};
+  if(!navigator.geolocation){cb(semGps);return;}
+  if(stEl) stEl.innerHTML=`<div class="status-msg status-loading">${msgAcao||'Registrando…'}</div>`;
+  navigator.geolocation.getCurrentPosition(
+    pos=>{cb(pos);},
+    ()=>{
+      // Sem GPS — avisar e executar mesmo assim
+      if(stEl) stEl.innerHTML='<div class="status-msg" style="background:rgba(217,119,6,.1);color:#d97706;">GPS indisponível — registrando sem coordenadas.</div>';
+      cb(semGps);
+    },
+    {timeout:5000,maximumAge:60000,enableHighAccuracy:false}
+  );
+}
+
+window.gravarPontoConfirmado = () => {
+  document.getElementById('confirm-ponto').classList.remove('open');
+  const tipo = pontoTipoConfirm; pontoTipoConfirm='';
+  const stEl = document.getElementById('status-ponto');
+  obterPosicaoOpcional(async pos=>{
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,
+      lat:pos.coords.latitude,lng:pos.coords.longitude,
+      horario:serverTimestamp(),tipo,chamado:'PONTO',
+      semGps:!pos.coords.latitude};
+    await addDoc(collection(db,'historico_ponto'),d);
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{...d,ultimaAtualizacao:serverTimestamp(),status:tipo},{merge:true});
+    stEl.innerHTML='<div class="status-msg status-ok">Ponto registrado!</div>';
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Registrando ponto…');
+};
+
+window.gravarCheckin = async () => {
+  const raw = document.getElementById('num-chamado').value.trim();
+  const num = apenasNums(raw);
+  const stEl = document.getElementById('status');
+  if(!num){ stEl.innerHTML='<div class="status-msg status-err">Informe o número do chamado!</div>'; return; }
+  if(chamadoAtivoNum){ stEl.innerHTML='<div class="status-msg status-err">Finalize o chamado atual antes de iniciar um novo.</div>'; return; }
+  const isRetorno = todosRegistros.some(r=>r.chamado===num&&r.tipo==='CHECK-OUT');
+  stEl.innerHTML='<div class="status-msg status-loading">Registrando check-in…</div>';
+  obterPosicaoOpcional(async pos=>{
+    const tipoReg=isRetorno?'CHECK-IN-RETORNO':'CHECK-IN';
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,lat:pos.coords.latitude,lng:pos.coords.longitude,horario:serverTimestamp(),tipo:tipoReg,chamado:num,retorno:isRetorno,semGps:!pos.coords.latitude};
+    await addDoc(collection(db,'atendimentos_chamados'),d);
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{...d,ultimaAtualizacao:serverTimestamp(),status:num},{merge:true});
+    document.getElementById('num-chamado').value='';
+    chamadoAtivoNum = num; chamadoAtivoTs = new Date(); chamadoIsRetorno = isRetorno;
+    iniciarTimer(); renderCardAtivo();
+    stEl.innerHTML=isRetorno
+      ?'<div class="status-msg status-ok" style="color:#d97706;">Retorno ao chamado '+num+' registrado!</div>'
+      :'<div class="status-msg status-ok">Check-in registrado!</div>';
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Registrando check-in…');
+};
+
+window.acaoPausarTimer = async () => {
+  if(!chamadoAtivoNum) return;
+  if(!confirm('Pausar o chamado #'+chamadoAtivoNum+'?\nVocê poderá retornar depois.')) return;
+  const stEl=document.getElementById('status');
+  stEl.innerHTML='<div class="status-msg status-loading">Pausando…</div>';
+  obterPosicaoOpcional(async pos=>{
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,lat:pos.coords.latitude,lng:pos.coords.longitude,horario:serverTimestamp(),tipo:'CHECK-OUT',chamado:chamadoAtivoNum,pausado:true,semGps:!pos.coords.latitude};
+    await addDoc(collection(db,'atendimentos_chamados'),d);
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{ultimaAtualizacao:serverTimestamp(),status:'disponivel'},{merge:true});
+    
+    if(chamadoBklId){
+      const ts=new Date().toISOString();
+      const snapBkl=await getDoc(doc(db,'backlog',chamadoBklId));
+      const chData=snapBkl.data()||{};
+      const evt={ts,acao:'Pausado — aguardando peça/retorno',lat:pos.coords.latitude,lng:pos.coords.longitude};
+      await setDoc(doc(db,'backlog',chamadoBklId),{status:'pausado',pausadoEm:ts,eventos:[...(chData.eventos||[]),evt]},{merge:true});
+    }
+    pararTimer();
+    chamadoAtivoNum=null; chamadoAtivoTs=null; chamadoBklId=null; chamadoIsRetorno=false;
+    document.getElementById('card-chamado-ativo').style.display='none';
+    stEl.innerHTML='<div class="status-msg" style="color:var(--warning);">Chamado pausado. Retome quando necessário.</div>';
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Pausando…');
+};
+
+window.acaoFinalizarTimer = async () => {
+  if(!chamadoAtivoNum) return;
+  if(!confirm('Finalizar o chamado #'+chamadoAtivoNum+'?\nEsta ação não pode ser desfeita.')) return;
+  
+  const obs = prompt('Deseja adicionar uma observação sobre o atendimento?\n(deixe em branco para pular)') || '';
+  const stEl=document.getElementById('status');
+  stEl.innerHTML='<div class="status-msg status-loading">Finalizando…</div>';
+  obterPosicaoOpcional(async pos=>{
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,lat:pos.coords.latitude,lng:pos.coords.longitude,horario:serverTimestamp(),tipo:'CHECK-OUT',chamado:chamadoAtivoNum,semGps:!pos.coords.latitude};
+    await addDoc(collection(db,'atendimentos_chamados'),d);
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{...d,ultimaAtualizacao:serverTimestamp(),status:'disponivel'},{merge:true});
+    if(chamadoBklId){
+      const ts=new Date().toISOString();
+      const snapBkl=await getDoc(doc(db,'backlog',chamadoBklId));
+      const chData=snapBkl.data()||{};
+      const evt={ts,acao:'Chamado finalizado',lat:pos.coords.latitude,lng:pos.coords.longitude};
+      if(obs)evt.obs=obs;
+      await setDoc(doc(db,'backlog',chamadoBklId),{
+        status:'concluido',concluidoEm:ts,
+        observacaoFinal:obs||null,
+        eventos:[...(chData.eventos||[]),evt]
+      },{merge:true});
+    }
+    pararTimer();
+    chamadoAtivoNum=null; chamadoAtivoTs=null; chamadoBklId=null; chamadoIsRetorno=false;
+    document.getElementById('card-chamado-ativo').style.display='none';
+    stEl.innerHTML='<div class="status-msg status-ok">Chamado finalizado!'+(obs?' Observação registrada.':'')+'</div>';
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Registrando…');
+};
+
+window.gravarCheckout = acaoFinalizarTimer;
+
+function iniciarTimer(){
+  pararTimer();
+  timerInterv = setInterval(()=>{
+    if(!chamadoAtivoTs) return;
+    const s = Math.floor((Date.now()-chamadoAtivoTs.getTime())/1000);
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
+    document.getElementById('chamado-timer').innerText =
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+  },1000);
+}
+function pararTimer(){ if(timerInterv){ clearInterval(timerInterv); timerInterv=null; } }
+
+function renderCardAtivo(){
+  if(!chamadoAtivoNum){ document.getElementById('card-chamado-ativo').style.display='none'; return; }
+  document.getElementById('card-chamado-ativo').style.display='block';
+  document.getElementById('chamado-ativo-num').innerText = chamadoAtivoNum;
+  const label=document.getElementById('chamado-ativo-label');
+  if(label)label.innerText=chamadoIsRetorno?'Retorno ao Chamado':'Em Atendimento';
+  const badge=document.querySelector('#card-chamado-ativo .badge');
+  if(badge){badge.innerText=chamadoIsRetorno?'Retorno':'Ativo';badge.style.background=chamadoIsRetorno?'#d97706':'';badge.className=chamadoIsRetorno?'badge':'badge badge-green';}
+  document.getElementById('chamado-checkin-meta').innerText = chamadoAtivoTs
+    ? (chamadoIsRetorno?'Retorno: ':'Check-in: ')+chamadoAtivoTs.toLocaleTimeString('pt-BR').slice(0,5)
+    : 'Check-in: —';
+}
+
+function carregarDados(){
+  onSnapshot(query(collection(db,'atendimentos_chamados'),where('matricula','==',tech.matricula.toString())), snap=>{
+    const docs=[];
+    snap.forEach(d=>docs.push(d.data()));
+    docs.sort((a,b)=>(b.horario?.seconds||0)-(a.horario?.seconds||0));
+    todosRegistros=docs;
+
+    const hoje=new Date().toLocaleDateString('pt-BR');
+    const mesAtual=new Date().toISOString().slice(0,7);
+    const totalHoje=docs.filter(c=>{ const dt=c.horario?.toDate(); return dt&&dt.toLocaleDateString('pt-BR')===hoje&&c.tipo==='CHECK-IN'; }).length;
+    const totalMes=docs.filter(c=>{ const dt=c.horario?.toDate(); return dt&&dt.toISOString().slice(0,7)===mesAtual&&c.tipo==='CHECK-IN'; }).length;
+    
+    const tmaMap={};
+    docs.forEach(c=>{ const dt=c.horario?.toDate(); if(!dt||dt.toISOString().slice(0,7)!==mesAtual)return; if(!tmaMap[c.chamado])tmaMap[c.chamado]={in:null,out:null}; if(c.tipo==='CHECK-IN'&&!tmaMap[c.chamado].in)tmaMap[c.chamado].in=dt; if(c.tipo==='CHECK-OUT'&&!tmaMap[c.chamado].out)tmaMap[c.chamado].out=dt; });
+    let soma=0,qtd=0;
+    for(const id in tmaMap){ if(tmaMap[id].in&&tmaMap[id].out){ soma+=Math.floor((tmaMap[id].out-tmaMap[id].in)/60000); qtd++; } }
+    document.getElementById('stat-hoje').innerText=totalHoje;
+    document.getElementById('stat-mes').innerText=totalMes;
+    document.getElementById('stat-tma').innerText=qtd>0?`TMA: ${Math.round(soma/qtd)}min`:'TMA: —';
+
+    
+    if(!chamadoAtivoNum){
+      const mapa={};
+      docs.forEach(c=>{ const dt=c.horario?.toDate(); if(!dt||dt.toLocaleDateString('pt-BR')!==hoje||c.chamado==='PONTO')return; if(!mapa[c.chamado])mapa[c.chamado]={in:null,out:null,retorno:false}; if((c.tipo==='CHECK-IN'||c.tipo==='CHECK-IN-RETORNO')&&!mapa[c.chamado].in){mapa[c.chamado].in=dt;mapa[c.chamado].retorno=c.tipo==='CHECK-IN-RETORNO';} if(c.tipo==='CHECK-OUT'&&!mapa[c.chamado].out)mapa[c.chamado].out=dt; });
+      for(const num in mapa){ if(mapa[num].in&&!mapa[num].out){ chamadoAtivoNum=num; chamadoAtivoTs=mapa[num].in; chamadoIsRetorno=!!mapa[num].retorno; chamadoBklId=mapa[num].bklId||null; iniciarTimer(); renderCardAtivo(); break; } }
+    }
+
+    agruparChamados(docs);
+    renderGraficoTec(docs);
+  });
+
+  onSnapshot(query(collection(db,'historico_ponto'),where('matricula','==',tech.matricula.toString())), snap=>{
+    const hoje=new Date().toLocaleDateString('pt-BR');
+    pontoHoje={entrada:null,saida:null};
+    snap.forEach(d=>{ const h=d.data(); const dt=h.horario?.toDate?h.horario.toDate():null; if(!dt||dt.toLocaleDateString('pt-BR')!==hoje)return; if(h.tipo==='ENTRADA DIA'&&!pontoHoje.entrada)pontoHoje.entrada=dt; if(h.tipo==='SAÍDA DIA'&&!pontoHoje.saida)pontoHoje.saida=dt; });
+    atualizarUIPonto();
+  });
+
+  onSnapshot(query(collection(db,'ajustes_ponto'),where('matricula','==',tech.matricula.toString())), snap=>{
+    const itens=[];
+    snap.forEach(d=>itens.push({id:d.id,...d.data()}));
+    itens.sort((a,b)=>(b.criadoEm?.seconds||0)-(a.criadoEm?.seconds||0));
+    renderSolicitacoes(itens);
+  });
+}
+
+function atualizarUIPonto(){
+  const pe=document.getElementById('pill-entrada'),ps=document.getElementById('pill-saida');
+  const be=document.getElementById('btn-entrada'),bs=document.getElementById('btn-saida');
+  if(pontoHoje.entrada){pe.className='ponto-pill done';pe.innerText='Entrada: '+pontoHoje.entrada.toLocaleTimeString('pt-BR').slice(0,5);be.disabled=true;}
+  else{pe.className='ponto-pill pending';pe.innerText='Entrada: pendente';be.disabled=false;}
+  if(pontoHoje.saida){ps.className='ponto-pill done';ps.innerText='Saída: '+pontoHoje.saida.toLocaleTimeString('pt-BR').slice(0,5);bs.disabled=true;}
+  else{ps.className='ponto-pill pending';ps.innerText='Saída: pendente';bs.disabled=!pontoHoje.entrada;}
+}
+
+function agruparChamados(docs){
+  const map={};
+  docs.forEach(c=>{
+    if(c.chamado==='PONTO') return;
+    if(!map[c.chamado])map[c.chamado]={chamado:c.chamado,checkIn:null,checkOut:null};
+    const dt=c.horario?.toDate?c.horario.toDate():null;
+    if((c.tipo==='CHECK-IN'||c.tipo==='CHECK-IN-RETORNO')&&!map[c.chamado].checkIn){map[c.chamado].checkIn=dt;if(c.tipo==='CHECK-IN-RETORNO')map[c.chamado].retorno=true;}
+    if(c.tipo==='CHECK-OUT'&&!map[c.chamado].checkOut)map[c.chamado].checkOut=dt;
+  });
+  chamadosAgrupados=Object.values(map).sort((a,b)=>(b.checkIn?.getTime()||0)-(a.checkIn?.getTime()||0));
+  filtradosChamados=[...chamadosAgrupados];
+  renderPagina();
+}
+
+window.filtrar=()=>{
+  const f=document.getElementById('busca').value.toLowerCase();
+  filtradosChamados=f?chamadosAgrupados.filter(c=>c.chamado?.toLowerCase().includes(f)):[...chamadosAgrupados];
+  paginaAtual=1; renderPagina();
+};
+
+function renderPagina(){
+  const total=filtradosChamados.length;
+  const totalPags=Math.max(1,Math.ceil(total/POR_PAGINA));
+  if(paginaAtual>totalPags)paginaAtual=totalPags;
+  const inicio=(paginaAtual-1)*POR_PAGINA,fim=Math.min(inicio+POR_PAGINA,total);
+  const body=document.getElementById('lista-atendimentos');
+  body.innerHTML='';
+  if(!total){body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3);">Nenhum chamado encontrado</td></tr>';}
+  else{
+    filtradosChamados.slice(inicio,fim).forEach(c=>{
+      const sb=c.checkIn&&c.checkOut?'<span class="badge badge-blue">Concluído</span>':c.checkIn?'<span class="badge badge-green">Em atend.</span>':'<span class="badge badge-gray">Pendente</span>';
+      body.innerHTML+=`<tr>
+        <td><div class="mono" style="font-weight:700;color:var(--accent);">${c.chamado}</div><div style="margin-top:3px;">${sb}</div></td>
+        <td class="mono">${fmt(c.checkIn)}</td>
+        <td class="mono">${fmt(c.checkOut)}</td>
+        <td><span class="badge badge-blue">${durMin(c.checkIn,c.checkOut)}</span></td>
+      </tr>`;
+    });
+  }
+  const pagEl=document.getElementById('paginacao');
+  pagEl.innerHTML='';
+  if(totalPags>1){
+    const addBtn=(label,pg,dis,ativo)=>pagEl.innerHTML+=`<button class="page-btn ${ativo?'active':''}" ${dis?'disabled':''} onclick="irPagina(${pg})">${label}</button>`;
+    addBtn('‹',paginaAtual-1,paginaAtual===1,false);
+    let s=Math.max(1,paginaAtual-2),e=Math.min(totalPags,s+4);
+    if(e-s<4)s=Math.max(1,e-4);
+    for(let i=s;i<=e;i++)addBtn(i,i,false,i===paginaAtual);
+    addBtn('›',paginaAtual+1,paginaAtual===totalPags,false);
+  }
+  document.getElementById('pag-info').innerText=total>0?`Exibindo ${inicio+1}–${fim} de ${total} chamados`:'';
+}
+window.irPagina=pg=>{ paginaAtual=pg; renderPagina(); };
+
+window.abrirHistoricoPonto=async()=>{
+  document.getElementById('mes-hist-ponto').value=new Date().toISOString().slice(0,7);
+  document.getElementById('ajuste-data').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ajuste-result').innerHTML='';
+  document.getElementById('modal-historico-ponto').classList.add('open');
+  await carregarHistMensal();
+  await carregarSolicitacoes();
+};
+window.fecharHistoricoPonto=()=>document.getElementById('modal-historico-ponto').classList.remove('open');
+
+window.carregarHistMensal=async()=>{
+  const mes=document.getElementById('mes-hist-ponto').value;
+  const lista=document.getElementById('hist-ponto-lista');
+  lista.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px;">Carregando…</div>';
+  try{
+    const snap=await getDocs(query(collection(db,'historico_ponto'),where('matricula','==',tech.matricula.toString())));
+    const itens=[];
+    snap.forEach(d=>{ const h=d.data(); const dt=h.horario?.toDate?h.horario.toDate():null; if(dt&&dt.toISOString().slice(0,7)===mes)itens.push({...h,dt}); });
+    itens.sort((a,b)=>b.dt.getTime()-a.dt.getTime());
+    if(!itens.length){lista.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px;">Sem registros neste mês.</div>';return;}
+    lista.innerHTML=itens.map(h=>`<div class="reg-item"><div><div class="reg-item-tipo">${h.tipo}</div><div class="reg-item-hora">${h.dt.toLocaleDateString('pt-BR')} ${h.dt.toLocaleTimeString('pt-BR').slice(0,5)}</div></div><span class="badge ${h.tipo.includes('ENTRADA')?'badge-green':'badge-amber'}">${h.tipo.includes('ENTRADA')?'Entrada':'Saída'}</span></div>`).join('');
+  }catch(e){lista.innerHTML='<div style="color:var(--danger);font-size:12px;text-align:center;padding:12px;">Erro ao carregar.</div>';}
+};
+
+async function carregarSolicitacoes(){
+  const lista=document.getElementById('lista-solicitacoes');
+  lista.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px;">Carregando…</div>';
+  try{
+    const snap=await getDocs(query(collection(db,'ajustes_ponto'),where('matricula','==',tech.matricula.toString())));
+    const itens=[];snap.forEach(d=>itens.push({id:d.id,...d.data()}));
+    itens.sort((a,b)=>(b.criadoEm?.seconds||0)-(a.criadoEm?.seconds||0));
+    renderSolicitacoes(itens);
+  }catch(e){lista.innerHTML='<div style="color:var(--text3);font-size:12px;">Sem dados.</div>';}
+}
+
+function renderSolicitacoes(itens){
+  const lista=document.getElementById('lista-solicitacoes');
+  if(!lista)return;
+  if(!itens.length){lista.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px;">Nenhuma solicitação enviada.</div>';return;}
+  const cor={pendente:'badge-amber',aprovado:'badge-green',recusado:'badge-red'};
+  const label={pendente:'Pendente',aprovado:'Aprovado',recusado:'Recusado'};
+  lista.innerHTML=itens.map(s=>{
+    const st=s.status||'pendente';
+    const resolvido=st==='aprovado'||st==='recusado';
+    return `<div class="solicit-item" style="${resolvido?'opacity:.6;':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:12px;font-weight:600;color:var(--text);">${s.tipo} — ${s.data}</span>
+        <span class="badge ${cor[st]}">${label[st]||st}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);">Horário: ${s.hora} · ${s.justificativa}</div>
+      ${resolvido?`<div style="font-size:11px;color:var(--accent);margin-top:3px;">${st==='aprovado'?'Aprovado pelo admin':'Recusado pelo admin'}${s.respostaAdmin?' — '+s.respostaAdmin:''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+window.enviarSolicitacaoAjuste=async()=>{
+  const data=document.getElementById('ajuste-data').value;
+  const tipo=document.getElementById('ajuste-tipo').value;
+  const hora=document.getElementById('ajuste-hora').value;
+  const justif=document.getElementById('ajuste-justif').value.trim();
+  const res=document.getElementById('ajuste-result');
+  if(!data||!hora||!justif){res.innerHTML='<div class="status-msg status-err">Preencha todos os campos.</div>';return;}
+  await addDoc(collection(db,'ajustes_ponto'),{matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,data,tipo,hora,justificativa:justif,status:'pendente',criadoEm:serverTimestamp()});
+  res.innerHTML='<div class="status-msg status-ok">Solicitação enviada!</div>';
+  document.getElementById('ajuste-justif').value='';
+  setTimeout(()=>res.innerHTML='',4000);
+  await carregarSolicitacoes();
+};
+
+document.getElementById('modal-historico-ponto').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-historico-ponto'))fecharHistoricoPonto();
+});
+
+window.setPeriodoTec=(periodo,btn)=>{
+  periodoAtualTec=periodo;
+  document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGraficoTec(todosRegistros);
+};
+
+function renderGraficoTec(docs){
+  const hoje=new Date();
+  let labels=[],valores=[],descricao='';
+  if(periodoAtualTec==='semanal'){
+    const dias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datas=[];
+    for(let i=6;i>=0;i--){const d=new Date(hoje);d.setDate(hoje.getDate()-i);labels.push(dias[d.getDay()]+' '+d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0'));datas.push(d);valores.push(0);}
+    docs.forEach(c=>{if(c.tipo!=='CHECK-IN')return;const dt=c.horario?.toDate?c.horario.toDate():null;if(!dt)return;for(let i=0;i<7;i++){if(dt.toDateString()===datas[i].toDateString()){valores[i]++;break;}}});
+    descricao='últimos 7 dias';
+  }else if(periodoAtualTec==='mensal'){
+    const m=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const am=hoje.getMonth(),aa=hoje.getFullYear();
+    for(let i=5;i>=0;i--){let mm=am-i,a=aa;if(mm<0){mm+=12;a--;}labels.push(m[mm]+'/'+String(a).slice(2));valores.push(0);}
+    docs.forEach(c=>{if(c.tipo!=='CHECK-IN')return;const dt=c.horario?.toDate?c.horario.toDate():null;if(!dt)return;for(let i=0;i<6;i++){let mm=am-5+i,a=aa;if(mm<0){mm+=12;a--;}if(dt.getMonth()===mm&&dt.getFullYear()===a){valores[i]++;break;}}});
+    descricao='últimos 6 meses';
+  }else{
+    const ay=hoje.getFullYear();
+    for(let i=4;i>=0;i--){labels.push(String(ay-i));valores.push(0);}
+    docs.forEach(c=>{if(c.tipo!=='CHECK-IN')return;const dt=c.horario?.toDate?c.horario.toDate():null;if(!dt)return;for(let i=0;i<5;i++){if(dt.getFullYear()===(ay-4+i)){valores[i]++;break;}}});
+    descricao='últimos 5 anos';
+  }
+  const total=valores.reduce((a,b)=>a+b,0);
+  document.getElementById('chart-total').innerText=`Total (${descricao}): ${total} chamados`;
+  const ctx=document.getElementById('chart-tec');
+  if(chartTec)chartTec.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gc=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)',tc=isDark?'#8ba3c0':'#94a3b8';
+  chartTec=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Chamados',data:valores,backgroundColor:valores.map(v=>v>0?'rgba(3,105,161,0.7)':'rgba(148,163,184,0.2)'),borderColor:valores.map(v=>v>0?'#0369a1':'#94a3b8'),borderWidth:1.5,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:isDark?'#0e1620':'#fff',titleColor:isDark?'#f0f6ff':'#0f172a',bodyColor:isDark?'#8ba3c0':'#475569',borderColor:isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)',borderWidth:1}},scales:{x:{grid:{display:false},ticks:{color:tc,font:{size:10}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:10},stepSize:1},beginAtZero:true}}}});
+}
+
+window.abrirModalIncidente=()=>{
+  const placa=document.getElementById('veiculo-placa-display').innerText;
+  document.getElementById('inc-placa-display').innerText=placa;
+  document.getElementById('inc-data').value=new Date().toISOString().slice(0,10);
+  document.getElementById('inc-bo').value='';
+  document.getElementById('inc-desc').value='';
+  document.getElementById('inc-status').innerHTML='';
+  document.getElementById('modal-incidente-veiculo').classList.add('open');
+};
+window.fecharModalIncidente=()=>document.getElementById('modal-incidente-veiculo').classList.remove('open');
+
+window.enviarIncidente=async()=>{
+  const placa=document.getElementById('veiculo-placa-display').innerText.trim();
+  const tipo=document.getElementById('inc-tipo').value;
+  const data=document.getElementById('inc-data').value;
+  const bo=document.getElementById('inc-bo').value.trim();
+  const desc=document.getElementById('inc-desc').value.trim();
+  const res=document.getElementById('inc-status');
+  if(!desc){res.innerHTML='<div class="status-msg status-err">Descreva o ocorrido.</div>';return;}
+  res.innerHTML='<div class="status-msg status-loading">Registrando…</div>';
+  try{
+    const id='inc_'+Date.now();
+    await setDoc(doc(db,'incidentes',id),{
+      id,placa,tipo,dataStr:data,boletimOcorrencia:bo||null,descricao:desc,
+      tecMatricula:tech.matricula.toString(),tecNome:tech.nome,atp:tech.atp,
+      valor:null,criadoEm:serverTimestamp()
+    });
+    res.innerHTML='<div class="status-msg status-ok">Incidente registrado!</div>';
+    carregarHistIncidentes();
+    setTimeout(()=>fecharModalIncidente(),1500);
+  }catch(e){res.innerHTML='<div class="status-msg status-err">Erro ao registrar.</div>';}
+};
+
+async function carregarManutencoes(placa){
+  if(!placa||placa==='—')return;
+  try{
+    const snap=await getDocs(query(collection(db,'manutencoes'),where('placa','==',placa)));
+    const hoje=new Date();hoje.setHours(0,0,0,0);
+    const lista=[];
+    snap.forEach(d=>{
+      const m=d.data();
+      if(!m.proxima)return;
+      
+      const [ano,mes,dia]=m.proxima.split('-').map(Number);
+      const dp=new Date(ano,mes-1,dia,0,0,0,0);
+      const dias=Math.round((dp-hoje)/864e5);
+      if(dias>30)return;
+      const TIPOS={revisao:'Revisão',troca_oleo:'Troca de Óleo',ipva:'IPVA',seguro:'Seguro',pneu:'Pneu',outro:'Manutenção'};
+      lista.push({tipo:TIPOS[m.tipo]||m.tipo,proxima:dp,dias,vencida:dias<0});
+    });
+    lista.sort((a,b)=>a.dias-b.dias);
+    const card=document.getElementById('card-manutencoes-veiculo');
+    const div=document.getElementById('lista-manutencoes-veiculo');
+    if(!lista.length){card.style.display='none';return;}
+    card.style.display='block';
+    div.innerHTML=lista.map(m=>{
+      const label=m.vencida?`VENCIDA há ${Math.abs(m.dias)} dia(s)`:m.dias===0?'Prevista para hoje':`Em ${m.dias} dia(s) — ${m.proxima.toLocaleDateString('pt-BR')}`;
+      const cor=m.vencida||m.dias===0?'#dc2626':'#d97706';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+        <span style="font-size:12px;font-weight:600;color:var(--text);">${m.tipo}</span>
+        <span style="font-size:11px;color:${cor};font-weight:600;">${label}</span>
+      </div>`;
+    }).join('');
+  }catch(e){}
+}
+
+async function carregarHistIncidentes(){
+  if(!tech)return;
+  try{
+    const snap=await getDocs(query(collection(db,'incidentes'),where('tecMatricula','==',tech.matricula.toString())));
+    const itens=[];
+    snap.forEach(d=>itens.push({id:d.id,...d.data()}));
+    itens.sort((a,b)=>(b.criadoEm?.seconds||0)-(a.criadoEm?.seconds||0));
+    const card=document.getElementById('card-hist-incidentes');
+    const lista=document.getElementById('lista-incidentes-tec');
+    card.style.display=itens.length?'block':'none';
+    if(!itens.length)return;
+    const TIPOS={acidente:'Acidente','multa-leve':'Multa Leve','multa-media':'Multa Média','multa-grave':'Multa Grave',avaria:'Avaria',furto:'Furto',outro:'Outro'};
+    const fmtD=s=>{if(!s)return'—';try{const[a,m,d]=s.split('-');return d+'/'+m+'/'+a;}catch(e){return s;}};
+    lista.innerHTML=itens.map(i=>`
+      <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          <span style="font-size:12px;font-weight:700;color:var(--text);">${TIPOS[i.tipo]||i.tipo}</span>
+          <span style="font-size:11px;color:var(--text3);">${fmtD(i.dataStr)}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);">${i.descricao||'—'}</div>
+        ${i.boletimOcorrencia?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">B.O.: ${i.boletimOcorrencia}</div>`:''}
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;">Veículo: ${i.placa||'—'}</div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+function carregarAvisos(){
+  if(!tech)return;
+  onSnapshot(query(collection(db,'avisos_tecnicos'),where('destinatarios','array-contains',tech.matricula.toString())),snap=>{
+    const itens=[];
+    snap.forEach(d=>itens.push({id:d.id,...d.data()}));
+    itens.sort((a,b)=>(b.criadoEm?.seconds||0)-(a.criadoEm?.seconds||0));
+    _renderAvisosTec(itens);
+  });
+}
+
+function _renderAvisosTec(itens){
+  const key='avisos_lidos_'+tech.matricula;
+  const lidos=JSON.parse(localStorage.getItem(key)||'[]');
+  const naoLidos=itens.filter(a=>!lidos.includes(a.id));
+  const card=document.getElementById('card-avisos');
+  const lista=document.getElementById('lista-avisos-tec');
+  const badge=document.getElementById('badge-avisos');
+  
+  card.style.display=itens.length?'block':'none';
+  
+  if(badge){
+    if(naoLidos.length>0){badge.style.display='flex';badge.innerText=naoLidos.length;}
+    else{badge.style.display='none';badge.innerText='0';}
+  }
+  if(!itens.length)return;
+  const fmtDt=s=>{if(!s?.seconds)return'--';const d=new Date(s.seconds*1000);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR').slice(0,5);};
+  lista.innerHTML=itens.map(a=>{
+    const novo=!lidos.includes(a.id);
+    const bg=novo?'rgba(3,105,161,0.07)':'var(--surface2)';
+    const bord=novo?'rgba(3,105,161,0.2)':'var(--border)';
+    const dot=novo?'<span style="width:8px;height:8px;border-radius:50%;background:#0369a1;display:inline-block;flex-shrink:0;"></span>':'';
+    const lido_badge=!novo?'<span style="font-size:9px;color:var(--text3);font-weight:600;">Lido</span>':'';
+    return `<div style="padding:12px;margin-bottom:8px;border-radius:10px;background:${bg};border:1px solid ${bord};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:12px;font-weight:700;color:var(--text);flex:1;">${a.titulo||'Aviso'}</span>
+        ${dot}${lido_badge}
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:6px;">${a.mensagem||''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:10px;color:var(--text3);">${fmtDt(a.criadoEm)} · ${a.remetente||'Gestão'}</span>
+        ${novo?`<button onclick="marcarAvisoLido('${a.id}',this)" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;">Marcar como lido</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.verAvisos=()=>{
+  
+  const card=document.getElementById('card-avisos');
+  if(card){card.style.display='block';card.scrollIntoView({behavior:'smooth',block:'start'});}
+};
+
+window.marcarTodosLidos=async()=>{
+  const key='avisos_lidos_'+tech.matricula;
+  const lidos=JSON.parse(localStorage.getItem(key)||'[]');
+  const lista=document.querySelectorAll('#lista-avisos-tec [data-aviso-id]');
+  lista.forEach(el=>{const id=el.dataset.avisoId;if(!lidos.includes(id))lidos.push(id);});
+  
+  const snap=await getDocs(query(collection(db,'avisos_tecnicos'),where('destinatarios','array-contains',tech.matricula.toString())));
+  snap.forEach(d=>{if(!lidos.includes(d.id))lidos.push(d.id);});
+  localStorage.setItem(key,JSON.stringify(lidos));
+  
+  snap.forEach(async d=>{
+    const data=d.data();
+    const lidosPor=data.lidosPor||[];
+    if(!lidosPor.includes(tech.matricula.toString())){
+      await setDoc(doc(db,'avisos_tecnicos',d.id),{lidosPor:[...lidosPor,tech.matricula.toString()]},{merge:true});
+    }
+  });
+  const badge=document.getElementById('badge-avisos');
+  if(badge){badge.style.display='none';badge.innerText='0';}
+  
+  const itens=[];snap.forEach(d=>itens.push({id:d.id,...d.data()}));
+  _renderAvisosTec(itens.sort((a,b)=>(b.criadoEm?.seconds||0)-(a.criadoEm?.seconds||0)));
+};
+
+window.marcarAvisoLido=async(id,el)=>{
+  const key='avisos_lidos_'+tech.matricula;
+  const lidos=JSON.parse(localStorage.getItem(key)||'[]');
+  if(!lidos.includes(id)){lidos.push(id);localStorage.setItem(key,JSON.stringify(lidos));}
+  
+  const snapDoc=await getDoc(doc(db,'avisos_tecnicos',id));
+  if(snapDoc.exists()){
+    const lidosPor=snapDoc.data().lidosPor||[];
+    if(!lidosPor.includes(tech.matricula.toString())){
+      await setDoc(doc(db,'avisos_tecnicos',id),{lidosPor:[...lidosPor,tech.matricula.toString()]},{merge:true});
+    }
+  }
+  el.style.background='var(--surface2)';el.style.borderColor='var(--border)';
+  el.innerHTML=el.innerHTML; 
+  const badge2=document.getElementById('badge-avisos');
+  const naoLidos=JSON.parse(localStorage.getItem(key)||'[]');
+  const total=document.querySelectorAll('#lista-avisos-tec > div').length;
+  if(badge2){const lidos=JSON.parse(localStorage.getItem(key)||'[]');const total=document.querySelectorAll('#lista-avisos-tec > div').length;if(lidos.length>=total){badge2.style.display='none';badge2.innerText='0';}}
+};
+
+const BKL_PEPS_CRITICOS_TEC = new Set(['H3-03752','H3-04035','H3-04039','H3-03150','H3-03965','H3-03922','H3-04207','H3-03509','H3-02956','H3-03141','H3-03501','1001464665']);
+let _dbBkl = [];
+
+function bklStatusTec(ch){
+  const st = (ch.status||'').toLowerCase().trim();
+
+  // Encerrado pelo status
+  if(['concluido','concluído','encerrado','fechado','finalizado','closed','done'].includes(st)) return 'concluido';
+
+  // Tem data de conclusão E status confirma = encerrado
+  if(ch.concluidoEm && (st==='concluido'||st==='concluído'||st==='encerrado'||ch.encerradoPor)) return 'concluido';
+
+  // checkOut no documento E o status não é pendente/atrasado/perdido (não ativo)
+  if(ch.checkOut && !['pendente','em_atendimento','pausado'].includes(st)) return 'concluido';
+
+  // em_atendimento há mais de 48h sem atualização = tratar como encerrado
+  if(st==='em_atendimento'){
+    const ref = ch.updatedAt||ch.ultimaAtualizacao;
+    if(ref){
+      const diff = (Date.now() - new Date(ref.seconds?ref.seconds*1000:ref).getTime()) / (1000*3600);
+      if(diff > 48) return 'concluido';
+    }
+  }
+
+  if(st==='pausado')        return 'pausado';
+  if(st==='em_atendimento') return 'em_atendimento';
+
+  if(!ch.dataLimite) return 'pendente';
+
+  const hoje = new Date(); hoje.setHours(23,59,59,0);
+  const limite = new Date(ch.dataLimite);
+  if(limite < hoje) return 'perdido';
+  return 'pendente';
+}
+
+function carregarBklTec(){
+  if(!tech) return;
+  const matStr = String(tech.matricula);
+  const matNum = parseInt(matStr);
+
+  
+  onSnapshot(
+    query(collection(db,'backlog'), where('tecMatricula','==',matStr)),
+    async snap=>{
+      const map = {};
+      snap.forEach(d=>{ map[d.id]={...d.data(), _docId:d.id}; });
+
+      
+      if(!isNaN(matNum)){
+        try{
+          const snap2 = await getDocs(query(collection(db,'backlog'), where('tecMatricula','==',matNum)));
+          snap2.forEach(d=>{ if(!map[d.id]) map[d.id]={...d.data(), _docId:d.id}; });
+          
+          const antigos = snap2.docs.filter(d=>typeof d.data().tecMatricula==='number');
+          for(const d of antigos){
+            setDoc(doc(db,'backlog',d.id),{tecMatricula:matStr},{merge:true}).catch(()=>{});
+          }
+        }catch(e){}
+      }
+
+      _dbBkl = Object.values(map);
+      renderBklTec();
+    }
+  );
+}
+
+function _renderBklSla(ativos){
+  const div=document.getElementById('bkl-lista-sla');
+  if(!div)return;
+  const hoje=new Date();
+  const grupos=[
+    {label:'Vence Hoje',cor:'var(--danger)',itens:ativos.filter(ch=>{if(!ch.dataLimite)return false;const dr=Math.ceil((new Date(ch.dataLimite)-hoje)/864e5);return dr<=0;})},
+    {label:'Vence em 2 dias',cor:'var(--warning)',itens:ativos.filter(ch=>{if(!ch.dataLimite)return false;const dr=Math.ceil((new Date(ch.dataLimite)-hoje)/864e5);return dr===1||dr===2;})},
+    {label:'Vence em 3 dias',cor:'var(--warning)',itens:ativos.filter(ch=>{if(!ch.dataLimite)return false;const dr=Math.ceil((new Date(ch.dataLimite)-hoje)/864e5);return dr===3;})},
+    {label:'Sem prazo',cor:'var(--text3)',itens:ativos.filter(ch=>!ch.dataLimite)}
+  ];
+  const html=grupos.map(g=>!g.itens.length?'':
+    `<div style="margin-bottom:10px;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:${g.cor};margin-bottom:5px;">${g.label} (${g.itens.length})</div>
+      <table style="width:100%;"><tbody>
+      ${g.itens.map(ch=>`<tr>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);">#${ch.chamado}</td>
+        <td style="font-size:11px;font-weight:600;color:${g.cor};">${_fmtD(ch.dataLimite)}</td>
+        <td><span class="badge badge-gray" style="font-size:9px;">${bklStatusTec(ch)}</span></td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>`).join('');
+  div.innerHTML=html||'<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px;">Todos os chamados estão dentro do prazo.</div>';
+}
+
+function _renderBklPP(){
+  const div=document.getElementById('bkl-lista-pp');
+  if(!div)return;
+  const pp=_dbBkl.filter(ch=>ch.pp===true||(ch.eventos||[]).some(e=>e.acao==='PP'));
+  if(!pp.length){div.innerHTML='<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3);font-size:12px;">Nenhum chamado com PP.</td></tr>';return;}
+  const stLabel={pendente:'Pendente',em_atendimento:'Em Atend.',pausado:'Pausado',atrasado:'Atrasado',perdido:'Perdido',concluido:'Concluido'};
+  const stBadge={pendente:'badge-gray',em_atendimento:'badge-green',pausado:'badge-amber',atrasado:'badge-red',perdido:'badge-red',concluido:'badge-blue'};
+  div.innerHTML=pp.map(ch=>{
+    const evt=(ch.eventos||[]).filter(e=>e.acao==='PP').slice(-1)[0];
+    const st=bklStatusTec(ch);
+    return `<tr>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);">#${ch.chamado}</span></td>
+      <td style="font-size:10px;color:var(--text3);">${evt?_fmtD(evt.ts):'--'}</td>
+      <td><span class="badge ${stBadge[st]||'badge-gray'}">${stLabel[st]||st}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function _renderBklPerdidos(){
+  const div=document.getElementById('bkl-lista-perdidos');
+  if(!div)return;
+  const hoje=new Date();
+  const perdidos=_dbBkl.filter(ch=>{
+    if(!ch.dataLimite)return false;
+    const limite=new Date(ch.dataLimite);
+    if(ch.status==='concluido'&&ch.concluidoEm)return new Date(ch.concluidoEm)>limite;
+    return limite<hoje;
+  });
+  if(!perdidos.length){div.innerHTML='<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3);font-size:12px;">Nenhum chamado perdido.</td></tr>';return;}
+  perdidos.sort((a,b)=>new Date(a.dataLimite)-new Date(b.dataLimite));
+  div.innerHTML=perdidos.map(ch=>{
+    const atraso=ch.dataLimite?Math.ceil((hoje-new Date(ch.dataLimite))/864e5):null;
+    return `<tr>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#7c3aed;">#${ch.chamado}</span></td>
+      <td style="font-size:10px;color:var(--danger);font-weight:600;">${_fmtD(ch.dataLimite)}</td>
+      <td>${atraso!==null&&atraso>0?`<span class="badge badge-red">${atraso}d</span>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function bklMostrarTab(tab, btn){
+  ['ativos','sla','pp','perdidos'].forEach(t=>{
+    const div = document.getElementById('bkl-tab-'+t);
+    const b   = document.getElementById('bkl-tab-btn-'+t);
+    if(div) div.style.display = t===tab?'block':'none';
+    if(b)   b.classList.toggle('active', t===tab);
+  });
+  
+  if(tab==='sla')   _renderBklSla(_dbBkl.filter(ch=>bklStatusTec(ch)!=='concluido'&&bklStatusTec(ch)!=='perdido'));
+  if(tab==='pp')    _renderBklPP();
+  if(tab==='perdidos') _renderBklPerdidos();
+}
+
+const _fmtD = v=>{
+  if(!v) return '--';
+  try{ const d=new Date(v); return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR').slice(0,5); }catch(e){ return String(v).slice(0,10); }
+};
+
+function renderBklTec(){
+  const card  = document.getElementById('card-bkl');
+  const badge = document.getElementById('bkl-badge-tec');
+  const hoje  = new Date();
+
+  const ativos   = _dbBkl.filter(ch=> bklStatusTec(ch)!=='concluido');
+  const perdidos = _dbBkl.filter(ch=> bklStatusTec(ch)==='perdido');
+
+  // Auto-corrigir chamados presos em em_atendimento que deveriam estar concluídos
+  _dbBkl.forEach(ch=>{
+    if(bklStatusTec(ch)==='concluido' && (ch.status||'').toLowerCase()==='em_atendimento'){
+      setDoc(doc(db,'backlog',ch._docId||ch.id||ch.chamado),{status:'concluido',concluidoEm:new Date().toISOString()},{merge:true}).catch(()=>{});
+    }
+  });
+  const pp       = _dbBkl.filter(ch=> ch.pp===true || (ch.eventos||[]).some(e=>e.acao==='PP'));
+
+  if(!card) return;
+  card.style.display = ativos.length ? 'block' : 'none';
+  if(!ativos.length) return;
+
+  const pend  = ativos.filter(ch=>['pendente','atrasado','perdido'].includes(bklStatusTec(ch))).length;
+  const atras = ativos.filter(ch=>bklStatusTec(ch)==='perdido'||bklStatusTec(ch)==='atrasado').length;
+  
+  const pillTotal = document.getElementById('bkl-pill-total');
+  const pillPend  = document.getElementById('bkl-pill-pend');
+  const pillAtras = document.getElementById('bkl-pill-atras');
+  if(pillTotal) pillTotal.innerText = `Total: ${ativos.length}`;
+  if(pillPend)  { pillPend.innerText = `Pendentes: ${pend}`; pillPend.className = pend>0?'ponto-pill done':'ponto-pill pending'; }
+  if(pillAtras) { pillAtras.innerText = `Atrasados: ${atras}`; pillAtras.className = atras>0?'ponto-pill pending':'ponto-pill done'; pillAtras.style.color = atras>0?'var(--danger)':''; }
+  if(badge){ badge.innerText = pend; badge.style.display = pend>0?'inline':'none'; }
+  
+  const elTotal = document.getElementById('bkl-tec-total');
+  const elPend  = document.getElementById('bkl-tec-pend');
+  const elAtras = document.getElementById('bkl-tec-atras');
+  if(elTotal) elTotal.innerText = ativos.length;
+  if(elPend)  elPend.innerText  = pend;
+  if(elAtras) elAtras.innerText = atras;
+
+  
+  const ord = {em_atendimento:0,perdido:1,atrasado:2,pausado:3,pendente:4};
+  ativos.sort((a,b)=>{
+    const sa=ord[bklStatusTec(a)]??9, sb=ord[bklStatusTec(b)]??9;
+    if(sa!==sb) return sa-sb;
+    const pa=BKL_PEPS_CRITICOS_TEC.has((a.pepCodigo||'').trim())?0:1;
+    const pb=BKL_PEPS_CRITICOS_TEC.has((b.pepCodigo||'').trim())?0:1;
+    if(pa!==pb) return pa-pb;
+    return new Date(a.dataLimite||'9999')-new Date(b.dataLimite||'9999');
+  });
+
+  
+  const fmtDtShort = v=>{
+    if(!v) return '--';
+    try{ const d=new Date(v); return d.toLocaleDateString('pt-BR').slice(0,5)+' '+d.toLocaleTimeString('pt-BR').slice(0,5); }
+    catch(e){ return String(v).slice(0,10); }
+  };
+
+  const stBadge = {
+    pendente:       '<span class="badge badge-gray">Pendente</span>',
+    atrasado:       '<span class="badge badge-red">Atrasado</span>',
+    pausado:        '<span class="badge badge-amber">Pausado</span>',
+    em_atendimento: '<span class="badge badge-green">Em Atend.</span>',
+    concluido:      '<span class="badge badge-blue">Concluído</span>',
+    perdido:        '<span class="badge" style="background:rgba(124,58,237,.1);color:#7c3aed;border:none;">Perdido</span>'
+  };
+
+  
+  const tbody = document.getElementById('bkl-lista-tec');
+  if(tbody){
+    tbody.innerHTML = ativos.length ? ativos.map(ch=>{
+      const st     = bklStatusTec(ch);
+      const isPrio = BKL_PEPS_CRITICOS_TEC.has((ch.pepCodigo||'').trim());
+      const hasPP  = ch.pp===true||(ch.eventos||[]).some(e=>e.acao==='PP');
+      const dr     = ch.dataLimite ? Math.ceil((new Date(ch.dataLimite)-hoje)/864e5) : null;
+      const drTxt  = dr===null?'':dr<0?`<span style="color:var(--danger);font-weight:700;">${Math.abs(dr)}d atr.</span>`:dr===0?`<span style="color:var(--danger);font-weight:700;">Hoje</span>`:dr<=3?`<span style="color:var(--danger);">${dr}d</span>`:dr<=7?`<span style="color:var(--warning);">${dr}d</span>`:`<span style="color:var(--text3);">${dr}d</span>`;
+
+      const ord2 = {em_atendimento:0,perdido:1,atrasado:2,pausado:3,pendente:4};
+
+      let acoes = '';
+      if(st==='pendente'||st==='atrasado'||st==='perdido'){
+        acoes = `<button class="btn btn-success" style="padding:7px 10px;font-size:11px;width:auto;white-space:nowrap;" onclick="bklIniciarAtendimento('${ch._docId||ch.id}','${ch.chamado}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>Iniciar</button>`;
+      } else if(st==='pausado'){
+        acoes = `<button class="btn btn-warning" style="padding:7px 10px;font-size:11px;width:auto;white-space:nowrap;" onclick="bklIniciarAtendimento('${ch._docId||ch.id}','${ch.chamado}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>Retornar</button>`;
+      } else if(st==='em_atendimento'){
+        acoes = `<span style="font-size:10px;color:var(--success);font-weight:600;white-space:nowrap;">Em atendimento</span>`;
+      }
+
+      
+      const rowStyle = isPrio ? 'background:rgba(124,58,237,.04);' : st==='atrasado' ? 'background:rgba(220,38,38,.03);' : '';
+
+      
+      const stCor={pendente:'badge-gray',em_atendimento:'badge-green',pausado:'badge-amber',atrasado:'badge-red',perdido:'badge-red'};
+      const stLbl={pendente:'Pendente',em_atendimento:'Em Atend.',pausado:'Pausado',atrasado:'Atrasado',perdido:'Perdido'};
+      const situacao=`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <span class="badge ${stCor[st]}">${stLbl[st]}</span>
+        ${drTxt?`<span style="font-size:10px;">${drTxt}</span>`:''}
+      </div>`;
+
+      return `<tr style="${rowStyle}" onclick="bklAbrirInfo('${ch.id}')" title="Ver informações">
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);">#${ch.chamado}</div>
+          ${isPrio?`<div style="font-size:9px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:.4px;">Prioridade Max</div>`:''}
+          ${hasPP?'<span style="font-size:9px;background:rgba(217,119,6,.1);color:#d97706;padding:1px 5px;border-radius:3px;font-weight:700;">PP</span>':''}
+        </td>
+        <td style="text-align:center;">${situacao}</td>
+        <td style="text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
+          ${acoes}
+        </td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Nenhum chamado ativo.</td></tr>';
+  }
+
+  
+  const tbodySla = document.getElementById('bkl-lista-sla');
+  if(tbodySla){
+    const slaOrdem = [...ativos].sort((a,b)=>{
+      const da=new Date(a.dataLimite||'9999'), db2=new Date(b.dataLimite||'9999');
+      return da-db2;
+    });
+    tbodySla.innerHTML = slaOrdem.length ? slaOrdem.map(ch=>{
+      const dr = ch.dataLimite ? Math.ceil((new Date(ch.dataLimite)-hoje)/864e5) : null;
+      const cor = dr===null?'var(--text3)':dr<0||dr===0?'var(--danger)':dr<=3?'var(--danger)':dr<=7?'var(--warning)':'var(--text3)';
+      const sit = dr===null?'Sem prazo':dr<0?`${Math.abs(dr)}d atraso`:dr===0?'Vence hoje':dr<=2?`${dr}d — crítico`:dr<=3?`${dr}d — atenção`:`${dr}d`;
+      return `<tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);">#${ch.chamado}</span></td>
+        <td class="mono">${_fmtD(ch.dataLimite)}</td>
+        <td><span style="font-size:11px;font-weight:600;color:${cor};">${sit}</span></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Sem dados de SLA.</td></tr>';
+  }
+
+  
+  const tbodyPP = document.getElementById('bkl-lista-pp');
+  const ppItens = _dbBkl.filter(ch=>ch.pp===true||(ch.eventos||[]).some(e=>e.acao==='PP'));
+  if(tbodyPP){
+    tbodyPP.innerHTML = ppItens.length ? ppItens.map(ch=>{
+      const ppEvt=(ch.eventos||[]).filter(e=>e.acao==='PP').slice(-1)[0];
+      return `<tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);">#${ch.chamado}</span></td>
+        <td class="mono" style="font-size:10px;">${ppEvt?fmtDtShort(ppEvt.ts):'--'}</td>
+        <td>${stBadge[bklStatusTec(ch)]||''}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Nenhum chamado com PP.</td></tr>';
+  }
+
+  
+  const tbodyPerd = document.getElementById('bkl-lista-perdidos');
+  if(tbodyPerd){
+    tbodyPerd.innerHTML = perdidos.length ? perdidos.map(ch=>`<tr>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#7c3aed;">#${ch.chamado}</span></td>
+      <td class="mono" style="font-size:10px;">${_fmtD(ch.dataLimite)}</td>
+      <td style="font-size:11px;color:var(--text3);">${(ch.endereco||'--').slice(0,28)}</td>
+    </tr>`).join('') : '<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Nenhum chamado perdido.</td></tr>';
+  }
+}
+
+window.bklAbrirInfo=(id)=>{
+  const ch=_dbBkl.find(x=>x.id===id);
+  if(!ch)return;
+  const jaTemPP=ch.pp===true||(ch.eventos||[]).some(e=>e.acao==='PP');
+  const st=bklStatusTec(ch);
+  const infos=[
+    ['Chamado',ch.chamado],['PEP',ch.pepCodigo||'--'],['Segmento',ch.segmento||'--'],
+    ['Detentor',ch.detentor||'--'],['Endereço',ch.endereco||'--'],['Abertura',_fmtD(ch.abertura)],
+    ['Data Limite',_fmtD(ch.dataLimite)],['Serial',ch.serial||'--'],['Modelo',ch.modelo||'--'],
+    ['Status',st],['Última Posição',ch.ultimaPosicao||'--'],['SLA',ch.sla||'--']
+  ];
+  const div=document.getElementById('bkl-info-modal-content');
+  if(div) div.innerHTML=infos.map(([k,v])=>{
+    
+    if(k==='Endereço' && v && v!=='--'){
+      const enc=encodeURIComponent(v);
+      const mapsBtn=`<button onclick="abrirGPS(decodeURIComponent('${enc}'),event)" style="margin-left:8px;background:var(--accent);color:#fff;padding:3px 10px;border-radius:5px;font-size:10px;font-weight:700;border:none;cursor:pointer;flex-shrink:0;">Maps</button>`;
+      return `<div style="display:flex;padding:7px 0;border-bottom:1px solid var(--border);align-items:center;"><span style="font-size:12px;color:var(--text3);width:110px;flex-shrink:0;">${k}</span><span style="font-size:12px;font-weight:600;color:var(--text);flex:1;">${v}</span>${mapsBtn}</div>`;
+    }
+    return `<div style="display:flex;padding:7px 0;border-bottom:1px solid var(--border);"><span style="font-size:12px;color:var(--text3);width:110px;flex-shrink:0;">${k}</span><span style="font-size:12px;font-weight:600;color:var(--text);">${v}</span></div>`;
+  }).join('');
+  
+  const btnArea=document.getElementById('bkl-info-modal-btns');
+  if(btnArea && st!=='concluido'){
+    btnArea.innerHTML=`
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn ${jaTemPP?'btn-warning':'btn-neutral'}" onclick="bklMarcarPP('${ch.id}');document.getElementById('modal-bkl-info').style.display='none'">
+          ${jaTemPP?'✓ PP Registrado':'Marcar PP'}
+        </button>
+        <button class="btn btn-success" onclick="abrirPPCR('${ch.id}','${ch.chamado}');document.getElementById('modal-bkl-info').style.display='none'">
+          Solicitar Peça (PPCR)
+        </button>
+      </div>`;
+  } else if(btnArea){ btnArea.innerHTML=''; }
+
+  
+  const ppcrArea=document.getElementById('bkl-info-ppcr-status');
+  if(ppcrArea){
+    getDocs(query(collection(db,'ppcr'),
+      where('chamado','==',String(ch.chamado)),
+      where('tecMatricula','==',tech.matricula.toString())
+    )).then(snap=>{
+      const ppcrs=[];snap.forEach(d=>ppcrs.push({id:d.id,...d.data()}));
+      if(!ppcrs.length){ppcrArea.innerHTML='';return;}
+      const stCores={aberta:'#d97706',em_andamento:'#0369A1',atendida:'#059669',recusada:'#dc2626'};
+      const stLabels={aberta:'Aberta',em_andamento:'Em andamento',atendida:'Atendida',recusada:'Recusada'};
+      ppcrArea.innerHTML='<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">'+
+        '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Solicitações de Peça</div>'+
+        ppcrs.map(p=>{
+          const cor=stCores[p.status]||'#64748b';
+          const label=stLabels[p.status]||p.status;
+          const msgs=p.mensagens||[];
+          const chatHtml=msgs.map(m=>{
+            const isTec=m.de==='tecnico';
+            const bg=isTec?'var(--accent)':'var(--surface)';
+            const cor2=isTec?'#fff':'var(--text)';
+            const align=isTec?'flex-end':'flex-start';
+            return `<div style="display:flex;justify-content:${align};margin-bottom:4px;">
+              <div style="max-width:85%;background:${bg};color:${cor2};padding:6px 10px;border-radius:8px;font-size:11px;">
+                <div style="font-weight:700;font-size:9px;opacity:.7;margin-bottom:2px;">${isTec?'Você':'Admin'}</div>
+                ${m.texto}
+              </div>
+            </div>`;
+          }).join('');
+          const podeResponder=p.status==='aberta'||p.status==='em_andamento';
+          return `<div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid ${cor};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:700;">${p.peca||'—'}</span>
+              <span style="font-size:10px;font-weight:700;color:${cor};background:${cor}20;padding:2px 8px;border-radius:10px;">${label}</span>
+            </div>
+            ${msgs.length?`<div style="background:var(--surface);border-radius:6px;padding:8px;max-height:160px;overflow-y:auto;margin-bottom:6px;">${chatHtml}</div>`:''}
+            ${podeResponder?`<div style="display:flex;gap:6px;">
+              <input type="text" id="ppcr-reply-${p.id}" placeholder="Responder ao admin…" style="flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:12px;font-family:inherit;" onkeydown="if(event.key==='Enter')enviarRespostaPPCR('${p.id}')">
+              <button onclick="enviarRespostaPPCR('${p.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">Enviar</button>
+            </div>`:''}
+          </div>`;
+        }).join('')+
+        '</div>';
+    }).catch(()=>{ppcrArea.innerHTML='';});
+  }
+  const modal=document.getElementById('modal-bkl-info');
+  if(modal)modal.style.display='flex';
+};
+
+window.bklMarcarPP=async(id)=>{
+  const ch=_dbBkl.find(x=>x.id===id);
+  if(!ch)return;
+  const jaTemPP=ch.pp===true||(ch.eventos||[]).some(e=>e.acao==='PP');
+  if(jaTemPP){
+    alert('Solicitação de peça já registrada. Para remover, entre em contato com o gestor.');
+    return;
+  }
+  if(!confirm('Confirmar solicitação de peça (PP) para o chamado #'+ch.chamado+'?\n\nApós confirmar não será possível desfazer pelo app.'))return;
+  const ts=new Date().toISOString();
+  const eventos=[...(ch.eventos||[]),{ts,acao:'PP',obs:'Solicitação de peça registrada'}];
+  await setDoc(doc(db,'backlog',id),{pp:true,ppEm:ts,eventos},{merge:true});
+};
+
+window.bklIniciarAtendimento=async(bklId,chamado)=>{
+  if(chamadoAtivoNum){
+    document.getElementById('status').innerHTML='<div class="status-msg status-err">Finalize o chamado atual primeiro.</div>';
+    return;
+  }
+  const stEl=document.getElementById('status');
+  stEl.innerHTML='<div class="status-msg status-loading">Obtendo localização...</div>';
+  obterPosicaoOpcional(async pos=>{
+    const ch=_dbBkl.find(x=>x.id===bklId)||{};
+    const isRetorno=ch.status==='pausado'||(ch.eventos||[]).some(e=>e.acao==='CHECK-OUT');
+    const ts=new Date().toISOString();
+    const evt={ts,acao:isRetorno?'Retorno ao chamado':'Início do atendimento',lat:pos.coords.latitude,lng:pos.coords.longitude};
+    const eventos=[...(ch.eventos||[]),evt];
+    await setDoc(doc(db,'backlog',bklId),{status:'em_atendimento',iniciadoEm:ts,eventos},{merge:true});
+    const tipo=isRetorno?'CHECK-IN-RETORNO':'CHECK-IN';
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,lat:pos.coords.latitude,lng:pos.coords.longitude,horario:serverTimestamp(),tipo,chamado,origem:'backlog',bklId,retorno:isRetorno};
+    await addDoc(collection(db,'atendimentos_chamados'),d);
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{...d,ultimaAtualizacao:serverTimestamp(),status:chamado},{merge:true});
+    chamadoAtivoNum=chamado; chamadoAtivoTs=new Date(); chamadoIsRetorno=isRetorno;
+    chamadoBklId=bklId; 
+    iniciarTimer(); renderCardAtivo();
+    stEl.innerHTML=`<div class="status-msg status-ok">${isRetorno?'Retorno registrado!':'Atendimento iniciado!'}</div>`;
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Registrando…');
+};
+
+window.bklPausarAtendimento=async(bklId)=>{
+  const stEl=document.getElementById('status');
+  stEl.innerHTML='<div class="status-msg status-loading">Pausando...</div>';
+  obterPosicaoOpcional(async pos=>{
+    const ch=_dbBkl.find(x=>x.id===bklId)||{};
+    const ts=new Date().toISOString();
+    const evt={ts,acao:'Pausado — aguardando peça/retorno',lat:pos.coords.latitude,lng:pos.coords.longitude};
+    const eventos=[...(ch.eventos||[]),evt];
+    await setDoc(doc(db,'backlog',bklId),{status:'pausado',pausadoEm:ts,eventos},{merge:true});
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,lat:pos.coords.latitude,lng:pos.coords.longitude,horario:serverTimestamp(),tipo:'CHECK-OUT',chamado:chamadoAtivoNum,origem:'backlog',bklId,pausado:true};
+    await addDoc(collection(db,'atendimentos_chamados'),d);
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{ultimaAtualizacao:serverTimestamp(),status:'disponivel'},{merge:true});
+    chamadoAtivoNum=null; chamadoAtivoTs=null; chamadoIsRetorno=false;
+    clearInterval(window._timerInterval); renderCardAtivo();
+    stEl.innerHTML='<div class="status-msg" style="color:#d97706;">Chamado pausado.</div>';
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Registrando…');
+};
+
+window.bklFinalizarAtendimento=async(bklId)=>{
+  if(!confirm('Confirmar finalização?')) return;
+  const stEl=document.getElementById('status');
+  stEl.innerHTML='<div class="status-msg status-loading">Finalizando...</div>';
+  obterPosicaoOpcional(async pos=>{
+    const ch=_dbBkl.find(x=>x._docId===bklId||x.id===bklId)||{};
+    const ts=new Date().toISOString();
+    const evt={ts,acao:'Chamado finalizado',lat:pos.coords.latitude,lng:pos.coords.longitude};
+    const eventos=[...(ch.eventos||[]),evt];
+    // 1. Atualizar backlog como concluído
+    await setDoc(doc(db,'backlog',bklId),{status:'concluido',concluidoEm:ts,eventos},{merge:true});
+    // 2. Gravar check-out em atendimentos_chamados
+    const chamadoNum=chamadoAtivoNum||ch.chamado;
+    const d={matricula:tech.matricula.toString(),nome:tech.nome,atp:tech.atp,lat:pos.coords.latitude,lng:pos.coords.longitude,horario:serverTimestamp(),tipo:'CHECK-OUT',chamado:chamadoNum,origem:'backlog',bklId};
+    await addDoc(collection(db,'atendimentos_chamados'),d);
+    // 3. Salvar registro completo no historico_atendimentos para o admin consultar sempre
+    await setDoc(doc(db,'historico_atendimentos',bklId),{
+      chamado:ch.chamado, pepCodigo:ch.pepCodigo||'', segmento:ch.segmento||'',
+      atp:ch.atp||tech.atp, atpNome:ch.atpNome||'',
+      tecMatricula:tech.matricula.toString(), tecNome:tech.nome,
+      status:'concluido', concluidoEm:ts,
+      abertura:ch.abertura||'', dataLimite:ch.dataLimite||'',
+      endereco:ch.endereco||'',
+      eventos, bklId,
+      importadoEm:ch.importadoEm||null, importadoPor:ch.importadoPor||null,
+      registradoEm:serverTimestamp()
+    });
+    await setDoc(doc(db,'tracking',tech.matricula.toString()),{ultimaAtualizacao:serverTimestamp(),status:'disponivel'},{merge:true});
+    chamadoAtivoNum=null; chamadoAtivoTs=null; chamadoIsRetorno=false;
+    clearInterval(window._timerInterval); renderCardAtivo();
+    stEl.innerHTML='<div class="status-msg status-ok">Chamado finalizado!</div>';
+    setTimeout(()=>stEl.innerHTML='',3000);
+  }, stEl, 'Registrando…');
+};
+
+let _ppcrBklId = null;
+let _ppcrChamado = null;
+
+window.abrirPPCR=(bklId, chamado)=>{
+  _ppcrBklId=bklId;
+  _ppcrChamado=chamado;
+  document.getElementById('ppcr-chamado-label').innerText='Chamado: #'+chamado;
+  document.getElementById('ppcr-peca').value='';
+  document.getElementById('ppcr-codigo').value='';
+  document.getElementById('ppcr-desc').value='';
+  document.getElementById('ppcr-urgencia').value='normal';
+  document.getElementById('ppcr-status').innerHTML='';
+  document.getElementById('modal-ppcr').classList.add('open');
+};
+window.fecharPPCR=()=>{
+  document.getElementById('modal-ppcr').classList.remove('open');
+  _ppcrBklId=null; _ppcrChamado=null;
+};
+window.enviarPPCR=async()=>{
+  const peca=document.getElementById('ppcr-peca').value.trim();
+  const codigo=document.getElementById('ppcr-codigo').value.trim();
+  const desc=document.getElementById('ppcr-desc').value.trim();
+  const urgencia=document.getElementById('ppcr-urgencia').value;
+  const res=document.getElementById('ppcr-status');
+  if(!peca){res.innerHTML='<div class="status-msg status-err">Informe a peça solicitada.</div>';return;}
+  if(!desc){res.innerHTML='<div class="status-msg status-err">Descreva a justificativa.</div>';return;}
+  res.innerHTML='<div class="status-msg status-loading">Enviando…</div>';
+  const id='ppcr_'+Date.now();
+  const ts=new Date().toISOString();
+  await setDoc(doc(db,'ppcr',id),{
+    id, bklId:_ppcrBklId, chamado:_ppcrChamado,
+    tecMatricula:tech.matricula.toString(), tecNome:tech.nome, atp:tech.atp,
+    peca, codigo:codigo||null, descricao:desc, urgencia,
+    status:'aberta', criadoEm:ts, criadoEmTs:serverTimestamp()
+  });
+  
+  if(_ppcrBklId){
+    const snapBkl=await getDoc(doc(db,'backlog',_ppcrBklId));
+    const chData=snapBkl.data()||{};
+    const evt={ts,acao:'PPCR enviado — '+peca+(urgencia!=='normal'?' ['+urgencia+']':'')};
+    const eventos=[...(chData.eventos||[]),evt];
+    await setDoc(doc(db,'backlog',_ppcrBklId),{pp:true,ppEm:ts,eventos},{merge:true});
+  }
+  res.innerHTML='<div class="status-msg status-ok">Solicitação enviada!</div>';
+  setTimeout(()=>fecharPPCR(),1500);
+};
+
+function _iniciarListenerPPCR(){
+  onSnapshot(query(collection(db,'ppcr'),where('tecMatricula','==',tech.matricula.toString())),snap=>{
+    snap.docChanges().forEach(change=>{
+      if(change.type==='added') return; 
+      const p=change.doc.data();
+      const novoStatus=p.status;
+      const msgs=p.mensagens||[];
+      
+      const ultimaMsg=msgs[msgs.length-1];
+      if(ultimaMsg&&ultimaMsg.de==='admin'){
+        const ts=ultimaMsg.ts?new Date(ultimaMsg.ts.seconds?ultimaMsg.ts.seconds*1000:ultimaMsg.ts):new Date();
+        const diff=(Date.now()-ts.getTime())/1000;
+        if(diff<30){
+          _mostrarToastPPCR('Nova mensagem PPCR #'+p.chamado,ultimaMsg.texto,'#0369A1');
+          
+          const modalBkl=document.getElementById('modal-bkl-info');
+          if(modalBkl&&modalBkl.style.display==='flex'){
+            const chamadoAtual=_dbBkl.find(ch=>String(ch.chamado)===String(p.chamado));
+            if(chamadoAtual)bklAbrirInfo(chamadoAtual);
+          }
+        }
+      }
+      
+      if(novoStatus&&novoStatus!=='aberta'){
+        const cor=novoStatus==='atendida'?'#059669':novoStatus==='recusada'?'#dc2626':'#d97706';
+        const icone=novoStatus==='atendida'?'✅':novoStatus==='recusada'?'❌':'🔄';
+        const label=novoStatus==='atendida'?'PPCR Atendido':novoStatus==='recusada'?'PPCR Recusado':'PPCR Em Andamento';
+        _mostrarToastPPCR(icone+' '+label+' — '+p.peca, p.observacaoAdmin||'', cor);
+        
+        setDoc(doc(db,'avisos_tecnicos','ppcr_'+change.doc.id),{
+          tipo:'ppcr_retorno',chamado:p.chamado,peca:p.peca,status:novoStatus,
+          observacao:p.observacaoAdmin||'',destinatarios:[tech.matricula.toString()],
+          criadoEm:serverTimestamp(),lidosPor:[]
+        },{merge:true});
+      }
+    });
+  });
+}
+
+window.enviarRespostaPPCR=async(ppcrId)=>{
+  const input=document.getElementById('ppcr-reply-'+ppcrId);
+  const texto=input?.value.trim();
+  if(!texto)return;
+  
+  const snapDoc=await getDoc(doc(db,'ppcr',ppcrId));
+  if(!snapDoc.exists())return;
+  const p=snapDoc.data();
+  const msg={de:'tecnico',remetente:tech.nome,texto,ts:new Date().toISOString()};
+  const msgs=[...(p.mensagens||[]),msg];
+  await setDoc(doc(db,'ppcr',ppcrId),{mensagens:msgs,ultimaMensagem:serverTimestamp()},{merge:true});
+  if(input)input.value='';
+  
+  const chamadoAtual=_dbBkl.find(ch=>String(ch.chamado)===String(p.chamado));
+  if(chamadoAtual)bklAbrirInfo(chamadoAtual);
+};
+
+window.buscarChamadoTec=async(num)=>{
+  num=(num||'').trim();
+  if(!num)return;
+  const modal=document.getElementById('modal-busca-chamado');
+  const corpo=document.getElementById('modal-busca-corpo');
+  const titulo=document.getElementById('modal-busca-titulo');
+  titulo.innerText='Chamado #'+num;
+  corpo.innerHTML='<div style="text-align:center;color:var(--text3);padding:20px;">Buscando…</div>';
+  modal.style.display='flex';
+  document.getElementById('hdr-busca-chamado').value='';
+
+  try{
+    // Buscar no backlog — tentar string e número
+    let bkl=null;
+    const snap1=await getDocs(query(collection(db,'backlog'),where('chamado','==',num)));
+    if(!snap1.empty) bkl={id:snap1.docs[0].id,...snap1.docs[0].data()};
+    if(!bkl){
+      const snap2=await getDocs(query(collection(db,'backlog'),where('chamado','==',parseInt(num))));
+      if(!snap2.empty) bkl={id:snap2.docs[0].id,...snap2.docs[0].data()};
+    }
+
+    // Buscar atendimentos
+    const snapAt=await getDocs(query(collection(db,'atendimentos_chamados'),where('chamado','==',num)));
+    const atends=[];snapAt.forEach(d=>atends.push(d.data()));
+    atends.sort((a,b)=>(a.horario?.seconds||0)-(b.horario?.seconds||0));
+
+    // Buscar PPCR
+    const snapPpcr=await getDocs(query(collection(db,'ppcr'),where('chamado','==',num)));
+    const ppcrs=[];snapPpcr.forEach(d=>ppcrs.push({id:d.id,...d.data()}));
+
+    if(!bkl&&!atends.length&&!ppcrs.length){
+      corpo.innerHTML='<div style="text-align:center;color:var(--text3);padding:30px;font-size:13px;">Chamado #'+num+' não encontrado.</div>';
+      return;
+    }
+
+    const fmtDt=v=>{if(!v)return'—';try{const d=new Date(v.seconds?v.seconds*1000:v);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR').slice(0,5);}catch(e){return String(v).slice(0,16);}};
+    const stCores={pendente:'#64748b',em_atendimento:'#059669',concluido:'#0369A1',atrasado:'#dc2626',perdido:'#dc2626'};
+    const stLabels={pendente:'Pendente',em_atendimento:'Em atendimento',concluido:'Encerrado',atrasado:'Atrasado',perdido:'Perdido'};
+
+    let html='';
+
+    if(bkl){
+      const st=bkl.status||'pendente';
+      const cor=stCores[st]||'#64748b';
+      html+=`<div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:800;color:var(--accent);">#${bkl.chamado}</span>
+          <span style="font-size:11px;font-weight:700;color:${cor};background:${cor}18;padding:3px 10px;border-radius:20px;">${stLabels[st]||st}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;">
+          <div><span style="color:var(--text3);">PEP:</span> ${bkl.pepCodigo||'—'}</div>
+          <div><span style="color:var(--text3);">ATP:</span> ${bkl.atpNome||bkl.atp||'—'}</div>
+          <div><span style="color:var(--text3);">Data Limite:</span> <span style="color:var(--danger);">${bkl.dataLimite?.slice(0,10)||'—'}</span></div>
+          <div><span style="color:var(--text3);">Importado:</span> ${fmtDt(bkl.importadoEm)}</div>
+          <div style="grid-column:span 2;"><span style="color:var(--text3);">Endereço:</span> ${bkl.endereco||'—'}</div>
+          ${bkl.tecNome?`<div style="grid-column:span 2;background:rgba(3,105,161,.08);border-radius:6px;padding:6px 8px;margin-top:2px;">
+            <span style="color:var(--text3);">Técnico:</span> <strong>${bkl.tecNome}</strong>
+            ${bkl.atribuidoEm?`<span style="font-size:10px;color:var(--text3);"> · atribuído em ${fmtDt(bkl.atribuidoEm)}</span>`:''}
+          </div>`:'<div style="grid-column:span 2;color:#d97706;font-size:11px;font-weight:600;">Não atribuído</div>'}
+          ${bkl.concluidoEm?`<div style="grid-column:span 2;font-size:11px;color:var(--success);">Encerrado em: ${fmtDt(bkl.concluidoEm)}${bkl.encerradoPor?' (admin: '+bkl.encerradoPor+')':''}</div>`:''}
+          ${bkl.observacaoFinal?`<div style="grid-column:span 2;font-size:11px;color:var(--text2);font-style:italic;">"${bkl.observacaoFinal}"</div>`:''}
+        </div>
+      </div>`;
+    }
+
+    if(atends.length){
+      html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Atendimentos</div>`;
+      atends.forEach(a=>{
+        const cor=a.tipo==='CHECK-IN'?'#059669':a.tipo==='CHECK-OUT'?'#0369A1':'#d97706';
+        html+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid ${cor};margin-bottom:4px;">
+          <span style="font-size:11px;font-weight:700;color:${cor};min-width:90px;">${a.tipo}</span>
+          <span style="font-size:11px;color:var(--text3);">${fmtDt(a.horario)}</span>
+        </div>`;
+      });
+    }
+
+    if(ppcrs.length){
+      html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:10px 0 6px;">Solicitações PPCR</div>`;
+      ppcrs.forEach(p=>{
+        const cor=p.status==='atendida'?'#059669':p.status==='recusada'?'#dc2626':'#d97706';
+        html+=`<div style="padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid ${cor};margin-bottom:4px;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:12px;font-weight:700;">${p.peca||'—'}</span>
+            <span style="font-size:10px;font-weight:700;color:${cor};">${p.status||'pendente'}</span>
+          </div>
+          ${p.observacaoAdmin?`<div style="font-size:11px;color:var(--text2);margin-top:2px;">${p.observacaoAdmin}</div>`:''}
+        </div>`;
+      });
+    }
+
+    corpo.innerHTML=html||'<div style="text-align:center;color:var(--text3);padding:20px;">Sem dados encontrados.</div>';
+  }catch(e){
+    corpo.innerHTML='<div style="color:var(--danger);padding:16px;font-size:12px;">Erro: '+e.message+'</div>';
+  }
+};
+function _mostrarToastPPCR(titulo, texto, cor){
+  const toast=document.createElement('div');
+  toast.style.cssText='position:fixed;top:72px;right:16px;z-index:9999;background:'+cor+';color:#fff;padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.2);max-width:300px;';
+  toast.innerHTML='<div style="font-weight:700;margin-bottom:2px;">'+titulo+'</div>'+(texto?'<div style="font-size:11px;font-weight:400;opacity:.9;">'+texto+'</div>':'');
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),5000);
+  const badge=document.getElementById('badge-avisos');
+  if(badge){badge.style.display='flex';badge.innerText=(parseInt(badge.innerText)||0)+1;}
+}
+
+window.abrirGPS=(endereco,evt)=>{
+  if(evt)evt.stopPropagation();
+  const enc=encodeURIComponent(endereco);
+  const modal=document.getElementById('modal-gps-selector');
+  const txt=document.getElementById('gps-endereco-txt');
+  if(txt)txt.innerText=endereco.slice(0,60)+(endereco.length>60?'…':'');
+  document.getElementById('gps-btn-googlemaps').onclick=()=>{window.open('https://www.google.com/maps/search/?api=1&query='+enc,'_blank');fecharGPS();};
+  document.getElementById('gps-btn-waze').onclick=()=>{window.open('https://waze.com/ul?q='+enc,'_blank');fecharGPS();};
+  document.getElementById('gps-btn-apple').onclick=()=>{window.open('maps://maps.apple.com/?q='+enc,'_blank');fecharGPS();};
+  if(modal)modal.style.display='flex';
+};
+window.fecharGPS=()=>{const m=document.getElementById('modal-gps-selector');if(m)m.style.display='none';};
+
+tentarAutoLogin();
+
+// ── DEVOLUÇÃO DE VEÍCULO ─────────────────────
+let _devMotivoSel = '';
+
+window.abrirModalDevolucao = () => {
+  const placa = tech?.veiculo || '';
+  document.getElementById('dev-subtitulo').innerText =
+    placa ? placa + (tech?.veiculoModelo ? ' · ' + tech.veiculoModelo : '') : '';
+  document.getElementById('dev-obs').value = '';
+  document.getElementById('dev-hodometro').value = '';
+  document.getElementById('dev-hod-hint').innerText = '';
+  document.getElementById('dev-result').innerHTML = '';
+  _devMotivoSel = '';
+  // Resetar botões de motivo
+  document.querySelectorAll('.dev-motivo-btn').forEach(b => {
+    b.style.borderColor='var(--border)';b.style.background='var(--surface2)';b.style.color='var(--text)';
+  });
+  // Resetar fotos
+  ['frente','traseira','esq','dir','painel'].forEach(lado => {
+    const input = document.getElementById('dev-foto-'+lado);
+    const prev  = document.getElementById('dev-prev-'+lado === 'painel' ? 'dev-prev-painel' : 'dev-prev-'+lado);
+    if(input) input.value = '';
+  });
+  ['dev-prev-frente','dev-prev-traseira','dev-prev-esq','dev-prev-dir','dev-prev-painel'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const lados=['frente','traseira','esq','dir','painel'];
+    const labels=['📷 Tirar foto','📷 Tirar foto','📷 Tirar foto','📷 Tirar foto','📷 Fotografar painel e hodômetro'];
+    el.innerHTML = `<span style="font-size:11px;color:${i===4?'var(--accent)':'var(--text3)'};">${labels[i]}</span>`;
+    el.style.border = `1.5px dashed ${i===4?'var(--accent)':'var(--border)'}`;
+  });
+
+  // Carregar hodômetro atual do veículo
+  if(placa){
+    getDoc(doc(db,'veiculos',placa)).then(snap => {
+      if(snap.exists()){
+        const hod = snap.data().hodometroAtual || 0;
+        if(hod > 0)
+          document.getElementById('dev-hod-hint').innerText =
+            'Último registrado: ' + Number(hod).toLocaleString('pt-BR') + ' km';
+      }
+    }).catch(()=>{});
+  }
+  document.getElementById('modal-devolucao').classList.add('open');
+};
+
+window.fecharModalDevolucao = () =>
+  document.getElementById('modal-devolucao').classList.remove('open');
+
+window.dev_setMotivo = (btn) => {
+  _devMotivoSel = btn.dataset.motivo;
+  document.querySelectorAll('.dev-motivo-btn').forEach(b => {
+    const sel = b === btn;
+    b.style.borderColor = sel ? '#6366f1' : 'var(--border)';
+    b.style.background  = sel ? 'rgba(99,102,241,.1)' : 'var(--surface2)';
+    b.style.color       = sel ? '#6366f1' : 'var(--text)';
+  });
+};
+
+window.dev_preview = (input, prevId, wrapId) => {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const el = document.getElementById(prevId);
+    if(!el) return;
+    el.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    el.appendChild(img);
+    el.style.border = '1.5px solid #6366f1';
+  };
+  reader.readAsDataURL(file);
+};
+
+async function _comprimirFotoDev(file) {
+  if(!file) return null;
+  return new Promise(ok => {
+    const canvas = document.createElement('canvas');
+    const img = new Image();
+    img.onload = () => {
+      const maxW=1200, maxH=900;
+      let w=img.width, h=img.height;
+      if(w>maxW){h=h*(maxW/w);w=maxW;}
+      if(h>maxH){w=w*(maxH/h);h=maxH;}
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      ok(canvas.toDataURL('image/jpeg',0.75));
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+window.salvarDevolucao = async () => {
+  const res = document.getElementById('dev-result');
+  const placa = tech?.veiculo || '';
+  const hod = parseFloat(document.getElementById('dev-hodometro').value) || 0;
+  const obs = document.getElementById('dev-obs').value.trim();
+
+  // Validações
+  const fotos = ['frente','traseira','esq','dir','painel'];
+  const labels = {frente:'Frente',traseira:'Traseira',esq:'Lateral Esq.',dir:'Lateral Dir.',painel:'Painel'};
+  for(const lado of fotos){
+    if(!document.getElementById('dev-foto-'+lado).files[0]){
+      res.innerHTML = `<div class="status-msg status-err">Foto ${labels[lado]} obrigatória.</div>`;
+      return;
+    }
+  }
+  if(!hod){
+    document.getElementById('dev-hodometro').focus();
+    document.getElementById('dev-hodometro').style.borderColor = '#DC2626';
+    res.innerHTML = '<div class="status-msg status-err">Informe o hodômetro atual.</div>';
+    return;
+  }
+  document.getElementById('dev-hodometro').style.borderColor = '';
+
+  res.innerHTML = '<div class="status-msg" style="color:var(--accent);">Comprimindo fotos…</div>';
+
+  try{
+    
+    const [fotoFrente, fotoTraseira, fotoEsq, fotoDir, fotoPainel] = await Promise.all(
+      fotos.map(lado => _comprimirFotoDev(document.getElementById('dev-foto-'+lado).files[0]))
+    );
+
+    res.innerHTML = '<div class="status-msg" style="color:var(--accent);">Salvando…</div>';
+
+    const agora = new Date();
+    const dataStr = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR').slice(0,8);
+
+    // GPS opcional
+    let gpsLat=null, gpsLng=null;
+    try{
+      const pos = await new Promise((ok,err) =>
+        navigator.geolocation.getCurrentPosition(ok,err,{timeout:4000}));
+      gpsLat=pos.coords.latitude; gpsLng=pos.coords.longitude;
+    }catch(e){}
+
+    const registro = {
+      placa, modelo:tech.veiculoModelo||'',
+      matricula:String(tech.matricula), tecNome:tech.nome,
+      data:dataStr, hodometro:hod,
+      motivo:_devMotivoSel||'nao_informado',
+      observacoes:obs||null,
+      fotoFrente, fotoTraseira, fotoEsq, fotoDir, fotoPainel,
+      gpsLat, gpsLng,
+      registradoEm:serverTimestamp()
+    };
+
+    
+    const docId = placa + '_' + dataStr.replace(/[/: ]/g,'') + '_' + String(tech.matricula);
+    await setDoc(doc(db,'devolucoes_veiculos',docId), registro);
+
+    // Atualizar hodômetro no veículo
+    await setDoc(doc(db,'veiculos',placa),{
+      hodometroAtual:hod,
+      hodometroAtualizado:dataStr
+    },{merge:true});
+
+    res.innerHTML = '<div class="status-msg status-ok">Devolução registrada com sucesso!</div>';
+    setTimeout(()=>fecharModalDevolucao(), 1500);
+  }catch(e){
+    res.innerHTML = `<div class="status-msg status-err">Erro: ${e.message}</div>`;
+  }
+};
+// ─────────────────────────────────────────────
+
+// ─────────────────────────────────────────────
+let _ultimoAbastecimento = JSON.parse(localStorage.getItem('enerfine_ult_abast')||'null');
+
+window.abrirModalAbastecimento = () => {
+  const placa = tech?.veiculo || '';
+  const uf    = tech?.estado  || '';
+  document.getElementById('abast-placa').value = placa;
+  document.getElementById('abast-uf').value    = uf;
+  if(_ultimoAbastecimento){
+    document.getElementById('abast-produto').value = _ultimoAbastecimento.produto || 'ETANOL COMUM';
+    document.getElementById('abast-estab').value   = _ultimoAbastecimento.estabelecimento || '';
+    document.getElementById('abast-cidade').value  = _ultimoAbastecimento.cidade || '';
+    if(_ultimoAbastecimento.uf && !uf) document.getElementById('abast-uf').value = _ultimoAbastecimento.uf;
+    if(_ultimoAbastecimento.hodometro)
+      document.getElementById('abast-hod-hint').innerText =
+        'Último registrado: '+Number(_ultimoAbastecimento.hodometro).toLocaleString('pt-BR')+' km  (somente valores maiores são aceitos)';
+  } else {
+    document.getElementById('abast-produto').value = 'ETANOL COMUM';
+    ['abast-estab','abast-cidade'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('abast-hod-hint').innerText='';
+  }
+  ['abast-qtd','abast-vunit','abast-vtotal','abast-hodometro'].forEach(id=>document.getElementById(id).value='');
+  const _hd=document.getElementById('abast-distancia');if(_hd)_hd.value='0';
+  document.getElementById('abast-kml').innerText='';
+  const _di=document.getElementById('abast-dist-info');if(_di)_di.style.display='none';
+  document.getElementById('abast-result').innerHTML='';
+  document.getElementById('abast-subtitulo').innerText =
+    placa ? placa+(tech?.veiculoModelo?' · '+tech.veiculoModelo:'') : 'Registro manual';
+
+  
+  document.getElementById('modal-abastecimento').classList.add('open');
+
+  
+  if(placa){
+    getDoc(doc(db,'veiculos',placa)).then(vSnap=>{
+      if(!vSnap.exists()) return;
+      const hodAtual=vSnap.data().hodometroAtual||0;
+      if(hodAtual>0){
+        _ultimoAbastecimento={..._ultimoAbastecimento, hodometro:hodAtual};
+        document.getElementById('abast-hod-hint').innerText=
+          'Último registrado: '+Number(hodAtual).toLocaleString('pt-BR')+' km  (somente valores maiores são aceitos)';
+      } else {
+        document.getElementById('abast-hod-hint').innerText='Primeiro registro para este veículo.';
+      }
+    }).catch(()=>{});
+  }
+
+  // Background: capturar GPS e cidade/UF (silencioso, sem bloquear)
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      _posGPS={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      try{
+        const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&accept-language=pt-BR');
+        const geo=await r.json();
+        const cidadeGeo=geo.address?.city||geo.address?.town||geo.address?.municipality||'';
+        const ufGeo=geo.address?.['ISO3166-2-lvl4']?.split('-')[1]||'';
+        const cidadeEl=document.getElementById('abast-cidade');
+        const ufEl=document.getElementById('abast-uf');
+        if(cidadeGeo&&cidadeEl) cidadeEl.value=cidadeGeo;
+        if(ufGeo&&ufEl) ufEl.value=ufGeo.toUpperCase();
+      }catch(e){}
+    },()=>{},{timeout:8000,maximumAge:120000});
+  }
+};
+
+window.fecharAbastecimento=()=>{
+  document.getElementById('modal-abastecimento').classList.remove('open');
+  abast_removerFoto();
+};
+
+window.abast_previewFoto=(evt)=>{
+  const file=evt.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    document.getElementById('abast-foto-img').src=e.target.result;
+    document.getElementById('abast-foto-preview').style.display='block';
+  };
+  reader.readAsDataURL(file);
+};
+
+window.abast_removerFoto=()=>{
+  document.getElementById('abast-foto-hod').value='';
+  document.getElementById('abast-foto-img').src='';
+  document.getElementById('abast-foto-preview').style.display='none';
+};
+
+window.abast_calcTotal=()=>{
+  const qtd=parseFloat(document.getElementById('abast-qtd').value)||0;
+  const vunit=parseFloat(document.getElementById('abast-vunit').value)||0;
+  if(qtd>0&&vunit>0) document.getElementById('abast-vtotal').value=(qtd*vunit).toFixed(2);
+  abast_calcKmL();
+};
+
+window.abast_calcDistancia=()=>{
+  const hodAtual=parseFloat(document.getElementById('abast-hodometro').value)||0;
+  const hodAnt=_ultimoAbastecimento?.hodometro||0;
+  const hintEl=document.getElementById('abast-hod-hint');
+  const distInfo=document.getElementById('abast-dist-info');
+  const distLabel=document.getElementById('abast-dist-label');
+  const hidDistEl=document.getElementById('abast-distancia');
+
+  if(hodAtual>0&&hodAnt>0){
+    if(hodAtual>hodAnt){
+      const dist=hodAtual-hodAnt;
+      if(hidDistEl) hidDistEl.value=dist;
+      hintEl.style.color='var(--text3)';
+      hintEl.innerText='Anterior: '+Number(hodAnt).toLocaleString('pt-BR')+' km';
+      distInfo.style.display='block';
+      distLabel.innerText=dist.toLocaleString('pt-BR')+' km percorridos desde o último abastecimento';
+    } else if(hodAtual<hodAnt){
+      if(hidDistEl) hidDistEl.value=0;
+      hintEl.style.color='#DC2626';
+      hintEl.innerText='Valor menor que o último ('+Number(hodAnt).toLocaleString('pt-BR')+' km) — verifique.';
+      distInfo.style.display='none';
+    } else {
+      if(hidDistEl) hidDistEl.value=0;
+      hintEl.style.color='var(--text3)';
+      hintEl.innerText='Igual ao último abastecimento.';
+      distInfo.style.display='none';
+    }
+  } else if(hodAtual>0&&hodAnt===0){
+    if(hidDistEl) hidDistEl.value=0;
+    hintEl.style.color='var(--text3)';
+    hintEl.innerText='Primeiro abastecimento registrado.';
+    distInfo.style.display='none';
+  } else {
+    if(hidDistEl) hidDistEl.value=0;
+    distInfo.style.display='none';
+  }
+  abast_calcKmL();
+};
+
+function abast_calcKmL(){
+  const qtd=parseFloat(document.getElementById('abast-qtd').value)||0;
+  const dist=parseFloat(document.getElementById('abast-distancia').value)||0;
+  const el=document.getElementById('abast-kml');
+  if(qtd>0&&dist>0){
+    const kml=(dist/qtd).toFixed(2);
+    el.style.color=parseFloat(kml)<8?'#DC2626':parseFloat(kml)>=15?'#059669':'var(--text3)';
+    el.innerText=kml+' Km/L estimado';
+  } else el.innerText='';
+}
+
+window.salvarAbastecimento=async()=>{
+  // Placa vem direto do cadastro do técnico — não do campo hidden
+  const placa=(tech?.veiculo||document.getElementById('abast-placa').value||'').trim().toUpperCase();
+  const produto=document.getElementById('abast-produto').value;
+  const qtd=parseFloat(document.getElementById('abast-qtd').value)||0;
+  const vunit=parseFloat(document.getElementById('abast-vunit').value)||0;
+  const vtotal=parseFloat(document.getElementById('abast-vtotal').value)||0;
+  const hod=parseFloat(document.getElementById('abast-hodometro').value)||0;
+  const dist=parseFloat(document.getElementById('abast-distancia').value)||0;
+  const estab=document.getElementById('abast-estab').value.trim();
+  const cidade=document.getElementById('abast-cidade')?.value?.trim()||tech?.cidade||'';
+  const uf=document.getElementById('abast-uf')?.value?.trim()?.toUpperCase()||tech?.estado||'';
+  const res=document.getElementById('abast-result');
+  const hodEl=document.getElementById('abast-hodometro');
+
+  if(!placa){
+    res.innerHTML='<div class="status-msg status-err">Veículo não encontrado no seu cadastro. Contate o gestor.</div>';
+    return;
+  }
+
+  
+  if(!hod){
+    hodEl.focus();hodEl.style.borderColor='#DC2626';
+    res.innerHTML='<div class="status-msg status-err">O hodômetro é obrigatório | registre o km atual do painel.</div>';
+    return;
+  }
+  hodEl.style.borderColor='';
+  
+  const hodAnt=_ultimoAbastecimento?.hodometro||0;
+  if(hodAnt>0&&hod<hodAnt){
+    res.innerHTML=`<div class="status-msg" style="background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:10px;font-size:12px;margin-bottom:8px;">
+      Atenção: valor (${hod.toLocaleString('pt-BR')} km) menor que o último registrado (${hodAnt.toLocaleString('pt-BR')} km). Salvando mesmo assim…
+    </div>`;
+    
+  }
+  if(!qtd){res.innerHTML='<div class="status-msg status-err">Informe a quantidade em litros.</div>';return;}
+
+ 
+  res.innerHTML='<div class="status-msg" style="color:var(--accent);">Salvando…</div>';
+
+  const consumo=dist>0&&qtd>0?parseFloat((dist/qtd).toFixed(2)):0;
+  const agora=new Date();
+  const dataStr=agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR').slice(0,8);
+
+  
+  let gpsLat=_posGPS?.lat||null, gpsLng=_posGPS?.lng||null;
+  if(!gpsLat&&navigator.geolocation){
+    try{
+      const pos=await Promise.race([
+        new Promise((ok,err)=>navigator.geolocation.getCurrentPosition(ok,err,{timeout:2000,maximumAge:60000,enableHighAccuracy:false})),
+        new Promise((_,err)=>setTimeout(()=>err(new Error('timeout')),2500))
+      ]);
+      gpsLat=pos.coords.latitude; gpsLng=pos.coords.longitude;
+    }catch(e){/* sem GPS — continua */}
+  }
+
+  
+  let fotoBase64=null;
+  const fotoFile=document.getElementById('abast-foto-hod').files[0];
+  if(fotoFile){
+    fotoBase64=await new Promise(ok=>{
+      const canvas=document.createElement('canvas');
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=800,maxH=600;
+        let w=img.width,h=img.height;
+        if(w>maxW){h=h*(maxW/w);w=maxW;}
+        if(h>maxH){w=w*(maxH/h);h=maxH;}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        ok(canvas.toDataURL('image/jpeg',0.7));
+      };
+      img.src=URL.createObjectURL(fotoFile);
+    });
+  }
+
+  const registro={
+    placa,data:dataStr,
+    matricula:String(tech.matricula),motorista:tech.nome,
+    modelo:tech.veiculoModelo||'',uf,cidade,estabelecimento:estab,
+    produto,quantidade:qtd,valorUnit:vunit,valorTotal:vtotal||qtd*vunit,
+    hodometro:hod,distancia:dist,consumo,
+    tipoUso:'servico',particular:false,
+    gpsLat,gpsLng,
+    fotoHodometro:fotoBase64||null,
+    fotoStatus:fotoBase64?'pendente':null,
+    filial:tech.filial||'',centroCusto:'',
+    registradoManualmente:true,registradoPorTec:true,
+    importadoPor:String(tech.matricula)
+  };
+
+  try{
+    const docId=placa+'_'+dataStr.replace(/[/: ]/g,'')+'_tec'+String(tech.matricula);
+    await setDoc(doc(db,'combustivel',docId),registro);
+
+    
+    await setDoc(doc(db,'veiculos',placa),{hodometroAtual:hod,hodometroAtualizado:dataStr},{merge:true});
+
+    _ultimoAbastecimento={produto,estabelecimento:estab,cidade,uf,hodometro:hod};
+    localStorage.setItem('enerfine_ult_abast',JSON.stringify(_ultimoAbastecimento));
+
+    // Mostrar confirmação com botão GPS se capturou coordenadas
+    let msgOk='<div class="status-msg status-ok">Abastecimento registrado!</div>';
+    if(gpsLat&&gpsLng){
+      msgOk+='<a href="https://www.google.com/maps?q='+gpsLat+','+gpsLng+'" target="_blank" '
+        +'style="width:100%;margin-top:8px;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:12px;font-weight:600;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;">'
+        +'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Ver local no mapa</a>';
+    }
+    res.innerHTML=msgOk;
+    setTimeout(()=>fecharAbastecimento(),gpsLat?2500:1200);
+  }catch(e){
+    console.error('salvarAbastecimento erro:', e);
+    res.innerHTML='<div class="status-msg status-err">Erro ao salvar: '+e.message+'</div>';
+  }
+};
+// ───────────────────────────────────────────────
+
+</script>
+
+
+<div class="confirm-overlay" id="modal-incidente-veiculo" style="align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border-radius:16px;padding:24px;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;">Registrar Incidente</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Veículo: <strong id="inc-placa-display">—</strong></div>
+    <div class="form-group">
+      <label class="form-label">Tipo</label>
+      <select id="inc-tipo" style="width:100%;">
+        <option value="acidente">Acidente</option>
+        <option value="multa-leve">Multa Leve</option>
+        <option value="multa-media">Multa Média</option>
+        <option value="multa-grave">Multa Grave</option>
+        <option value="avaria">Avaria</option>
+        <option value="furto">Furto</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Data da Ocorrência</label>
+      <input type="date" id="inc-data">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nº Boletim (B.O.) — opcional</label>
+      <input type="text" id="inc-bo" placeholder="Número do B.O.">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea id="inc-desc" rows="3" placeholder="Descreva o ocorrido…" style="resize:vertical;"></textarea>
+    </div>
+    <div id="inc-status" style="margin-bottom:10px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalIncidente()" style="flex:1;padding:11px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);">Cancelar</button>
+      <button onclick="enviarIncidente()" style="flex:1;padding:11px;background:#dc2626;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#fff;">Registrar</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="modal-bkl-info" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:15px;font-weight:700;">Informações do Chamado</span>
+      <button onclick="document.getElementById('modal-bkl-info').style.display='none'" style="background:var(--surface2);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--text3);">✕</button>
+    </div>
+    <div id="bkl-info-modal-content"></div>
+    <div id="bkl-info-modal-btns"></div>
+    <div id="bkl-info-ppcr-status"></div>
+  </div>
+</div>
+
+
+
+<div class="confirm-overlay" id="modal-ppcr" style="align-items:flex-end;justify-content:center;">
+  <div style="background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">Solicitação de Peça (PPCR)</div>
+        <div style="font-size:11px;color:var(--text3);" id="ppcr-chamado-label">Chamado: —</div>
+      </div>
+      <button onclick="fecharPPCR()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;cursor:pointer;color:var(--text3);font-size:16px;font-family:inherit;">✕</button>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+    <div class="form-group">
+      <label class="form-label">Peça / Material</label>
+      <input type="text" id="ppcr-peca" placeholder="Ex: Placa mãe, SSD 256GB, fonte...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Código do material (se souber)</label>
+      <input type="text" id="ppcr-codigo" placeholder="Opcional">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Justificativa / Descrição</label>
+      <textarea id="ppcr-desc" rows="4" placeholder="Descreva o problema e por que a peça é necessária..." style="resize:vertical;width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;color:var(--text);outline:none;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Urgência</label>
+      <select id="ppcr-urgencia" style="width:100%;">
+        <option value="normal">Normal</option>
+        <option value="urgente">Urgente</option>
+        <option value="critico">Crítico | SLA em risco</option>
+      </select>
+    </div>
+    <div id="ppcr-status" style="margin-bottom:10px;"></div>
+    <div class="btn-row">
+      <button class="btn btn-neutral" onclick="fecharPPCR()">Cancelar</button>
+      <button class="btn btn-success" onclick="enviarPPCR()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar Solicitação
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-gps-selector" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Abrir no app de navegação</div>
+    <div id="gps-endereco-txt" style="font-size:12px;color:var(--text3);margin-bottom:16px;"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button id="gps-btn-googlemaps" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);">
+        <svg width="22" height="22" viewBox="0 0 48 48" fill="none"><path d="M24 4C16.268 4 10 10.268 10 18c0 11 14 26 14 26s14-15 14-26c0-7.732-6.268-14-14-14z" fill="#EA4335"/><circle cx="24" cy="18" r="6" fill="#fff"/></svg>
+        Google Maps
+      </button>
+      <button id="gps-btn-waze" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);">
+        <svg width="22" height="22" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" fill="#33CCFF"/><text x="24" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">W</text></svg>
+        Waze
+      </button>
+      <button id="gps-btn-apple" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);">
+        <svg width="22" height="22" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" fill="#333"/><text x="24" y="30" text-anchor="middle" font-size="13" fill="#fff">🍎</text></svg>
+        Apple Maps
+      </button>
+      <button onclick="fecharGPS()" style="padding:12px;background:none;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--text3);">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="modal-busca-chamado" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:flex-start;justify-content:center;padding-top:60px;">
+  <div style="background:var(--surface);border-radius:16px;width:min(480px,94vw);max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);" id="modal-busca-titulo">Chamado</div>
+      <button onclick="document.getElementById('modal-busca-chamado').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1;">✕</button>
+    </div>
+    <div id="modal-busca-corpo" style="padding:16px;">
+      <div style="text-align:center;color:var(--text3);padding:20px;">Carregando…</div>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-overlay" id="modal-abastecimento" style="align-items:flex-end;padding:0;">
+  <div style="background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;margin:0 auto;max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,16px);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">Registrar Abastecimento</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px;" id="abast-subtitulo"></div>
+      </div>
+      <button onclick="fecharAbastecimento()" style="background:var(--surface2);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="padding:12px 20px;display:flex;flex-direction:column;gap:12px;">
+
+      
+      <input type="hidden" id="abast-placa">
+      <input type="hidden" id="abast-cidade">
+      <input type="hidden" id="abast-uf">
+
+      
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Produto</label>
+        <select id="abast-produto" style="width:100%;margin-top:4px;">
+          <option value="ETANOL COMUM">Etanol Comum</option>
+          <option value="GASOLINA COMUM">Gasolina Comum</option>
+          <option value="GASOLINA ADITIVADA">Gasolina Aditivada</option>
+          <option value="DIESEL">Diesel</option>
+          <option value="GNV">GNV</option>
+        </select>
+      </div>
+
+      
+      <div style="background:rgba(3,105,161,.06);border:1.5px solid rgba(3,105,161,.2);border-radius:12px;padding:12px;">
+        <label style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;">
+          Hodômetro atual (km) <span style="color:var(--danger);">*</span>
+        </label>
+        <input type="number" id="abast-hodometro" placeholder="Ex: 45230" min="0" inputmode="numeric"
+          style="width:100%;margin-top:6px;font-size:18px;font-weight:700;text-align:center;border:2px solid var(--accent);border-radius:10px;"
+          oninput="abast_calcDistancia()">
+        <div id="abast-hod-hint" style="font-size:11px;color:var(--text3);margin-top:4px;text-align:center;"></div>
+        <div id="abast-kml" style="font-size:12px;font-weight:700;margin-top:2px;text-align:center;"></div>
+        
+        <div style="margin-top:10px;">
+          <input type="file" id="abast-foto-hod" accept="image/*" capture="environment" style="display:none;" onchange="abast_previewFoto(event)">
+          <button type="button" onclick="document.getElementById('abast-foto-hod').click()"
+            style="width:100%;padding:8px;background:var(--surface);border:1.5px dashed var(--accent);border-radius:8px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Fotografar hodômetro (opcional, para comprovação)
+          </button>
+          <div id="abast-foto-preview" style="display:none;margin-top:8px;position:relative;">
+            <img id="abast-foto-img" style="width:100%;border-radius:8px;max-height:140px;object-fit:cover;">
+            <button onclick="abast_removerFoto()" type="button"
+              style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:24px;height:24px;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+            <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center;">Foto enviada para validação. Será apagada após revisão.</div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Litros</label>
+          <input type="number" id="abast-qtd" placeholder="0.00" step="0.01" min="0" inputmode="decimal" style="width:100%;margin-top:4px;" oninput="abast_calcTotal()">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">R$/Litro</label>
+          <input type="number" id="abast-vunit" placeholder="0.00" step="0.001" min="0" inputmode="decimal" style="width:100%;margin-top:4px;" oninput="abast_calcTotal()">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Total R$</label>
+          <input type="number" id="abast-vtotal" placeholder="0.00" step="0.01" min="0" inputmode="decimal" style="width:100%;margin-top:4px;">
+        </div>
+      </div>
+
+      
+      <input type="hidden" id="abast-distancia" value="0">
+      <div id="abast-dist-info" style="display:none;padding:8px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text3);">
+        <span id="abast-dist-label"></span>
+      </div>
+
+      <!-- Posto -->
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Estabelecimento</label>
+        <input type="text" id="abast-estab" placeholder="Nome do posto" style="width:100%;margin-top:4px;" autocomplete="off">
+      </div>
+      <div id="abast-result"></div>
+
+      <button onclick="salvarAbastecimento()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirmar Abastecimento
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-overlay" id="modal-devolucao" style="align-items:flex-end;justify-content:center;">
+  <div style="background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;margin:0 auto;max-height:94vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,16px);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">Devolução de Veículo</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px;" id="dev-subtitulo"></div>
+      </div>
+      <button onclick="fecharModalDevolucao()" style="background:var(--surface2);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div style="padding:12px 20px 0;background:rgba(99,102,241,.06);border-bottom:1px solid var(--border);margin:12px 0 0;">
+      <div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.6px;padding-bottom:8px;">Fotografe o veículo antes de entregar</div>
+    </div>
+    <div style="padding:12px 20px;display:flex;flex-direction:column;gap:14px;">
+
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div id="dev-foto-frente-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Frente <span style="color:var(--danger);">*</span></label>
+          <input type="file" id="dev-foto-frente" accept="image/*" capture="environment" style="display:none;" onchange="dev_preview(this,'dev-prev-frente','dev-foto-frente-wrap')">
+          <div id="dev-prev-frente" onclick="document.getElementById('dev-foto-frente').click()" style="margin-top:4px;height:100px;border:1.5px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--surface2);">
+            <span style="font-size:11px;color:var(--text3);">📷 Tirar foto</span>
+          </div>
+        </div>
+        <div id="dev-foto-traseira-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Traseira <span style="color:var(--danger);">*</span></label>
+          <input type="file" id="dev-foto-traseira" accept="image/*" capture="environment" style="display:none;" onchange="dev_preview(this,'dev-prev-traseira','dev-foto-traseira-wrap')">
+          <div id="dev-prev-traseira" onclick="document.getElementById('dev-foto-traseira').click()" style="margin-top:4px;height:100px;border:1.5px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--surface2);">
+            <span style="font-size:11px;color:var(--text3);">📷 Tirar foto</span>
+          </div>
+        </div>
+        <div id="dev-foto-esq-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Lateral Esq. <span style="color:var(--danger);">*</span></label>
+          <input type="file" id="dev-foto-esq" accept="image/*" capture="environment" style="display:none;" onchange="dev_preview(this,'dev-prev-esq','dev-foto-esq-wrap')">
+          <div id="dev-prev-esq" onclick="document.getElementById('dev-foto-esq').click()" style="margin-top:4px;height:100px;border:1.5px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--surface2);">
+            <span style="font-size:11px;color:var(--text3);">📷 Tirar foto</span>
+          </div>
+        </div>
+        <div id="dev-foto-dir-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Lateral Dir. <span style="color:var(--danger);">*</span></label>
+          <input type="file" id="dev-foto-dir" accept="image/*" capture="environment" style="display:none;" onchange="dev_preview(this,'dev-prev-dir','dev-foto-dir-wrap')">
+          <div id="dev-prev-dir" onclick="document.getElementById('dev-foto-dir').click()" style="margin-top:4px;height:100px;border:1.5px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--surface2);">
+            <span style="font-size:11px;color:var(--text3);">📷 Tirar foto</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Painel / Hodômetro <span style="color:var(--danger);">*</span></label>
+        <input type="file" id="dev-foto-painel" accept="image/*" capture="environment" style="display:none;" onchange="dev_preview(this,'dev-prev-painel','dev-painel-wrap')">
+        <div id="dev-painel-wrap">
+          <div id="dev-prev-painel" onclick="document.getElementById('dev-foto-painel').click()" style="margin-top:4px;height:90px;border:1.5px dashed var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:rgba(3,105,161,.05);">
+            <span style="font-size:11px;color:var(--accent);">📷 Fotografar painel e hodômetro</span>
+          </div>
+        </div>
+        <input type="number" id="dev-hodometro" placeholder="Hodômetro atual (km) *" min="0" inputmode="numeric"
+          style="width:100%;margin-top:8px;font-size:15px;font-weight:700;text-align:center;border:2px solid var(--accent);border-radius:10px;padding:10px;">
+        <div id="dev-hod-hint" style="font-size:10px;color:var(--text3);margin-top:3px;text-align:center;"></div>
+      </div>
+
+      
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Motivo da Devolução</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;" id="dev-motivo-wrap">
+          <button type="button" class="dev-motivo-btn" data-motivo="troca" onclick="dev_setMotivo(this)" style="padding:9px 6px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Troca de veículo</button>
+          <button type="button" class="dev-motivo-btn" data-motivo="desligamento" onclick="dev_setMotivo(this)" style="padding:9px 6px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Desligamento</button>
+          <button type="button" class="dev-motivo-btn" data-motivo="manutencao" onclick="dev_setMotivo(this)" style="padding:9px 6px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Manutenção</button>
+          <button type="button" class="dev-motivo-btn" data-motivo="outro" onclick="dev_setMotivo(this)" style="padding:9px 6px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Outro</button>
+        </div>
+      </div>
+
+      
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Observações / Inconsistências</label>
+        <textarea id="dev-obs" rows="3" placeholder="Relate danos, arranhões, itens faltando ou qualquer inconsistência observada…"
+          style="width:100%;margin-top:6px;resize:none;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;"></textarea>
+      </div>
+
+      <div id="dev-result"></div>
+
+      <button onclick="salvarDevolucao()" style="width:100%;padding:14px;background:#6366f1;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">
+        Registrar Devolução
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
