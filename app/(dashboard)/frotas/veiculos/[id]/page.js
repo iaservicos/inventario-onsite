@@ -92,14 +92,14 @@ export default function EditarVeiculoPage() {
   }
 
   return (
-    <>
+    <div>
       <PageHeader title={form.placa} subtitle={`${form.modelo} · ${form.ano}`} />
 
       <div style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '2rem', maxWidth: '600px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Placa */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Placa
             </label>
             <input
@@ -113,7 +113,7 @@ export default function EditarVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box',
                 background: '#f9fafb',
                 opacity: 0.6,
@@ -124,7 +124,7 @@ export default function EditarVeiculoPage() {
 
           {/* Modelo */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Modelo
             </label>
             <input
@@ -137,7 +137,7 @@ export default function EditarVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box'
               }}
             />
@@ -145,7 +145,7 @@ export default function EditarVeiculoPage() {
 
           {/* Marca */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Marca
             </label>
             <input
@@ -158,7 +158,7 @@ export default function EditarVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box'
               }}
             />
@@ -167,7 +167,7 @@ export default function EditarVeiculoPage() {
           {/* Ano e KM */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 Ano
               </label>
               <input
@@ -180,13 +180,13 @@ export default function EditarVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               />
             </div>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 KM Atual
               </label>
               <input
@@ -199,7 +199,7 @@ export default function EditarVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               />
@@ -209,7 +209,7 @@ export default function EditarVeiculoPage() {
           {/* Status e Combustível */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 Status
               </label>
               <select
@@ -221,7 +221,7 @@ export default function EditarVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               >
@@ -232,7 +232,7 @@ export default function EditarVeiculoPage() {
               </select>
             </div>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 Combustível (L)
               </label>
               <input
@@ -245,7 +245,7 @@ export default function EditarVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               />
@@ -254,7 +254,7 @@ export default function EditarVeiculoPage() {
 
           {/* Observações */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Observações
             </label>
             <textarea
@@ -267,7 +267,7 @@ export default function EditarVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
                 resize: 'vertical'
@@ -289,7 +289,7 @@ export default function EditarVeiculoPage() {
                 type="button"
                 style={{
                   width: '100%',
-                  padding: '0.85rem',
+                  padding: '0.75rem',
                   background: '#f3f4f6',
                   color: '#666',
                   border: '1px solid #e5e7eb',
@@ -307,7 +307,7 @@ export default function EditarVeiculoPage() {
               disabled={salvando}
               style={{
                 width: '100%',
-                padding: '0.85rem',
+                padding: '0.75rem',
                 background: salvando ? '#d1d5db' : '#0369a1',
                 color: '#fff',
                 border: 'none',
@@ -323,6 +323,6 @@ export default function EditarVeiculoPage() {
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 }

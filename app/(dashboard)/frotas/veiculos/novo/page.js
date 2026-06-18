@@ -62,14 +62,14 @@ export default function NovoVeiculoPage() {
   };
 
   return (
-    <>
+    <div>
       <PageHeader title="Novo Veículo" subtitle="Cadastre um novo veículo na frota" />
 
       <div style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '2rem', maxWidth: '600px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Placa */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Placa *
             </label>
             <input
@@ -83,7 +83,7 @@ export default function NovoVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box',
                 fontFamily: "'JetBrains Mono'"
               }}
@@ -92,7 +92,7 @@ export default function NovoVeiculoPage() {
 
           {/* Modelo */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Modelo *
             </label>
             <input
@@ -106,7 +106,7 @@ export default function NovoVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box'
               }}
             />
@@ -114,7 +114,7 @@ export default function NovoVeiculoPage() {
 
           {/* Marca */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Marca *
             </label>
             <input
@@ -128,7 +128,7 @@ export default function NovoVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box'
               }}
             />
@@ -137,7 +137,7 @@ export default function NovoVeiculoPage() {
           {/* Ano e KM */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 Ano
               </label>
               <input
@@ -150,13 +150,13 @@ export default function NovoVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               />
             </div>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 KM Atual
               </label>
               <input
@@ -169,7 +169,7 @@ export default function NovoVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               />
@@ -179,7 +179,7 @@ export default function NovoVeiculoPage() {
           {/* Status e Combustível */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 Status
               </label>
               <select
@@ -191,7 +191,7 @@ export default function NovoVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               >
@@ -202,7 +202,7 @@ export default function NovoVeiculoPage() {
               </select>
             </div>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
                 Combustível (L)
               </label>
               <input
@@ -215,7 +215,7 @@ export default function NovoVeiculoPage() {
                   padding: '0.75rem',
                   borderRadius: '6px',
                   border: '1px solid #e5e7eb',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   boxSizing: 'border-box'
                 }}
               />
@@ -224,7 +224,7 @@ export default function NovoVeiculoPage() {
 
           {/* Observações */}
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>
               Observações
             </label>
             <textarea
@@ -238,7 +238,7 @@ export default function NovoVeiculoPage() {
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #e5e7eb',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
                 resize: 'vertical'
@@ -260,7 +260,7 @@ export default function NovoVeiculoPage() {
                 type="button"
                 style={{
                   width: '100%',
-                  padding: '0.85rem',
+                  padding: '0.75rem',
                   background: '#f3f4f6',
                   color: '#666',
                   border: '1px solid #e5e7eb',
@@ -278,7 +278,7 @@ export default function NovoVeiculoPage() {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '0.85rem',
+                padding: '0.75rem',
                 background: loading ? '#d1d5db' : '#0369a1',
                 color: '#fff',
                 border: 'none',
@@ -294,6 +294,6 @@ export default function NovoVeiculoPage() {
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 }

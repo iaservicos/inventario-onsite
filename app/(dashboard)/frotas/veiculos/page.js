@@ -62,8 +62,8 @@ export default function VeiculosPage() {
   ];
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0' }}>
         <PageHeader title="Veículos" subtitle="Gerencie todos os veículos da frota" />
         <Link href="/frotas/veiculos/novo">
           <button style={{
@@ -163,6 +163,6 @@ export default function VeiculosPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
