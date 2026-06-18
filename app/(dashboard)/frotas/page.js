@@ -50,15 +50,15 @@ export default function FrotasPage() {
   ];
 
   return (
-    <>
+    <div>
       <PageHeader title="Gestão de Frotas" subtitle="Gerencie todos os veículos da frota" />
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <KPICard label="Total de Veículos" value={stats.total} color="#0f172a" />
-        <KPICard label="Ativos" value={stats.ativos} color="#059669" />
-        <KPICard label="Manutenção" value={stats.manutencao} color="#d97706" />
-        <KPICard label="Parados" value={stats.parados} color="#666666" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <KPICard label="Total" value={stats.total} />
+        <KPICard label="Ativos" value={stats.ativos} />
+        <KPICard label="Manutenção" value={stats.manutencao} />
+        <KPICard label="Parados" value={stats.parados} />
       </div>
 
       {/* Filtros */}
@@ -122,17 +122,19 @@ export default function FrotasPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
-function KPICard({ label, value, color }) {
+function KPICard({ label, value }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2rem', fontWeight: '900', color }}>{value}</div>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#0f172a' }}>
+        {value}
+      </div>
     </div>
   );
 }
