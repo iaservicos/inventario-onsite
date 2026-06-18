@@ -254,10 +254,15 @@ export async function POST(req) {
       inventoryUpdate.first_count_divergence_quantity = sumAbsDiff(divergencesToInsert);
     }
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('inventories')
       .update(inventoryUpdate)
       .eq('id', invId);
+
+    if (updateError) {
+      console.error('[finalize-inventory] Falha ao atualizar inventário:', updateError.message);
+      return NextResponse.json({ error: 'Falha ao atualizar inventário: ' + updateError.message }, { status: 500 });
+    }
 
     // Sincroniza status do agendamento com o resultado da finalização
     await supabase
