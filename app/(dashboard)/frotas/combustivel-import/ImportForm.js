@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
-import { parseExcelFile } from '@/lib/simple-xlsx-parser';
 
 export default function CombustvelImportForm() {
   const [arquivo, setArquivo] = useState(null);
@@ -20,37 +19,14 @@ export default function CombustvelImportForm() {
     setPreview(null);
     setErrosDetalhados(null);
 
-    try {
-      const dados = await parseExcelFile(file);
+    // Apenas mostrar que arquivo foi selecionado, sem preview
+    setPreview({
+      nomeArquivo: file.name,
+      totalLinhas: '?',
+      previewLinhas: [['Arquivo selecionado. Clique em Confirmar para processar.']]
+    });
 
-      if (!Array.isArray(dados) || dados.length === 0) {
-        throw new Error('Arquivo vazio ou formato inválido');
-      }
-
-      // Se for array de objetos, converter para array de arrays
-      let previewData = dados;
-      let totalLinhas = dados.length - 1; // -1 header
-
-      if (dados.length > 0 && typeof dados[0] === 'object' && !Array.isArray(dados[0])) {
-        const headers = Object.keys(dados[0]);
-        previewData = [
-          headers,
-          ...dados.map(obj => headers.map(h => obj[h]))
-        ];
-      }
-
-      setPreview({
-        nomeArquivo: file.name,
-        totalLinhas,
-        previewLinhas: previewData.slice(0, 6)
-      });
-
-      toast.success('Arquivo carregado com sucesso');
-    } catch (error) {
-      console.error('Erro:', error);
-      toast.error('Erro ao ler arquivo: ' + error.message);
-      setArquivo(null);
-    }
+    toast.success('Arquivo selecionado: ' + file.name);
   }
 
   async function handleImport() {
