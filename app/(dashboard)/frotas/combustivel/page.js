@@ -15,10 +15,10 @@ export default function CombustvelPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/frotas', { cache: 'no-store' });
+      const res = await fetch('/api/frotas/combustivel/list', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        setCombustivel([]);
+        setCombustivel(dados.data || []);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -37,11 +37,11 @@ export default function CombustvelPage() {
   );
 
   const stats = {
-    totalGasto: '0.00',
-    totalLitros: '0.00',
-    mediaKmL: '0.00',
-    abastecimentos: 0,
-    precoMedio: '0.00'
+    totalGasto: combustivel.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2),
+    totalLitros: combustivel.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(2),
+    mediaKmL: combustivel.length > 0 ? (combustivel.reduce((sum, c) => sum + (parseFloat(c.consumo) || 0), 0) / combustivel.length).toFixed(2) : '0.00',
+    abastecimentos: combustivel.length,
+    precoMedio: combustivel.length > 0 ? (combustivel.reduce((sum, c) => sum + (parseFloat(c.valor_unitario) || 0), 0) / combustivel.length).toFixed(2) : '0.00'
   };
 
   return (
@@ -154,31 +154,31 @@ export default function CombustvelPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtrados.map((c) => (
-                  <tr key={c.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                {filtrados.map((c, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5' }}>
                     <td style={{ padding: '0.75rem', color: '#666666', fontSize: '0.85rem' }}>
-                      {new Date(c.data).toLocaleDateString('pt-BR')}
+                      {c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '-'}
                     </td>
                     <td style={{ padding: '0.75rem', fontWeight: '600', color: '#333333' }}>{c.placa}</td>
                     <td style={{ padding: '0.75rem', color: '#666666' }}>{c.motorista}</td>
-                    <td style={{ padding: '0.75rem', color: '#666666', fontWeight: '600' }}>{c.uf}</td>
-                    <td style={{ padding: '0.75rem', color: '#666666' }}>{c.produto}</td>
+                    <td style={{ padding: '0.75rem', color: '#666666', fontWeight: '600' }}>{c.uf || '-'}</td>
+                    <td style={{ padding: '0.75rem', color: '#666666' }}>{c.produto || '-'}</td>
                     <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
-                      {parseFloat(c.litros).toFixed(1)}L
+                      {(parseFloat(c.quantidade) || 0).toFixed(1)}L
                     </td>
                     <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
-                      {c.kmL}
+                      {(parseFloat(c.consumo) || 0).toFixed(2)}
                     </td>
                     <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
-                      {c.hodometro}
+                      {c.hodometro || '-'}
                     </td>
                     <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
-                      R$ {c.valorUnit}
+                      R$ {(parseFloat(c.valor_unitario) || 0).toFixed(2)}
                     </td>
                     <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
-                      R$ {parseFloat(c.valorTotal).toFixed(2)}
+                      R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem', color: '#666666' }}>{c.filial}</td>
+                    <td style={{ padding: '0.75rem', color: '#666666' }}>{c.filial || '-'}</td>
                   </tr>
                 ))}
               </tbody>
