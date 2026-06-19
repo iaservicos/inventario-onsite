@@ -6,7 +6,8 @@ import PageHeader from '@/components/ui/PageHeader';
 export default function CombustivelHistoricoPage() {
   const [combustiveis, setCombustiveis] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ search: '', motorista: '', mes: new Date().toISOString().substring(0, 7) });
+  const [ultimoMes, setUltimoMes] = useState(new Date().toISOString().substring(0, 7));
+  const [filters, setFilters] = useState({ search: '', motorista: '', mes: '', produto: '', uf: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -14,7 +15,22 @@ export default function CombustivelHistoricoPage() {
       const res = await fetch('/api/frotas/combustivel/list', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        setCombustiveis(dados.data || []);
+        const dados_arr = dados.data || [];
+        setCombustiveis(dados_arr);
+
+        // Detectar último mês com dados
+        if (dados_arr.length > 0) {
+          const meses = dados_arr
+            .map(c => new Date(c.data).toISOString().substring(0, 7))
+            .filter(Boolean);
+          const mesUnico = [...new Set(meses)].sort().reverse()[0];
+          setUltimoMes(mesUnico);
+
+          // Atualizar filtro com o último mês encontrado
+          if (!filters.mes) {
+            setFilters(prev => ({ ...prev, mes: mesUnico }));
+          }
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -27,17 +43,21 @@ export default function CombustivelHistoricoPage() {
     load();
   }, [load]);
 
+  const mesFiltro = filters.mes || ultimoMes;
   const filtrados = combustiveis.filter(c => {
     const matchSearch = !filters.search ||
       (c.placa && c.placa.toUpperCase().includes(filters.search.toUpperCase()));
     const matchMotorista = !filters.motorista ||
       (c.motorista && c.motorista.toUpperCase().includes(filters.motorista.toUpperCase()));
-    const matchMes = !filters.mes ||
-      (c.data && new Date(c.data).toISOString().substring(0, 7) === filters.mes);
-    return matchSearch && matchMotorista && matchMes;
+    const matchMes = c.data && new Date(c.data).toISOString().substring(0, 7) === mesFiltro;
+    const matchProduto = !filters.produto || (c.produto && c.produto.toLowerCase() === filters.produto.toLowerCase());
+    const matchUf = !filters.uf || (c.uf && c.uf === filters.uf);
+    return matchSearch && matchMotorista && matchMes && matchProduto && matchUf;
   });
 
-  const motoristasUnicos = [...new Set(combustiveis.map(c => c.motorista))].sort();
+  const motoristasUnicos = [...new Set(combustiveis.map(c => c.motorista).filter(Boolean))].sort();
+  const produtosUnicos = [...new Set(combustiveis.map(c => c.produto).filter(Boolean))].sort();
+  const ufsUnicos = [...new Set(combustiveis.map(c => c.uf).filter(Boolean))].sort();
 
   const stats = {
     totalAbastecimentos: filtrados.length,
@@ -60,30 +80,68 @@ export default function CombustivelHistoricoPage() {
       </div>
 
       {/* Filtros */}
-      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          placeholder="Buscar por placa..."
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
-        />
-        <select
-          value={filters.motorista}
-          onChange={(e) => setFilters({ ...filters, motorista: e.target.value })}
-          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
-        >
-          <option value="">Todos motoristas</option>
-          {motoristasUnicos.map(m => (
-            <option key={m} value={m}>{m}</option>
-          ))}
-        </select>
-        <input
-          type="month"
-          value={filters.mes}
-          onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
-          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
-        />
+      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Buscar por placa..."
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          />
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Motorista</label>
+            <select
+              value={filters.motorista}
+              onChange={(e) => setFilters({ ...filters, motorista: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
+            >
+              <option value="">Todos</option>
+              {motoristasUnicos.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Mês</label>
+            <input
+              type="month"
+              value={filters.mes || ultimoMes}
+              onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Combustível</label>
+            <select
+              value={filters.produto}
+              onChange={(e) => setFilters({ ...filters, produto: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+            >
+              <option value="">Todos</option>
+              {produtosUnicos.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Estado</label>
+            <select
+              value={filters.uf}
+              onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+            >
+              <option value="">Todos</option>
+              {ufsUnicos.map(u => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Tabela */}
