@@ -159,6 +159,23 @@ export default function CombustivelMotoristasPage() {
     setHistoricoMotorista([]);
   };
 
+  // Formatadores
+  const formatarMoeda = (valor) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(valor);
+  };
+
+  const formatarNumero = (valor) => {
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(Math.floor(valor));
+  };
+
   // Obter valores únicos para filtros
   const produtosUnicos = [...new Set(combustivelBruto.map(c => c.produto).filter(Boolean))].sort();
   const ufsUnicos = [...new Set(combustivelBruto.map(c => c.uf).filter(Boolean))].sort();
@@ -179,9 +196,10 @@ export default function CombustivelMotoristasPage() {
       />
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
-        <StatCard label="Total Motoristas" value={stats.totalMotoristas} />
-        <StatCard label="Gasto Total" value={`R$ ${stats.gastoTotal}`} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+        <StatCard label="Total Motoristas" value={formatarNumero(stats.totalMotoristas)} />
+        <StatCard label="Gasto Total" value={formatarMoeda(stats.gastoTotal)} />
+        <StatCard label="Total KM Rodado" value={formatarNumero(filtrados.reduce((sum, m) => sum + m.totalKm, 0))} unit="km" />
         <StatCard label="Consumo Médio Geral" value={`${stats.consumoMedioGeral} km/L`} />
       </div>
 
@@ -287,8 +305,8 @@ export default function CombustivelMotoristasPage() {
               </thead>
               <tbody>
                 {filtrados.map((m, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#0066cc', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => abrirHistoricoMotorista(m.nome)}>
+                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa', cursor: 'pointer', transition: 'background-color 0.2s' }} onClick={() => abrirHistoricoMotorista(m.nome)} onMouseEnter={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseLeave={(e) => e.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#fafafa'}>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>
                       {m.nome}
                     </td>
                     <td style={{ padding: '0.75rem 1rem', color: '#666666', fontWeight: '600' }}>
@@ -320,35 +338,44 @@ export default function CombustivelMotoristasPage() {
         )}
       </div>
 
-      {/* Modal Histórico do Motorista */}
+      {/* Painel Lateral Histórico do Motorista */}
       {motoristaSelecionado && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '1rem'
-        }}>
+        <>
+          {/* Overlay */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.3)',
+              zIndex: 999
+            }}
+            onClick={fecharHistorico}
+          />
+          {/* Painel */}
           <div style={{
+            position: 'fixed',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: '500px',
             background: '#ffffff',
-            borderRadius: '8px',
-            maxWidth: '95vw',
-            maxHeight: '90vh',
-            overflow: 'auto',
-            padding: '2rem',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            position: 'relative'
+            boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.15)',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            animation: 'slideIn 0.3s ease-in-out',
+            '@keyframes slideIn': {
+              from: { transform: 'translateX(100%)' },
+              to: { transform: 'translateX(0)' }
+            }
           }}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#000000', margin: 0 }}>
-                Histórico - {motoristaSelecionado}
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e5e5', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000', margin: 0, wordBreak: 'break-word' }}>
+                {motoristaSelecionado}
               </h2>
               <button
                 onClick={fecharHistorico}
@@ -359,118 +386,114 @@ export default function CombustivelMotoristasPage() {
                   cursor: 'pointer',
                   color: '#999999',
                   padding: 0,
-                  marginLeft: '1rem'
+                  marginLeft: '1rem',
+                  flexShrink: 0
                 }}
               >
                 ✕
               </button>
             </div>
 
-            {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
-                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Gasto</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
-                  R$ {historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2)}
+            {/* Content - Scrollable */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem' }}>
+              {/* Stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Total Gasto</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                    R$ {historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2)}
+                  </div>
+                </div>
+                <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Total Litros</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                    {historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(1)}L
+                  </div>
+                </div>
+                <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Abastecimentos</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                    {historicoMotorista.length}
+                  </div>
+                </div>
+                <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Consumo Médio</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                    {historicoMotorista.length > 0 && historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0) > 0
+                      ? (historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.distancia) || 0), 0) / historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0)).toFixed(2)
+                      : '0.00'
+                    } km/L
+                  </div>
                 </div>
               </div>
-              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
-                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Litros</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
-                  {historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(1)}L
-                </div>
-              </div>
-              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
-                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Abastecimentos</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
-                  {historicoMotorista.length}
-                </div>
-              </div>
-              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
-                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Consumo Médio</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
-                  {historicoMotorista.length > 0 && historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0) > 0
-                    ? (historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.distancia) || 0), 0) / historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0)).toFixed(2)
-                    : '0.00'
-                  } km/L
-                </div>
-              </div>
-            </div>
 
-            {/* Tabela */}
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #333333', background: '#f5f5f5' }}>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Data</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Placa</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Produto</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Terminal</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Cidade</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Litros</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Vl.Unit.</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Vl.Total</th>
-                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Consumo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historicoMotorista.length === 0 ? (
-                    <tr>
-                      <td colSpan="9" style={{ padding: '1rem', textAlign: 'center', color: '#999999' }}>
-                        Nenhum abastecimento encontrado
-                      </td>
+              {/* Tabela */}
+              <div style={{ overflowX: 'auto', marginTop: '1.5rem', borderTop: '1px solid #e5e5e5', paddingTop: '1.5rem' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#000000', marginBottom: '1rem' }}>Histórico de Abastecimentos</div>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
+                      <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.65rem' }}>Data</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.65rem' }}>Placa</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.65rem' }}>Produto</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.65rem' }}>Litros</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.65rem' }}>Vl.Total</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.65rem' }}>Consumo</th>
                     </tr>
-                  ) : (
-                    historicoMotorista.map((c, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #e5e5e5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                        <td style={{ padding: '0.75rem', color: '#666666' }}>
-                          {c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '-'}
-                        </td>
-                        <td style={{ padding: '0.75rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
-                          {c.placa}
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#666666' }}>
-                          {c.produto || '-'}
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#666666', fontSize: '0.8rem' }}>
-                          {c.terminal || '-'}
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#666666' }}>
-                          {c.cidade || '-'}
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
-                          {(parseFloat(c.quantidade) || 0).toFixed(1)}L
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
-                          R$ {(parseFloat(c.valor_unitario) || 0).toFixed(2)}
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
-                          R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
-                        </td>
-                        <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
-                          {(parseFloat(c.consumo) || 0).toFixed(2)} km/L
+                  </thead>
+                  <tbody>
+                    {historicoMotorista.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ padding: '1rem', textAlign: 'center', color: '#999999', fontSize: '0.8rem' }}>
+                          Nenhum abastecimento encontrado
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      historicoMotorista.map((c, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                          <td style={{ padding: '0.5rem', color: '#666666', fontSize: '0.7rem' }}>
+                            {c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '-'}
+                          </td>
+                          <td style={{ padding: '0.5rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'", fontSize: '0.7rem' }}>
+                            {c.placa}
+                          </td>
+                          <td style={{ padding: '0.5rem', color: '#666666', fontSize: '0.7rem' }}>
+                            {c.produto || '-'}
+                          </td>
+                          <td style={{ padding: '0.5rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.7rem' }}>
+                            {(parseFloat(c.quantidade) || 0).toFixed(1)}L
+                          </td>
+                          <td style={{ padding: '0.5rem', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.7rem' }}>
+                            R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
+                          </td>
+                          <td style={{ padding: '0.5rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.7rem' }}>
+                            {(parseFloat(c.consumo) || 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
 }
 
-function StatCard({ label, value }) {
+function StatCard({ label, value, unit }) {
   return (
     <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
       <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
-        {value}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+        <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000', lineHeight: '1' }}>
+          {value}
+        </div>
+        {unit && <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#999999' }}>{unit}</div>}
       </div>
     </div>
   );
