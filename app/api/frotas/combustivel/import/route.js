@@ -6,7 +6,7 @@
  */
 
 import { saveCombustivelBatch, normalizeCombustivel, validateCombustivel } from '@/lib/models/combustivel';
-import { parseFile, validateImportStructure } from '@/lib/simple-xlsx-parser';
+import { parseExcelFile, validateImportStructure } from '@/lib/simple-xlsx-parser';
 
 export async function POST(request) {
   try {
@@ -42,8 +42,8 @@ export async function POST(request) {
         );
       }
 
-      parseResult = await parseFile(file);
-      data = parseResult.data || [];
+      const parsedData = await parseExcelFile(file);
+      parseResult = Array.isArray(parsedData) ? parsedData : (parsedData.data || []);
     }
     // Processar JSON direto
     else if (contentType?.includes('application/json')) {
