@@ -248,7 +248,7 @@ export default function NovoVeiculoPage() {
 
           {/* Erro */}
           {erro && (
-            <div style={{ background: 'rgba(220,38,38,0.1)', border: '1px solid #dc2626', borderRadius: '6px', padding: '0.75rem', fontSize: '0.9rem', color: '#dc2626', fontWeight: '600' }}>
+            <div style={{ background: '#f5f5f5', border: '1px solid #dddddd', borderRadius: '6px', padding: '0.75rem', fontSize: '0.9rem', color: '#333333', fontWeight: '600' }}>
               {erro}
             </div>
           )}
@@ -279,7 +279,7 @@ export default function NovoVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                background: loading ? '#d1d5db' : '#0369a1',
+                background: loading ? '#cccccc' : '#000000',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '6px',

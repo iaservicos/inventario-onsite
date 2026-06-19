@@ -133,18 +133,12 @@ export default function ManutencaoPage() {
 }
 
 function KPICard({ label, value, color, sub }) {
-  const colorMap = {
-    red: '#dc2626',
-    amber: '#d97706',
-    green: '#059669'
-  };
-
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', borderTop: `3px solid ${colorMap[color]}` }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
       <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: colorMap[color], marginBottom: '0.5rem' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000', marginBottom: '0.5rem' }}>
         {value}
       </div>
       <div style={{ fontSize: '0.75rem', color: '#999999' }}>
@@ -156,15 +150,15 @@ function KPICard({ label, value, color, sub }) {
 
 function StatusBadge({ status }) {
   const statusStyles = {
-    'Vencida': { bg: '#fee2e2', color: '#dc2626', text: 'Vencida' },
-    'Próxima em 30 dias': { bg: '#fef3c7', color: '#d97706', text: 'Próximos 30d' },
-    'Em dia': { bg: '#d1fae5', color: '#059669', text: 'Em dia' }
+    'Vencida': { bg: '#f0f0f0', color: '#333333', text: 'Vencida', border: '1px solid #dddddd' },
+    'Próxima em 30 dias': { bg: '#f0f0f0', color: '#333333', text: 'Próximos 30d', border: '1px solid #dddddd' },
+    'Em dia': { bg: '#ffffff', color: '#000000', text: 'Em dia', border: '1px solid #dddddd' }
   };
 
   const style = statusStyles[status] || statusStyles['Em dia'];
 
   return (
-    <span style={{ background: style.bg, color: style.color, padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', whiteSpace: 'nowrap' }}>
+    <span style={{ background: style.bg, color: style.color, padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', whiteSpace: 'nowrap', border: style.border }}>
       {style.text}
     </span>
   );

@@ -132,6 +132,11 @@ tr:hover td { background: #fafafa; }
 .badge-not-ok { background: #f0f0f0; color: #000000; border: 1px solid #d0d0d0; }
 .badge-success { background: #000000; color: #ffffff; }
 .badge-info { background: #f0f0f0; color: #000000; border: 1px solid #e0e0e0; }
+.badge-warning { background: #f0f0f0; color: #333333; border: 1px solid #cccccc; }
+.badge-error { background: #f0f0f0; color: #333333; border: 1px solid #cccccc; }
+.badge-neutral { background: #ffffff; color: #666666; border: 1px solid #dddddd; }
+.badge-active { background: #000000; color: #ffffff; }
+.badge-inactive { background: #f0f0f0; color: #333333; border: 1px solid #dddddd; }
 
 /* ── Progress ── */
 .progress-bar {

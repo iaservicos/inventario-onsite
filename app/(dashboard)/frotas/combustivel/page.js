@@ -169,19 +169,12 @@ export default function CombustvelPage() {
 }
 
 function KPICard({ label, value, color }) {
-  const colorMap = {
-    blue: '#0369a1',
-    amber: '#d97706',
-    green: '#059669',
-    red: '#dc2626'
-  };
-
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem', borderTop: `3px solid ${colorMap[color]}` }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem', borderTop: '3px solid #333333' }}>
       <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: colorMap[color] }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000000' }}>
         {value}
       </div>
     </div>

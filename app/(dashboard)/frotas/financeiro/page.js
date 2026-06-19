@@ -228,8 +228,9 @@ export default function FinanceiroPage() {
                         borderRadius: '3px',
                         fontSize: '0.7rem',
                         fontWeight: '600',
-                        background: d.tipo === 'Multa' ? '#fee2e2' : '#fef3c7',
-                        color: d.tipo === 'Multa' ? '#991b1b' : '#b45309'
+                        background: '#f0f0f0',
+                        color: '#333333',
+                        border: '1px solid #dddddd'
                       }}>
                         {d.tipo}
                       </span>
@@ -255,19 +256,12 @@ export default function FinanceiroPage() {
 }
 
 function KPICard({ label, value, color }) {
-  const colorMap = {
-    red: '#dc2626',
-    amber: '#d97706',
-    blue: '#0369a1',
-    green: '#059669'
-  };
-
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem', borderTop: `3px solid ${colorMap[color]}` }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.25rem', borderTop: '3px solid #333333' }}>
       <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: colorMap[color] }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: '#000000' }}>
         {value}
       </div>
     </div>

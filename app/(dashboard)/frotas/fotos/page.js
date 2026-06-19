@@ -134,7 +134,7 @@ export default function FotosPage() {
                       style={{
                         flex: 1,
                         padding: '0.75rem',
-                        background: '#059669',
+                        background: '#000000',
                         color: '#ffffff',
                         border: 'none',
                         borderRadius: '4px',
@@ -150,9 +150,9 @@ export default function FotosPage() {
                       style={{
                         flex: 1,
                         padding: '0.75rem',
-                        background: '#dc2626',
-                        color: '#ffffff',
-                        border: 'none',
+                        background: '#f0f0f0',
+                        color: '#333333',
+                        border: '1px solid #dddddd',
                         borderRadius: '4px',
                         fontSize: '0.85rem',
                         fontWeight: '600',
@@ -171,11 +171,11 @@ export default function FotosPage() {
 
       {/* Fotos Rejeitadas */}
       {fotos.filter(f => f.status === 'Rejeitada').length > 0 && (
-        <div style={{ marginTop: '2rem', padding: '1rem', background: '#fee2e2', border: '1px solid #fecaca', borderRadius: '6px' }}>
-          <div style={{ color: '#dc2626', fontWeight: '600', marginBottom: '0.5rem' }}>
+        <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', border: '1px solid #dddddd', borderRadius: '6px' }}>
+          <div style={{ color: '#333333', fontWeight: '600', marginBottom: '0.5rem' }}>
             Fotos Rejeitadas ({fotos.filter(f => f.status === 'Rejeitada').length})
           </div>
-          <div style={{ color: '#991b1b', fontSize: '0.9rem' }}>
+          <div style={{ color: '#666666', fontSize: '0.9rem' }}>
             O gestor foi notificado sobre as rejeições.
           </div>
         </div>
