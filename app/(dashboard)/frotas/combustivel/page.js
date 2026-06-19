@@ -28,11 +28,15 @@ export default function CombustvelPage() {
             tecnicos[c.motorista] = {
               gasto: 0,
               abastecimentos: 0,
+              totalLitros: 0,
+              totalKm: 0,
               uf: c.uf || 'N/A'
             };
           }
           tecnicos[c.motorista].gasto += parseFloat(c.valor_total) || 0;
           tecnicos[c.motorista].abastecimentos += 1;
+          tecnicos[c.motorista].totalLitros += parseFloat(c.quantidade) || 0;
+          tecnicos[c.motorista].totalKm += parseFloat(c.distancia) || 0;
         });
         const top = Object.entries(tecnicos)
           .map(([nome, dados]) => ({
@@ -40,7 +44,7 @@ export default function CombustvelPage() {
             gasto: dados.gasto,
             abastecimentos: dados.abastecimentos,
             uf: dados.uf,
-            consumoMedio: (dados.gasto / dados.abastecimentos).toFixed(2)
+            consumoMedio: dados.totalLitros > 0 ? (dados.totalKm / dados.totalLitros).toFixed(2) : '0.00'
           }))
           .sort((a, b) => b.gasto - a.gasto)
           .slice(0, 5);
@@ -196,7 +200,7 @@ export default function CombustvelPage() {
                       {m.abastecimentos || '-'}
                     </td>
                     <td style={{ padding: '0.5rem', textAlign: 'right', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
-                      {m.consumoMedio ? `R$ ${m.consumoMedio}` : '-'}
+                      {m.consumoMedio ? `${m.consumoMedio} km/L` : '-'}
                     </td>
                   </tr>
                 ))
