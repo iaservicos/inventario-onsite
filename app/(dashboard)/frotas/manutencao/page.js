@@ -117,18 +117,20 @@ export default function ManutencaoPage() {
               </thead>
               <tbody>
                 {filtrados.map((m, idx) => {
-                  const proxima = new Date(m.proxima_preventiva);
-                  const dias = Math.floor((proxima - new Date()) / (1000 * 60 * 60 * 24));
                   let status = 'Em dia';
-                  if (dias < 0) status = 'Vencida';
-                  else if (dias <= 30) status = 'Próxima em 30 dias';
+                  if (m.proxima_preventiva) {
+                    const proxima = new Date(m.proxima_preventiva);
+                    const dias = Math.floor((proxima - new Date()) / (1000 * 60 * 60 * 24));
+                    if (dias < 0) status = 'Vencida';
+                    else if (dias <= 30) status = 'Próxima em 30 dias';
+                  }
 
                   return (
                     <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
                       <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>{m.placa}</td>
                       <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.tipo}</td>
                       <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
-                        {m.data_realizacao ? new Date(m.data_realizacao).toLocaleDateString('pt-BR') : '-'}
+                        {m.data_realizada ? new Date(m.data_realizada).toLocaleDateString('pt-BR') : '-'}
                       </td>
                       <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
                         {m.proxima_preventiva ? new Date(m.proxima_preventiva).toLocaleDateString('pt-BR') : '-'}
