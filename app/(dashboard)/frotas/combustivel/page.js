@@ -171,32 +171,33 @@ export default function CombustvelPage() {
           </div>
         </div>
 
-        {/* 3 Maiores Médias de Consumo */}
+        {/* 3 Maiores Abastecimentos do Mês (km/L) */}
         <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
-            3 Maiores Médias (km/L)
+            3 Maiores Médias do Mês
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {topTecnicos.length === 0 ? (
+            {filtrados.length === 0 ? (
               <div style={{ color: '#999999', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
                 Nenhum dado
               </div>
             ) : (
-              topTecnicos
-                .sort((a, b) => parseFloat(b.consumoMedio) - parseFloat(a.consumoMedio))
+              filtrados
+                .filter(c => (parseFloat(c.consumo) || 0) > 0)
+                .sort((a, b) => parseFloat(b.consumo) - parseFloat(a.consumo))
                 .slice(0, 3)
-                .map((t, idx) => (
+                .map((c, idx) => (
                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '0.75rem', borderBottom: '1px solid #f5f5f5' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: '600', color: '#000000', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                        {t.nome}
+                        {c.motorista || 'N/A'} - {c.placa || 'N/A'}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#999999' }}>
-                        {t.abastecimentos} abastos
+                        {new Date(c.data).toLocaleDateString('pt-BR')}
                       </div>
                     </div>
                     <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'", fontSize: '0.85rem' }}>
-                      {t.consumoMedio} km/L
+                      {(parseFloat(c.consumo) || 0).toFixed(2)} km/L
                     </div>
                   </div>
                 ))
@@ -204,32 +205,33 @@ export default function CombustvelPage() {
           </div>
         </div>
 
-        {/* 3 Menores Médias de Consumo */}
+        {/* 3 Menores Abastecimentos do Mês (km/L) */}
         <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
-            3 Menores Médias (km/L)
+            3 Menores Médias do Mês
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {topTecnicos.length === 0 ? (
+            {filtrados.length === 0 ? (
               <div style={{ color: '#999999', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
                 Nenhum dado
               </div>
             ) : (
-              topTecnicos
-                .sort((a, b) => parseFloat(a.consumoMedio) - parseFloat(b.consumoMedio))
+              filtrados
+                .filter(c => (parseFloat(c.consumo) || 0) > 0)
+                .sort((a, b) => parseFloat(a.consumo) - parseFloat(b.consumo))
                 .slice(0, 3)
-                .map((t, idx) => (
+                .map((c, idx) => (
                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '0.75rem', borderBottom: '1px solid #f5f5f5' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: '600', color: '#000000', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                        {t.nome}
+                        {c.motorista || 'N/A'} - {c.placa || 'N/A'}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#999999' }}>
-                        {t.abastecimentos} abastos
+                        {new Date(c.data).toLocaleDateString('pt-BR')}
                       </div>
                     </div>
                     <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'", fontSize: '0.85rem' }}>
-                      {t.consumoMedio} km/L
+                      {(parseFloat(c.consumo) || 0).toFixed(2)} km/L
                     </div>
                   </div>
                 ))
