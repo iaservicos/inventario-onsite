@@ -28,10 +28,11 @@ export async function POST(request) {
     let data = [];
     try {
       console.log('[Import Simple] Tentando importar XLSX');
-      const XLSX = await import('xlsx');
-      console.log('[Import Simple] XLSX importado:', typeof XLSX);
+      const xlsxModule = await import('xlsx');
+      const XLSX = xlsxModule.default || xlsxModule;
+      console.log('[Import Simple] XLSX importado');
 
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
       console.log('[Import Simple] Workbook lido');
 
       const sheetName = workbook.SheetNames[0];
@@ -44,12 +45,12 @@ export async function POST(request) {
       console.log('[Import Simple] Dados parseados:', data.length, 'registros');
 
       if (data.length > 0) {
-        console.log('[Import Simple] Primeiro registro:', Object.keys(data[0]));
+        console.log('[Import Simple] Primeiro registro:', Object.keys(data[0]).slice(0, 5));
       }
     } catch (xlsxError) {
       console.error('[Import Simple] Erro ao ler com XLSX:', {
         message: xlsxError.message,
-        stack: xlsxError.stack
+        code: xlsxError.code
       });
       throw xlsxError;
     }
