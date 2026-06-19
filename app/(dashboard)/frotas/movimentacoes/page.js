@@ -14,19 +14,7 @@ export default function MovimentacoesPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const tecnicos = ['João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Ferreira'];
-        const movimentacoes = dados.data.flatMap((f) =>
-          Array.from({ length: 2 }, (_, i) => ({
-            id: `${f.id}-mov${i}`,
-            placa: f.placa,
-            modelo: f.modelo,
-            tecnicoAnterior: tecnicos[i % tecnicos.length],
-            tecnicoAtual: tecnicos[(i + 1) % tecnicos.length],
-            data: new Date(Date.now() - i * 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            registradoPor: 'Supervisor'
-          }))
-        );
-        setMovimentacoes(movimentacoes.sort((a, b) => new Date(b.data) - new Date(a.data)));
+        setMovimentacoes([]);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);

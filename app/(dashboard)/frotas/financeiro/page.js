@@ -14,19 +14,7 @@ export default function FinanceiroPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const tipos = ['Multa', 'Manutenção'];
-        const despesas = dados.data.flatMap((f, idx) =>
-          Array.from({ length: 3 }, (_, i) => ({
-            id: `${f.id}-desp${i}`,
-            data: new Date(Date.now() - i * 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            placa: f.placa,
-            modelo: f.modelo,
-            tipo: tipos[i % tipos.length],
-            descricao: tipos[i % tipos.length] === 'Multa' ? 'Multa de trânsito' : 'Revisão preventiva',
-            valor: (100 + Math.random() * 500).toFixed(2)
-          }))
-        );
-        setDespesas(despesas.sort((a, b) => new Date(b.data) - new Date(a.data)));
+        setDespesas([]);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -44,47 +32,17 @@ export default function FinanceiroPage() {
   );
 
   const kpis = {
-    totalMultas: despesas
-      .filter(d => d.tipo === 'Multa')
-      .reduce((acc, d) => acc + parseFloat(d.valor), 0)
-      .toFixed(2),
-    totalManutencoes: despesas
-      .filter(d => d.tipo === 'Manutenção')
-      .reduce((acc, d) => acc + parseFloat(d.valor), 0)
-      .toFixed(2),
-    totalGeral: despesas.reduce((acc, d) => acc + parseFloat(d.valor), 0).toFixed(2),
-    mediaVeiculo: (despesas.reduce((acc, d) => acc + parseFloat(d.valor), 0) / Math.max(1, new Set(despesas.map(d => d.placa)).size)).toFixed(2)
+    totalMultas: '0.00',
+    totalManutencoes: '0.00',
+    totalGeral: '0.00',
+    mediaVeiculo: '0.00'
   };
 
-  const rankingVeiculos = Array.from(
-    new Map(
-      despesas.map(d => [
-        d.placa,
-        {
-          placa: d.placa,
-          modelo: d.modelo,
-          multas: despesas.filter(x => x.placa === d.placa && x.tipo === 'Multa').reduce((acc, x) => acc + parseFloat(x.valor), 0),
-          manutencoes: despesas.filter(x => x.placa === d.placa && x.tipo === 'Manutenção').reduce((acc, x) => acc + parseFloat(x.valor), 0)
-        }
-      ])
-    ).values()
-  )
-    .map(v => ({ ...v, total: v.multas + v.manutencoes }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 5);
+  const rankingVeiculos = [];
 
-  const rankingTecnicos = [
-    { tecnico: 'João Silva', atp: 'ABC-1234', qtd: 3, valor: 450.00 },
-    { tecnico: 'Maria Santos', atp: 'XYZ-5678', qtd: 2, valor: 320.00 },
-    { tecnico: 'Pedro Oliveira', atp: 'DEF-9012', qtd: 1, valor: 150.00 }
-  ].sort((a, b) => b.valor - a.valor);
+  const rankingTecnicos = [];
 
-  const rankingOcorrencias = rankingVeiculos.map((v, i) => ({
-    ...v,
-    acidentes: Math.floor(Math.random() * 3),
-    multas_qtd: Math.floor(Math.random() * 5),
-    danos: Math.floor(Math.random() * 2)
-  }));
+  const rankingOcorrencias = [];
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -136,6 +94,11 @@ export default function FinanceiroPage() {
                 ))}
               </tbody>
             </table>
+            {rankingVeiculos.length === 0 && (
+              <div style={{ padding: '1rem', textAlign: 'center', color: '#999999', fontSize: '0.85rem' }}>
+                Nenhum dado disponível
+              </div>
+            )}
           </div>
         </div>
 
@@ -171,6 +134,11 @@ export default function FinanceiroPage() {
                 ))}
               </tbody>
             </table>
+            {rankingTecnicos.length === 0 && (
+              <div style={{ padding: '1rem', textAlign: 'center', color: '#999999', fontSize: '0.85rem' }}>
+                Nenhum dado disponível
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -211,6 +179,11 @@ export default function FinanceiroPage() {
                 ))}
               </tbody>
             </table>
+            {rankingOcorrencias.length === 0 && (
+              <div style={{ padding: '1rem', textAlign: 'center', color: '#999999', fontSize: '0.85rem' }}>
+                Nenhum dado disponível
+              </div>
+            )}
           </div>
         </div>
 
@@ -269,6 +242,11 @@ export default function FinanceiroPage() {
                 ))}
               </tbody>
             </table>
+            {filtrados.length === 0 && (
+              <div style={{ padding: '1rem', textAlign: 'center', color: '#999999', fontSize: '0.85rem' }}>
+                Nenhum dado disponível
+              </div>
+            )}
           </div>
         </div>
       </div>

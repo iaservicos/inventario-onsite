@@ -16,23 +16,7 @@ export default function DevolucoesPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const tecnicos = ['João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Ferreira'];
-        const motivos = ['Troca de responsável', 'Dano no veículo', 'Revisão', 'Abastecimento', 'Limpeza'];
-        const devolucoes = dados.data.flatMap((f) =>
-          Array.from({ length: 2 }, (_, i) => ({
-            id: `${f.id}-dev${i}`,
-            placa: f.placa,
-            modelo: f.modelo,
-            data: new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            tecnico: tecnicos[i % tecnicos.length],
-            hodometro: Math.floor(50000 + Math.random() * 150000),
-            motivo: motivos[i % motivos.length],
-            fotos: Math.floor(2 + Math.random() * 4),
-            fotoUrls: Array.from({ length: Math.floor(2 + Math.random() * 4) }, (_, j) => `foto-${j+1}.jpg`),
-            observacoes: 'Veículo devolvido em bom estado'
-          }))
-        );
-        setDevolucoes(devolucoes.sort((a, b) => new Date(b.data) - new Date(a.data)));
+        setDevolucoes([]);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);

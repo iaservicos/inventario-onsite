@@ -14,22 +14,7 @@ export default function ManutencaoPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const tipos = ['Revisão', 'Troca de Óleo', 'IPVA', 'Seguro', 'Pneu', 'Outro'];
-        const statusOpcoes = ['Em dia', 'Próxima em 30 dias', 'Vencida'];
-        const manutencoes = dados.data.flatMap((f) =>
-          Array.from({ length: 3 }, (_, i) => ({
-            id: `${f.id}-m${i}`,
-            placa: f.placa,
-            modelo: f.modelo,
-            tipo: tipos[i % tipos.length],
-            dataRealizacao: new Date(Date.now() - i * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            proximaPreventiva: new Date(Date.now() + (30 - i * 20) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            km: Math.floor(50000 + Math.random() * 150000),
-            valor: (200 + Math.random() * 800).toFixed(2),
-            status: statusOpcoes[i % statusOpcoes.length]
-          }))
-        );
-        setManutencoes(manutencoes.sort((a, b) => new Date(b.dataRealizacao) - new Date(a.dataRealizacao)));
+        setManutencoes([]);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);

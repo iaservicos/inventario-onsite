@@ -16,31 +16,7 @@ export default function CombustvelPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const estados = ['SP', 'RJ', 'MG', 'RS', 'PR', 'BA', 'SC'];
-        const produtos = ['Gasolina', 'Diesel', 'Arla 32'];
-        const motoristas = ['João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa'];
-        const combustivel = dados.data.flatMap((f) =>
-          Array.from({ length: 5 }, (_, i) => {
-            const litrosAbast = 20 + Math.random() * 30;
-            const kmRodado = 500 + Math.random() * 500;
-            return {
-              id: `${f.id}-comb${i}`,
-              data: new Date(Date.now() - i * 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              placa: f.placa,
-              modelo: f.modelo,
-              motorista: motoristas[i % motoristas.length],
-              uf: estados[i % estados.length],
-              produto: produtos[i % produtos.length],
-              litros: litrosAbast.toFixed(2),
-              kmL: (kmRodado / litrosAbast).toFixed(2),
-              hodometro: Math.floor(50000 + Math.random() * 150000),
-              valorUnit: (5.5 + Math.random() * 2).toFixed(2),
-              valorTotal: (litrosAbast * (5.5 + Math.random() * 2)).toFixed(2),
-              filial: 'Filial ' + ['A', 'B', 'C'][i % 3]
-            };
-          })
-        );
-        setCombustivel(combustivel.sort((a, b) => new Date(b.data) - new Date(a.data)));
+        setCombustivel([]);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -59,11 +35,11 @@ export default function CombustvelPage() {
   );
 
   const stats = {
-    totalGasto: (filtrados.reduce((acc, c) => acc + parseFloat(c.valorTotal), 0)).toFixed(2),
-    totalLitros: (filtrados.reduce((acc, c) => acc + parseFloat(c.litros), 0)).toFixed(2),
-    mediaKmL: (filtrados.reduce((acc, c) => acc + parseFloat(c.kmL), 0) / Math.max(1, filtrados.length)).toFixed(2),
-    abastecimentos: filtrados.length,
-    precoMedio: (filtrados.reduce((acc, c) => acc + parseFloat(c.valorUnit), 0) / Math.max(1, filtrados.length)).toFixed(2)
+    totalGasto: '0.00',
+    totalLitros: '0.00',
+    mediaKmL: '0.00',
+    abastecimentos: 0,
+    precoMedio: '0.00'
   };
 
   return (

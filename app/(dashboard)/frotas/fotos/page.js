@@ -13,18 +13,7 @@ export default function FotosPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const motoristas = ['João Silva', 'Maria Santos', 'Pedro Oliveira'];
-        const fotos = dados.data.flatMap((f) =>
-          Array.from({ length: 2 }, (_, i) => ({
-            id: `${f.id}-foto${i}`,
-            placa: f.placa,
-            motorista: motoristas[i % motoristas.length],
-            data: new Date(Date.now() - i * 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            hodometro: Math.floor(50000 + Math.random() * 150000),
-            status: i === 0 ? 'Pendente' : 'Revisão'
-          }))
-        );
-        setFotos(fotos.sort((a, b) => new Date(b.data) - new Date(a.data)));
+        setFotos([]);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
