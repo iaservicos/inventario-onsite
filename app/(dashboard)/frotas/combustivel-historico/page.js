@@ -1,0 +1,159 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import PageHeader from '@/components/ui/PageHeader';
+
+export default function CombustivelHistoricoPage() {
+  const [combustiveis, setCombustiveis] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({ search: '', motorista: '' });
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/frotas/combustivel/list', { cache: 'no-store' });
+      const dados = await res.json();
+      if (dados.success) {
+        setCombustiveis(dados.data || []);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const filtrados = combustiveis.filter(c => {
+    const matchSearch = !filters.search ||
+      (c.placa && c.placa.toUpperCase().includes(filters.search.toUpperCase()));
+    const matchMotorista = !filters.motorista ||
+      (c.motorista && c.motorista.toUpperCase().includes(filters.motorista.toUpperCase()));
+    return matchSearch && matchMotorista;
+  });
+
+  const motoristasUnicos = [...new Set(combustiveis.map(c => c.motorista))].sort();
+
+  const stats = {
+    totalAbastecimentos: filtrados.length,
+    totalLitros: filtrados.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(1),
+    totalGasto: filtrados.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2)
+  };
+
+  return (
+    <div style={{ padding: '2rem', width: '100%' }}>
+      <PageHeader
+        title="Histórico de Abastecimentos"
+        subtitle="Quem abasteceu cada veículo - data, horário, motorista e valores"
+      />
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+        <StatCard label="Total Abastecimentos" value={stats.totalAbastecimentos} />
+        <StatCard label="Total Litros" value={`${stats.totalLitros}L`} />
+        <StatCard label="Total Gasto" value={`R$ ${stats.totalGasto}`} />
+      </div>
+
+      {/* Filtros */}
+      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          placeholder="Buscar por placa..."
+          value={filters.search}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+        />
+        <select
+          value={filters.motorista}
+          onChange={(e) => setFilters({ ...filters, motorista: e.target.value })}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
+        >
+          <option value="">Todos motoristas</option>
+          {motoristasUnicos.map(m => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Tabela */}
+      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e5e5e5' }}>
+        {loading ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
+        ) : filtrados.length === 0 ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum abastecimento encontrado</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Quem Abasteceu</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Produto</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Terminal</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cidade</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Litros</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor Unit.</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor Total</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consumo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtrados.map((c, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                      {c.data ? new Date(c.data).toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
+                      {c.placa}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#000000' }}>
+                      {c.motorista}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                      {c.produto || '-'}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.85rem' }}>
+                      {c.terminal || '-'}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                      {c.cidade || '-'}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                      {(parseFloat(c.quantidade) || 0).toFixed(1)}L
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                      R$ {(parseFloat(c.valor_unitario) || 0).toFixed(2)}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                      R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                      {(parseFloat(c.consumo) || 0).toFixed(2)} km/L
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value }) {
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+        {value}
+      </div>
+    </div>
+  );
+}
