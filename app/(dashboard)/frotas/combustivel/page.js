@@ -139,9 +139,9 @@ export default function CombustvelPage() {
         <KPICard label="Preço Médio" value={`R$ ${stats.precoMedio}/L`} />
       </div>
 
-      {/* Motoristas com Maior/Menor Gasto e Top 5 Maiores Consumidores */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-        {/* Maiores Consumidores */}
+      {/* Top 5 + Maiores Médias + Menores Médias */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+        {/* Top 5 Maiores Consumidores */}
         <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
             Top 5 Maiores Consumidores
@@ -171,55 +171,70 @@ export default function CombustvelPage() {
           </div>
         </div>
 
-        {/* Motoristas por Faixa de Consumo */}
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'auto' }}>
+        {/* 3 Maiores Médias de Consumo */}
+        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
-            Motoristas por Consumo
+            3 Maiores Médias (km/L)
           </h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-                <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
-                  Motorista
-                </th>
-                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
-                  Gasto Total
-                </th>
-                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
-                  Abastecimentos
-                </th>
-                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
-                  Consumo Médio
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {topTecnicos.length === 0 ? (
-                <tr>
-                  <td colSpan="4" style={{ padding: '1rem', textAlign: 'center', color: '#999999' }}>
-                    Nenhum dado
-                  </td>
-                </tr>
-              ) : (
-                topTecnicos.map((m, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                    <td style={{ padding: '0.5rem', color: '#0066cc', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => abrirHistoricoMotorista(m.nome)}>
-                      {m.nome}
-                    </td>
-                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
-                      R$ {m.gasto.toFixed(2)}
-                    </td>
-                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
-                      {m.abastecimentos || '-'}
-                    </td>
-                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
-                      {m.consumoMedio ? `${m.consumoMedio} km/L` : '-'}
-                    </td>
-                  </tr>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {topTecnicos.length === 0 ? (
+              <div style={{ color: '#999999', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
+                Nenhum dado
+              </div>
+            ) : (
+              topTecnicos
+                .sort((a, b) => parseFloat(b.consumoMedio) - parseFloat(a.consumoMedio))
+                .slice(0, 3)
+                .map((t, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '0.75rem', borderBottom: '1px solid #f5f5f5' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', color: '#000000', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                        {t.nome}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#999999' }}>
+                        {t.abastecimentos} abastos
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'", fontSize: '0.85rem' }}>
+                      {t.consumoMedio} km/L
+                    </div>
+                  </div>
                 ))
-              )}
-            </tbody>
-          </table>
+            )}
+          </div>
+        </div>
+
+        {/* 3 Menores Médias de Consumo */}
+        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
+            3 Menores Médias (km/L)
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {topTecnicos.length === 0 ? (
+              <div style={{ color: '#999999', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
+                Nenhum dado
+              </div>
+            ) : (
+              topTecnicos
+                .sort((a, b) => parseFloat(a.consumoMedio) - parseFloat(b.consumoMedio))
+                .slice(0, 3)
+                .map((t, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '0.75rem', borderBottom: '1px solid #f5f5f5' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', color: '#000000', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                        {t.nome}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#999999' }}>
+                        {t.abastecimentos} abastos
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'", fontSize: '0.85rem' }}>
+                      {t.consumoMedio} km/L
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
         </div>
       </div>
 
