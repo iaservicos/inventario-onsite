@@ -1,15 +1,13 @@
 /**
- * API de Importação Simplificada - sem dependências externas
+ * API de Importação Simplificada
  * POST /api/frotas/combustivel/import-simple
+ *
+ * Compatível com o relatório padrão de consumo da Positivo
  */
-
-import { saveCombustivelBatch, normalizeCombustivel, validateCombustivel } from '@/lib/models/combustivel';
 
 export async function POST(request) {
   try {
     console.log('[Import Simple] Iniciando');
-    const contentType = request.headers.get('content-type');
-    console.log('[Import Simple] Content-Type:', contentType);
 
     // Receber o arquivo como FormData
     const formData = await request.formData();
@@ -24,148 +22,139 @@ export async function POST(request) {
 
     console.log('[Import Simple] Arquivo:', { name: file.name, size: file.size });
 
-    // Ler arquivo como texto
-    const text = await file.text();
-    console.log('[Import Simple] Arquivo lido, tamanho:', text.length);
+    // Ler arquivo como ArrayBuffer e usar XLSX
+    const arrayBuffer = await file.arrayBuffer();
 
-    // Parse simples - trata como CSV/XLSX exportado como texto
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line);
-    console.log('[Import Simple] Total de linhas:', lines.length);
+    let data = [];
+    try {
+      const XLSX = await import('xlsx');
+      const workbook = XLSX.default.read(arrayBuffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
 
-    if (lines.length < 2) {
-      return Response.json(
-        { success: false, error: 'Arquivo vazio ou sem dados' },
-        { status: 400 }
-      );
+      console.log('[Import Simple] Sheet lida:', sheetName);
+
+      // Converter para JSON
+      data = XLSX.default.utils.sheet_to_json(worksheet);
+      console.log('[Import Simple] Dados parseados:', data.length, 'registros');
+    } catch (xlsxError) {
+      console.error('[Import Simple] Erro ao ler com XLSX:', xlsxError);
+      throw xlsxError;
     }
-
-    // Extrair headers (primeira linha)
-    const headerLine = lines[0];
-    // Tenta com vírgula, depois ponto-e-vírgula
-    let headers = headerLine.split(',').map(h => h.trim().toLowerCase());
-    if (headers.length === 1) {
-      headers = headerLine.split(';').map(h => h.trim().toLowerCase());
-    }
-
-    console.log('[Import Simple] Headers:', headers);
-
-    // Processar dados
-    const data = [];
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      let values = line.split(',').map(v => v.trim());
-      if (values.length === 1) {
-        values = line.split(';').map(v => v.trim());
-      }
-
-      if (values.every(v => !v)) continue; // pular linhas vazias
-
-      const row = {};
-      headers.forEach((header, idx) => {
-        row[header] = values[idx] || '';
-      });
-
-      data.push(row);
-      console.log(`[Import Simple] Linha ${i}:`, {
-        placa: row.placa || row.vehicle,
-        data: row.data || row.date
-      });
-    }
-
-    console.log('[Import Simple] Total de registros:', data.length);
 
     if (data.length === 0) {
       return Response.json(
-        { success: false, error: 'Nenhum dado para importar' },
+        { success: false, error: 'Nenhum dado encontrado no arquivo' },
         { status: 400 }
       );
     }
 
-    // Normalizar nomes de campo para lowercase
-    const normalized = data.map(row => {
-      const newRow = {};
-      Object.keys(row).forEach(key => {
-        const lowerKey = key.toLowerCase().trim();
-        newRow[lowerKey] = row[key];
-      });
-      return newRow;
-    });
+    // Importar Supabase para salvar
+    const { createServiceClient } = await import('@/lib/supabase');
+    const supabase = createServiceClient();
 
-    console.log('[Import Simple] Normalizando registros');
-
-    // Tentar salvar
+    // Processar e salvar
     let saved = 0;
     const errors = [];
 
-    for (let i = 0; i < normalized.length; i++) {
-      const record = normalized[i];
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
 
       try {
-        // Validar
-        const validation = validateCombustivel(record);
-        if (!validation.valid) {
-          console.log(`[Import Simple] Linha ${i + 2} inválida:`, validation.errors);
-          errors.push({
-            line: i + 2,
-            errors: validation.errors
-          });
-          continue;
+        // Normalizar nomes de coluna - Excel vem com MAIÚSCULA
+        const record = {};
+        Object.keys(row).forEach(key => {
+          const lowerKey = key.toLowerCase().trim();
+          record[lowerKey] = row[key];
+        });
+
+        console.log(`[Import Simple] Processando linha ${i + 1}:`, {
+          placa: record.placa,
+          motorista: record.motorista
+        });
+
+        // Validar campos obrigatórios
+        if (!record.placa || !record.data || !record.motorista) {
+          throw new Error('Campos obrigatórios faltando: placa, data, motorista');
         }
 
-        // Normalizar
-        const normalized_record = normalizeCombustivel(record);
+        // Converter data (vem como "01/05/2026 00:07:22" ou número Excel)
+        let dataFormatada = record.data;
+        if (typeof record.data === 'string' && record.data.includes('/')) {
+          const [dataPart] = record.data.split(' ');
+          const [dia, mes, ano] = dataPart.split('/');
+          dataFormatada = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T00:00:00`;
+        } else if (typeof record.data === 'number') {
+          // Excel serial date
+          const date = new Date((record.data - 25569) * 86400 * 1000);
+          dataFormatada = date.toISOString().split('T')[0];
+        }
 
-        // Salvar no Supabase
-        const { createServiceClient } = await import('@/lib/supabase');
-        const supabase = createServiceClient();
+        // Converter números
+        const quantidade = parseFloat(record.quantidade) || 0;
+        const valor_unitario = parseFloat(record['valor unitario'] || record['valor_unitario']) || 0;
+        const valor_total = parseFloat(record['valor total'] || record['valor_total']) || 0;
+        const distancia = parseInt(record.distancia) || 0;
+        const consumo = parseFloat(record.consumo) || 0;
+        const hodometro = parseInt(record.hodometro) || 0;
 
-        const { data: insertData, error: insertError } = await supabase
+        // Preparar dados para inserção
+        const insertData = {
+          placa: record.placa.toString().toUpperCase().trim(),
+          data: dataFormatada,
+          numero_cartao: record['numero cartao'] || record['numero_cartao'] || null,
+          matricula: record.matricula || null,
+          motorista: record.motorista.toString().trim(),
+          tipo_frota: record['tipo frota'] || record['tipo_frota'] || null,
+          modelo: record.modelo || null,
+          fabricante: record.fabricante || null,
+          terminal: record.terminal || null,
+          estabelecimento: record.estabelecimento || null,
+          cidade: record.cidade || null,
+          uf: record.uf ? record.uf.toString().toUpperCase().trim() : null,
+          produto: record.produto || null,
+          distancia: distancia,
+          consumo: consumo,
+          unidade: record.unidade || null,
+          hodometro: hodometro,
+          quantidade: quantidade,
+          valor_unitario: valor_unitario,
+          valor_total: valor_total,
+          cupom_fiscal: record['cupom fiscal'] || record['cupom_fiscal'] || null,
+          centro_resultado: record['centro resultado'] || record['centro_resultado'] || null,
+          filial: record.filial || null,
+          centro_custo: record['centro custo'] || record['centro_custo'] || null
+        };
+
+        // Inserir no banco
+        const { error: insertError } = await supabase
           .from('combustiveis')
-          .insert({
-            data: normalized_record.data,
-            placa: normalized_record.placa,
-            motorista: normalized_record.motorista,
-            uf: normalized_record.uf,
-            produto: normalized_record.produto,
-            litros: normalized_record.litros,
-            km_l: normalized_record.kmL,
-            hodometro: normalized_record.hodometro,
-            vl_unit: normalized_record.vl_unit,
-            vl_total: normalized_record.vl_total,
-            filial: normalized_record.filial,
-            uso: normalized_record.uso
-          })
-          .select()
-          .single();
+          .insert(insertData);
 
         if (insertError) {
-          console.error(`[Import Simple] Erro ao salvar linha ${i + 2}:`, insertError.message);
-          errors.push({
-            line: i + 2,
-            errors: [insertError.message]
-          });
-          continue;
+          throw insertError;
         }
 
         saved++;
-        console.log(`[Import Simple] Linha ${i + 2} salva com sucesso`);
+        console.log(`[Import Simple] Linha ${i + 1} importada com sucesso`);
       } catch (err) {
-        console.error(`[Import Simple] Exceção na linha ${i + 2}:`, err.message);
+        console.error(`[Import Simple] Erro na linha ${i + 1}:`, err.message);
         errors.push({
-          line: i + 2,
-          errors: [err.message]
+          line: i + 1,
+          placa: row.PLACA || row.placa || 'N/A',
+          error: err.message
         });
       }
     }
 
-    console.log('[Import Simple] Conclusão:', { saved, total: normalized.length, errors: errors.length });
+    console.log('[Import Simple] Importação concluída:', { saved, total: data.length, errors: errors.length });
 
     return Response.json({
       success: errors.length === 0,
       imported: saved,
-      total: normalized.length,
+      total: data.length,
       failed: errors.length,
-      message: `${saved} de ${normalized.length} registros importados`,
+      message: `${saved} de ${data.length} registros importados com sucesso`,
       details: {
         errors: errors.length > 0 ? errors.slice(0, 10) : null
       }
@@ -175,8 +164,7 @@ export async function POST(request) {
     return Response.json(
       {
         success: false,
-        error: error.message,
-        details: error.stack
+        error: 'Erro ao processar importação: ' + error.message
       },
       { status: 500 }
     );
