@@ -11,6 +11,8 @@ export default function CombustvelPage() {
   const [filters, setFilters] = useState({ search: '', mes: '', uf: '', produto: '', uso: '' });
   const [combustivel, setCombustivel] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [topTecnicos, setTopTecnicos] = useState([]);
+  const [mediaMes, setMediaMes] = useState([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -19,6 +21,45 @@ export default function CombustvelPage() {
       const dados = await res.json();
       if (dados.success) {
         setCombustivel(dados.data || []);
+
+        // Calcular top 5 técnicos que mais gastam
+        const tecnicos = {};
+        dados.data.forEach(c => {
+          if (!tecnicos[c.motorista]) {
+            tecnicos[c.motorista] = 0;
+          }
+          tecnicos[c.motorista] += parseFloat(c.valor_total) || 0;
+        });
+        const top = Object.entries(tecnicos)
+          .map(([nome, gasto]) => ({ nome, gasto }))
+          .sort((a, b) => b.gasto - a.gasto)
+          .slice(0, 5);
+        setTopTecnicos(top);
+
+        // Calcular média por mês
+        const meses = {};
+        dados.data.forEach(c => {
+          if (c.data) {
+            const data = new Date(c.data);
+            const mes = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+            if (!meses[mes]) {
+              meses[mes] = { total: 0, quantidade: 0, litros: 0 };
+            }
+            meses[mes].total += parseFloat(c.valor_total) || 0;
+            meses[mes].quantidade += 1;
+            meses[mes].litros += parseFloat(c.quantidade) || 0;
+          }
+        });
+        const media = Object.entries(meses)
+          .map(([mes, dados]) => ({
+            mes,
+            gasto: dados.total,
+            abastecimentos: dados.quantidade,
+            litros: dados.litros,
+            media: (dados.total / dados.quantidade).toFixed(2)
+          }))
+          .sort((a, b) => b.mes.localeCompare(a.mes));
+        setMediaMes(media);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -78,6 +119,93 @@ export default function CombustvelPage() {
         <KPICard label="Média Km/L" value={stats.mediaKmL} color="green" />
         <KPICard label="Abastecimentos" value={stats.abastecimentos} color="blue" />
         <KPICard label="Preço Médio" value={`R$ ${stats.precoMedio}/L`} color="red" />
+      </div>
+
+      {/* Top Técnicos e Média por Mês */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+        {/* Top Técnicos */}
+        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
+            Top 5 Maiores Gastadores
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {topTecnicos.length === 0 ? (
+              <div style={{ color: '#999999', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
+                Nenhum dado
+              </div>
+            ) : (
+              topTecnicos.map((t, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid #f5f5f5' }}>
+                  <div>
+                    <div style={{ fontWeight: '600', color: '#000000', fontSize: '0.9rem' }}>
+                      {idx + 1}. {t.nome}
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'" }}>
+                    R$ {t.gasto.toFixed(2)}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Média por Mês */}
+        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'auto' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
+            Média por Mês
+          </h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #eeeeee' }}>
+                <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
+                  Mês
+                </th>
+                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
+                  Gasto
+                </th>
+                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
+                  Abasteç.
+                </th>
+                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
+                  Litros
+                </th>
+                <th style={{ padding: '0.5rem', textAlign: 'right', fontWeight: '700', color: '#666666', fontSize: '0.75rem' }}>
+                  Média
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {mediaMes.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ padding: '1rem', textAlign: 'center', color: '#999999' }}>
+                    Nenhum dado
+                  </td>
+                </tr>
+              ) : (
+                mediaMes.map((m, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                    <td style={{ padding: '0.5rem', color: '#333333', fontWeight: '600' }}>
+                      {new Date(m.mes + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                    </td>
+                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
+                      R$ {m.gasto.toFixed(2)}
+                    </td>
+                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                      {m.abastecimentos}
+                    </td>
+                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                      {m.litros.toFixed(1)}L
+                    </td>
+                    <td style={{ padding: '0.5rem', textAlign: 'right', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
+                      R$ {m.media}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Filtro */}

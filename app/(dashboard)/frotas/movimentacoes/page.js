@@ -11,10 +11,10 @@ export default function MovimentacoesPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/frotas', { cache: 'no-store' });
+      const res = await fetch('/api/frotas/movimentacao/list', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        setMovimentacoes([]);
+        setMovimentacoes(dados.data || []);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -28,23 +28,40 @@ export default function MovimentacoesPage() {
   }, [load]);
 
   const filtrados = movimentacoes.filter(m =>
-    m.placa.toUpperCase().includes(filters.search.toUpperCase()) ||
-    m.tecnicoAnterior.toUpperCase().includes(filters.search.toUpperCase()) ||
-    m.tecnicoAtual.toUpperCase().includes(filters.search.toUpperCase())
+    m.placa.toUpperCase().includes(filters.search.toUpperCase())
   );
+
+  const stats = {
+    total: filtrados.length,
+    ultimas24h: filtrados.filter(m => {
+      const data = new Date(m.data_movimentacao);
+      const agora = new Date();
+      const diff = (agora - data) / (1000 * 60 * 60);
+      return diff <= 24;
+    }).length
+  };
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
-      <PageHeader title="Movimentações" subtitle="Registro de todas as trocas de técnico por veículo" />
+      <PageHeader
+        title="Movimentações"
+        subtitle="Histórico de trocas de técnico e alocação de veículos"
+      />
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+        <StatCard label="Total de Movimentações" value={stats.total} />
+        <StatCard label="Últimas 24h" value={stats.ultimas24h} />
+      </div>
 
       {/* Filtro */}
-      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
         <input
           type="text"
-          placeholder="Buscar por placa ou técnico..."
+          placeholder="Buscar por placa..."
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ flex: 1, minWidth: '200px', padding: '0.5rem 0.75rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem' }}
+          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
         />
       </div>
 
@@ -58,32 +75,51 @@ export default function MovimentacoesPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Anterior</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Atual</th>
+                <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Registrado por</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Anterior</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Novo Técnico</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motivo</th>
                 </tr>
               </thead>
               <tbody>
-                {filtrados.map((m) => (
-                  <tr key={m.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>{m.placa}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.modelo}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.tecnicoAnterior}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.tecnicoAtual}</td>
+                {filtrados.map((m, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
                     <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
-                      {new Date(m.data).toLocaleDateString('pt-BR')}
+                      {m.data_movimentacao ? new Date(m.data_movimentacao).toLocaleDateString('pt-BR') : '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.registradoPor}</td>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
+                      {m.placa}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                      {m.tecnico_anterior || '-'}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#333333', fontWeight: '600' }}>
+                      {m.novo_tecnico || '-'}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                      {m.motivo || '-'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value }) {
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+        {value}
       </div>
     </div>
   );

@@ -6,14 +6,15 @@ import PageHeader from '@/components/ui/PageHeader';
 export default function FotosPage() {
   const [fotos, setFotos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({ placa: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/frotas', { cache: 'no-store' });
+      const res = await fetch('/api/frotas/fotos-hodometro/list', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        setFotos([]);
+        setFotos(dados.data || []);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -26,26 +27,42 @@ export default function FotosPage() {
     load();
   }, [load]);
 
-  const handleAprovar = (id) => {
-    setFotos(fotos.filter(f => f.id !== id));
+  const filtrados = fotos.filter(f =>
+    f.placa.toUpperCase().includes(filters.placa.toUpperCase())
+  );
+
+  const stats = {
+    pendentes: filtrados.filter(f => f.status === 'pendente').length,
+    aprovadas: filtrados.filter(f => f.status === 'aprovado').length,
+    rejeitadas: filtrados.filter(f => f.status === 'rejeitado').length
   };
 
-  const handleRejeitar = (id) => {
-    const foto = fotos.find(f => f.id === id);
-    if (foto) {
-      foto.status = 'Rejeitada';
-      setFotos([...fotos]);
-    }
-  };
-
-  const fotosPendentes = fotos.filter(f => f.status === 'Pendente');
+  const fotosPendentes = filtrados.filter(f => f.status === 'pendente');
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
-        title="Validar Fotos"
+        title="Validação de Fotos do Hodômetro"
         subtitle="Aprovando, a foto é apagada do banco. Rejeitando, o gestor é notificado."
       />
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+        <StatCard label="Pendentes" value={stats.pendentes} />
+        <StatCard label="Aprovadas" value={stats.aprovadas} />
+        <StatCard label="Rejeitadas" value={stats.rejeitadas} />
+      </div>
+
+      {/* Filtro */}
+      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
+        <input
+          type="text"
+          placeholder="Filtrar por placa..."
+          value={filters.placa}
+          onChange={(e) => setFilters({ ...filters, placa: e.target.value })}
+          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+        />
+      </div>
 
       {/* Grid de Fotos */}
       <div style={{ marginTop: '1.5rem' }}>
@@ -169,17 +186,19 @@ export default function FotosPage() {
         )}
       </div>
 
-      {/* Fotos Rejeitadas */}
-      {fotos.filter(f => f.status === 'Rejeitada').length > 0 && (
-        <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', border: '1px solid #dddddd', borderRadius: '6px' }}>
-          <div style={{ color: '#333333', fontWeight: '600', marginBottom: '0.5rem' }}>
-            Fotos Rejeitadas ({fotos.filter(f => f.status === 'Rejeitada').length})
-          </div>
-          <div style={{ color: '#666666', fontSize: '0.9rem' }}>
-            O gestor foi notificado sobre as rejeições.
-          </div>
-        </div>
-      )}
+    </div>
+  );
+}
+
+function StatCard({ label, value }) {
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+        {value}
+      </div>
     </div>
   );
 }
