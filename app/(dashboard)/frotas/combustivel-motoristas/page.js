@@ -7,9 +7,10 @@ export default function CombustivelMotoristasPage() {
   const [motoristas, setMotoristas] = useState([]);
   const [combustivelBruto, setCombustivelBruto] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ultimoMes, setUltimoMes] = useState(new Date().toISOString().substring(0, 7));
   const [filters, setFilters] = useState({
     search: '',
-    mes: new Date().toISOString().substring(0, 7),
+    mes: '',
     produto: '',
     uf: ''
   });
@@ -22,9 +23,26 @@ export default function CombustivelMotoristasPage() {
       const res = await fetch('/api/frotas/combustivel/list', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        // Filtrar por critérios
+        setCombustivelBruto(dados.data || []);
+
+        // Detectar último mês com dados
+        if (dados.data && dados.data.length > 0) {
+          const meses = dados.data
+            .map(c => new Date(c.data).toISOString().substring(0, 7))
+            .filter(Boolean);
+          const mesUnico = [...new Set(meses)].sort().reverse()[0];
+          setUltimoMes(mesUnico);
+
+          // Atualizar filtro com o último mês encontrado
+          if (!filters.mes) {
+            setFilters(prev => ({ ...prev, mes: mesUnico }));
+          }
+        }
+
+        // Filtrar por critérios (usar ultimoMes se nenhum mês foi selecionado)
+        const mesFiltro = filters.mes || ultimoMes;
         const dadosFiltrados = dados.data.filter(c => {
-          const matchMes = !filters.mes || new Date(c.data).toISOString().substring(0, 7) === filters.mes;
+          const matchMes = new Date(c.data).toISOString().substring(0, 7) === mesFiltro;
           const matchProduto = !filters.produto || (c.produto && c.produto.toLowerCase() === filters.produto.toLowerCase());
           const matchUf = !filters.uf || (c.uf && c.uf === filters.uf);
           return matchMes && matchProduto && matchUf;
@@ -72,14 +90,13 @@ export default function CombustivelMotoristasPage() {
           .sort((a, b) => b.gasto - a.gasto);
 
         setMotoristas(lista);
-        setCombustivelBruto(dados.data || []);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, ultimoMes]);
 
   useEffect(() => {
     load();
@@ -154,7 +171,7 @@ export default function CombustivelMotoristasPage() {
 
       {/* Filtros e Ordenação */}
       <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
-        {/* Linha Principal */}
+        {/* Linha 1: Busca e Filtros Básicos */}
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
           <input
             type="text"
@@ -163,74 +180,47 @@ export default function CombustivelMotoristasPage() {
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
           />
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            style={{
-              padding: '0.5rem 0.75rem',
-              background: showFilters ? '#333333' : '#f5f5f5',
-              color: showFilters ? '#ffffff' : '#333333',
-              border: '1px solid #e5e5e5',
-              borderRadius: '4px',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            ⚙️ Filtros Avançados
-          </button>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Mês</label>
+            <input
+              type="month"
+              value={filters.mes || ultimoMes}
+              onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Combustível</label>
+            <select
+              value={filters.produto}
+              onChange={(e) => setFilters({ ...filters, produto: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+            >
+              <option value="">Todos</option>
+              {produtosUnicos.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: '600', color: '#666666', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Estado</label>
+            <select
+              value={filters.uf}
+              onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
+              style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+            >
+              <option value="">Todos</option>
+              {ufsUnicos.map(u => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Filtros Avançados - Expansível */}
-        {showFilters && (
-          <div style={{ paddingTop: '1rem', borderTop: '1px solid #e5e5e5', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#666666', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                Mês
-              </label>
-              <input
-                type="month"
-                value={filters.mes}
-                onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#666666', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                Tipo de Combustível
-              </label>
-              <select
-                value={filters.produto}
-                onChange={(e) => setFilters({ ...filters, produto: e.target.value })}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
-              >
-                <option value="">Todos</option>
-                {produtosUnicos.map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#666666', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                Estado (UF)
-              </label>
-              <select
-                value={filters.uf}
-                onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
-              >
-                <option value="">Todos</option>
-                {ufsUnicos.map(u => (
-                  <option key={u} value={u}>{u}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        )}
-
-        {/* Ordenação */}
+        {/* Linha 2: Ordenação */}
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', paddingTop: '1rem', borderTop: '1px solid #e5e5e5' }}>
           <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#333333' }}>Ordenar por:</span>
           <select
