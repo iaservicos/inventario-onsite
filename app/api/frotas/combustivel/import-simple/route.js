@@ -2,14 +2,13 @@
  * API de Importação Simplificada
  * POST /api/frotas/combustivel/import-simple
  *
- * Compatível com o relatório padrão de consumo da Positivo
+ * Compatível com o relatório padrão de consumo da Positivo (26 colunas)
  */
 
 export async function POST(request) {
   try {
     console.log('[Import Simple] Iniciando');
 
-    // Receber o arquivo como FormData
     const formData = await request.formData();
     const file = formData.get('file');
 
@@ -22,37 +21,24 @@ export async function POST(request) {
 
     console.log('[Import Simple] Arquivo:', { name: file.name, size: file.size });
 
-    // Ler arquivo como ArrayBuffer e usar XLSX
+    // Ler com XLSX
     const arrayBuffer = await file.arrayBuffer();
+    const xlsxModule = await import('xlsx');
+    const XLSX = xlsxModule.default || xlsxModule;
 
-    let data = [];
-    try {
-      console.log('[Import Simple] Tentando importar XLSX');
-      const xlsxModule = await import('xlsx');
-      const XLSX = xlsxModule.default || xlsxModule;
-      console.log('[Import Simple] XLSX importado');
+    const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
 
-      const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-      console.log('[Import Simple] Workbook lido');
+    console.log('[Import Simple] Sheet lida:', sheetName);
 
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
+    // Converter para JSON
+    const data = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' });
+    console.log('[Import Simple] Dados parseados:', data.length, 'registros');
 
-      console.log('[Import Simple] Sheet lida:', sheetName);
-
-      // Converter para JSON
-      data = XLSX.utils.sheet_to_json(worksheet);
-      console.log('[Import Simple] Dados parseados:', data.length, 'registros');
-
-      if (data.length > 0) {
-        console.log('[Import Simple] Primeiro registro:', Object.keys(data[0]).slice(0, 5));
-      }
-    } catch (xlsxError) {
-      console.error('[Import Simple] Erro ao ler com XLSX:', {
-        message: xlsxError.message,
-        code: xlsxError.code
-      });
-      throw xlsxError;
+    if (data.length > 0) {
+      console.log('[Import Simple] Headers:', Object.keys(data[0]).length, 'colunas');
+      console.log('[Import Simple] Primeiro registro - Placa:', data[0].PLACA);
     }
 
     if (data.length === 0) {

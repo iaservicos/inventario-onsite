@@ -19,63 +19,7 @@ export default function CombustvelImportForm() {
     setPreview(null);
     setErrosDetalhados(null);
 
-    // Apenas mostrar que arquivo foi selecionado, sem preview
-    setPreview({
-      nomeArquivo: file.name,
-      totalLinhas: '?',
-      previewLinhas: [['Arquivo selecionado. Clique em Confirmar para processar.']]
-    });
-
     toast.success('Arquivo selecionado: ' + file.name);
-  }
-
-  async function handleAnalyze() {
-    if (!arquivo) {
-      toast.error('Selecione um arquivo');
-      return;
-    }
-
-    setImportando(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', arquivo);
-
-      const res = await fetch('/api/frotas/combustivel/analyze', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        console.log('Estrutura do Excel:', data);
-        alert(`
-ESTRUTURA DO EXCEL:
-─────────────────────────────────
-Separador: ${data.structure.separator}
-Total de colunas: ${data.structure.totalHeaders}
-Total de linhas: ${data.structure.totalDataLines}
-
-COLUNAS ENCONTRADAS:
-${data.structure.headers.map((h, i) => `  ${i + 1}. ${h}`).join('\n')}
-
-AMOSTRA DE DADOS (primeiras 3 linhas):
-${data.sampleData.slice(0, 3).map((row, i) => `
-Linha ${i + 1}:
-${Object.entries(row).map(([k, v]) => `  ${k}: ${v}`).join('\n')}
-`).join('\n')}
-        `);
-        toast.success('Estrutura analisada');
-      } else {
-        toast.error('Erro: ' + data.error);
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-      toast.error('Erro ao analisar: ' + error.message);
-    } finally {
-      setImportando(false);
-    }
   }
 
   async function handleImport() {
@@ -212,104 +156,34 @@ ${Object.entries(row).map(([k, v]) => `  ${k}: ${v}`).join('\n')}
           </div>
         </div>
 
-        {/* Preview */}
-        {preview && (
-          <div
-            style={{
-              background: '#f9f9f9',
-              border: '1px solid #e5e5e5',
-              borderRadius: '4px',
-              padding: '1rem',
-              marginBottom: '1.5rem',
-              fontSize: '0.85rem'
-            }}>
-            <div style={{ fontWeight: '700', color: '#000000', marginBottom: '0.5rem' }}>
-              Preview - {preview.totalLinhas} registros
-            </div>
-            <div style={{ color: '#666666', marginBottom: '0.75rem' }}>
-              Primeiras linhas do arquivo:
-            </div>
-            <div
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                borderRadius: '3px',
-                padding: '0.75rem',
-                overflowX: 'auto',
-                fontSize: '0.75rem',
-                fontFamily: "'JetBrains Mono', monospace",
-                color: '#333333',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word'
-              }}>
-              {preview.previewLinhas
-                .map((linha, i) => {
-                  if (Array.isArray(linha)) {
-                    return linha.join(' | ');
-                  }
-                  return typeof linha === 'string' ? linha : JSON.stringify(linha);
-                })
-                .join('\n')}
-            </div>
-          </div>
-        )}
-
-        {/* Botões */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <button
-            onClick={handleAnalyze}
-            disabled={!arquivo || importando}
-            style={{
-              padding: '0.75rem',
-              background: !arquivo || importando ? '#cccccc' : '#666666',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '0.9rem',
-              fontWeight: '700',
-              cursor: !arquivo || importando ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={e => {
-              if (arquivo && !importando) {
-                e.target.style.background = '#888888';
-              }
-            }}
-            onMouseOut={e => {
-              if (arquivo && !importando) {
-                e.target.style.background = '#666666';
-              }
-            }}>
-            {importando ? 'Analisando...' : 'Analisar Estrutura'}
-          </button>
-
-          <button
-            onClick={handleImport}
-            disabled={!arquivo || importando}
-            style={{
-              padding: '0.75rem',
-              background: !arquivo || importando ? '#cccccc' : '#000000',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '0.9rem',
-              fontWeight: '700',
-              cursor: !arquivo || importando ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={e => {
-              if (arquivo && !importando) {
-                e.target.style.background = '#222222';
-              }
-            }}
-            onMouseOut={e => {
-              if (arquivo && !importando) {
-                e.target.style.background = '#000000';
-              }
-            }}>
-            {importando ? 'Importando...' : 'Confirmar Importação'}
-          </button>
-        </div>
+        {/* Botão Importar */}
+        <button
+          onClick={handleImport}
+          disabled={!arquivo || importando}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            background: !arquivo || importando ? '#cccccc' : '#000000',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '0.9rem',
+            fontWeight: '700',
+            cursor: !arquivo || importando ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={e => {
+            if (arquivo && !importando) {
+              e.target.style.background = '#222222';
+            }
+          }}
+          onMouseOut={e => {
+            if (arquivo && !importando) {
+              e.target.style.background = '#000000';
+            }
+          }}>
+          {importando ? 'Importando...' : 'Importar'}
+        </button>
       </div>
 
       {/* Resultado */}
