@@ -196,11 +196,10 @@ export default function CombustivelMotoristasPage() {
       />
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
         <StatCard label="Total Motoristas" value={formatarNumero(stats.totalMotoristas)} />
         <StatCard label="Gasto Total" value={formatarMoeda(stats.gastoTotal)} />
         <StatCard label="Total KM Rodado" value={formatarNumero(filtrados.reduce((sum, m) => sum + m.totalKm, 0))} unit="km" />
-        <StatCard label="Consumo Médio Geral" value={`${stats.consumoMedioGeral} km/L`} />
       </div>
 
       {/* Filtros e Ordenação */}
@@ -283,14 +282,14 @@ export default function CombustivelMotoristasPage() {
       </div>
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e5e5e5' }}>
+      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e5e5e5', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 400px)' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum motorista encontrado</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+          <div style={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', minWidth: '1000px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motorista</th>

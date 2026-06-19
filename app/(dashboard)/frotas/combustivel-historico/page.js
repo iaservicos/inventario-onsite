@@ -145,14 +145,14 @@ export default function CombustivelHistoricoPage() {
       </div>
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e5e5e5' }}>
+      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e5e5e5', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 400px)' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum abastecimento encontrado</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+          <div style={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', minWidth: '1100px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
