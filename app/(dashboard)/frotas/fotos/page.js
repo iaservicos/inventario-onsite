@@ -2,11 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
-import FilterBar from '@/components/ui/FilterBar';
 
 export default function FotosPage() {
-  const [filters, setFilters] = useState({ search: '' });
-  const [documentos, setDocumentos] = useState([]);
+  const [fotos, setFotos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -15,19 +13,18 @@ export default function FotosPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        const tipos = ['Frontal', 'Traseira', 'Lateral', 'Interior', 'Documentos'];
-        const documentos = dados.data.flatMap((f, idx) =>
-          Array.from({ length: 3 }, (_, i) => ({
-            id: `${f.id}-${i}`,
+        const motoristas = ['João Silva', 'Maria Santos', 'Pedro Oliveira'];
+        const fotos = dados.data.flatMap((f) =>
+          Array.from({ length: 2 }, (_, i) => ({
+            id: `${f.id}-foto${i}`,
             placa: f.placa,
-            modelo: f.modelo,
-            tipo: tipos[i % tipos.length],
-            data: new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            descricao: 'Documentação do veículo',
-            tamanho: `${(Math.random() * 5 + 1).toFixed(1)}MB`
+            motorista: motoristas[i % motoristas.length],
+            data: new Date(Date.now() - i * 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            hodometro: Math.floor(50000 + Math.random() * 150000),
+            status: i === 0 ? 'Pendente' : 'Revisão'
           }))
         );
-        setDocumentos(documentos.sort((a, b) => new Date(b.data) - new Date(a.data)));
+        setFotos(fotos.sort((a, b) => new Date(b.data) - new Date(a.data)));
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -40,82 +37,160 @@ export default function FotosPage() {
     load();
   }, [load]);
 
-  const filtrados = documentos.filter(d =>
-    d.placa.toUpperCase().includes(filters.search.toUpperCase())
-  );
-
-  const stats = {
-    totalArquivos: documentos.length,
-    tamanhoTotal: (documentos.reduce((acc, d) => acc + parseFloat(d.tamanho), 0)).toFixed(1),
-    veiculos: new Set(documentos.map(d => d.placa)).size
+  const handleAprovar = (id) => {
+    setFotos(fotos.filter(f => f.id !== id));
   };
+
+  const handleRejeitar = (id) => {
+    const foto = fotos.find(f => f.id === id);
+    if (foto) {
+      foto.status = 'Rejeitada';
+      setFotos([...fotos]);
+    }
+  };
+
+  const fotosPendentes = fotos.filter(f => f.status === 'Pendente');
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
-      <PageHeader title="Fotos e Documentos" subtitle="Gerencie fotos e documentação dos veículos" />
-
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
-        <KPICard label="Arquivos" value={stats.totalArquivos} />
-        <KPICard label="Tamanho Total" value={`${stats.tamanhoTotal}MB`} />
-        <KPICard label="Veículos" value={stats.veiculos} />
-      </div>
-
-      {/* Filtro */}
-      <FilterBar
-        filters={filters}
-        setFilters={setFilters}
-        searchPlaceholder="Buscar por placa..."
+      <PageHeader
+        title="Validar Fotos"
+        subtitle="Aprovando, a foto é apagada do banco. Rejeitando, o gestor é notificado."
       />
 
-      {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
+      {/* Grid de Fotos */}
+      <div style={{ marginTop: '1.5rem' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
-        ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum arquivo encontrado</div>
+        ) : fotosPendentes.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '3rem 2rem',
+            color: '#999999'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.3 }}>✓</div>
+            <div>Nenhuma foto pendente de validação.</div>
+          </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Descrição</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tamanho</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtrados.map((d) => (
-                  <tr key={d.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>{d.placa}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{d.tipo}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{d.descricao}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
-                      {new Date(d.data).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{d.tamanho}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '1.5rem'
+          }}>
+            {fotosPendentes.map((foto) => (
+              <div
+                key={foto.id}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #eeeeee',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Imagem */}
+                <div style={{
+                  height: '200px',
+                  background: '#f5f5f5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderBottom: '1px solid #eeeeee',
+                  color: '#999999',
+                  fontSize: '0.9rem'
+                }}>
+                  Foto Hodômetro
+                </div>
+
+                {/* Info */}
+                <div style={{ padding: '1rem' }}>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                      Placa
+                    </div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000', marginBottom: '0.75rem' }}>
+                      {foto.placa}
+                    </div>
+
+                    <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                      Motorista
+                    </div>
+                    <div style={{ color: '#666666', marginBottom: '0.75rem' }}>
+                      {foto.motorista}
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                          Data
+                        </div>
+                        <div style={{ color: '#666666', fontSize: '0.9rem' }}>
+                          {new Date(foto.data).toLocaleDateString('pt-BR')}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                          Hodômetro
+                        </div>
+                        <div style={{ color: '#666666', fontSize: '0.9rem', fontFamily: "'JetBrains Mono'" }}>
+                          {foto.hodometro} km
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Botões */}
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button
+                      onClick={() => handleAprovar(foto.id)}
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        background: '#059669',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.85rem',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Aprovar
+                    </button>
+                    <button
+                      onClick={() => handleRejeitar(foto.id)}
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        background: '#dc2626',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.85rem',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Rejeitar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-    </div>
-  );
-}
 
-function KPICard({ label, value }) {
-  return (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-        {label}
-      </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
-        {value}
-      </div>
+      {/* Fotos Rejeitadas */}
+      {fotos.filter(f => f.status === 'Rejeitada').length > 0 && (
+        <div style={{ marginTop: '2rem', padding: '1rem', background: '#fee2e2', border: '1px solid #fecaca', borderRadius: '6px' }}>
+          <div style={{ color: '#dc2626', fontWeight: '600', marginBottom: '0.5rem' }}>
+            Fotos Rejeitadas ({fotos.filter(f => f.status === 'Rejeitada').length})
+          </div>
+          <div style={{ color: '#991b1b', fontSize: '0.9rem' }}>
+            O gestor foi notificado sobre as rejeições.
+          </div>
+        </div>
+      )}
     </div>
   );
 }

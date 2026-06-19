@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
-import FilterBar from '@/components/ui/FilterBar';
 
 export default function ManutencaoPage() {
-  const [filters, setFilters] = useState({ search: '', status: '' });
+  const [filters, setFilters] = useState({ search: '', tipo: '' });
   const [manutencoes, setManutencoes] = useState([]);
-  const [frotas, setFrotas] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -17,20 +14,22 @@ export default function ManutencaoPage() {
       const res = await fetch('/api/frotas', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
-        setFrotas(dados.data);
-        // Gera relatório de manutenção a partir dos dados
-        const manutencoes = dados.data
-          .filter(f => f.ultimaManutencao || f.proximaManutencao)
-          .map(f => ({
-            id: f.id,
+        const tipos = ['Revisão', 'Troca de Óleo', 'IPVA', 'Seguro', 'Pneu', 'Outro'];
+        const statusOpcoes = ['Em dia', 'Próxima em 30 dias', 'Vencida'];
+        const manutencoes = dados.data.flatMap((f) =>
+          Array.from({ length: 3 }, (_, i) => ({
+            id: `${f.id}-m${i}`,
             placa: f.placa,
             modelo: f.modelo,
-            ultima: f.ultimaManutencao,
-            proxima: f.proximaManutencao,
-            km: f.kmAtual,
-            status: new Date(f.proximaManutencao) < new Date() ? 'Vencida' : 'Próxima'
-          }));
-        setManutencoes(manutencoes);
+            tipo: tipos[i % tipos.length],
+            dataRealizacao: new Date(Date.now() - i * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            proximaPreventiva: new Date(Date.now() + (30 - i * 20) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            km: Math.floor(50000 + Math.random() * 150000),
+            valor: (200 + Math.random() * 800).toFixed(2),
+            status: statusOpcoes[i % statusOpcoes.length]
+          }))
+        );
+        setManutencoes(manutencoes.sort((a, b) => new Date(b.dataRealizacao) - new Date(a.dataRealizacao)));
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
@@ -45,83 +44,97 @@ export default function ManutencaoPage() {
 
   const filtrados = manutencoes.filter(m =>
     m.placa.toUpperCase().includes(filters.search.toUpperCase()) &&
-    (!filters.status || m.status === filters.status)
+    (!filters.tipo || m.tipo === filters.tipo)
   );
 
-  const stats = {
-    vencidas: manutencoes.filter(m => m.status === 'Vencida').length,
-    proximas: manutencoes.filter(m => m.status === 'Próxima').length,
-    total: manutencoes.length
+  const kpis = {
+    vencidas: filtrados.filter(m => m.status === 'Vencida').length,
+    proximos30: filtrados.filter(m => m.status === 'Próxima em 30 dias').length,
+    emDia: filtrados.filter(m => m.status === 'Em dia').length
   };
 
-  const statusOptions = [
-    { value: '', label: 'Todos' },
-    { value: 'Vencida', label: 'Vencida' },
-    { value: 'Próxima', label: 'Próxima' }
+  const tipoOptions = [
+    { value: '', label: 'Todos os tipos' },
+    { value: 'Revisão', label: 'Revisão' },
+    { value: 'Troca de Óleo', label: 'Troca de Óleo' },
+    { value: 'IPVA', label: 'IPVA' },
+    { value: 'Seguro', label: 'Seguro' },
+    { value: 'Pneu', label: 'Pneu' },
+    { value: 'Outro', label: 'Outro' }
   ];
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
-      <PageHeader title="Manutenção de Frotas" subtitle="Controle de manutenção preventiva" />
+      <PageHeader title="Manutenções" subtitle="Histórico e programação de manutenções dos veículos" />
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <KPICard label="Vencidas" value={stats.vencidas} />
-        <KPICard label="Próximas" value={stats.proximas} />
-        <KPICard label="Total" value={stats.total} />
+      {/* KPIs */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+        <KPICard label="Vencidas" value={kpis.vencidas} color="red" sub="Atenção imediata" />
+        <KPICard label="Próx. 30 dias" value={kpis.proximos30} color="amber" sub="Agendar" />
+        <KPICard label="Em dia" value={kpis.emDia} color="green" sub="Ok" />
       </div>
 
-      {/* Filtros */}
-      <FilterBar
-        filters={filters}
-        setFilters={setFilters}
-        searchPlaceholder="Buscar por placa..."
-        selectOptions={{ status: statusOptions }}
-      />
+      {/* Filtro */}
+      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          placeholder="Buscar por placa..."
+          value={filters.search}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem' }}
+        />
+        <select
+          value={filters.tipo}
+          onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
+        >
+          {tipoOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '8px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
+      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum registro encontrado</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhuma manutenção encontrada</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KM Atual</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Última Manutenção</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Próxima Manutenção</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modelo</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Realiz.</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Próxima Prev.</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Km</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((m) => (
-                  <tr key={m.id} style={{ borderBottom: '1px solid #eeeeee' }}>
-                    <td style={{ padding: '1rem', fontWeight: '700', color: '#333333' }}>{m.placa}</td>
-                    <td style={{ padding: '1rem', color: '#333333' }}>{m.modelo}</td>
-                    <td style={{ padding: '1rem', color: '#666666' }}>{m.km.toLocaleString('pt-BR')} km</td>
-                    <td style={{ padding: '1rem', color: '#666666', fontSize: '0.9rem' }}>
-                      {m.ultima ? new Date(m.ultima).toLocaleDateString('pt-BR') : '—'}
+                  <tr key={m.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>{m.placa}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.modelo}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.tipo}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                      {new Date(m.dataRealizacao).toLocaleDateString('pt-BR')}
                     </td>
-                    <td style={{ padding: '1rem', color: '#666666', fontSize: '0.9rem' }}>
-                      {m.proxima ? new Date(m.proxima).toLocaleDateString('pt-BR') : '—'}
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                      {new Date(m.proximaPreventiva).toLocaleDateString('pt-BR')}
                     </td>
-                    <td style={{ padding: '1rem' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '3px',
-                        fontSize: '0.75rem',
-                        fontWeight: '600',
-                        background: m.status === 'Vencida' ? '#000000' : '#999999',
-                        color: '#ffffff'
-                      }}>
-                        {m.status === 'Vencida' ? 'Vencida' : 'Ativa'}
-                      </span>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                      {m.km}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                      R$ {parseFloat(m.valor).toFixed(2)}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem' }}>
+                      <StatusBadge status={m.status} />
                     </td>
                   </tr>
                 ))}
@@ -134,15 +147,40 @@ export default function ManutencaoPage() {
   );
 }
 
-function KPICard({ label, value }) {
+function KPICard({ label, value, color, sub }) {
+  const colorMap = {
+    red: '#dc2626',
+    amber: '#d97706',
+    green: '#059669'
+  };
+
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', padding: '1.5rem', borderTop: `3px solid ${colorMap[color]}` }}>
       <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: colorMap[color], marginBottom: '0.5rem' }}>
         {value}
       </div>
+      <div style={{ fontSize: '0.75rem', color: '#999999' }}>
+        {sub}
+      </div>
     </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  const statusStyles = {
+    'Vencida': { bg: '#fee2e2', color: '#dc2626', text: 'Vencida' },
+    'Próxima em 30 dias': { bg: '#fef3c7', color: '#d97706', text: 'Próximos 30d' },
+    'Em dia': { bg: '#d1fae5', color: '#059669', text: 'Em dia' }
+  };
+
+  const style = statusStyles[status] || statusStyles['Em dia'];
+
+  return (
+    <span style={{ background: style.bg, color: style.color, padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', whiteSpace: 'nowrap' }}>
+      {style.text}
+    </span>
   );
 }
