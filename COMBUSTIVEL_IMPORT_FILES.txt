@@ -1,0 +1,226 @@
+ESTRUTURA COMPLETA DE IMPORTAÇÃO DE COMBUSTÍVEL
+================================================
+
+ARQUIVOS CRIADOS (13 arquivos):
+
+1. MODELOS E UTILITÁRIOS
+   ✓ /lib/models/combustivel.js (241 linhas)
+     - Validação de registros
+     - Normalização de dados
+     - Mock database (pronto para integração real)
+     - Funções: validateCombustivel, normalizeCombustivel, saveCombustivelBatch
+
+   ✓ /lib/xlsx-parser.js (262 linhas)
+     - Parse de Excel/CSV/JSON
+     - Mapeamento automático de colunas
+     - Validação de estrutura
+     - Funções: parseFile, parseExcelData, mapHeaders, validateImportStructure
+
+   ✓ /lib/xlsx-helper.js (74 linhas)
+     - Helper para cliente
+     - Funções: parseExcelFile, downloadExcelTemplate
+
+2. API
+   ✓ /app/api/frotas/combustivel/import/route.js (103 linhas)
+     - POST endpoint para importação
+     - Suporta FormData (arquivo) e JSON direto
+     - Validação completa
+     - Retorna status detalhado
+
+3. PÁGINAS E COMPONENTES
+   ✓ /app/(dashboard)/frotas/combustivel-import/page.js (51 linhas)
+     - Página de importação
+     - Download de template
+     - Instruções para usuário
+
+   ✓ /app/(dashboard)/frotas/combustivel-import/ImportForm.js (282 linhas)
+     - Componente reutilizável
+     - Upload com drag & drop
+     - Preview de dados
+     - Feedback detalhado
+
+   ✓ /app/(dashboard)/frotas/combustivel/page.js (MODIFICADO)
+     - Adicionado botão "Importar Relatório"
+     - Link para página de importação
+
+4. DOCUMENTAÇÃO
+   ✓ COMBUSTIVEL_IMPORT.md (340 linhas)
+     - Documentação completa
+     - Estrutura de dados
+     - Validações
+     - Integração com DB real
+     - Schema Prisma exemplo
+
+   ✓ COMBUSTIVEL_IMPORT_QUICK_START.md (175 linhas)
+     - Guia rápido
+     - Estrutura resumida
+     - Exemplos de API
+     - Próximos passos
+
+   ✓ COMBUSTIVEL_IMPORT_FILES.txt (este arquivo)
+
+5. EXEMPLOS E TESTES
+   ✓ /examples/combustivel-import-example.js (280 linhas)
+     - Exemplos de uso
+     - Dados de exemplo
+     - Casos de erro
+     - Respostas esperadas
+
+   ✓ /lib/models/__tests__/combustivel.test.js (168 linhas)
+     - Testes básicos
+     - Cobertura de validação
+     - Testes de normalização
+     - Testes de batch
+
+ESTRUTURA DE ARQUIVOS:
+======================
+
+app/
+├── api/frotas/combustivel/import/
+│   └── route.js ✓
+├── (dashboard)/frotas/
+│   ├── combustivel/page.js ✓ (MODIFICADO)
+│   └── combustivel-import/
+│       ├── page.js ✓
+│       └── ImportForm.js ✓
+
+lib/
+├── models/
+│   ├── combustivel.js ✓
+│   └── __tests__/
+│       └── combustivel.test.js ✓
+├── xlsx-parser.js ✓
+└── xlsx-helper.js ✓
+
+Documentação/
+├── COMBUSTIVEL_IMPORT.md ✓
+├── COMBUSTIVEL_IMPORT_QUICK_START.md ✓
+└── COMBUSTIVEL_IMPORT_FILES.txt ✓
+
+Exemplos/
+└── combustivel-import-example.js ✓
+
+FUNCIONALIDADES IMPLEMENTADAS:
+==============================
+
+✓ Validação de dados com mensagens detalhadas
+✓ Parser de Excel/CSV/JSON com mapeamento automático de colunas
+✓ Upload com drag & drop
+✓ Preview de dados antes de confirmar
+✓ Feedback detalhado de importação (quantas linhas, erros por linha)
+✓ Design monochromático (preto, branco, cinza)
+✓ API pronta para banco de dados real
+✓ Mock database para testes
+✓ Componente reutilizável (ImportForm)
+✓ Template CSV para download
+✓ Suporte a múltiplos formatos (xlsx, xls, csv, json)
+✓ Normalização de dados (maiúsculas, trim, parsing números)
+✓ Botão de importação na página principal de combustível
+
+CAMPOS VALIDADOS:
+=================
+
+- Data (YYYY-MM-DD)
+- Placa (ABC-1234)
+- Motorista (min 3 chars)
+- UF (exatamente 2 letras maiúsculas)
+- Produto (enum: Gasolina, Diesel, Etanol, Arla 32, GNV)
+- Litros (decimal > 0.1)
+- Km/L (decimal > 0.1)
+- Hodômetro (inteiro >= 0)
+- Vl.Unit (decimal >= 0)
+- Vl.Total (decimal >= 0)
+- Filial (min 2 chars)
+- Uso (enum: servico, particular)
+
+PRÓXIMOS PASSOS:
+================
+
+1. Integrar com banco de dados real (Prisma + PostgreSQL)
+   - Modificar /lib/models/combustivel.js saveCombustivelBatch()
+   - Adicionar schema em prisma/schema.prisma
+
+2. Adicionar autenticação/autorização na API
+   - Verificar permissões de usuário
+   - Audit log de importações
+
+3. Implementar import assíncrono para arquivos grandes
+   - Usar fila (Bull/RabbitMQ)
+   - Webhook de notificação
+
+4. Adicionar funcionalidades avançadas
+   - Exportação de dados (relatórios)
+   - Reconciliação com notas fiscais
+   - Duplicação/detecção de registros
+
+TESTES:
+=======
+
+npm test -- combustivel.test.js
+
+Cobre:
+- Validação de registro correto
+- Rejeição de placa inválida
+- Rejeição de produto inválido
+- Rejeição de UF inválida
+- Rejeição de litros inválido
+- Normalização de dados
+- Batch save com registros válidos
+- Batch save com erros parciais
+
+USO DA FEATURE:
+===============
+
+1. Acessar: /frotas/combustivel-import
+2. Baixar template CSV
+3. Preencher dados
+4. Arrastar ou clicar para selecionar arquivo
+5. Confirmar importação
+6. Ver resultado e erros (se houver)
+
+API ENDPOINT:
+=============
+
+POST /api/frotas/combustivel/import
+
+FormData (arquivo):
+  file: File (.xlsx, .xls, .csv, .json)
+
+JSON:
+  {
+    "data": [
+      {
+        "data": "2026-06-19",
+        "placa": "ABC-1234",
+        "motorista": "João Silva",
+        "uf": "SP",
+        "produto": "Diesel",
+        "litros": 50,
+        "kmL": 5.5,
+        "hodometro": 45000,
+        "vl_unit": 5.80,
+        "vl_total": 290.00,
+        "filial": "SP-01",
+        "uso": "servico"
+      }
+    ]
+  }
+
+DESIGN:
+=======
+
+Cores:
+- Preto: #000000
+- Branco: #ffffff
+- Cinza escuro: #222222
+- Cinza médio: #666666
+- Cinza claro: #e5e5e5
+- Cinza muito claro: #f9f9f9
+- Sucesso: #f0fdf4 (fundo), #155724 (texto)
+- Erro: #fef2f2 (fundo), #721c24 (texto)
+
+Componentes:
+- Botões pretos com hover #222222
+- Cards com borda #e5e5e5
+- Inputs com borda #eeeeee
+- Status com cores de feedback sutis

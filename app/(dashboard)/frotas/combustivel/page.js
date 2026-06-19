@@ -3,9 +3,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 
 export default function CombustvelPage() {
+  const router = useRouter();
   const [filters, setFilters] = useState({ search: '', mes: '', uf: '', produto: '', uso: '' });
   const [combustivel, setCombustivel] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,10 +46,30 @@ export default function CombustvelPage() {
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
-      <PageHeader
-        title="Combustível Serviço"
-        subtitle="Consumo, gastos e eficiência por veículo e motorista"
-      />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+        <PageHeader
+          title="Combustível Serviço"
+          subtitle="Consumo, gastos e eficiência por veículo e motorista"
+        />
+        <button
+          onClick={() => router.push('/frotas/combustivel-import')}
+          style={{
+            padding: '0.6rem 1.2rem',
+            background: '#000000',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => (e.target.style.background = '#222222')}
+          onMouseOut={(e) => (e.target.style.background = '#000000')}>
+          Importar Relatório
+        </button>
+      </div>
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '1.5rem', marginTop: '1.5rem' }}>
