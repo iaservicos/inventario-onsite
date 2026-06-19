@@ -2,151 +2,164 @@
  * API de Importação de Combustível
  * POST /api/frotas/combustivel/import
  *
- * Recebe dados de combustível, valida e insere no banco
+ * Importa dados do relatório padrão de consumo da Positivo
+ * Mapeia automaticamente as colunas do Excel para o banco de dados
  */
-
-import { saveCombustivelBatch, normalizeCombustivel, validateCombustivel } from '@/lib/models/combustivel';
-import { parseExcelFile, validateImportStructure } from '@/lib/simple-xlsx-parser';
 
 export async function POST(request) {
   try {
     console.log('[Import API] Iniciando POST');
-    const contentType = request.headers.get('content-type');
-    console.log('[Import API] Content-Type:', contentType);
 
-    let parseResult;
-    let data = [];
+    const formData = await request.formData();
+    const file = formData.get('file');
 
-    // Processar FormData (arquivo)
-    if (contentType?.includes('multipart/form-data')) {
-      console.log('[Import API] Processando FormData');
-      const formData = await request.formData();
-      const file = formData.get('file');
-
-      if (!file) {
-        console.log('[Import API] Nenhum arquivo enviado');
-        return Response.json(
-          { success: false, error: 'Nenhum arquivo enviado' },
-          { status: 400 }
-        );
-      }
-
-      console.log('[Import API] Arquivo recebido:', {
-        name: file.name,
-        size: file.size,
-        type: file.type
-      });
-
-      // Validar tipo de arquivo
-      const filename = file.name.toLowerCase();
-      const allowedExtensions = ['.xlsx', '.xls', '.csv', '.json'];
-      const hasValidExtension = allowedExtensions.some(ext => filename.endsWith(ext));
-
-      if (!hasValidExtension) {
-        console.log('[Import API] Tipo de arquivo não suportado:', filename);
-        return Response.json(
-          {
-            success: false,
-            error: `Tipo de arquivo não suportado. Aceitos: ${allowedExtensions.join(', ')}`
-          },
-          { status: 400 }
-        );
-      }
-
-      console.log('[Import API] Iniciando parseExcelFile');
-      try {
-        const parsedData = await parseExcelFile(file);
-        console.log('[Import API] parseExcelFile sucesso, registros:', Array.isArray(parsedData) ? parsedData.length : 0);
-        parseResult = Array.isArray(parsedData) ? parsedData : (parsedData.data || []);
-      } catch (parseError) {
-        console.error('[Import API] Erro no parseExcelFile:', parseError);
-        throw parseError;
-      }
-    }
-    // Processar JSON direto
-    else if (contentType?.includes('application/json')) {
-      const body = await request.json();
-
-      if (!body.data || !Array.isArray(body.data)) {
-        return Response.json(
-          { success: false, error: 'Campo "data" deve ser um array' },
-          { status: 400 }
-        );
-      }
-
-      parseResult = { success: true, data: body.data };
-    } else {
+    if (!file) {
       return Response.json(
-        { success: false, error: 'Content-Type inválido' },
+        { success: false, error: 'Nenhum arquivo enviado' },
         { status: 400 }
       );
     }
 
-    // Validar estrutura dos dados
-    console.log('[Import API] Iniciando validateImportStructure');
-    const validation = validateImportStructure(parseResult);
-    console.log('[Import API] Validação completa:', {
-      valid: validation.valid,
-      validRecords: validation.validRecords.length,
-      invalidRecords: validation.invalidRecords.length
-    });
+    console.log('[Import API] Arquivo recebido:', { name: file.name, size: file.size });
 
-    if (!validation.valid && validation.invalidRecords.length > 0) {
-      // Se há registros válidos, importar mesmo assim com avisos
-      if (validation.validRecords.length === 0) {
-        console.log('[Import API] Nenhum registro válido encontrado');
-        return Response.json(
-          {
-            success: false,
-            error: 'Nenhum registro válido encontrado',
-            details: validation.invalidRecords,
-            summary: validation.summary
-          },
-          { status: 400 }
-        );
-      }
-    }
+    // Ler arquivo como ArrayBuffer e usar XLSX
+    const arrayBuffer = await file.arrayBuffer();
 
-    // Normalizar e salvar registros válidos
-    console.log('[Import API] Normalizando', validation.validRecords.length, 'registros');
+    let data = [];
     try {
-      const recordsToSave = validation.validRecords.map(record => normalizeCombustivel(record));
-      console.log('[Import API] Normalizados com sucesso');
+      const XLSX = await import('xlsx');
+      const workbook = XLSX.default.read(arrayBuffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
 
-      console.log('[Import API] Salvando no banco com saveCombustivelBatch');
-      const saveResult = await saveCombustivelBatch(recordsToSave);
-      console.log('[Import API] saveCombustivelBatch completo:', saveResult);
-    } catch (saveError) {
-      console.error('[Import API] Erro ao salvar:', saveError);
-      throw saveError;
+      console.log('[Import API] Sheet lida:', sheetName);
+
+      // Converter para JSON
+      data = XLSX.default.utils.sheet_to_json(worksheet);
+      console.log('[Import API] Dados parseados:', data.length, 'registros');
+    } catch (xlsxError) {
+      console.error('[Import API] Erro ao ler com XLSX:', xlsxError);
+      throw xlsxError;
     }
 
-    // Resposta com resultado detalhado
-    return Response.json(
-      {
-        success: saveResult.success,
-        imported: saveResult.saved,
-        total: saveResult.total,
-        failed: validation.invalidRecords.length,
-        message: `${saveResult.saved} de ${saveResult.total} registros importados com sucesso`,
-        details: {
-          summary: validation.summary,
-          errors: validation.invalidRecords.length > 0 ? validation.invalidRecords : null,
-          warnings: parseResult.warnings || null
-        }
-      },
-      {
-        status: saveResult.success ? 200 : 207 // 207 Multi-Status se há erros parciais
-      }
-    );
-  } catch (error) {
-    console.error('Erro na importação:', error);
+    if (data.length === 0) {
+      return Response.json(
+        { success: false, error: 'Nenhum dado encontrado no arquivo' },
+        { status: 400 }
+      );
+    }
 
+    // Importar Supabase para salvar
+    const { createServiceClient } = await import('@/lib/supabase');
+    const supabase = createServiceClient();
+
+    // Processar e salvar
+    let saved = 0;
+    const errors = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
+
+      try {
+        // Normalizar nomes de coluna - Excel vem com MAIÚSCULA
+        const record = {};
+        Object.keys(row).forEach(key => {
+          const lowerKey = key.toLowerCase().trim();
+          record[lowerKey] = row[key];
+        });
+
+        // Validar campos obrigatórios
+        if (!record.placa || !record.data || !record.motorista) {
+          throw new Error('Campos obrigatórios faltando: placa, data, motorista');
+        }
+
+        // Converter data (vem como "01/05/2026 00:07:22" ou número Excel)
+        let dataFormatada = record.data;
+        if (typeof record.data === 'string' && record.data.includes('/')) {
+          const [dataPart] = record.data.split(' ');
+          const [dia, mes, ano] = dataPart.split('/');
+          dataFormatada = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T00:00:00`;
+        } else if (typeof record.data === 'number') {
+          // Excel serial date
+          const date = new Date((record.data - 25569) * 86400 * 1000);
+          dataFormatada = date.toISOString().split('T')[0];
+        }
+
+        // Converter números
+        const quantidade = parseFloat(record.quantidade) || 0;
+        const valor_unitario = parseFloat(record['valor unitario'] || record['valor_unitario']) || 0;
+        const valor_total = parseFloat(record['valor total'] || record['valor_total']) || 0;
+        const distancia = parseInt(record.distancia) || 0;
+        const consumo = parseFloat(record.consumo) || 0;
+        const hodometro = parseInt(record.hodometro) || 0;
+
+        // Preparar dados para inserção
+        const insertData = {
+          placa: record.placa.toString().toUpperCase().trim(),
+          data: dataFormatada,
+          numero_cartao: record['numero cartao'] || record['numero_cartao'] || null,
+          matricula: record.matricula || null,
+          motorista: record.motorista.toString().trim(),
+          tipo_frota: record['tipo frota'] || record['tipo_frota'] || null,
+          modelo: record.modelo || null,
+          fabricante: record.fabricante || null,
+          terminal: record.terminal || null,
+          estabelecimento: record.estabelecimento || null,
+          cidade: record.cidade || null,
+          uf: record.uf ? record.uf.toString().toUpperCase().trim() : null,
+          produto: record.produto || null,
+          distancia: distancia,
+          consumo: consumo,
+          unidade: record.unidade || null,
+          hodometro: hodometro,
+          quantidade: quantidade,
+          valor_unitario: valor_unitario,
+          valor_total: valor_total,
+          cupom_fiscal: record['cupom fiscal'] || record['cupom_fiscal'] || null,
+          centro_resultado: record['centro resultado'] || record['centro_resultado'] || null,
+          filial: record.filial || null,
+          centro_custo: record['centro custo'] || record['centro_custo'] || null
+        };
+
+        // Inserir no banco
+        const { error: insertError } = await supabase
+          .from('combustiveis')
+          .insert(insertData);
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        saved++;
+        console.log(`[Import API] Linha ${i + 1} importada com sucesso`);
+      } catch (err) {
+        console.error(`[Import API] Erro na linha ${i + 1}:`, err.message);
+        errors.push({
+          line: i + 1,
+          placa: row.PLACA || row.placa || 'N/A',
+          error: err.message
+        });
+      }
+    }
+
+    console.log('[Import API] Importação concluída:', { saved, total: data.length, errors: errors.length });
+
+    return Response.json({
+      success: errors.length === 0,
+      imported: saved,
+      total: data.length,
+      failed: errors.length,
+      message: `${saved} de ${data.length} registros importados com sucesso`,
+      details: {
+        errors: errors.length > 0 ? errors.slice(0, 10) : null
+      }
+    });
+  } catch (error) {
+    console.error('[Import API] Erro geral:', error);
     return Response.json(
       {
         success: false,
-        error: 'Erro ao processar importação',
-        details: error.message
+        error: 'Erro ao processar importação: ' + error.message
       },
       { status: 500 }
     );
