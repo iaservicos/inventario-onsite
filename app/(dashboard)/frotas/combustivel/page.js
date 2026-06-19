@@ -12,6 +12,8 @@ export default function CombustvelPage() {
   const [combustivel, setCombustivel] = useState([]);
   const [loading, setLoading] = useState(true);
   const [topTecnicos, setTopTecnicos] = useState([]);
+  const [motoristaSelecionado, setMotoristaSelecionado] = useState(null);
+  const [historicoMatorista, setHistoricoMatorista] = useState([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -81,6 +83,17 @@ export default function CombustvelPage() {
 
     return matchSearch && matchMes && matchUf && matchProduto && matchUso;
   });
+
+  const abrirHistoricoMotorista = (nomeMotorista) => {
+    const historico = combustivel.filter(c => c.motorista === nomeMotorista);
+    setHistoricoMatorista(historico);
+    setMotoristaSelecionado(nomeMotorista);
+  };
+
+  const fecharHistorico = () => {
+    setMotoristaSelecionado(null);
+    setHistoricoMatorista([]);
+  };
 
   const stats = {
     totalGasto: combustivel.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2),
@@ -190,7 +203,7 @@ export default function CombustvelPage() {
               ) : (
                 topTecnicos.map((m, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                    <td style={{ padding: '0.5rem', color: '#333333', fontWeight: '600', fontSize: '0.85rem' }}>
+                    <td style={{ padding: '0.5rem', color: '#0066cc', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => abrirHistoricoMotorista(m.nome)}>
                       {m.nome}
                     </td>
                     <td style={{ padding: '0.5rem', textAlign: 'right', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
@@ -328,6 +341,132 @@ export default function CombustvelPage() {
           </div>
         )}
       </div>
+
+      {/* Modal Histórico do Motorista */}
+      {motoristaSelecionado && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '8px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            padding: '2rem',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            position: 'relative'
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#000000', margin: 0 }}>
+                Histórico de Abastecimentos - {motoristaSelecionado}
+              </h2>
+              <button
+                onClick={fecharHistorico}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: '#999999',
+                  padding: 0
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
+                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Gasto</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
+                  R$ {historicoMatorista.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2)}
+                </div>
+              </div>
+              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
+                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Litros</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
+                  {historicoMatorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(1)}L
+                </div>
+              </div>
+              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
+                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Abastecimentos</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
+                  {historicoMatorista.length}
+                </div>
+              </div>
+              <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '6px' }}>
+                <div style={{ fontSize: '0.7rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Consumo Médio</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#000000' }}>
+                  {historicoMatorista.length > 0 && historicoMatorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0) > 0
+                    ? (historicoMatorista.reduce((sum, c) => sum + (parseFloat(c.distancia) || 0), 0) / historicoMatorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0)).toFixed(2)
+                    : '0.00'
+                  } km/L
+                </div>
+              </div>
+            </div>
+
+            {/* Tabela */}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #333333', background: '#f5f5f5' }}>
+                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Data</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Placa</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Produto</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Local</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Litros</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Valor Unit.</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Valor Total</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#000000', fontSize: '0.7rem' }}>Consumo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historicoMatorista.map((c, idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid #e5e5e5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                      <td style={{ padding: '0.75rem', color: '#666666' }}>
+                        {c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '-'}
+                      </td>
+                      <td style={{ padding: '0.75rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
+                        {c.placa}
+                      </td>
+                      <td style={{ padding: '0.75rem', color: '#666666' }}>
+                        {c.produto || '-'}
+                      </td>
+                      <td style={{ padding: '0.75rem', color: '#666666', fontSize: '0.8rem' }}>
+                        {c.cidade || '-'}
+                      </td>
+                      <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                        {(parseFloat(c.quantidade) || 0).toFixed(1)}L
+                      </td>
+                      <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                        R$ {(parseFloat(c.valor_unitario) || 0).toFixed(2)}
+                      </td>
+                      <td style={{ padding: '0.75rem', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                        R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
+                      </td>
+                      <td style={{ padding: '0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                        {(parseFloat(c.consumo) || 0).toFixed(2)} km/L
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
