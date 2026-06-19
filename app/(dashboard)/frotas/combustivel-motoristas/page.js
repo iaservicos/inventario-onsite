@@ -397,32 +397,47 @@ export default function CombustivelMotoristasPage() {
             {/* Content - Scrollable */}
             <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem' }}>
               {/* Stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
                 <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
                   <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Total Gasto</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
-                    R$ {historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2)}
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#000000' }}>
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0))}
                   </div>
                 </div>
                 <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
                   <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Total Litros</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#000000' }}>
                     {historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(1)}L
                   </div>
                 </div>
                 <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Total KM</div>
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#000000' }}>
+                    {new Intl.NumberFormat('pt-BR').format(Math.floor(historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.distancia) || 0), 0)))} km
+                  </div>
+                </div>
+                <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
                   <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Abastecimentos</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#000000' }}>
                     {historicoMotorista.length}
                   </div>
                 </div>
                 <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
                   <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Consumo Médio</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#000000' }}>
                     {historicoMotorista.length > 0 && historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0) > 0
                       ? (historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.distancia) || 0), 0) / historicoMotorista.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0)).toFixed(2)
                       : '0.00'
                     } km/L
+                  </div>
+                </div>
+                <div style={{ background: '#f5f5f5', padding: '0.75rem', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#999999', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.3rem' }}>Hodômetro</div>
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#000000' }}>
+                    {historicoMotorista.length > 0
+                      ? new Intl.NumberFormat('pt-BR').format(Math.max(...historicoMotorista.map(c => parseInt(c.hodometro) || 0)))
+                      : '0'
+                    } km
                   </div>
                 </div>
               </div>
