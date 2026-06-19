@@ -67,7 +67,7 @@ export default function CombustvelImportForm() {
       const formData = new FormData();
       formData.append('file', arquivo);
 
-      const res = await fetch('/api/frotas/combustivel/import', {
+      const res = await fetch('/api/frotas/combustivel/import-simple', {
         method: 'POST',
         body: formData
       });

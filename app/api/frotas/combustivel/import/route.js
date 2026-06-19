@@ -10,22 +10,32 @@ import { parseExcelFile, validateImportStructure } from '@/lib/simple-xlsx-parse
 
 export async function POST(request) {
   try {
+    console.log('[Import API] Iniciando POST');
     const contentType = request.headers.get('content-type');
+    console.log('[Import API] Content-Type:', contentType);
 
     let parseResult;
     let data = [];
 
     // Processar FormData (arquivo)
     if (contentType?.includes('multipart/form-data')) {
+      console.log('[Import API] Processando FormData');
       const formData = await request.formData();
       const file = formData.get('file');
 
       if (!file) {
+        console.log('[Import API] Nenhum arquivo enviado');
         return Response.json(
           { success: false, error: 'Nenhum arquivo enviado' },
           { status: 400 }
         );
       }
+
+      console.log('[Import API] Arquivo recebido:', {
+        name: file.name,
+        size: file.size,
+        type: file.type
+      });
 
       // Validar tipo de arquivo
       const filename = file.name.toLowerCase();
@@ -33,6 +43,7 @@ export async function POST(request) {
       const hasValidExtension = allowedExtensions.some(ext => filename.endsWith(ext));
 
       if (!hasValidExtension) {
+        console.log('[Import API] Tipo de arquivo não suportado:', filename);
         return Response.json(
           {
             success: false,
@@ -42,8 +53,15 @@ export async function POST(request) {
         );
       }
 
-      const parsedData = await parseExcelFile(file);
-      parseResult = Array.isArray(parsedData) ? parsedData : (parsedData.data || []);
+      console.log('[Import API] Iniciando parseExcelFile');
+      try {
+        const parsedData = await parseExcelFile(file);
+        console.log('[Import API] parseExcelFile sucesso, registros:', Array.isArray(parsedData) ? parsedData.length : 0);
+        parseResult = Array.isArray(parsedData) ? parsedData : (parsedData.data || []);
+      } catch (parseError) {
+        console.error('[Import API] Erro no parseExcelFile:', parseError);
+        throw parseError;
+      }
     }
     // Processar JSON direto
     else if (contentType?.includes('application/json')) {
@@ -65,11 +83,18 @@ export async function POST(request) {
     }
 
     // Validar estrutura dos dados
+    console.log('[Import API] Iniciando validateImportStructure');
     const validation = validateImportStructure(parseResult);
+    console.log('[Import API] Validação completa:', {
+      valid: validation.valid,
+      validRecords: validation.validRecords.length,
+      invalidRecords: validation.invalidRecords.length
+    });
 
     if (!validation.valid && validation.invalidRecords.length > 0) {
       // Se há registros válidos, importar mesmo assim com avisos
       if (validation.validRecords.length === 0) {
+        console.log('[Import API] Nenhum registro válido encontrado');
         return Response.json(
           {
             success: false,
@@ -83,8 +108,18 @@ export async function POST(request) {
     }
 
     // Normalizar e salvar registros válidos
-    const recordsToSave = validation.validRecords.map(record => normalizeCombustivel(record));
-    const saveResult = await saveCombustivelBatch(recordsToSave);
+    console.log('[Import API] Normalizando', validation.validRecords.length, 'registros');
+    try {
+      const recordsToSave = validation.validRecords.map(record => normalizeCombustivel(record));
+      console.log('[Import API] Normalizados com sucesso');
+
+      console.log('[Import API] Salvando no banco com saveCombustivelBatch');
+      const saveResult = await saveCombustivelBatch(recordsToSave);
+      console.log('[Import API] saveCombustivelBatch completo:', saveResult);
+    } catch (saveError) {
+      console.error('[Import API] Erro ao salvar:', saveError);
+      throw saveError;
+    }
 
     // Resposta com resultado detalhado
     return Response.json(
