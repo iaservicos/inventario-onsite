@@ -5,8 +5,16 @@ import PageHeader from '@/components/ui/PageHeader';
 
 export default function CombustivelMotoristasPage() {
   const [motoristas, setMotoristas] = useState([]);
+  const [combustivelBruto, setCombustivelBruto] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ search: '' });
+  const [filters, setFilters] = useState({
+    search: '',
+    mes: new Date().toISOString().substring(0, 7),
+    produto: '',
+    uf: ''
+  });
+  const [sort, setSort] = useState({ por: 'gasto', ordem: 'desc' });
+  const [showFilters, setShowFilters] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -14,9 +22,17 @@ export default function CombustivelMotoristasPage() {
       const res = await fetch('/api/frotas/combustivel/list', { cache: 'no-store' });
       const dados = await res.json();
       if (dados.success) {
+        // Filtrar por critérios
+        const dadosFiltrados = dados.data.filter(c => {
+          const matchMes = !filters.mes || new Date(c.data).toISOString().substring(0, 7) === filters.mes;
+          const matchProduto = !filters.produto || (c.produto && c.produto.toLowerCase() === filters.produto.toLowerCase());
+          const matchUf = !filters.uf || (c.uf && c.uf === filters.uf);
+          return matchMes && matchProduto && matchUf;
+        });
+
         // Processar dados dos motoristas
         const tecnicos = {};
-        dados.data.forEach(c => {
+        dadosFiltrados.forEach(c => {
           if (!tecnicos[c.motorista]) {
             tecnicos[c.motorista] = {
               nome: c.motorista,
@@ -56,21 +72,63 @@ export default function CombustivelMotoristasPage() {
           .sort((a, b) => b.gasto - a.gasto);
 
         setMotoristas(lista);
+        setCombustivelBruto(dados.data || []);
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const filtrados = motoristas.filter(m =>
+  let filtrados = motoristas.filter(m =>
     m.nome.toUpperCase().includes(filters.search.toUpperCase())
   );
+
+  // Aplicar ordenação
+  filtrados = [...filtrados].sort((a, b) => {
+    let valorA, valorB;
+
+    switch (sort.por) {
+      case 'nome':
+        valorA = a.nome.toLowerCase();
+        valorB = b.nome.toLowerCase();
+        return sort.ordem === 'asc' ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
+      case 'consumo':
+        valorA = parseFloat(a.consumoMedio);
+        valorB = parseFloat(b.consumoMedio);
+        return sort.ordem === 'asc' ? valorA - valorB : valorB - valorA;
+      case 'litros':
+        valorA = a.totalLitros;
+        valorB = b.totalLitros;
+        return sort.ordem === 'asc' ? valorA - valorB : valorB - valorA;
+      case 'km':
+        valorA = a.totalKm;
+        valorB = b.totalKm;
+        return sort.ordem === 'asc' ? valorA - valorB : valorB - valorA;
+      case 'abastecimentos':
+        valorA = a.abastecimentos;
+        valorB = b.abastecimentos;
+        return sort.ordem === 'asc' ? valorA - valorB : valorB - valorA;
+      case 'uf':
+        valorA = a.uf.toLowerCase();
+        valorB = b.uf.toLowerCase();
+        return sort.ordem === 'asc' ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
+      case 'gasto':
+      default:
+        valorA = a.gasto;
+        valorB = b.gasto;
+        return sort.ordem === 'asc' ? valorA - valorB : valorB - valorA;
+    }
+  });
+
+  // Obter valores únicos para filtros
+  const produtosUnicos = [...new Set(combustivelBruto.map(c => c.produto).filter(Boolean))].sort();
+  const ufsUnicos = [...new Set(combustivelBruto.map(c => c.uf).filter(Boolean))].sort();
 
   const stats = {
     totalMotoristas: filtrados.length,
@@ -94,15 +152,110 @@ export default function CombustivelMotoristasPage() {
         <StatCard label="Consumo Médio Geral" value={`${stats.consumoMedioGeral} km/L`} />
       </div>
 
-      {/* Filtro */}
+      {/* Filtros e Ordenação */}
       <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
-        <input
-          type="text"
-          placeholder="Buscar por nome..."
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
-        />
+        {/* Linha Principal */}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
+          <input
+            type="text"
+            placeholder="Buscar por nome..."
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          />
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              background: showFilters ? '#333333' : '#f5f5f5',
+              color: showFilters ? '#ffffff' : '#333333',
+              border: '1px solid #e5e5e5',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            ⚙️ Filtros Avançados
+          </button>
+        </div>
+
+        {/* Filtros Avançados - Expansível */}
+        {showFilters && (
+          <div style={{ paddingTop: '1rem', borderTop: '1px solid #e5e5e5', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#666666', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                Mês
+              </label>
+              <input
+                type="month"
+                value={filters.mes}
+                onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
+                style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#666666', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                Tipo de Combustível
+              </label>
+              <select
+                value={filters.produto}
+                onChange={(e) => setFilters({ ...filters, produto: e.target.value })}
+                style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+              >
+                <option value="">Todos</option>
+                {produtosUnicos.map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#666666', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                Estado (UF)
+              </label>
+              <select
+                value={filters.uf}
+                onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
+                style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+              >
+                <option value="">Todos</option>
+                {ufsUnicos.map(u => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Ordenação */}
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', paddingTop: '1rem', borderTop: '1px solid #e5e5e5' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#333333' }}>Ordenar por:</span>
+          <select
+            value={sort.por}
+            onChange={(e) => setSort({ ...sort, por: e.target.value })}
+            style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          >
+            <option value="gasto">Gasto Total</option>
+            <option value="consumo">Consumo (km/L)</option>
+            <option value="litros">Total Litros</option>
+            <option value="km">Total KM</option>
+            <option value="abastecimentos">Abastecimentos</option>
+            <option value="nome">Nome</option>
+            <option value="uf">Estado (UF)</option>
+          </select>
+
+          <select
+            value={sort.ordem}
+            onChange={(e) => setSort({ ...sort, ordem: e.target.value })}
+            style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          >
+            <option value="desc">↓ Decrescente (Maior)</option>
+            <option value="asc">↑ Crescente (Menor)</option>
+          </select>
+        </div>
       </div>
 
       {/* Tabela */}

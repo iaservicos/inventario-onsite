@@ -6,7 +6,7 @@ import PageHeader from '@/components/ui/PageHeader';
 export default function CombustivelHistoricoPage() {
   const [combustiveis, setCombustiveis] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ search: '', motorista: '' });
+  const [filters, setFilters] = useState({ search: '', motorista: '', mes: new Date().toISOString().substring(0, 7) });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -32,7 +32,9 @@ export default function CombustivelHistoricoPage() {
       (c.placa && c.placa.toUpperCase().includes(filters.search.toUpperCase()));
     const matchMotorista = !filters.motorista ||
       (c.motorista && c.motorista.toUpperCase().includes(filters.motorista.toUpperCase()));
-    return matchSearch && matchMotorista;
+    const matchMes = !filters.mes ||
+      (c.data && new Date(c.data).toISOString().substring(0, 7) === filters.mes);
+    return matchSearch && matchMotorista && matchMes;
   });
 
   const motoristasUnicos = [...new Set(combustiveis.map(c => c.motorista))].sort();
@@ -76,6 +78,12 @@ export default function CombustivelHistoricoPage() {
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
+        <input
+          type="month"
+          value={filters.mes}
+          onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+        />
       </div>
 
       {/* Tabela */}
