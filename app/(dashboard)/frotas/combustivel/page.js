@@ -84,6 +84,27 @@ export default function CombustvelPage() {
     return matchSearch && matchMes && matchUf && matchProduto && matchUso;
   });
 
+  // Top 5 Estados com Maior Gasto
+  const topEstados = (() => {
+    const estados = {};
+    filtrados.forEach(c => {
+      const uf = c.uf || 'N/A';
+      if (!estados[uf]) {
+        estados[uf] = { gasto: 0, abastecimentos: 0 };
+      }
+      estados[uf].gasto += parseFloat(c.valor_total) || 0;
+      estados[uf].abastecimentos += 1;
+    });
+    return Object.entries(estados)
+      .map(([uf, dados]) => ({
+        uf,
+        gasto: dados.gasto,
+        abastecimentos: dados.abastecimentos
+      }))
+      .sort((a, b) => b.gasto - a.gasto)
+      .slice(0, 5);
+  })();
+
   const abrirHistoricoMotorista = (nomeMotorista) => {
     const historico = combustivel.filter(c => c.motorista === nomeMotorista);
     setHistoricoMatorista(historico);
@@ -139,12 +160,12 @@ export default function CombustvelPage() {
         <KPICard label="Preço Médio" value={`R$ ${stats.precoMedio}/L`} />
       </div>
 
-      {/* Top 5 + Maiores Médias + Menores Médias */}
+      {/* Top 5 + Top 5 Estados + Maiores Médias + Menores Médias */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
         {/* Top 5 Maiores Consumidores */}
         <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
-            Top 5 Maiores Consumidores
+            Top 5 Motoristas
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {topTecnicos.length === 0 ? (
@@ -164,6 +185,36 @@ export default function CombustvelPage() {
                   </div>
                   <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'", fontSize: '0.85rem' }}>
                     R$ {t.gasto.toFixed(2)}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Top 5 Estados com Maior Gasto */}
+        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', overflow: 'hidden' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: '#000000' }}>
+            Top 5 Estados
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {topEstados.length === 0 ? (
+              <div style={{ color: '#999999', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
+                Nenhum dado
+              </div>
+            ) : (
+              topEstados.map((e, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '0.75rem', borderBottom: '1px solid #f5f5f5' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', color: '#000000', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                      {idx + 1}. {e.uf}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#999999' }}>
+                      {e.abastecimentos} abastos
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: '700', color: '#000000', fontFamily: "'JetBrains Mono'", fontSize: '0.85rem' }}>
+                    R$ {e.gasto.toFixed(2)}
                   </div>
                 </div>
               ))
