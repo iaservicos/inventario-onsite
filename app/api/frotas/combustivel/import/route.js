@@ -6,7 +6,7 @@
  */
 
 import { saveCombustivelBatch, normalizeCombustivel, validateCombustivel } from '@/lib/models/combustivel';
-import { parseFile, validateImportStructure } from '@/lib/xlsx-parser';
+import { parseFile, validateImportStructure } from '@/lib/simple-xlsx-parser';
 
 export async function POST(request) {
   try {

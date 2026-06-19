@@ -2,8 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
-import { parseExcelFile } from '@/lib/xlsx-helper';
-import { parseExcelData } from '@/lib/xlsx-parser';
+import { parseExcelFile } from '@/lib/simple-xlsx-parser';
 
 export default function CombustvelImportForm() {
   const [arquivo, setArquivo] = useState(null);
