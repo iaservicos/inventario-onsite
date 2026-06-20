@@ -152,56 +152,52 @@ export default function CombustivelHistoricoPage() {
           <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum abastecimento encontrado</div>
         ) : (
           <div style={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', minWidth: '1100px' }}>
-              <thead>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', minWidth: '1300px' }}>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Quem Abasteceu</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Produto</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Terminal</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cidade</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Litros</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor Unit.</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor Total</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Consumo</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hodômetro</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Data</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Motorista</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Produto</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Cidade</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Litros</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Vl.Unit.</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Vl.Total</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Consumo</th>
+                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Hodômetro</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((c, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
-                      {c.data ? new Date(c.data).toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontSize: '0.8rem' }}>
+                      {c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '0.75rem 0.75rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'", fontSize: '0.8rem' }}>
                       {c.placa}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#000000' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', fontWeight: '600', color: '#000000', fontSize: '0.8rem' }}>
                       {c.motorista}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontSize: '0.8rem' }}>
                       {c.produto || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.85rem' }}>
-                      {c.terminal || '-'}
-                    </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontSize: '0.75rem' }}>
                       {c.cidade || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       {(parseFloat(c.quantidade) || 0).toFixed(1)}L
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       R$ {(parseFloat(c.valor_unitario) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
-                      {(parseFloat(c.consumo) || 0).toFixed(2)} km/L
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
+                      {(parseFloat(c.consumo) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right' }}>
+                    <td style={{ padding: '0.75rem 0.75rem', color: '#666666', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       {c.hodometro || '-'}
                     </td>
                   </tr>

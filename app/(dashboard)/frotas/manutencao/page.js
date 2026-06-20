@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
 
 export default function ManutencaoPage() {
-  const [filters, setFilters] = useState({ search: '', tipo: '' });
+  const [filters, setFilters] = useState({ search: '', tipo: '', uf: '' });
   const [manutencoes, setManutencoes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,8 @@ export default function ManutencaoPage() {
 
   const filtrados = manutencoes.filter(m =>
     (m.placa || '').toUpperCase().includes(filters.search.toUpperCase()) &&
-    (!filters.tipo || m.tipo === filters.tipo)
+    (!filters.tipo || m.tipo === filters.tipo) &&
+    (!filters.uf || m.uf === filters.uf)
   );
 
   const kpis = {
@@ -92,6 +93,16 @@ export default function ManutencaoPage() {
         >
           {tipoOptions.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <select
+          value={filters.uf}
+          onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', minWidth: '140px' }}
+        >
+          <option value="">Todos UF</option>
+          {[...new Set(manutencoes.map(m => m.uf).filter(Boolean))].sort().map(uf => (
+            <option key={uf} value={uf}>{uf}</option>
           ))}
         </select>
       </div>

@@ -117,11 +117,11 @@ export default function CombustvelPage() {
   };
 
   const stats = {
-    totalGasto: combustivel.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2),
-    totalLitros: combustivel.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(2),
-    mediaKmL: combustivel.length > 0 ? (combustivel.reduce((sum, c) => sum + (parseFloat(c.consumo) || 0), 0) / combustivel.length).toFixed(2) : '0.00',
-    abastecimentos: combustivel.length,
-    precoMedio: combustivel.length > 0 ? (combustivel.reduce((sum, c) => sum + (parseFloat(c.valor_unitario) || 0), 0) / combustivel.length).toFixed(2) : '0.00'
+    totalGasto: filtrados.reduce((sum, c) => sum + (parseFloat(c.valor_total) || 0), 0).toFixed(2),
+    totalLitros: filtrados.reduce((sum, c) => sum + (parseFloat(c.quantidade) || 0), 0).toFixed(2),
+    mediaKmL: filtrados.length > 0 ? (filtrados.reduce((sum, c) => sum + (parseFloat(c.consumo) || 0), 0) / filtrados.length).toFixed(2) : '0.00',
+    abastecimentos: filtrados.length,
+    precoMedio: filtrados.length > 0 ? (filtrados.reduce((sum, c) => sum + (parseFloat(c.valor_unitario) || 0), 0) / filtrados.length).toFixed(2) : '0.00'
   };
 
   return (
@@ -153,11 +153,11 @@ export default function CombustvelPage() {
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '1.5rem', marginTop: '1.5rem' }}>
-        <KPICard label="Total Gasto" value={`R$ ${stats.totalGasto}`} />
-        <KPICard label="Litros" value={stats.totalLitros} />
+        <KPICard label="Total Gasto" value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalGasto)} />
+        <KPICard label="Litros" value={new Intl.NumberFormat('pt-BR').format(parseFloat(stats.totalLitros)).replace('.', ',')} />
         <KPICard label="Média Km/L" value={stats.mediaKmL} />
         <KPICard label="Abastecimentos" value={stats.abastecimentos} />
-        <KPICard label="Preço Médio" value={`R$ ${stats.precoMedio}/L`} />
+        <KPICard label="Preço Médio" value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.precoMedio) + '/L'} />
       </div>
 
       {/* Top 5 + Top 5 Estados + Maiores Médias + Menores Médias */}
@@ -292,7 +292,7 @@ export default function CombustvelPage() {
       </div>
 
       {/* Filtro */}
-      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem', alignItems: 'flex-end' }}>
         <input
           type="text"
           placeholder="Placa ou motorista..."
@@ -325,9 +325,9 @@ export default function CombustvelPage() {
           style={{ padding: '0.5rem 0.75rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem' }}
         >
           <option value="">Todos UF</option>
-          <option value="SP">SP</option>
-          <option value="RJ">RJ</option>
-          <option value="MG">MG</option>
+          {[...new Set(combustivel.map(c => c.uf).filter(Boolean))].sort().map(uf => (
+            <option key={uf} value={uf}>{uf}</option>
+          ))}
         </select>
         <select
           value={filters.produto}
@@ -335,11 +335,9 @@ export default function CombustvelPage() {
           style={{ padding: '0.5rem 0.75rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem' }}
         >
           <option value="">Todos produtos</option>
-          <option value="GASOLINA">Gasolina</option>
-          <option value="DIESEL">Diesel</option>
-          <option value="ETANOL">Etanol</option>
-          <option value="GNV">GNV</option>
-          <option value="ARLA">Arla 32</option>
+          {[...new Set(combustivel.map(c => c.produto).filter(Boolean))].sort().map(produto => (
+            <option key={produto} value={produto}>{produto}</option>
+          ))}
         </select>
         <select
           value={filters.uso}
@@ -350,6 +348,14 @@ export default function CombustvelPage() {
           <option value="servico">Somente Serviço</option>
           <option value="particular">Somente Particular</option>
         </select>
+        <button
+          onClick={() => setFilters({ search: '', mes: '', uf: '', produto: '', uso: '' })}
+          style={{ padding: '0.5rem 1rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem', background: '#f5f5f5', color: '#666666', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}
+          onMouseOver={(e) => (e.target.style.background = '#e5e5e5')}
+          onMouseOut={(e) => (e.target.style.background = '#f5f5f5')}
+        >
+          🔄 Limpar
+        </button>
       </div>
 
       {/* Tabela */}
