@@ -350,11 +350,11 @@ export default function CombustvelPage() {
         </select>
         <button
           onClick={() => setFilters({ search: '', mes: '', uf: '', produto: '', uso: '' })}
-          style={{ padding: '0.5rem 1rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem', background: '#f5f5f5', color: '#666666', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}
-          onMouseOver={(e) => (e.target.style.background = '#e5e5e5')}
-          onMouseOut={(e) => (e.target.style.background = '#f5f5f5')}
+          style={{ padding: '0.5rem 1rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.85rem', background: '#ffffff', color: '#666666', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s' }}
+          onMouseOver={(e) => (e.target.style.color = '#333333')}
+          onMouseOut={(e) => (e.target.style.color = '#666666')}
         >
-          🔄 Limpar
+          Limpar
         </button>
       </div>
 
