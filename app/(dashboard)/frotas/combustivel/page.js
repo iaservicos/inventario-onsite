@@ -154,7 +154,7 @@ export default function CombustvelPage() {
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '1.5rem', marginTop: '1.5rem' }}>
         <KPICard label="Total Gasto" value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalGasto)} />
-        <KPICard label="Litros" value={new Intl.NumberFormat('pt-BR').format(parseFloat(stats.totalLitros)).replace('.', ',')} />
+        <KPICard label="Litros" value={parseFloat(stats.totalLitros).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' L'} />
         <KPICard label="Média Km/L" value={stats.mediaKmL} />
         <KPICard label="Abastecimentos" value={stats.abastecimentos} />
         <KPICard label="Preço Médio" value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.precoMedio) + '/L'} />
