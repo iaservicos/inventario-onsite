@@ -619,6 +619,9 @@ export default function AgendamentosPage() {
   const role = session?.user?.role;
   const isAdmin = role === 'admin';
   const isSupervisor = role === 'supervisor';
+  const isCoordinator = role === 'coordinator';
+  const isAnalyst = role === 'analyst';
+  const canViewInventarioGeral = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -640,7 +643,7 @@ export default function AgendamentosPage() {
         </div>
       )}
 
-      {(isAdmin || isSupervisor) && (
+      {canViewInventarioGeral && (
         <>
           <InventarioGeralSection onMsg={showMsg} />
           <hr style={{ margin: '2.5rem 0', border: 'none', borderTop: '2px solid #eee' }} />

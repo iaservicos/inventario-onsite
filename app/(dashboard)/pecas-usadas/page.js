@@ -78,8 +78,10 @@ export default function PecasUsadasPage() {
   const [codeSearch,       setCodeSearch]       = useState('');
   const [codeResults,      setCodeResults]      = useState(null);
   const [codeLoading,      setCodeLoading]      = useState(false);
+  const [exportingAll,     setExportingAll]     = useState(false);
 
   const canSeeSupervisor = ['admin', 'coordinator'].includes(session?.user?.role);
+  const isAdmin = session?.user?.role === 'admin';
 
   const supervisors = useMemo(() => {
     const names = [...new Set(technicians.map(t => t.supervisor_name).filter(Boolean))];
@@ -252,6 +254,61 @@ export default function PecasUsadasPage() {
     XLSX.writeFile(wb, `pecas_usadas_resumo_${filterSupervisor.replace(/\s/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
+  async function handleExportAllExcel() {
+    setExportingAll(true);
+    setError('');
+    try {
+      const res = await fetch('/api/technician-used-items/export-all');
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Erro ao exportar');
+        setExportingAll(false);
+        return;
+      }
+
+      const data = await res.json();
+      if (!data.technicians?.length) {
+        setError('Nenhuma peça usada encontrada');
+        setExportingAll(false);
+        return;
+      }
+
+      const rows = [];
+      data.technicians.forEach(tech => {
+        tech.items.forEach(item => {
+          rows.push({
+            'Técnico':      tech.name,
+            'Supervisor':   tech.supervisor_name || '—',
+            'Região':       tech.region || '—',
+            'Código':       item.item_code,
+            'Nome':         item.item_name,
+            'Quantidade':   item.item_quantity ?? '—',
+            'Remessa':      item.item_num_remessa || '—',
+            'ATP Centro':   item.atp_centro || '—',
+            'ATP Nome':     item.atp_nome || '—',
+            'Chamado':      item.chamado_consumo || '—',
+            'Encerramento': item.data_encerramento ? new Date(item.data_encerramento).toLocaleDateString('pt-BR') : '—',
+            'Status':       item.status_consumo || '—',
+            'Subgrupo':     item.item_subgroup || 'OUTROS',
+          });
+        });
+      });
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws['!cols'] = [
+        { wch: 28 }, { wch: 20 }, { wch: 12 }, { wch: 15 }, { wch: 35 },
+        { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
+        { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 15 }
+      ];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Todas as Peças');
+      XLSX.writeFile(wb, `pecas_usadas_completo_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    } catch (err) {
+      setError('Erro de conexão ao exportar');
+    }
+    setExportingAll(false);
+  }
+
   const filteredItems = items.filter(item => {
     if (!searchFilter) return true;
     const q = searchFilter.toLowerCase();
@@ -360,6 +417,19 @@ export default function PecasUsadasPage() {
 
       {/* Seleção de técnico + filtro + exportar */}
       <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap' }}>
+
+        {/* Exportar Tudo (apenas admin) */}
+        {isAdmin && !selectedTech && !filterSupervisor && (
+          <button
+            className="btn btn-primary"
+            onClick={handleExportAllExcel}
+            disabled={exportingAll}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px', whiteSpace: 'nowrap' }}
+          >
+            <IconDownload />
+            {exportingAll ? 'Exportando...' : 'Exportar Tudo'}
+          </button>
+        )}
 
         {/* Supervisor (admin/coordinator) */}
         {canSeeSupervisor && (
