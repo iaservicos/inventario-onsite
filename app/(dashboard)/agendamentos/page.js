@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 
 const DIAS_SEMANA = [
