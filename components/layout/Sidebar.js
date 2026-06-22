@@ -99,9 +99,9 @@ export default function Sidebar({ user, isOpen }) {
   const isManagement    = ['admin', 'supervisor', 'coordinator', 'analyst'].includes(user?.role);
   const isAnalistaCusto = user?.role === 'analista_custo';
   const isAdmin         = user?.role === 'admin';
-  const hasFerramental  = ['admin', 'supervisor', 'analista_custo'].includes(user?.role);
+  const hasFerramental  = ['admin', 'analista_custo'].includes(user?.role);
 
-  const hasFrotas = ['admin', 'supervisor', 'coordinator', 'analyst'].includes(user?.role);
+  const hasFrotas = user?.role === 'admin';
 
   const [open, setOpen] = useState({ inventario: true, estoque: true, gestao: true, ferramental: true, frotas: true });
   const toggle = (key) => setOpen(p => ({ ...p, [key]: !p[key] }));
