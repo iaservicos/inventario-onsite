@@ -6,6 +6,47 @@ import { getScopeFilter } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+export async function POST(request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Permitir admin, supervisor, coordinator, e analyst para cadastrar técnicos
+    if (!['admin', 'supervisor', 'coordinator', 'analyst'].includes(session.user.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const supabase = createServiceClient();
+
+    const cleanData = {
+      name: body.name,
+      email: body.email || null,
+      phone: body.phone || null,
+      region: body.region || null,
+      supervisor_name: body.supervisor_name || session.user.name,
+      coordinator_name: body.coordinator_name || null,
+      active: body.active !== undefined ? body.active : true
+    };
+
+    const { data, error } = await supabase
+      .from('technicians')
+      .insert(cleanData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase Insert Error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data, { status: 201 });
+  } catch (err) {
+    console.error('API POST technicians error:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);

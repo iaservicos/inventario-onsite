@@ -11,7 +11,7 @@ const ESTADOS_BR = [
 ];
 
 /* ─── Modal de Cadastro/Edição ───────────────────────────── */
-function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoordinator, supervisores, coordenadores }) {
+function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoordinator, isAnalyst, supervisores, coordenadores }) {
   const [form, setForm] = useState({
     name:             tecnico?.name             || '',
     email:            tecnico?.email            || '',
@@ -24,7 +24,7 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
 
-  const canEditAll = isAdmin || isSupervisor || isCoordinator;
+  const canEditAll = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
@@ -257,6 +257,7 @@ export default function CadastroTecnicosPage() {
   const isAdmin = session?.user?.role === 'admin';
   const isSupervisor = session?.user?.role === 'supervisor';
   const isCoordinator = session?.user?.role === 'coordinator';
+  const isAnalyst = session?.user?.role === 'analyst';
 
   const [tecnicos,      setTecnicos]      = useState([]);
   const [supervisores,  setSupervisores]  = useState([]);
@@ -355,7 +356,7 @@ export default function CadastroTecnicosPage() {
 
   if (status === 'loading') return null;
 
-  const canEditAll = isAdmin || isSupervisor || isCoordinator;
+  const canEditAll = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
@@ -498,19 +499,19 @@ export default function CadastroTecnicosPage() {
       </div>
 
       {modal?.type === 'new' && (
-        <ModalTecnico 
-          onClose={() => setModal(null)} 
+        <ModalTecnico
+          onClose={() => setModal(null)}
           onSaved={(d) => { setModal(null); load(); toast.success('Técnico cadastrado!'); }}
-          isAdmin={isAdmin} isSupervisor={isSupervisor} isCoordinator={isCoordinator}
+          isAdmin={isAdmin} isSupervisor={isSupervisor} isCoordinator={isCoordinator} isAnalyst={isAnalyst}
           supervisores={supervisores} coordenadores={coordenadores}
         />
       )}
       {modal?.type === 'edit' && (
-        <ModalTecnico 
-          tecnico={modal.data} 
-          onClose={() => setModal(null)} 
+        <ModalTecnico
+          tecnico={modal.data}
+          onClose={() => setModal(null)}
           onSaved={(d) => { setModal(null); load(); toast.success('Cadastro atualizado!'); }}
-          isAdmin={isAdmin} isSupervisor={isSupervisor} isCoordinator={isCoordinator}
+          isAdmin={isAdmin} isSupervisor={isSupervisor} isCoordinator={isCoordinator} isAnalyst={isAnalyst}
           supervisores={supervisores} coordenadores={coordenadores}
         />
       )}
