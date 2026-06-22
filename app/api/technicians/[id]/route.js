@@ -152,10 +152,11 @@ export async function PATCH(request, context) {
     
     const isAdmin = session.user.role === 'admin';
     const isCoordinator = session.user.role === 'coordinator';
+    const isAnalyst = session.user.role === 'analyst';
 
     const params = await context.params;
     const { id } = params;
-    
+
     if (!id || id === 'undefined') {
       return NextResponse.json({ error: 'ID do técnico inválido' }, { status: 400 });
     }
@@ -163,8 +164,8 @@ export async function PATCH(request, context) {
     const body = await request.json();
     const supabase = createServiceClient();
 
-    // Validação de Permissão para Supervisor
-    if (!isAdmin && !isCoordinator) {
+    // Validação de Permissão para Supervisor (não aplica para admin, coordinator, analyst)
+    if (!isAdmin && !isCoordinator && !isAnalyst) {
       const { data: tech } = await supabase.from('technicians').select('supervisor_name, region').eq('id', id).single();
       const isHisTech = tech?.supervisor_name === session.user.name;
       const isSPTech = tech?.region === 'SP';

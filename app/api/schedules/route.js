@@ -22,7 +22,7 @@ export async function GET(request) {
 export async function POST(request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (!['admin', 'supervisor'].includes(session.user.role)) {
+  if (!['admin', 'supervisor', 'coordinator', 'analyst'].includes(session.user.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
