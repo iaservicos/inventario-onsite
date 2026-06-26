@@ -81,7 +81,7 @@ export default function DashboardPage() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Background Tech - Mapa Brasil 3D */}
+      {/* Background Tech - Imagem Brasil Positivo */}
       <div
         style={{
           position: 'fixed',
@@ -90,82 +90,14 @@ export default function DashboardPage() {
           width: '100%',
           height: '100%',
           zIndex: 0,
-          background: '#000000',
+          backgroundImage: 'url(https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Captura%20de%20tela%202026-06-26%20171836.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
           overflow: 'hidden',
           pointerEvents: 'none',
         }}>
-        {/* Globo/Mapa de fundo */}
-        <svg
-          style={{
-            position: 'absolute',
-            top: '-20%',
-            right: '-15%',
-            width: '800px',
-            height: '800px',
-            opacity: 0.3,
-          }}
-          viewBox="0 0 400 400"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <radialGradient id="globeGlow">
-              <stop offset="0%" stopColor="#26d0ce" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#26d0ce" stopOpacity="0" />
-            </radialGradient>
-            <filter id="glow2">
-              <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-              <feMerge>
-                <feMergeNode in="coloredBlur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-
-          {/* Círculo principal */}
-          <circle cx="200" cy="200" r="180" fill="url(#globeGlow)" filter="url(#glow2)" />
-          <circle cx="200" cy="200" r="180" fill="none" stroke="#26d0ce" strokeWidth="1" opacity="0.2" />
-
-          {/* Padrão de pontos/cidades */}
-          {[
-            { x: 180, y: 160 }, { x: 220, y: 180 }, { x: 190, y: 220 },
-            { x: 240, y: 200 }, { x: 170, y: 190 }, { x: 210, y: 240 },
-            { x: 250, y: 160 }, { x: 160, y: 240 }, { x: 230, y: 210 },
-          ].map((pos, i) => (
-            <g key={i}>
-              <circle cx={pos.x} cy={pos.y} r="3" fill="#26d0ce" opacity="0.8" />
-              <circle cx={pos.x} cy={pos.y} r="6" fill="none" stroke="#26d0ce" strokeWidth="0.5" opacity="0.4" />
-            </g>
-          ))}
-        </svg>
-
-        {/* Partículas flutuando */}
-        <div
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-          }}>
-          {Array.from({ length: 40 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${Math.random() * 3 + 1}px`,
-                height: `${Math.random() * 3 + 1}px`,
-                background: '#26d0ce',
-                borderRadius: '50%',
-                opacity: Math.random() * 0.6 + 0.1,
-                boxShadow: '0 0 10px #26d0ce',
-                animation: `float-particle ${Math.random() * 15 + 10}s infinite ease-in-out`,
-                animationDelay: `${i * 0.2}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Gradiente de fundo elegante */}
+        {/* Overlay escuro para melhorar legibilidade */}
         <div
           style={{
             position: 'absolute',
@@ -174,34 +106,24 @@ export default function DashboardPage() {
             width: '100%',
             height: '100%',
             background: `
-              linear-gradient(135deg, rgba(15, 20, 25, 0.9) 0%, rgba(10, 22, 40, 0.85) 50%, rgba(13, 24, 37, 0.9) 100%)
+              linear-gradient(135deg, rgba(15, 20, 25, 0.75) 0%, rgba(10, 22, 40, 0.7) 50%, rgba(13, 24, 37, 0.75) 100%)
             `,
             pointerEvents: 'none',
           }}
         />
 
-        {/* Glow dinâmico */}
+        {/* Glow dinâmico subtil */}
         <div
           style={{
             position: 'absolute',
             width: '100%',
             height: '100%',
             background: `
-              radial-gradient(circle at 25% 25%, rgba(38, 208, 206, 0.12) 0%, transparent 40%),
-              radial-gradient(circle at 75% 75%, rgba(38, 208, 206, 0.08) 0%, transparent 45%)
+              radial-gradient(circle at 20% 20%, rgba(38, 208, 206, 0.15) 0%, transparent 45%),
+              radial-gradient(circle at 80% 80%, rgba(38, 208, 206, 0.1) 0%, transparent 50%)
             `,
           }}
         />
-
-        {/* Estilo CSS para animações */}
-        <style>{`
-          @keyframes float-particle {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.1; }
-            25% { transform: translateY(-20px) translateX(10px); opacity: 0.4; }
-            50% { transform: translateY(-40px) translateX(-10px); opacity: 0.6; }
-            75% { transform: translateY(-20px) translateX(15px); opacity: 0.3; }
-          }
-        `}</style>
       </div>
 
       {/* Padrão de Grid Tech */}
