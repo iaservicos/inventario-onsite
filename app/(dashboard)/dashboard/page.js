@@ -188,7 +188,7 @@ export default function DashboardPage() {
             />
             <PremiumKpiCard
               label="Divergências"
-              value={kpis.abandoned || 0}
+              value={kpis.divergences || 0}
               sub="Atenção"
               color="#ef4444"
             />
@@ -246,14 +246,14 @@ export default function DashboardPage() {
                         </Pie>
                         <Tooltip
                           contentStyle={{
-                            background: 'rgba(15, 20, 25, 0.75)',
-                            border: '1.5px solid rgba(38, 208, 206, 0.6)',
+                            background: 'rgba(15, 20, 25, 0.6)',
+                            border: '1.5px solid rgba(38, 208, 206, 0.7)',
                             borderRadius: '8px',
                             fontSize: '0.8rem',
-                            color: '#26d0ce',
-                            fontWeight: '700',
+                            color: '#ffffff',
+                            fontWeight: '800',
                             padding: '0.75rem',
-                            boxShadow: '0 0 15px rgba(38, 208, 206, 0.3)',
+                            boxShadow: '0 0 20px rgba(38, 208, 206, 0.4)',
                           }}
                           cursor={{ fill: 'rgba(38, 208, 206, 0.1)' }}
                         />
