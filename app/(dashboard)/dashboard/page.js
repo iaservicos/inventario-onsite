@@ -125,10 +125,47 @@ export default function DashboardPage() {
     <div style={{
       padding: '2rem',
       width: '100%',
-      background: '#0f1419',
+      background: 'linear-gradient(135deg, #0f1419 0%, #0a1628 50%, #0d1825 100%)',
       minHeight: '100vh',
+      position: 'relative',
+      overflow: 'hidden',
     }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      {/* Background Tech - Efeito Subtil */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0,
+          background: `
+            radial-gradient(circle at 30% 30%, rgba(38, 208, 206, 0.1) 0%, transparent 40%),
+            radial-gradient(circle at 70% 60%, rgba(38, 208, 206, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(38, 208, 206, 0.06) 0%, transparent 45%)
+          `,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Padrão de Grid Tech */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0,
+          backgroundImage: `
+            linear-gradient(0deg, transparent 24%, rgba(38, 208, 206, 0.05) 25%, rgba(38, 208, 206, 0.05) 26%, transparent 27%, transparent 74%, rgba(38, 208, 206, 0.05) 75%, rgba(38, 208, 206, 0.05) 76%, transparent 77%, transparent),
+            linear-gradient(90deg, transparent 24%, rgba(38, 208, 206, 0.05) 25%, rgba(38, 208, 206, 0.05) 26%, transparent 27%, transparent 74%, rgba(38, 208, 206, 0.05) 75%, rgba(38, 208, 206, 0.05) 76%, transparent 77%, transparent)
+          `,
+          backgroundSize: '50px 50px',
+          pointerEvents: 'none',
+        }}
+      />
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem', position: 'relative', zIndex: 1 }}>
         <PageHeader
           title="Dashboard"
           subtitle="Visão geral do inventário cíclico de técnicos"
@@ -150,7 +187,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
+      </div>
 
       <div style={{ height: '2rem' }} />
 
@@ -164,6 +203,8 @@ export default function DashboardPage() {
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '1.5rem',
             marginBottom: '3rem',
+            position: 'relative',
+            zIndex: 1,
           }}>
             <PremiumKpiCard
               label="Total Inventários"
@@ -198,6 +239,8 @@ export default function DashboardPage() {
             gridTemplateColumns: '1.2fr 1fr',
             gap: '1.5rem',
             marginBottom: '2.5rem',
+            position: 'relative',
+            zIndex: 1,
           }}>
             {/* Card Gráfico */}
             <div style={{
@@ -336,6 +379,7 @@ export default function DashboardPage() {
             overflow: 'hidden',
             boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
             position: 'relative',
+            zIndex: 1,
           }}>
             <TechElements />
             <div style={{
