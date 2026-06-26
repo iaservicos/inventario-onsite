@@ -272,8 +272,6 @@ export default function DashboardPage() {
               display: 'flex',
               flexDirection: 'column',
             }}>
-              <BackgroundElement />
-              <TechElements />
               <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
                 <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: '0 0 1.5rem 0' }}>
                   Alertas Críticos
