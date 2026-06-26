@@ -17,6 +17,27 @@ function formatDateShort(date) {
   }).format(new Date(date));
 }
 
+// SVG Background Circles
+const BackgroundElement = () => (
+  <svg width="200" height="200" viewBox="0 0 200 200" style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.1 }}>
+    <circle cx="100" cy="100" r="80" fill="none" stroke="#26d0ce" strokeWidth="2" />
+    <circle cx="100" cy="100" r="60" fill="none" stroke="#26d0ce" strokeWidth="1" />
+    <circle cx="100" cy="100" r="40" fill="none" stroke="#26d0ce" strokeWidth="1" />
+  </svg>
+);
+
+// SVG Grid Pattern
+const GridPattern = () => (
+  <svg style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, opacity: 0.03 }} xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#26d0ce" strokeWidth="0.5" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grid)" />
+  </svg>
+);
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -108,149 +129,230 @@ export default function DashboardPage() {
         <div style={{ textAlign: 'center', padding: '5rem', color: '#ffffff', fontWeight: '700' }}>Carregando dados...</div>
       ) : (
         <>
-          {/* KPIs - 4 colunas com borda turquesa sutil */}
+          {/* KPIs - Cards Premium */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '1.25rem',
             marginBottom: '2.5rem',
           }}>
-            <KpiCard label="Total Inventários" value={kpis.total || 0} sub="No período" />
-            <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}%`} highlight />
-            <KpiCard label="Em Andamento" value={kpis.in_progress || 0} sub="Ativo" />
-            <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Atenção" />
+            <PremiumKpiCard
+              label="Total Inventários"
+              value={kpis.total || 0}
+              sub="No período"
+              color="#26d0ce"
+            />
+            <PremiumKpiCard
+              label="Concluídos"
+              value={kpis.completed || 0}
+              sub={`${completionRate}%`}
+              color="#26d0ce"
+              highlight
+            />
+            <PremiumKpiCard
+              label="Em Andamento"
+              value={kpis.in_progress || 0}
+              sub="Ativo"
+              color="#3b82f6"
+            />
+            <PremiumKpiCard
+              label="Divergências"
+              value={kpis.abandoned || 0}
+              sub="Atenção"
+              color="#ef4444"
+            />
           </div>
 
-          {/* Gráfico + Alertas em 2 colunas */}
+          {/* Seção Principal - Gráfico + Alertas */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: '1.2fr 1fr',
             gap: '1.5rem',
-            marginBottom: '2rem',
+            marginBottom: '2.5rem',
           }}>
-            {/* Gráfico */}
+            {/* Card Gráfico */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(38, 208, 206, 0.3)',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              boxShadow: '0 0 30px rgba(38, 208, 206, 0.2)',
+              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
+              backdropFilter: 'blur(30px)',
+              border: '1px solid rgba(38, 208, 206, 0.35)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)',
+              position: 'relative',
+              overflow: 'hidden',
             }}>
-              <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '0.95rem' }}>Distribuição de Status</h3>
-              <div style={{ height: '240px', width: '100%' }}>
-                {pieData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                        {pieData.map((entry, i) => (
-                          <Cell key={i} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          background: 'rgba(30, 45, 64, 0.9)',
-                          border: '1px solid rgba(38, 208, 206, 0.3)',
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          color: '#ffffff',
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b95a5' }}>Sem dados</div>
-                )}
+              <GridPattern />
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  marginBottom: '2rem',
+                }}>
+                  <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: 0 }}>
+                    Distribuição de Status
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: '#8b95a5' }}>Resumo por categoria</span>
+                </div>
+
+                <div style={{ height: '260px', width: '100%', marginBottom: '1.5rem' }}>
+                  {pieData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={95} paddingAngle={3} dataKey="value">
+                          {pieData.map((entry, i) => (
+                            <Cell key={i} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            background: 'rgba(15, 20, 25, 0.95)',
+                            border: '1px solid rgba(38, 208, 206, 0.3)',
+                            borderRadius: '8px',
+                            fontSize: '0.75rem',
+                            color: '#ffffff',
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b95a5' }}>Sem dados</div>
+                  )}
+                </div>
+
+                {/* Legend */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '1rem',
+                  padding: '1rem 0',
+                  borderTop: '1px solid rgba(38, 208, 206, 0.1)',
+                }}>
+                  {pieData.map((item) => (
+                    <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ width: '10px', height: '10px', background: item.color, borderRadius: '2px' }} />
+                      <span style={{ fontSize: '0.75rem', color: '#e8eef7', fontWeight: '600' }}>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Alertas */}
+            {/* Card Alertas */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(38, 208, 206, 0.3)',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              boxShadow: '0 0 30px rgba(38, 208, 206, 0.2)',
+              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
+              backdropFilter: 'blur(30px)',
+              border: '1px solid rgba(38, 208, 206, 0.35)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)',
+              position: 'relative',
+              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
             }}>
-              <h3 style={{ color: '#26d0ce', marginBottom: '1.25rem', fontWeight: '700', fontSize: '0.95rem' }}>Alertas Críticos</h3>
-              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                {alerts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '2rem', color: '#8b95a5', fontWeight: '600' }}>Nenhum alerta</div>
-                ) : (
-                  alerts.slice(0, 4).map((a) => (
-                    <div key={a.id} style={{
-                      padding: '0.85rem',
-                      background: 'rgba(38, 208, 206, 0.08)',
-                      border: '1px solid rgba(38, 208, 206, 0.2)',
-                      borderRadius: '6px',
-                    }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#ffffff' }}>{a.title}</div>
-                      <div style={{ fontSize: '0.7rem', color: '#8b95a5', marginTop: '3px' }}>{a.description}</div>
+              <BackgroundElement />
+              <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
+                <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: '0 0 1.5rem 0' }}>
+                  Alertas Críticos
+                </h3>
+
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {alerts.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2rem', color: '#8b95a5', fontWeight: '600' }}>
+                      Nenhum alerta crítico
                     </div>
-                  ))
-                )}
+                  ) : (
+                    alerts.slice(0, 4).map((a) => (
+                      <div key={a.id} style={{
+                        padding: '1rem',
+                        background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.12) 0%, transparent 100%)',
+                        border: '1px solid rgba(38, 208, 206, 0.25)',
+                        borderRadius: '8px',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.18) 0%, transparent 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.4)';
+                        e.currentTarget.style.transform = 'translateX(4px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.12) 0%, transparent 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.25)';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#26d0ce', marginBottom: '0.5rem' }}>
+                          {a.title}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#8b95a5', lineHeight: '1.4' }}>
+                          {a.description}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Tabela */}
           <div style={{
-            background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(38, 208, 206, 0.3)',
-            borderRadius: '12px',
+            background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
+            backdropFilter: 'blur(30px)',
+            border: '1px solid rgba(38, 208, 206, 0.35)',
+            borderRadius: '16px',
             overflow: 'hidden',
-            boxShadow: '0 0 30px rgba(38, 208, 206, 0.2)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)',
           }}>
             <div style={{
-              padding: '1.25rem 1.5rem',
-              background: 'rgba(38, 208, 206, 0.05)',
-              borderBottom: '1px solid rgba(38, 208, 206, 0.15)',
+              padding: '1.75rem 2rem',
+              background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.1) 0%, transparent 100%)',
+              borderBottom: '1px solid rgba(38, 208, 206, 0.2)',
             }}>
-              <h3 style={{ color: '#26d0ce', margin: 0, fontWeight: '700', fontSize: '0.95rem' }}>Atividade Recente</h3>
+              <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: 0 }}>
+                Atividade Recente
+              </h3>
             </div>
             <div style={{ overflow: 'x', overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: 'transparent' }}>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Técnico</th>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Região</th>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Semana</th>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Status</th>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Progresso</th>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Divergências</th>
-                    <th style={{ color: '#26d0ce', padding: '0.85rem 1rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Data</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Técnico</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Região</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Semana</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Status</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Progresso</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Divergências</th>
+                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Data</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recent.length === 0 ? (
-                    <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#8b95a5', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
+                    <tr><td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#8b95a5', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
                   ) : (
                     recent.slice(0, 8).map((inv) => {
                       const pct = inv.total_items > 0 ? Math.min(100, Math.round((inv.counted_items / inv.total_items) * 100)) : 0;
                       return (
                         <tr key={inv.id} style={{
-                          borderBottom: '1px solid rgba(38, 208, 206, 0.08)',
+                          borderBottom: '1px solid rgba(38, 208, 206, 0.1)',
                           transition: 'all 0.2s ease',
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(38, 208, 206, 0.08)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                          <td style={{ padding: '0.75rem 1rem', color: '#ffffff', fontWeight: '700' }}>{inv.technicians?.name}</td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#e8eef7' }}>{inv.technicians?.region || '—'}</td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#e8eef7' }}>{inv.week_ref || '—'}</td>
-                          <td style={{ padding: '0.75rem 1rem' }}><StatusBadge status={inv.status} /></td>
-                          <td style={{ padding: '0.75rem 1rem' }}>
+                          <td style={{ padding: '1rem 1.5rem', color: '#ffffff', fontWeight: '700' }}>{inv.technicians?.name}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: '#e8eef7' }}>{inv.technicians?.region || '—'}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: '#e8eef7' }}>{inv.week_ref || '—'}</td>
+                          <td style={{ padding: '1rem 1.5rem' }}><StatusBadge status={inv.status} /></td>
+                          <td style={{ padding: '1rem 1.5rem' }}>
                             <div style={{ width: '70px', height: '3px', background: 'rgba(38, 208, 206, 0.12)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${pct}%`, height: '100%', background: '#26d0ce', boxShadow: '0 0 8px rgba(38, 208, 206, 0.4)' }} />
+                              <div style={{ width: `${pct}%`, height: '100%', background: '#26d0ce', boxShadow: '0 0 10px rgba(38, 208, 206, 0.5)' }} />
                             </div>
                           </td>
-                          <td style={{ padding: '0.75rem 1rem', color: (inv.divergence_quantity ?? 0) > 0 ? '#26d0ce' : '#8b95a5', fontWeight: '800' }}>
+                          <td style={{ padding: '1rem 1.5rem', color: (inv.divergence_quantity ?? 0) > 0 ? '#26d0ce' : '#8b95a5', fontWeight: '800' }}>
                             {inv.divergence_quantity ?? 0}
                           </td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#8b95a5', fontSize: '0.7rem' }}>
+                          <td style={{ padding: '1rem 1.5rem', color: '#8b95a5', fontSize: '0.75rem' }}>
                             {inv.created_at ? new Date(inv.created_at).toLocaleDateString('pt-BR') : '—'}
                           </td>
                         </tr>
@@ -267,29 +369,79 @@ export default function DashboardPage() {
   );
 }
 
-function KpiCard({ label, value, sub, highlight }) {
+function PremiumKpiCard({ label, value, sub, color, highlight }) {
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
-      backdropFilter: 'blur(20px)',
-      border: highlight ? '1px solid rgba(38, 208, 206, 0.5)' : '1px solid rgba(38, 208, 206, 0.3)',
-      borderRadius: '12px',
-      padding: '1.5rem',
-      boxShadow: highlight ? '0 0 25px rgba(38, 208, 206, 0.3)' : '0 0 20px rgba(38, 208, 206, 0.18)',
-      transition: 'all 0.25s ease',
+      background: highlight
+        ? 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, rgba(38, 208, 206, 0.05) 100%)'
+        : 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
+      backdropFilter: 'blur(30px)',
+      border: highlight ? '1.5px solid rgba(38, 208, 206, 0.5)' : '1px solid rgba(38, 208, 206, 0.35)',
+      borderRadius: '16px',
+      padding: '1.75rem',
+      boxShadow: highlight
+        ? '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.3)'
+        : '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 20px rgba(38, 208, 206, 0.15)',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       cursor: 'pointer',
+      position: 'relative',
+      overflow: 'hidden',
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow = highlight ? '0 0 35px rgba(38, 208, 206, 0.4)' : '0 0 30px rgba(38, 208, 206, 0.28)';
-      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.transform = 'translateY(-4px)';
+      e.currentTarget.style.boxShadow = highlight
+        ? '0 30px 80px rgba(0, 0, 0, 0.5), 0 0 50px rgba(38, 208, 206, 0.4)'
+        : '0 30px 80px rgba(0, 0, 0, 0.5), 0 0 30px rgba(38, 208, 206, 0.25)';
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow = highlight ? '0 0 25px rgba(38, 208, 206, 0.3)' : '0 0 20px rgba(38, 208, 206, 0.18)';
       e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = highlight
+        ? '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.3)'
+        : '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 20px rgba(38, 208, 206, 0.15)';
     }}>
-      <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>{label}</div>
-      <div style={{ fontSize: '2rem', fontWeight: '900', color: highlight ? '#26d0ce' : '#ffffff', lineHeight: 1, marginBottom: '0.5rem' }}>{value}</div>
-      {sub && <div style={{ fontSize: '0.7rem', color: '#8b95a5', fontWeight: '600' }}>{sub}</div>}
+      <GridPattern />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{
+          fontSize: '0.75rem',
+          fontWeight: '700',
+          color: '#8b95a5',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          marginBottom: '1rem',
+        }}>
+          {label}
+        </div>
+        <div style={{
+          fontSize: '2.5rem',
+          fontWeight: '900',
+          color: highlight ? color : '#ffffff',
+          lineHeight: 1,
+          marginBottom: '0.75rem',
+        }}>
+          {value}
+        </div>
+        {sub && (
+          <div style={{
+            fontSize: '0.8rem',
+            color: '#8b95a5',
+            fontWeight: '600',
+          }}>
+            {sub}
+          </div>
+        )}
+      </div>
+      {highlight && (
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: '100px',
+          height: '100px',
+          background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`,
+          borderRadius: '50%',
+          zIndex: 0,
+        }} />
+      )}
     </div>
   );
 }
