@@ -350,7 +350,7 @@ export default function DashboardPage() {
               </h3>
             </div>
             <div style={{ overflow: 'x', overflowX: 'auto', position: 'relative', zIndex: 1 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                 <thead>
                   <tr style={{ background: 'transparent' }}>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid rgba(38, 208, 206, 0.15)', letterSpacing: '0.05em' }}>Técnico</th>
@@ -375,19 +375,19 @@ export default function DashboardPage() {
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(38, 208, 206, 0.08)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                          <td style={{ padding: '1rem 1.5rem', color: '#ffffff', fontWeight: '700' }}>{inv.technicians?.name}</td>
-                          <td style={{ padding: '1rem 1.5rem', color: '#e8eef7' }}>{inv.technicians?.region || '—'}</td>
-                          <td style={{ padding: '1rem 1.5rem', color: '#e8eef7' }}>{inv.week_ref || '—'}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: '#ffffff', fontWeight: '700', fontSize: '0.9rem' }}>{inv.technicians?.name}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: '#e8eef7', fontSize: '0.9rem' }}>{inv.technicians?.region || '—'}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: '#e8eef7', fontSize: '0.9rem' }}>{inv.week_ref || '—'}</td>
                           <td style={{ padding: '1rem 1.5rem' }}><StatusBadge status={inv.status} /></td>
                           <td style={{ padding: '1rem 1.5rem' }}>
                             <div style={{ width: '70px', height: '3px', background: 'rgba(38, 208, 206, 0.12)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${pct}%`, height: '100%', background: '#26d0ce', boxShadow: '0 0 10px rgba(38, 208, 206, 0.5)' }} />
                             </div>
                           </td>
-                          <td style={{ padding: '1rem 1.5rem', color: (inv.divergence_quantity ?? 0) > 0 ? '#26d0ce' : '#8b95a5', fontWeight: '800' }}>
+                          <td style={{ padding: '1rem 1.5rem', color: (inv.divergence_quantity ?? 0) > 0 ? '#26d0ce' : '#8b95a5', fontWeight: '800', fontSize: '0.9rem' }}>
                             {inv.divergence_quantity ?? 0}
                           </td>
-                          <td style={{ padding: '1rem 1.5rem', color: '#8b95a5', fontSize: '0.75rem' }}>
+                          <td style={{ padding: '1rem 1.5rem', color: '#8b95a5', fontSize: '0.85rem' }}>
                             {inv.created_at ? new Date(inv.created_at).toLocaleDateString('pt-BR') : '—'}
                           </td>
                         </tr>

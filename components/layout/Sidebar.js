@@ -114,11 +114,11 @@ export default function Sidebar({ user, isOpen }) {
   return (
     <aside className={`sidebar${isOpen ? ' sidebar-open' : ''}`}>
       {/* Logo */}
-      <div style={{ padding: '1.5rem 1rem 1rem', borderBottom: '1.5px solid var(--color-border-light)' }}>
+      <div style={{ padding: '1.5rem 0.75rem 1.5rem', borderBottom: '1.5px solid var(--color-border-light)' }}>
         <Link href="/categorias" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none' }}>
           <div style={{
             background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.12) 0%, transparent 100%)',
-            padding: '1rem',
+            padding: '1.25rem 0.75rem',
             borderRadius: '12px',
             display: 'flex',
             justifyContent: 'center',
@@ -128,7 +128,7 @@ export default function Sidebar({ user, isOpen }) {
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             width: '100%',
-            minHeight: '60px',
+            minHeight: '80px',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.6)';
@@ -144,9 +144,9 @@ export default function Sidebar({ user, isOpen }) {
               src="https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-(1).png"
               alt="Positivo Tecnologia"
               style={{
-                maxWidth: '170px',
+                maxWidth: '90%',
                 height: 'auto',
-                maxHeight: '45px',
+                maxHeight: '60px',
                 objectFit: 'contain',
                 filter: 'brightness(1.1)',
               }}

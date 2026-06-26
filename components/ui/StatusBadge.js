@@ -3,7 +3,7 @@ const STATUS_MAP = {
   // Inventário
   completed:       { label: 'Concluído',    cls: 'badge-success' },
   in_progress:     { label: 'Em Andamento', cls: 'badge-info' },
-  abandoned:       { label: 'Abandonado',   cls: 'badge-error' },
+  abandoned:       { label: 'Abandonado',   cls: 'badge-success' },
   recount_pending: { label: 'Aguarda Recontagem', cls: 'badge-warning' },
   pending:         { label: 'Agendado',          cls: 'badge-neutral' },
   cancelled:       { label: 'Cancelado',    cls: 'badge-neutral' },
