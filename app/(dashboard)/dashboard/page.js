@@ -63,15 +63,12 @@ export default function DashboardPage() {
   const recent = data?.recent || [];
   const alerts = data?.alerts || [];
 
-  const pieChartData = [
+  const pieData = [
     { name: 'Concluído', value: kpis.completed || 0, color: '#26d0ce' },
-    { name: 'Em Andamento', value: kpis.in_progress || 0, color: '#3b82f6' },
     { name: 'Abandonado', value: kpis.abandoned || 0, color: '#f85149' },
+    { name: 'Em Andamento', value: kpis.in_progress || 0, color: '#3b82f6' },
     { name: 'Recontagem', value: kpis.recount_pending || 0, color: '#fbbf24' },
-  ];
-
-  const pieData = pieChartData.filter((d) => d.value > 0);
-  const allPieData = pieChartData;
+  ].filter((d) => d.value > 0);
 
   const completionRate = kpis.total > 0 ? Math.round((kpis.completed / kpis.total) * 100) : 0;
 
@@ -269,20 +266,20 @@ export default function DashboardPage() {
                 {/* Legend */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '0.85rem',
-                  padding: '1.5rem 0 0 0',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '0.75rem',
+                  padding: '1.25rem 0 0 0',
                   borderTop: '1px solid rgba(38, 208, 206, 0.15)',
                 }}>
-                  {allPieData.map((item) => (
+                  {pieData.map((item) => (
                     <div key={item.name} style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.75rem',
-                      padding: '0.75rem 0.85rem',
-                      background: 'rgba(38, 208, 206, 0.08)',
-                      border: '1.5px solid rgba(38, 208, 206, 0.3)',
-                      borderRadius: '6px',
+                      gap: '0.5rem',
+                      padding: '0.5rem 0.65rem',
+                      background: 'rgba(38, 208, 206, 0.1)',
+                      border: '1px solid rgba(38, 208, 206, 0.35)',
+                      borderRadius: '5px',
                       transition: 'all 0.2s ease',
                       cursor: 'pointer',
                     }}
@@ -291,18 +288,18 @@ export default function DashboardPage() {
                       e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.5)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.08)';
-                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.3)';
+                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.1)';
+                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.35)';
                     }}>
                       <div style={{
-                        width: '12px',
-                        height: '12px',
+                        width: '10px',
+                        height: '10px',
                         background: item.color,
                         borderRadius: '2px',
-                        boxShadow: `0 0 6px ${item.color}80`,
+                        boxShadow: `0 0 5px ${item.color}70`,
                         flexShrink: 0
                       }} />
-                      <span style={{ fontSize: '0.8rem', color: '#ffffff', fontWeight: '800', whiteSpace: 'nowrap', textShadow: '0 1px 3px rgba(0, 0, 0, 0.4)' }}>{item.name}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#ffffff', fontWeight: '700', whiteSpace: 'nowrap' }}>{item.name}</span>
                     </div>
                   ))}
                 </div>
