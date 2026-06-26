@@ -291,7 +291,7 @@ export default function CategoriasPage() {
 
       {/* Header */}
       <div style={{
-        padding: '1.5rem 2rem 0',
+        padding: '1rem 2rem 0',
         textAlign: 'center',
         borderBottom: 'none',
         position: 'relative',
@@ -299,7 +299,7 @@ export default function CategoriasPage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '0.75rem',
+        gap: '0.5rem',
       }}>
         {/* Logo */}
         <div style={{
@@ -333,20 +333,20 @@ export default function CategoriasPage() {
         </div>
 
         <h1 style={{
-          fontSize: '3.2rem',
+          fontSize: '2.8rem',
           fontWeight: '900',
           color: '#ffffff',
-          margin: 0,
+          margin: '0.25rem 0 0',
           letterSpacing: '-0.02em',
           textShadow: '0 2px 10px rgba(38, 208, 206, 0.3)',
         }}>
           Bem-vindo ao Portal Onsite
         </h1>
         <p style={{
-          fontSize: '1rem',
+          fontSize: '0.9rem',
           color: '#8b95a5',
-          margin: 0,
-          lineHeight: '1.4',
+          margin: '0.3rem 0 0',
+          lineHeight: '1.3',
           fontWeight: 500,
           letterSpacing: '0.01em',
         }}>
@@ -360,7 +360,7 @@ export default function CategoriasPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2.5rem 2rem 3rem',
+        padding: '1.5rem 2rem 3rem',
         position: 'relative',
         zIndex: 1,
       }}>
