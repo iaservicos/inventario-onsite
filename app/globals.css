@@ -91,7 +91,7 @@ html[data-theme="light"] body {
 
 /* ── Cards Modernos com Neon ── */
 .card {
-  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(29, 209, 161, 0.03) 100%);
+  background: linear-gradient(135deg, rgba(30, 45, 64, 0.95) 0%, rgba(30, 45, 64, 0.85) 100%);
   border: 1.5px solid var(--color-border-light);
   border-radius: 12px;
   padding: 1.5rem;
@@ -231,23 +231,23 @@ select option {
 
 /* ── Status Badges Modernas ── */
 .badge {
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 800;
-  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   transition: all 0.2s ease;
   display: inline-block;
 }
-.badge-ok { background: rgba(38, 208, 206, 0.15); color: #26d0ce; border: 1px solid rgba(38, 208, 206, 0.4); box-shadow: 0 2px 8px rgba(38, 208, 206, 0.1); }
-.badge-not-ok { background: rgba(38, 208, 206, 0.12); color: white; border: 1px solid rgba(38, 208, 206, 0.3); }
-.badge-success { background: rgba(38, 208, 206, 0.15); color: #26d0ce; box-shadow: 0 2px 8px rgba(38, 208, 206, 0.1); border: 1px solid rgba(38, 208, 206, 0.4); }
-.badge-info { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-.badge-warning { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-.badge-error { background: rgba(248, 81, 73, 0.12); color: #ef4444; border: 1px solid rgba(248, 81, 73, 0.3); }
+.badge-ok { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
+.badge-not-ok { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
+.badge-success { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
+.badge-info { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
+.badge-warning { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
+.badge-error { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
 .badge-neutral { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
-.badge-active { background: rgba(38, 208, 206, 0.15); color: #26d0ce; box-shadow: 0 2px 8px rgba(38, 208, 206, 0.1); border: 1px solid rgba(38, 208, 206, 0.4); }
+.badge-active { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
 .badge-inactive { background: rgba(139, 149, 165, 0.12); color: #a0aab5; border: 1px solid rgba(139, 149, 165, 0.3); }
 
 /* ── Progress ── */
