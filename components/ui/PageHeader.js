@@ -9,9 +9,9 @@ export default function PageHeader({ title, subtitle, actions }) {
     }}>
       <div>
         <h1 style={{
-          fontSize: '1.25rem',
-          fontWeight: '700',
-          color: 'var(--color-text-primary)',
+          fontSize: '1.75rem',
+          fontWeight: '900',
+          color: '#ffffff',
           letterSpacing: '-0.02em',
           lineHeight: 1.2,
         }}>

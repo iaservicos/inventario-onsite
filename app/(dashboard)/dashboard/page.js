@@ -221,7 +221,7 @@ export default function DashboardPage() {
                   alignItems: 'baseline',
                   marginBottom: '2rem',
                 }}>
-                  <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: 0 }}>
+                  <h3 style={{ color: '#ffffff', fontWeight: '800', fontSize: '1.1rem', margin: 0 }}>
                     Distribuição de Status
                   </h3>
                   <span style={{ fontSize: '0.75rem', color: '#8b95a5' }}>Resumo por categoria</span>
@@ -246,13 +246,14 @@ export default function DashboardPage() {
                         </Pie>
                         <Tooltip
                           contentStyle={{
-                            background: 'rgba(15, 20, 25, 0.98)',
-                            border: '1.5px solid rgba(38, 208, 206, 0.5)',
+                            background: 'rgba(15, 20, 25, 0.75)',
+                            border: '1.5px solid rgba(38, 208, 206, 0.6)',
                             borderRadius: '8px',
                             fontSize: '0.8rem',
-                            color: '#ffffff',
+                            color: '#26d0ce',
                             fontWeight: '700',
                             padding: '0.75rem',
+                            boxShadow: '0 0 15px rgba(38, 208, 206, 0.3)',
                           }}
                           cursor={{ fill: 'rgba(38, 208, 206, 0.1)' }}
                         />
@@ -320,7 +321,7 @@ export default function DashboardPage() {
               flexDirection: 'column',
             }}>
               <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
-                <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: '0 0 1.5rem 0' }}>
+                <h3 style={{ color: '#ffffff', fontWeight: '800', fontSize: '1.1rem', margin: '0 0 1.5rem 0' }}>
                   Alertas Críticos
                 </h3>
 
@@ -381,7 +382,7 @@ export default function DashboardPage() {
               position: 'relative',
               zIndex: 1,
             }}>
-              <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: 0 }}>
+              <h3 style={{ color: '#ffffff', fontWeight: '800', fontSize: '1.1rem', margin: 0 }}>
                 Atividade Recente
               </h3>
             </div>
