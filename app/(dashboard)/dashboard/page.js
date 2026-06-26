@@ -18,11 +18,11 @@ function formatDateShort(date) {
 }
 
 const STATUS_COLORS = {
-  completed:       '#1dd1a1',
-  in_progress:     '#3b82f6',
-  abandoned:       '#ef4444',
-  recount_pending: '#f59e0b',
-  pending:         '#8b96a8',
+  completed:       'var(--color-accent)',
+  in_progress:     'var(--color-info)',
+  abandoned:       'var(--color-error)',
+  recount_pending: 'var(--color-warning)',
+  pending:         'var(--color-text-tertiary)',
 };
 
 export default function DashboardPage() {
@@ -109,7 +109,7 @@ export default function DashboardPage() {
       <div style={{ height: '2rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '5rem', color: '#000000', fontWeight: '700' }}>Carregando dados...</div>
+        <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--color-text-primary)', fontWeight: '700' }}>Carregando dados...</div>
       ) : (
         <>
           {/* KPIs - Grid Fluido */}
@@ -134,17 +134,17 @@ export default function DashboardPage() {
                         ))}
                       </Pie>
                       <Tooltip
-                        contentStyle={{ background: '#ffffff', border: '1px solid #000000', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}
+                        contentStyle={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888888', fontWeight: '600' }}>Sem dados para exibir</div>
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>Sem dados para exibir</div>
                 )}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
                 {pieData.map((d) => (
-                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.7rem', fontWeight: '700', color: '#000000' }}>
+                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.7rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>
                     <span style={{ width: 10, height: 10, borderRadius: '2px', background: d.color }} />
                     {d.name.toUpperCase()}
                   </div>
@@ -156,13 +156,13 @@ export default function DashboardPage() {
               <div className="section-title" style={{ marginBottom: '1.5rem' }}>Alertas Críticos</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {alerts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: '#888888', fontWeight: '600' }}>Nenhum alerta ativo</div>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>Nenhum alerta ativo</div>
                 ) : (
                   alerts.map((a) => (
-                    <div key={a.id} style={{ padding: '1rem', background: '#f9f9f9', border: '1px solid #eeeeee', borderRadius: '6px' }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#000000' }}>{a.title}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#444444', marginTop: '2px', fontWeight: '500' }}>{a.description}</div>
-                      <div style={{ fontSize: '0.65rem', color: '#888888', marginTop: '6px', fontWeight: '700' }}>{formatDate(a.created_at)}</div>
+                    <div key={a.id} style={{ padding: '1rem', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '6px' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>{a.title}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px', fontWeight: '500' }}>{a.description}</div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '6px', fontWeight: '700' }}>{formatDate(a.created_at)}</div>
                     </div>
                   ))
                 )}
@@ -172,7 +172,7 @@ export default function DashboardPage() {
 
           {/* Tabela Recente - Full Width */}
           <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-            <div style={{ padding: '1.25rem 1.5rem', background: '#f0f0f0', borderBottom: '1px solid #000000' }}>
+            <div style={{ padding: '1.25rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-border-default)' }}>
               <div className="section-title">Atividade Recente</div>
             </div>
             <div className="table-wrapper" style={{ border: 'none' }}>
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                       const subgrupo    = sched?.scheduled_subgroup;
                       return (
                         <tr key={inv.id}>
-                          <td style={{ fontWeight: '800', color: '#000000' }}>{inv.technicians?.name}</td>
+                          <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{inv.technicians?.name}</td>
                           <td style={{ fontWeight: '600' }}>{inv.technicians?.region || '—'}</td>
                           <td style={{ fontWeight: '600' }}>{inv.week_ref || '—'}</td>
                           <td>
@@ -226,7 +226,7 @@ export default function DashboardPage() {
                               <span style={{ fontSize: '0.75rem', fontWeight: '800' }}>{pct}%</span>
                             </div>
                           </td>
-                          <td style={{ fontWeight: '900', color: (inv.divergence_quantity ?? inv.divergence_count) > 0 ? '#000000' : '#888888' }}>
+                          <td style={{ fontWeight: '900', color: (inv.divergence_quantity ?? inv.divergence_count) > 0 ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}>
                             {inv.divergence_quantity ?? inv.divergence_count}
                           </td>
                           <td>
@@ -234,23 +234,23 @@ export default function DashboardPage() {
                               <span style={{
                                 fontSize: '0.75rem',
                                 fontWeight: isPending ? '800' : '600',
-                                color: isOverdue ? '#000' : isPending ? '#333' : '#aaa',
-                                background: isOverdue ? '#f0f0f0' : 'transparent',
+                                color: isOverdue ? 'var(--color-error)' : isPending ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)',
+                                background: isOverdue ? 'var(--color-bg-tertiary)' : 'transparent',
                                 padding: isOverdue ? '2px 6px' : '0',
                                 borderRadius: '4px',
-                                border: isOverdue ? '1px solid #ccc' : 'none',
+                                border: isOverdue ? '1px solid var(--color-border-light)' : 'none',
                               }}>
                                 {formatDateShort(scheduledAt)}
                               </span>
                             ) : (
-                              <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>
+                              <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>—</span>
                             )}
                           </td>
                           <td>
                             {inv.started_at ? (
-                              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#000' }}>{formatDateShort(inv.started_at)}</span>
+                              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>{formatDateShort(inv.started_at)}</span>
                             ) : (
-                              <span style={{ fontSize: '0.7rem', fontWeight: '600', color: '#bbb' }}>Aguardando</span>
+                              <span style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--color-text-tertiary)' }}>Aguardando</span>
                             )}
                           </td>
                         </tr>
@@ -269,10 +269,10 @@ export default function DashboardPage() {
 
 function KpiCard({ label, value, sub }) {
   return (
-    <div className="card" style={{ border: '1px solid #000000', background: '#ffffff' }}>
-      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#333333', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{label}</div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000', lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '0.75rem', color: '#666666', fontWeight: '600', marginTop: '0.5rem' }}>{sub}</div>}
+    <div className="card" style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-primary)' }}>
+      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{label}</div>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-text-primary)', lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '600', marginTop: '0.5rem' }}>{sub}</div>}
     </div>
   );
 }

@@ -135,14 +135,18 @@ export default function CategoriasPage() {
       border_dark: '#6e7681',
       accent: '#39c5cf',
       accent_hover: '#1f8f9c',
+      success: '#1dd1a1',
+      warning: '#f59e0b',
+      error: '#ef4444',
+      info: '#3b82f6',
     };
 
     Object.entries(darkTheme).forEach(([key, value]) => {
       root.style.setProperty(`--color-${key}`, value);
     });
 
-    document.body.style.backgroundColor = '#0d1117';
-    document.body.style.color = '#c9d1d9';
+    document.body.style.backgroundColor = 'var(--color-bg-primary)';
+    document.body.style.color = 'var(--color-text-primary)';
   }, []);
 
   if (status === 'loading') {

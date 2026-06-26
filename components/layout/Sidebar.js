@@ -8,14 +8,11 @@ import { ROLE_LABELS } from '@/lib/utils';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
-const NAV_ITEMS = [
+const INVENTARIO_ITEMS = [
   { href: '/dashboard', label: 'Dashboard Inventário' },
   { href: '/divergencias', label: 'Divergências' },
   { href: '/historico', label: 'Histórico' },
   { href: '/agendamentos', label: 'Agendamentos' },
-];
-
-const ESTOQUE_ITEMS = [
   { href: '/pecas', label: 'Peças Novas' },
   { href: '/pecas-usadas', label: 'Peças Usadas' },
   { href: '/devolucoes', label: 'Lotes Montados' },
@@ -56,7 +53,7 @@ function getActiveCategory(pathname) {
   if (pathname.startsWith('/ferramental')) return 'ferramental';
   if (pathname.startsWith('/frotas')) return 'frotas';
   if (pathname.startsWith('/cadastro-tecnicos') || pathname.startsWith('/usuarios')) return 'admin';
-  if (pathname.startsWith('/pecas') || pathname.startsWith('/devolucoes')) return 'estoque';
+  if (pathname.startsWith('/pecas') || pathname.startsWith('/devolucoes')) return 'inventario';
   if (pathname.startsWith('/dashboard') || pathname === '/' || pathname.startsWith('/divergencias') || pathname.startsWith('/historico') || pathname.startsWith('/agendamentos')) return 'inventario';
   return null;
 }
@@ -69,9 +66,7 @@ function getCategoryMenu(category, role) {
 
   switch (category) {
     case 'inventario':
-      return NAV_ITEMS;
-    case 'estoque':
-      return ESTOQUE_ITEMS;
+      return INVENTARIO_ITEMS;
     case 'admin':
       return isAnalistaCusto ? SHARED_ADMIN_ITEMS : (isAdmin ? ADMIN_ITEMS : SHARED_ADMIN_ITEMS);
     case 'ferramental':

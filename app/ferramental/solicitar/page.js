@@ -7,9 +7,9 @@ const FIELD_STYLE = {
   width: '100%',
   padding: '0.9rem 1.1rem',
   borderRadius: '10px',
-  background: '#222222',
-  border: '1px solid #333333',
-  color: '#ffffff',
+  background: 'var(--color-bg-secondary)',
+  border: '1px solid var(--color-border-default)',
+  color: 'var(--color-text-primary)',
   fontSize: '0.95rem',
   fontWeight: '500',
   outline: 'none',
@@ -18,7 +18,7 @@ const FIELD_STYLE = {
 
 const LABEL_STYLE = {
   fontSize: '0.75rem',
-  color: '#888888',
+  color: 'var(--color-text-tertiary)',
   fontWeight: '800',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
@@ -106,22 +106,22 @@ export default function SolicitarFerramentalPage() {
 
   if (submitted) {
     return (
-      <div style={{ minHeight: '100vh', background: '#121212', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div style={{ minHeight: '100vh', background: 'var(--color-bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', fontFamily: "'Inter', system-ui, sans-serif" }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-          <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#1a2e1a', border: '2px solid #2d5a2d', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '2rem' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'var(--color-bg-tertiary)', border: `2px solid var(--color-success)`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '2rem' }}>
             ✓
           </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
             Solicitação Enviada!
           </h2>
-          <p style={{ color: '#888888', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+          <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
             {submittedTools.length === 1
               ? <><strong style={{ color: '#cccccc' }}>{submittedTools[0].name}</strong> ({submittedTools[0].quantity} unidade{submittedTools[0].quantity > 1 ? 's' : ''}) foi registrada com sucesso.</>
               : <>{submittedTools.length} ferramentas solicitadas com sucesso.</>
             }
           </p>
           {submittedTools.length > 1 && (
-            <div style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.25rem', textAlign: 'left' }}>
+            <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-default)', borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.25rem', textAlign: 'left' }}>
               {submittedTools.map(t => (
                 <div key={t.id} style={{ fontSize: '0.82rem', color: '#cccccc', fontWeight: '600', padding: '0.2rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -137,7 +137,7 @@ export default function SolicitarFerramentalPage() {
           </p>
           <button
             onClick={() => { setSubmitted(false); setForm({ technician_name: '', technician_email: '', comment: '' }); setSelectedTools({}); setSubmittedTools([]); }}
-            style={{ padding: '0.8rem 2rem', background: '#ffffff', color: '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+            style={{ padding: '0.8rem 2rem', background: 'var(--color-accent)', color: '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}
           >
             Nova Solicitação
           </button>
@@ -152,17 +152,17 @@ export default function SolicitarFerramentalPage() {
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ background: '#ffffff', padding: '0.6rem 1.2rem', borderRadius: '8px', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ background: 'white', padding: '0.6rem 1.2rem', borderRadius: '8px', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1.5rem' }}>
             <Image src="/logo-positivo.png" alt="Positivo Tecnologia" width={160} height={40} style={{ objectFit: 'contain' }} />
           </div>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '0.4rem' }}>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '0.4rem' }}>
             Solicitação de Ferramental
           </h1>
-          <p style={{ fontSize: '0.8rem', color: '#666666', fontWeight: '600' }}>IA SERVIÇOS — Portal Onsite</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>IA SERVIÇOS — Portal Onsite</p>
         </div>
 
         {/* Card */}
-        <div style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '16px', padding: '2rem' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-default)', borderRadius: '16px', padding: '2rem' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
             <div>
@@ -214,8 +214,8 @@ export default function SolicitarFerramentalPage() {
                         key={tool.id}
                         style={{
                           borderRadius: '10px',
-                          background: isSelected ? '#1a2e1a' : '#222222',
-                          border: `1px solid ${isSelected ? '#3a6a3a' : '#333333'}`,
+                          background: isSelected ? 'var(--color-bg-tertiary)' : 'var(--color-bg-secondary)',
+                          border: `1px solid ${isSelected ? 'var(--color-success)' : 'var(--color-border-default)'}`,
                           overflow: 'hidden',
                           transition: 'all 0.15s',
                         }}
@@ -232,14 +232,14 @@ export default function SolicitarFerramentalPage() {
                         >
                           <div style={{
                             width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
-                            background: isSelected ? '#2d5a2d' : 'transparent',
-                            border: `2px solid ${isSelected ? '#4a8a4a' : '#555555'}`,
+                            background: isSelected ? 'var(--color-success)' : 'transparent',
+                            border: `2px solid ${isSelected ? 'var(--color-success)' : 'var(--color-text-tertiary)'}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.7rem', color: '#ffffff', fontWeight: '900',
+                            fontSize: '0.7rem', color: 'white', fontWeight: '900',
                           }}>
                             {isSelected ? '✓' : ''}
                           </div>
-                          <div style={{ fontSize: '0.9rem', fontWeight: '700', color: isSelected ? '#aaddaa' : '#ffffff' }}>
+                          <div style={{ fontSize: '0.9rem', fontWeight: '700', color: isSelected ? 'var(--color-success)' : 'var(--color-text-primary)' }}>
                             {tool.name}
                           </div>
                         </button>

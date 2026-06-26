@@ -226,7 +226,7 @@ function SubgruposSection() {
                           )}
                           <button
                             className="btn"
-                            style={{ fontSize: '0.7rem', padding: '0.25rem 0.6rem', color: '#cc0000', borderColor: '#cc0000', whiteSpace: 'nowrap' }}
+                            style={{ fontSize: '0.7rem', padding: '0.25rem 0.6rem', color: 'var(--color-error)', borderColor: 'var(--color-error)', whiteSpace: 'nowrap' }}
                             disabled={isSaving || isDeleting}
                             onClick={() => handleDelete(ag.id, ag.technician_name)}
                           >

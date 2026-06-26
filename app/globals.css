@@ -13,6 +13,10 @@
   --color-border-dark: #4a5568;
   --color-accent: #1dd1a1;
   --color-accent-hover: #10b981;
+  --color-success: #1dd1a1;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,7 +25,7 @@ html, body {
   height: 100%;
   width: 100%;
   font-family: inherit, system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1b2a 100%);
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, #1a1f3a 50%, #0d1b2a 100%);
   color: var(--color-text-primary);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
@@ -60,6 +64,10 @@ html[data-theme="light"] body {
   --color-border-dark: #a0aec0;
   --color-accent: #14b8a6;
   --color-accent-hover: #0d9488;
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
 }
 
 /* ── Layout Estrutural (Full Width) ── */

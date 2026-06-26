@@ -338,10 +338,10 @@ export default function PecasPage() {
         <div style={{
           marginBottom: '1.5rem',
           padding: '1rem',
-          background: '#ffebee',
-          border: '1px solid #ffcdd2',
+          background: 'var(--color-bg-tertiary)',
+          border: '1px solid var(--color-error)',
           borderRadius: '8px',
-          color: '#b71c1c',
+          color: 'var(--color-error)',
           fontSize: '0.875rem',
           fontWeight: '600',
           display: 'flex',
@@ -447,8 +447,8 @@ export default function PecasPage() {
             disabled={summaryLoading}
             style={{
               display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px',
-              padding: '0 1.25rem', background: summaryLoading ? '#e5e7eb' : '#111',
-              color: summaryLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px',
+              padding: '0 1.25rem', background: summaryLoading ? 'var(--color-border-light)' : 'var(--color-accent)',
+              color: summaryLoading ? 'var(--color-text-tertiary)' : '#000', border: 'none', borderRadius: '8px',
               fontSize: '0.85rem', fontWeight: '700', cursor: summaryLoading ? 'not-allowed' : 'pointer',
             }}
           >
@@ -498,8 +498,8 @@ export default function PecasPage() {
             style={{ flex: 1, minWidth: '220px', height: '44px', fontWeight: '600', textTransform: 'uppercase' }}
           />
           <button type="submit" disabled={codeLoading || !codeSearch.trim()} style={{
-            height: '44px', padding: '0 1.25rem', background: codeLoading ? '#e5e7eb' : '#111',
-            color: codeLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px',
+            height: '44px', padding: '0 1.25rem', background: codeLoading ? 'var(--color-border-light)' : 'var(--color-accent)',
+            color: codeLoading ? 'var(--color-text-tertiary)' : '#000', border: 'none', borderRadius: '8px',
             fontSize: '0.85rem', fontWeight: '700', cursor: codeLoading ? 'not-allowed' : 'pointer',
           }}>
             {codeLoading ? 'Buscando...' : 'Buscar'}
@@ -523,17 +523,17 @@ export default function PecasPage() {
           </div>
 
           {summaryData.technicians?.length === 0 && (
-            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', background: '#f9f9f9', borderRadius: '10px', border: '2px dashed #d0d0d0', fontWeight: '600' }}>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', background: 'var(--color-bg-secondary)', borderRadius: '10px', border: '2px dashed var(--color-border-light)', fontWeight: '600' }}>
               Nenhum técnico ativo com peças para este supervisor.
             </div>
           )}
 
           {summaryData.technicians?.map(tech => (
-            <div key={tech.id} className="card" style={{ padding: 0, border: '2px solid var(--color-text-primary)', marginBottom: '1.25rem' }}>
-              <div style={{ padding: '0.85rem 1.25rem', background: '#111', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ fontWeight: '900', fontSize: '0.9rem', color: '#fff' }}>{tech.name}</span>
-                {tech.region && <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: '600' }}>{tech.region}</span>}
-                <span style={{ marginLeft: 'auto', background: '#fff', color: '#000', borderRadius: '10px', padding: '1px 10px', fontSize: '0.75rem', fontWeight: '800' }}>
+            <div key={tech.id} className="card" style={{ padding: 0, border: '2px solid var(--color-border-default)', marginBottom: '1.25rem' }}>
+              <div style={{ padding: '0.85rem 1.25rem', background: 'var(--color-bg-secondary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontWeight: '900', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{tech.name}</span>
+                {tech.region && <span style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>{tech.region}</span>}
+                <span style={{ marginLeft: 'auto', background: 'var(--color-accent)', color: '#000', borderRadius: '10px', padding: '1px 10px', fontSize: '0.75rem', fontWeight: '800' }}>
                   {tech.items.length} peça(s)
                 </span>
               </div>
@@ -551,7 +551,7 @@ export default function PecasPage() {
                   <tbody>
                     {tech.items.map((item, idx) => (
                       <tr key={`${item.item_code}-${idx}`}>
-                        <td><code style={{ background: 'var(--color-bg-tertiary)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
+                        <td><code style={{ background: 'var(--color-bg-tertiary)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid var(--color-border-light)' }}>{item.item_code}</code></td>
                         <td style={{ fontWeight: '700', fontSize: '0.9rem' }}>{item.item_name}</td>
                         <td style={{ fontWeight: '900', textAlign: 'center' }}>{item.item_quantity}</td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>{item.item_num_remessa || '—'}</td>
@@ -568,11 +568,11 @@ export default function PecasPage() {
 
       {/* ── Resultados busca por código ───────────────────────────────────── */}
       {codeResults && !summaryMode && (
-        <div className="card" style={{ padding: 0, border: '2px solid var(--color-text-primary)', marginBottom: '2rem' }}>
-          <div style={{ padding: '1.25rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '2px solid var(--color-text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div className="card" style={{ padding: 0, border: '2px solid var(--color-border-default)', marginBottom: '2rem' }}>
+          <div style={{ padding: '1.25rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '2px solid var(--color-border-default)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-text-primary)' }}>
               Busca: "{codeSearch.toUpperCase()}"
-              <span style={{ marginLeft: '0.5rem', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>
+              <span style={{ marginLeft: '0.5rem', background: 'var(--color-accent)', color: '#000', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>
                 {codeResults.total} resultado(s)
               </span>
               {codeResults.total > 0 && (
@@ -621,11 +621,11 @@ export default function PecasPage() {
 
       {/* ── Tabela de peças ───────────────────────────────────────────────── */}
       {selectedTech && !loading && filteredItems.length > 0 && (
-        <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
+        <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid var(--color-border-default)' }}>
           <div style={{
             padding: '1.25rem 1.5rem',
             background: 'var(--color-bg-tertiary)',
-            borderBottom: '2px solid var(--color-text-primary)',
+            borderBottom: '2px solid var(--color-border-default)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -636,8 +636,8 @@ export default function PecasPage() {
               Peças Ativas
               <span style={{
                 marginLeft: '0.5rem',
-                background: '#000',
-                color: '#fff',
+                background: 'var(--color-accent)',
+                color: '#000',
                 borderRadius: '12px',
                 padding: '2px 10px',
                 fontSize: '0.8rem',
@@ -655,11 +655,11 @@ export default function PecasPage() {
                   alignItems: 'center',
                   gap: '0.4rem',
                   fontSize: '0.75rem',
-                  color: '#1e40af',
+                  color: 'var(--color-info)',
                   background: 'var(--color-bg-primary)',
                   padding: '0.3rem 0.7rem',
                   borderRadius: '6px',
-                  border: '1px solid #bfdbfe',
+                  border: '1px solid var(--color-info)',
                   fontWeight: '700',
                 }}>
                   <IconClock />
@@ -673,7 +673,7 @@ export default function PecasPage() {
                 background: 'var(--color-bg-primary)',
                 padding: '0.3rem 0.7rem',
                 borderRadius: '6px',
-                border: '1px solid #d0d0d0',
+                border: '1px solid var(--color-border-light)',
               }}>
                 Sincronização de dados
               </span>
@@ -703,7 +703,7 @@ export default function PecasPage() {
                         fontSize: '0.85rem',
                         color: 'var(--color-text-primary)',
                         fontWeight: '800',
-                        border: '1px solid #d0d0d0',
+                        border: '1px solid var(--color-border-light)',
                       }}>
                         {item.item_code}
                       </code>
@@ -755,9 +755,9 @@ export default function PecasPage() {
           padding: '5rem 2rem',
           textAlign: 'center',
           color: 'var(--color-text-secondary)',
-          background: '#f9f9f9',
+          background: 'var(--color-bg-secondary)',
           borderRadius: '10px',
-          border: '2px dashed #d0d0d0',
+          border: '2px dashed var(--color-border-light)',
         }}>
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-border-light)ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1rem' }}>
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -786,9 +786,9 @@ export default function PecasPage() {
           padding: '3rem 2rem',
           textAlign: 'center',
           color: 'var(--color-text-tertiary)',
-          background: '#f9f9f9',
+          background: 'var(--color-bg-secondary)',
           borderRadius: '10px',
-          border: '2px dashed #d0d0d0',
+          border: '2px dashed var(--color-border-light)',
         }}>
           <p style={{ fontWeight: '700' }}>Nenhuma peça corresponde ao filtro "<strong>{searchFilter}</strong>"</p>
           <button
@@ -806,9 +806,9 @@ export default function PecasPage() {
           padding: '5rem 2rem',
           textAlign: 'center',
           color: 'var(--color-text-secondary)',
-          background: '#f9f9f9',
+          background: 'var(--color-bg-secondary)',
           borderRadius: '10px',
-          border: '2px dashed #d0d0d0',
+          border: '2px dashed var(--color-border-light)',
         }}>
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-border-light)ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1.5rem' }}>
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />

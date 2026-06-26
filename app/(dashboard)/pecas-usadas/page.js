@@ -400,10 +400,10 @@ export default function PecasUsadasPage() {
         <div style={{
           marginBottom: '1.5rem',
           padding: '1rem',
-          background: '#ffebee',
-          border: '1px solid #ffcdd2',
+          background: 'var(--color-bg-secondary)',
+          border: '1px solid var(--color-error)',
           borderRadius: '8px',
-          color: '#b71c1c',
+          color: 'var(--color-error)',
           fontSize: '0.875rem',
           fontWeight: '600',
           display: 'flex',
