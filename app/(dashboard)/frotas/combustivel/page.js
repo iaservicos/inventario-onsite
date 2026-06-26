@@ -541,6 +541,7 @@ export default function CombustvelPage() {
           </div>
         </div>
       )}
+      </div>
     </DashboardLayout>
   );
 }
