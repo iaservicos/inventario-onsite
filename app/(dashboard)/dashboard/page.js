@@ -208,9 +208,9 @@ export default function DashboardPage() {
               background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
               backdropFilter: 'blur(40px)',
               border: '1px solid rgba(38, 208, 206, 0.4)',
-              borderRadius: '20px',
-              padding: '2.5rem',
-              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
+              borderRadius: '16px',
+              padding: '1.75rem',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(38, 208, 206, 0.2)',
               position: 'relative',
               overflow: 'hidden',
             }}>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                   <span style={{ fontSize: '0.75rem', color: '#8b95a5' }}>Resumo por categoria</span>
                 </div>
 
-                <div style={{ height: '300px', width: '100%', marginBottom: '1.5rem' }}>
+                <div style={{ height: '250px', width: '100%', marginBottom: '1.25rem' }}>
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -311,9 +311,9 @@ export default function DashboardPage() {
               background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
               backdropFilter: 'blur(40px)',
               border: '1px solid rgba(38, 208, 206, 0.4)',
-              borderRadius: '20px',
-              padding: '2.5rem',
-              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
+              borderRadius: '16px',
+              padding: '1.75rem',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(38, 208, 206, 0.2)',
               position: 'relative',
               overflow: 'hidden',
               display: 'flex',
@@ -352,7 +352,7 @@ export default function DashboardPage() {
                         <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#26d0ce', marginBottom: '0.5rem' }}>
                           {a.title}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#8b95a5', lineHeight: '1.4' }}>
+                        <div style={{ fontSize: '0.75rem', color: '#e8eef7', lineHeight: '1.4', fontWeight: '500' }}>
                           {a.description}
                         </div>
                       </div>
@@ -368,9 +368,9 @@ export default function DashboardPage() {
             background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
             backdropFilter: 'blur(40px)',
             border: '1px solid rgba(38, 208, 206, 0.4)',
-            borderRadius: '20px',
+            borderRadius: '16px',
             overflow: 'hidden',
-            boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(38, 208, 206, 0.2)',
             position: 'relative',
             zIndex: 1,
           }}>
