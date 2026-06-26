@@ -249,8 +249,8 @@ function Field({ label, children }) {
   );
 }
 
-const inputStyle = { border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600' };
-const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
+const inputStyle = { border: '1px solid var(--color-text-primary)', borderRadius: '8px', fontWeight: '600', background: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' };
+const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: 'var(--color-text-tertiary)', marginBottom: '0.25rem', textTransform: 'uppercase' };
 
 export default function CadastroTecnicosPage() {
   const { data: session, status } = useSession();

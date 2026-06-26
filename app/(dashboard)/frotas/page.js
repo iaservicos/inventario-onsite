@@ -91,9 +91,9 @@ export default function FrotasPage() {
       {/* Tabela */}
       <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--color-border-light)', marginTop: '2rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando frotas...</div>
+          <div style={{ padding: '2.5rem 3rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando frotas...</div>
         ) : frotas.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhum veículo encontrado</div>
+          <div style={{ padding: '2.5rem 3rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhum veículo encontrado</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>

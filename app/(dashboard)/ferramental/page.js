@@ -158,7 +158,7 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
               </button>
             </>
           ) : (
-            <div style={{ textAlign: 'center', padding: '1rem', color: '#666', fontSize: '0.85rem' }}>
+            <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
               Nenhuma ação disponível para este status com seu perfil.
             </div>
           )}
@@ -258,7 +258,7 @@ function ModalSolicitarTecnico({ onClose, onSaved }) {
                       <div key={tool.id} style={{ borderRadius: '8px', border: `1px solid ${isSelected ? 'var(--color-success)' : 'var(--color-border-light)'}`, background: isSelected ? 'var(--color-bg-tertiary)' : 'var(--color-bg-tertiary)', overflow: 'hidden' }}>
                         <button type="button" onClick={() => toggleTool(tool.id)}
                           style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.6rem 0.85rem', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-                          <div style={{ width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0, background: isSelected ? 'var(--color-success)' : 'transparent', border: `2px solid ${isSelected ? 'var(--color-success)' : 'var(--color-border-light)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', color: 'var(--color-bg-primary)', fontWeight: '900' }}>
+                          <div style={{ width: '18px', height: '18px', borderRadius: '8px', flexShrink: 0, background: isSelected ? 'var(--color-success)' : 'transparent', border: `2px solid ${isSelected ? 'var(--color-success)' : 'var(--color-border-light)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', color: 'var(--color-bg-primary)', fontWeight: '900' }}>
                             {isSelected ? '✓' : ''}
                           </div>
                           <span style={{ fontSize: '0.82rem', fontWeight: '700', color: isSelected ? 'var(--color-success)' : 'var(--color-text-secondary)' }}>{tool.name}</span>
@@ -403,7 +403,7 @@ export default function FerramentalPage() {
                 )}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                   {entry.tools.map(t => (
-                    <span key={t.id} style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '4px', padding: '0.1rem 0.45rem', fontSize: '0.7rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>
+                    <span key={t.id} style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '0.1rem 0.45rem', fontSize: '0.7rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>
                       {t.name}
                     </span>
                   ))}
@@ -469,12 +469,12 @@ export default function FerramentalPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', alignItems: 'flex-start' }}>
                           <StatusBadge status={r.status} />
                           {faltaTermo && (
-                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', color: 'var(--color-text-secondary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
+                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '8px', fontSize: '0.62rem', fontWeight: '800', color: 'var(--color-text-secondary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
                               Falta Termo
                             </span>
                           )}
                           {r.termo_emitido_em && (
-                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', color: 'var(--color-text-secondary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
+                            <span style={{ display: 'inline-block', padding: '0.12rem 0.4rem', borderRadius: '8px', fontSize: '0.62rem', fontWeight: '800', color: 'var(--color-text-secondary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
                               Termo OK
                             </span>
                           )}

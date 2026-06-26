@@ -173,7 +173,7 @@ export default function AlertasPage() {
 
               {showResolved && resolved.length > 0 && (
                 <>
-                  <div style={{ fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#bbb', margin: '1rem 0 0.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-tertiary)', margin: '1rem 0 0.25rem' }}>
                     Resolvidos
                   </div>
                   {resolved.map((a) => (
@@ -198,7 +198,7 @@ function AlertCard({ alert: a, onResolve, resolving, isResolved, getElapsed }) {
       background: isResolved ? 'var(--color-bg-tertiary)' : sev.bg,
       border: `1px solid ${sev.border}`,
       borderLeft: `4px solid ${sev.border}`,
-      borderRadius: '6px',
+      borderRadius: '12px',
       padding: '1rem 1.25rem',
       opacity: isResolved ? 0.6 : 1,
       display: 'flex',

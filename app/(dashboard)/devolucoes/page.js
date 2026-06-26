@@ -184,7 +184,7 @@ export default function DevolucoesPage() {
   }
 
   if (status === 'loading') {
-    return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
+    return <div style={{ padding: '2.5rem 3rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
   }
 
   return (
@@ -275,8 +275,8 @@ export default function DevolucoesPage() {
 
       {syncMsg && (
         <div style={{
-          padding: '0.6rem 0.75rem', background: 'var(--color-bg-tertiary)', color: '#000',
-          border: '1px solid #000', borderRadius: '4px', marginBottom: '1rem',
+          padding: '0.6rem 0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)',
+          border: '1px solid var(--color-border-light)', borderRadius: '8px', marginBottom: '1rem',
           fontSize: '0.8rem', fontWeight: '700',
         }}>
           {syncMsg}
@@ -284,7 +284,7 @@ export default function DevolucoesPage() {
       )}
 
       {lastSync && (
-        <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '1rem' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginBottom: '1rem' }}>
           Última sincronização: {lastSync.formatted_at || lastSync.finished_at}
         </p>
       )}
@@ -307,7 +307,7 @@ export default function DevolucoesPage() {
           {summaryLoading ? (
             <div style={{ textAlign: 'center', padding: '2rem', fontWeight: '700' }}>Carregando...</div>
           ) : summaryData.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#666', fontSize: '0.85rem', border: '1px solid #eee', borderRadius: '8px' }}>
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem', border: '1px solid var(--color-border-light)', borderRadius: '8px' }}>
               Nenhum técnico com devoluções pendentes
             </div>
           ) : (
@@ -327,17 +327,17 @@ export default function DevolucoesPage() {
                   <tbody>
                     {summaryData.map(t => (
                       <tr key={t.id}>
-                        <td style={{ fontWeight: '800', color: '#000' }}>{t.name}</td>
+                        <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{t.name}</td>
                         <td><span className="badge badge-info">{t.region || '—'}</span></td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>
                           {t.montado_pecas > 0
                             ? <span className="badge badge-not-ok">{t.montado_lotes}L / {t.montado_pecas}P</span>
-                            : <span style={{ color: '#999' }}>—</span>}
+                            : <span style={{ color: 'var(--color-text-tertiary)' }}>—</span>}
                         </td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>
                           {t.enviado_pecas > 0
                             ? <span className="badge badge-info">{t.enviado_lotes}L / {t.enviado_pecas}P</span>
-                            : <span style={{ color: '#999' }}>—</span>}
+                            : <span style={{ color: 'var(--color-text-tertiary)' }}>—</span>}
                         </td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>{t.montado_pecas + t.enviado_pecas}</td>
                         <td style={{ textAlign: 'center', fontWeight: '700' }}>
@@ -364,25 +364,25 @@ export default function DevolucoesPage() {
               ].map(c => (
                 <div key={c.label} style={{
                   flex: 1, minWidth: '180px',
-                  background: '#fff',
-                  border: '1px solid #e8e8e8',
+                  background: 'var(--color-bg-secondary)',
+                  border: '1px solid var(--color-border-light)',
                   borderTop: `4px solid ${c.accent}`,
-                  borderRadius: '6px',
+                  borderRadius: '12px',
                   padding: '1.1rem 1.25rem',
                 }}>
                   <div style={{ marginBottom: '0.85rem' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: '800', color: c.accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.label}</div>
-                    <div style={{ fontSize: '0.62rem', color: '#bbb', marginTop: '1px', fontWeight: '500' }}>{c.sub}</div>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--color-text-tertiary)', marginTop: '1px', fontWeight: '500' }}>{c.sub}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0' }}>
                     <div style={{ flex: 1, textAlign: 'center' }}>
-                      <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000', lineHeight: 1 }}>{c.lotes}</div>
-                      <div style={{ fontSize: '0.58rem', fontWeight: '700', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '0.3rem' }}>lotes</div>
+                      <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-text-primary)', lineHeight: 1 }}>{c.lotes}</div>
+                      <div style={{ fontSize: '0.58rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '0.3rem' }}>lotes</div>
                     </div>
-                    <div style={{ width: '1px', height: '48px', background: '#ebebeb', marginBottom: '2px' }} />
+                    <div style={{ width: '1px', height: '48px', background: 'var(--color-border-light)', marginBottom: '2px' }} />
                     <div style={{ flex: 1, textAlign: 'center' }}>
-                      <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#444', lineHeight: 1 }}>{c.pecas}</div>
-                      <div style={{ fontSize: '0.58rem', fontWeight: '700', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '0.3rem' }}>peças</div>
+                      <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--color-text-secondary)', lineHeight: 1 }}>{c.pecas}</div>
+                      <div style={{ fontSize: '0.58rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '0.3rem' }}>peças</div>
                     </div>
                   </div>
                 </div>
@@ -409,8 +409,8 @@ export default function DevolucoesPage() {
             <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
           ) : filteredItems.length === 0 ? (
             <div style={{
-              textAlign: 'center', padding: '3rem', color: '#666', fontSize: '0.85rem',
-              border: '1px solid #eee', borderRadius: '8px',
+              textAlign: 'center', padding: '3rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem',
+              border: '1px solid var(--color-border-light)', borderRadius: '8px',
             }}>
               {items.length === 0
                 ? 'Nenhuma devolução pendente para este técnico'
@@ -466,8 +466,8 @@ export default function DevolucoesPage() {
 
       {!summaryMode && !selectedTech && (
         <div style={{
-          textAlign: 'center', padding: '3rem', color: '#666', fontSize: '0.85rem',
-          border: '1px solid #eee', borderRadius: '8px',
+          textAlign: 'center', padding: '3rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem',
+          border: '1px solid var(--color-border-light)', borderRadius: '8px',
         }}>
           Selecione um técnico para visualizar as devoluções pendentes
         </div>

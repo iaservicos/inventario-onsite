@@ -67,7 +67,7 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
               placeholder="Ex: INC0012345"
               autoFocus
               className="input"
-              style={{ border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600', width: '100%' }}
+              style={{ border: '1px solid var(--color-text-primary)', borderRadius: '8px', fontWeight: '600', width: '100%' }}
             />
           </div>
           <div style={{ marginBottom: '1.5rem' }}>
@@ -80,7 +80,7 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
               placeholder="Descreva a ação em andamento..."
               rows={3}
               className="input"
-              style={{ border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600', width: '100%', resize: 'vertical' }}
+              style={{ border: '1px solid var(--color-text-primary)', borderRadius: '8px', fontWeight: '600', width: '100%', resize: 'vertical' }}
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
@@ -233,7 +233,7 @@ export default function DivergenciasPage() {
                           <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{d.technicians?.name}</td>
                           <td style={{ color: 'var(--color-text-tertiary)', fontWeight: '600' }}>{d.inventories?.week_ref || '—'}</td>
                           <td>
-                            <code style={{ fontSize: '0.75rem', background: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--color-border-light)' }}>
+                            <code style={{ fontSize: '0.75rem', background: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: '8px', border: '1px solid var(--color-border-light)' }}>
                               {d.item_code}
                             </code>
                           </td>

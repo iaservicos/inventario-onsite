@@ -613,7 +613,7 @@ export default function AgendamentosPage() {
   }, []);
 
   if (status === 'loading') {
-    return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
+    return <div style={{ padding: '2.5rem 3rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
   }
 
   const role = session?.user?.role;

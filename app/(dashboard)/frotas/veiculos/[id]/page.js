@@ -277,7 +277,7 @@ export default function EditarVeiculoPage() {
 
           {/* Erro */}
           {erro && (
-            <div style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '0.75rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
+            <div style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '0.75rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
               {erro}
             </div>
           )}

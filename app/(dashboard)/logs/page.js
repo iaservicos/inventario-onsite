@@ -102,7 +102,7 @@ export default function LogsPage() {
                       <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{r.technicians?.name || '—'}</td>
                       <td><span className="badge badge-info">{r.technicians?.region || '—'}</span></td>
                       <td>
-                        <code style={{ fontSize: '0.75rem', background: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--color-border-light)' }}>
+                        <code style={{ fontSize: '0.75rem', background: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: '8px', border: '1px solid var(--color-border-light)' }}>
                           {r.item_code}
                         </code>
                       </td>
@@ -113,7 +113,7 @@ export default function LogsPage() {
                             #{r.count_number}
                           </span>
                         ) : (
-                          <span style={{ color: '#aaa', fontWeight: '600', fontSize: '0.8rem' }}>1ª</span>
+                          <span style={{ color: 'var(--color-text-tertiary)', fontWeight: '600', fontSize: '0.8rem' }}>1ª</span>
                         )}
                       </td>
                       <td style={{ textAlign: 'right', fontWeight: '800' }}>{r.physical_qty}</td>

@@ -179,11 +179,11 @@ function ModalItens({ inventory, phase, onClose }) {
                       </td>
                       <td style={{ padding: '0.55rem 0.75rem' }}>
                         {isPend ? (
-                          <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--color-text-tertiary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '4px', padding: '2px 7px' }}>PENDENTE</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--color-text-tertiary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '2px 7px' }}>PENDENTE</span>
                         ) : item.has_divergence ? (
-                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-bg-primary)', background: 'var(--color-text-primary)', borderRadius: '4px', padding: '2px 7px' }}>DIVERGENTE</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-bg-primary)', background: 'var(--color-text-primary)', borderRadius: '8px', padding: '2px 7px' }}>DIVERGENTE</span>
                         ) : (
-                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-success)', background: 'var(--color-success)', borderRadius: '4px', padding: '2px 7px', opacity: 0.2 }}>OK</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-success)', background: 'var(--color-success)', borderRadius: '8px', padding: '2px 7px', opacity: 0.2 }}>OK</span>
                         )}
                       </td>
                     </tr>
@@ -338,7 +338,7 @@ export default function HistoricoPage() {
                         {divQty === null
                           ? <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>—</span>
                           : hasDiv
-                            ? <span style={{ background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{divQty}</span>
+                            ? <span style={{ background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', padding: '1px 7px', borderRadius: '8px', fontSize: '0.72rem' }}>{divQty}</span>
                             : <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>0</span>
                         }
                       </td>

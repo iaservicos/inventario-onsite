@@ -1,18 +1,18 @@
 :root {
-  /* Cores padrão DARK MODE - POSITIVO Preto + Vermelho Neon */
-  --color-bg-primary: #0a0a0a;
-  --color-bg-secondary: #1a1a1a;
-  --color-bg-tertiary: #2d2d2d;
-  --color-sidebar-bg: #000000;
+  /* Cores padrão DARK MODE - Fundo Tech Elegante */
+  --color-bg-primary: #0a0e27;
+  --color-bg-secondary: #141d3a;
+  --color-bg-tertiary: #1f2d4d;
+  --color-sidebar-bg: #050810;
   --color-text-primary: #ffffff;
-  --color-text-secondary: #e5e5e5;
-  --color-text-tertiary: #a0a0a0;
-  --color-text-disabled: #6b6b6b;
-  --color-border-light: #2d2d2d;
-  --color-border-default: #3d3d3d;
-  --color-border-dark: #5d5d5d;
+  --color-text-secondary: #e8e8e8;
+  --color-text-tertiary: #a8a8a8;
+  --color-text-disabled: #707070;
+  --color-border-light: #1f2d4d;
+  --color-border-default: #2a3d5a;
+  --color-border-dark: #3d5580;
   --color-accent: #00d4ff;
-  --color-accent-hover: #00b8d4;
+  --color-accent-hover: #00a8cc;
   --color-success: #00d4ff;
   --color-warning: #ffa500;
   --color-error: #ff4444;
