@@ -291,7 +291,7 @@ export default function CategoriasPage() {
 
       {/* Header */}
       <div style={{
-        padding: '2.5rem 2rem 1.5rem',
+        padding: '1.5rem 2rem 0',
         textAlign: 'center',
         borderBottom: 'none',
         position: 'relative',
@@ -299,13 +299,13 @@ export default function CategoriasPage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '1.25rem',
+        gap: '0.75rem',
       }}>
         {/* Logo */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, transparent 100%)',
-          padding: '1.25rem 2rem',
-          borderRadius: '14px',
+          padding: '1.75rem 2.5rem',
+          borderRadius: '16px',
           border: '1.5px solid rgba(38, 208, 206, 0.4)',
           boxShadow: '0 0 30px rgba(38, 208, 206, 0.2)',
           cursor: 'pointer',
@@ -325,7 +325,7 @@ export default function CategoriasPage() {
             src="https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-(1).png"
             alt="Positivo Tecnologia"
             style={{
-              maxWidth: '180px',
+              maxWidth: '220px',
               height: 'auto',
               filter: 'brightness(1.15)',
             }}
@@ -360,7 +360,7 @@ export default function CategoriasPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '4rem 2rem 3rem',
+        padding: '2.5rem 2rem 3rem',
         position: 'relative',
         zIndex: 1,
       }}>
