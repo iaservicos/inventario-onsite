@@ -42,6 +42,8 @@ export function ThemeToggle() {
     localStorage.setItem('theme', newTheme);
 
     const root = document.documentElement;
+    root.setAttribute('data-theme', newTheme);
+
     const themeData = newTheme === 'light'
       ? window.__lightTheme__
       : window.__darkTheme__;
@@ -51,9 +53,6 @@ export function ThemeToggle() {
         root.style.setProperty(`--color-${key}`, value);
       });
     }
-
-    document.body.style.backgroundColor = newTheme === 'light' ? '#ffffff' : '#0d1117';
-    document.body.style.color = newTheme === 'light' ? '#000000' : '#c9d1d9';
   };
 
   if (!mounted) return null;

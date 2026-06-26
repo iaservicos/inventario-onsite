@@ -21,6 +21,9 @@ export function ThemeProvider({ children }) {
     const themeData = getTheme(themeName);
     const root = document.documentElement;
 
+    // Aplicar data-theme attribute
+    root.setAttribute('data-theme', themeName);
+
     // Aplicar todas as cores como CSS variables
     Object.entries(themeData.colors).forEach(([key, value]) => {
       root.style.setProperty(`--color-${key}`, value);
@@ -30,10 +33,6 @@ export function ThemeProvider({ children }) {
     window.__currentTheme__ = themeName;
     window.__lightTheme__ = getTheme('light').colors;
     window.__darkTheme__ = getTheme('dark').colors;
-
-    // Aplicar no body para background
-    document.body.style.backgroundColor = themeData.colors.bg_primary;
-    document.body.style.color = themeData.colors.text_primary;
 
     // Salvar preferência
     localStorage.setItem('theme', themeName);
