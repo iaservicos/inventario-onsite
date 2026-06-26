@@ -91,7 +91,7 @@ html[data-theme="light"] body {
 
 /* ── Cards Modernos com Neon ── */
 .card {
-  background: linear-gradient(135deg, rgba(30, 45, 64, 0.95) 0%, rgba(30, 45, 64, 0.85) 100%);
+  background: linear-gradient(135deg, rgba(30, 45, 64, 0.98) 0%, rgba(25, 40, 55, 0.95) 100%);
   border: 1.5px solid var(--color-border-light);
   border-radius: 12px;
   padding: 1.5rem;

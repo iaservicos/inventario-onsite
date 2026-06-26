@@ -51,21 +51,41 @@ function CategoriaCard({ titulo, descricao, icon: Icon, href, temAcesso }) {
   if (!temAcesso) {
     return (
       <div style={{
-        background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-light)',
-        borderRadius: '12px',
-        padding: '2rem 1.5rem',
+        background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.7) 0%, rgba(25, 40, 55, 0.65) 100%)',
+        backdropFilter: 'blur(20px)',
+        border: '1.5px solid rgba(139, 149, 165, 0.3)',
+        borderRadius: '16px',
+        padding: '2.5rem 2rem',
         textAlign: 'center',
         cursor: 'not-allowed',
-        opacity: 0.5,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem',
+        opacity: 0.6,
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <div style={{ marginBottom: '1rem', color: 'var(--color-text-disabled)' }}>
+        <div style={{ marginBottom: '0.5rem', color: '#8b95a5' }}>
           <Icon />
         </div>
-        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--color-text-secondary)', margin: '0 0 0.5rem' }}>
+        <h3 style={{
+          fontSize: '1.3rem',
+          fontWeight: '900',
+          color: '#6e7681',
+          margin: '0.5rem 0 0.25rem',
+          letterSpacing: '-0.01em',
+        }}>
           {titulo}
         </h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', margin: 0 }}>
+        <p style={{
+          fontSize: '0.9rem',
+          color: '#5a626a',
+          margin: 0,
+          lineHeight: '1.5',
+        }}>
           Acesso não autorizado
         </p>
       </div>
@@ -75,37 +95,84 @@ function CategoriaCard({ titulo, descricao, icon: Icon, href, temAcesso }) {
   return (
     <Link href={href}>
       <div style={{
-        background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-light)',
-        borderRadius: '12px',
-        padding: '2rem 1.5rem',
+        background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.95) 0%, rgba(25, 40, 55, 0.9) 100%)',
+        backdropFilter: 'blur(40px)',
+        border: '1.5px solid rgba(38, 208, 206, 0.3)',
+        borderRadius: '16px',
+        padding: '2.5rem 2rem',
         textAlign: 'center',
         cursor: 'pointer',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        gap: '1rem',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(38, 208, 206, 0.08)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--color-accent-cyan)';
-        e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)';
-        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.7)';
+        e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)';
+        e.currentTarget.style.transform = 'translateY(-8px)';
+        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(30, 45, 64, 0.98) 0%, rgba(25, 40, 55, 0.95) 100%)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--color-border-light)';
-        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.3)';
+        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(38, 208, 206, 0.08)';
         e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(30, 45, 64, 0.95) 0%, rgba(25, 40, 55, 0.9) 100%)';
       }}
       >
-        <div style={{ marginBottom: '1rem', color: 'var(--color-accent-cyan)' }}>
+        {/* Glow effect */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at center, rgba(38, 208, 206, 0.1) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{
+          marginBottom: '0.5rem',
+          color: '#26d0ce',
+          filter: 'drop-shadow(0 0 10px rgba(38, 208, 206, 0.3))',
+          position: 'relative',
+          zIndex: 1,
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.15)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+        }}>
           <Icon />
         </div>
-        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--color-text-primary)', margin: '0 0 0.5rem' }}>
+        <h3 style={{
+          fontSize: '1.3rem',
+          fontWeight: '900',
+          color: '#ffffff',
+          margin: '0.5rem 0 0.25rem',
+          letterSpacing: '-0.01em',
+          position: 'relative',
+          zIndex: 1,
+        }}>
           {titulo}
         </h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', margin: 0, lineHeight: '1.4' }}>
+        <p style={{
+          fontSize: '0.9rem',
+          color: '#a0aab5',
+          margin: 0,
+          lineHeight: '1.5',
+          position: 'relative',
+          zIndex: 1,
+          fontWeight: 500,
+        }}>
           {descricao}
         </p>
       </div>
@@ -172,21 +239,119 @@ export default function CategoriasPage() {
       padding: 0,
       width: '100%',
       minHeight: '100vh',
-      background: 'var(--color-bg-primary)',
+      background: 'linear-gradient(135deg, #0f1419 0%, #0a1628 50%, #0d1825 100%)',
       color: 'var(--color-text-primary)',
       display: 'flex',
       flexDirection: 'column',
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Background Brasil 3D */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0,
+          backgroundImage: 'url(https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Captura%20de%20tela%202026-06-26%20171836.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+        }}>
+        {/* Overlay escuro */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: `
+              linear-gradient(135deg, rgba(15, 20, 25, 0.8) 0%, rgba(10, 22, 40, 0.75) 50%, rgba(13, 24, 37, 0.8) 100%)
+            `,
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Glow dinâmico */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            background: `
+              radial-gradient(circle at 20% 20%, rgba(38, 208, 206, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(38, 208, 206, 0.15) 0%, transparent 55%)
+            `,
+          }}
+        />
+      </div>
+
       {/* Header */}
       <div style={{
-        padding: '2.5rem 3rem',
+        padding: '3rem 3rem 2rem',
         textAlign: 'center',
-        borderBottom: '1px solid var(--color-border-light)',
+        borderBottom: 'none',
+        position: 'relative',
+        zIndex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1.5rem',
       }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--color-text-primary)', margin: '0 0 0.75rem' }}>
+        {/* Logo */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, transparent 100%)',
+          padding: '1.5rem 2.5rem',
+          borderRadius: '16px',
+          border: '1.5px solid rgba(38, 208, 206, 0.4)',
+          boxShadow: '0 0 30px rgba(38, 208, 206, 0.2)',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.7)';
+          e.currentTarget.style.boxShadow = '0 0 40px rgba(38, 208, 206, 0.35)';
+          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.2) 0%, transparent 100%)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.4)';
+          e.currentTarget.style.boxShadow = '0 0 30px rgba(38, 208, 206, 0.2)';
+          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, transparent 100%)';
+        }}>
+          <img
+            src="https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-(1).png"
+            alt="Positivo Tecnologia"
+            style={{
+              maxWidth: '180px',
+              height: 'auto',
+              filter: 'brightness(1.15)',
+            }}
+          />
+        </div>
+
+        <h1 style={{
+          fontSize: '3rem',
+          fontWeight: '900',
+          color: '#ffffff',
+          margin: 0,
+          letterSpacing: '-0.02em',
+          textShadow: '0 2px 10px rgba(38, 208, 206, 0.3)',
+        }}>
           Bem-vindo ao Portal
         </h1>
-        <p style={{ fontSize: '1rem', color: 'var(--color-text-tertiary)', margin: 0, lineHeight: '1.5' }}>
+        <p style={{
+          fontSize: '1.1rem',
+          color: '#a0aab5',
+          margin: 0,
+          lineHeight: '1.5',
+          fontWeight: 500,
+          letterSpacing: '0.02em',
+        }}>
           Selecione uma categoria para começar
         </p>
       </div>
@@ -197,15 +362,17 @@ export default function CategoriasPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '3rem 2rem',
+        padding: '4rem 2rem 3rem',
+        position: 'relative',
+        zIndex: 1,
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '1.5rem',
-          maxWidth: '1200px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2rem',
+          maxWidth: '1300px',
           width: '100%',
-        }}>
+        }}
         <CategoriaCard
           titulo="Inventário & Peças"
           descricao="Gerencie inventários, peças novas, peças usadas e agendamentos"
@@ -243,30 +410,48 @@ export default function CategoriasPage() {
       {/* Footer com user info */}
       <div style={{
         padding: '1.5rem 3rem',
-        borderTop: '1px solid var(--color-border-light)',
-        background: 'var(--color-bg-secondary)',
+        borderTop: '1.5px solid rgba(38, 208, 206, 0.2)',
+        background: 'linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 30, 40, 0.9) 100%)',
+        backdropFilter: 'blur(20px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        position: 'relative',
+        zIndex: 1,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{
-            width: '40px',
-            height: '40px',
+            width: '44px',
+            height: '44px',
             borderRadius: '50%',
-            background: 'var(--color-accent-cyan)',
+            background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.3) 0%, rgba(38, 208, 206, 0.1) 100%)',
+            border: '1.5px solid rgba(38, 208, 206, 0.5)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '0.9rem',
+            fontSize: '1rem',
             fontWeight: '800',
-            color: '#000',
+            color: '#26d0ce',
+            boxShadow: '0 0 15px rgba(38, 208, 206, 0.2)',
           }}>
             {session.user.name?.charAt(0)?.toUpperCase()}
           </div>
           <div style={{ overflow: 'hidden' }}>
-            <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>
+            <div style={{
+              fontSize: '0.95rem',
+              fontWeight: '700',
+              color: '#ffffff',
+              letterSpacing: '-0.01em',
+            }}>
               {session.user.name}
+            </div>
+            <div style={{
+              fontSize: '0.75rem',
+              color: '#8b95a5',
+              fontWeight: 500,
+              marginTop: '0.15rem',
+            }}>
+              {session.user.email}
             </div>
           </div>
         </div>
@@ -277,26 +462,28 @@ export default function CategoriasPage() {
             onClick={() => signOut({ callbackUrl: '/login' })}
             style={{
               background: 'transparent',
-              border: '1px solid var(--color-border-light)',
+              border: '1.5px solid rgba(38, 208, 206, 0.4)',
               borderRadius: '8px',
-              padding: '0.5rem 1rem',
+              padding: '0.6rem 1.2rem',
               cursor: 'pointer',
-              color: 'var(--color-text-tertiary)',
+              color: '#a0aab5',
               fontSize: '0.8rem',
               fontWeight: '700',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.3s ease',
               textTransform: 'uppercase',
-              letterSpacing: '0.05em'
+              letterSpacing: '0.06em',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-accent-cyan)';
-              e.currentTarget.style.color = 'var(--color-accent-cyan)';
-              e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 255, 255, 0.2)';
+              e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.7)';
+              e.currentTarget.style.color = '#26d0ce';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(38, 208, 206, 0.3)';
+              e.currentTarget.style.background = 'rgba(38, 208, 206, 0.08)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border-light)';
-              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.4)';
+              e.currentTarget.style.color = '#a0aab5';
               e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.background = 'transparent';
             }}
           >
             Sair
