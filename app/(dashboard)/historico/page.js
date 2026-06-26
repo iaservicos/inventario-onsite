@@ -17,15 +17,15 @@ const STATUS_OPTIONS = [
 /* Retorna a fase do ciclo baseado nos dados do inventário */
 function getFaseLabel(inv) {
   if (inv.status === 'recount_pending') {
-    return { text: '1ª Contagem → aguarda recon.', accent: '#888' };
+    return { text: '1ª Contagem → aguarda recon.', accent: 'var(--color-text-tertiary)' };
   }
   if (inv.is_recount === true) {
-    return { text: 'Com recontagem', accent: '#555' };
+    return { text: 'Com recontagem', accent: 'var(--color-text-secondary)' };
   }
   if (inv.is_recount === false) {
-    return { text: '1ª Contagem', accent: '#000' };
+    return { text: '1ª Contagem', accent: 'var(--color-text-primary)' };
   }
-  return { text: '—', accent: '#ccc' };
+  return { text: '—', accent: 'var(--color-border-light)' };
 }
 
 function formatDateOnly(val) {
@@ -111,37 +111,37 @@ function ModalItens({ inventory, phase, onClose }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-      <div style={{ background: '#fff', width: '100%', maxWidth: '860px', maxHeight: '90vh', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ background: 'var(--color-bg-primary)', width: '100%', maxWidth: '860px', maxHeight: '90vh', borderRadius: '8px', overflow: 'hidden', border: '2px solid var(--color-text-primary)', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', background: 'var(--color-bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <div style={{ fontWeight: '900', fontSize: '0.95rem', color: '#000', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div style={{ fontWeight: '900', fontSize: '0.95rem', color: 'var(--color-text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {inventory.technicians?.name}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               Semana {inventory.week_ref} &nbsp;·&nbsp; {inventory.technicians?.region}
               {inventory.inventory_schedules?.[0]?.scheduled_subgroup && (
                 <> &nbsp;·&nbsp; {inventory.inventory_schedules[0].scheduled_subgroup}</>
               )}
-              <span style={{ background: '#000', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.62rem', fontWeight: '800' }}>
+              <span style={{ background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', borderRadius: '3px', padding: '1px 6px', fontSize: '0.62rem', fontWeight: '800' }}>
                 {faseLabel}
               </span>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900', color: '#000' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900', color: 'var(--color-text-primary)' }}>✕</button>
         </div>
 
         {/* KPIs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #e4e4e7' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border-light)' }}>
           {[
             { label: 'Unidades',     value: total   },
             { label: 'OK',           value: ok      },
             { label: 'Divergências', value: diverg  },
             { label: 'Pendentes',    value: pending },
           ].map((k, i) => (
-            <div key={i} style={{ flex: 1, padding: '0.75rem', textAlign: 'center', borderRight: i < 3 ? '1px solid #e4e4e7' : 'none' }}>
-              <div style={{ fontSize: '1.1rem', fontWeight: '900', color: '#000' }}>{loading ? '—' : k.value}</div>
-              <div style={{ fontSize: '0.6rem', fontWeight: '700', color: '#888', textTransform: 'uppercase', marginTop: '1px' }}>{k.label}</div>
+            <div key={i} style={{ flex: 1, padding: '0.75rem', textAlign: 'center', borderRight: i < 3 ? '1px solid var(--color-border-light)' : 'none' }}>
+              <div style={{ fontSize: '1.1rem', fontWeight: '900', color: 'var(--color-text-primary)' }}>{loading ? '—' : k.value}</div>
+              <div style={{ fontSize: '0.6rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginTop: '1px' }}>{k.label}</div>
             </div>
           ))}
         </div>
@@ -149,15 +149,15 @@ function ModalItens({ inventory, phase, onClose }) {
         {/* Tabela de itens */}
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {loading ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>Carregando peças...</div>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>Carregando peças...</div>
           ) : items.length === 0 ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>Nenhuma peça registrada</div>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>Nenhuma peça registrada</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
               <thead>
-                <tr style={{ background: '#fafafa', borderBottom: '1px solid #e4e4e7' }}>
+                <tr style={{ background: 'var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-border-light)' }}>
                   {['Código', 'Item', 'Subgrupo', 'Sistema', 'Físico', 'Diferença', 'Status'].map(h => (
-                    <th key={h} style={{ padding: '0.55rem 0.75rem', textAlign: 'left', fontWeight: '800', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888' }}>{h}</th>
+                    <th key={h} style={{ padding: '0.55rem 0.75rem', textAlign: 'left', fontWeight: '800', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-tertiary)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -166,24 +166,24 @@ function ModalItens({ inventory, phase, onClose }) {
                   const diff    = item.physical_qty !== null ? Number(item.physical_qty) - Number(item.system_qty) : null;
                   const isPend  = item.physical_qty === null;
                   return (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <tr key={item.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)' }}>
                       <td style={{ padding: '0.55rem 0.75rem' }}>
-                        <code style={{ fontSize: '0.72rem', background: '#f5f5f5', padding: '2px 5px', borderRadius: '3px', border: '1px solid #eee' }}>{item.item_code}</code>
+                        <code style={{ fontSize: '0.72rem', background: 'var(--color-bg-tertiary)', padding: '2px 5px', borderRadius: '3px', border: '1px solid var(--color-border-light)' }}>{item.item_code}</code>
                       </td>
-                      <td style={{ padding: '0.55rem 0.75rem', fontWeight: '700', color: '#000' }}>{item.item_name}</td>
-                      <td style={{ padding: '0.55rem 0.75rem', color: '#666', fontSize: '0.75rem' }}>{item.item_subgroup || '—'}</td>
-                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', color: '#666' }}>{item.system_qty ?? '—'}</td>
-                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '700', color: isPend ? '#888' : '#000' }}>{isPend ? '—' : item.physical_qty}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{item.item_name}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>{item.item_subgroup || '—'}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', color: 'var(--color-text-tertiary)' }}>{item.system_qty ?? '—'}</td>
+                      <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '700', color: isPend ? 'var(--color-text-tertiary)' : 'var(--color-text-primary)' }}>{isPend ? '—' : item.physical_qty}</td>
                       <td style={{ padding: '0.55rem 0.75rem', textAlign: 'right', fontWeight: '800' }}>
                         {diff === null ? '—' : diff > 0 ? `+${diff}` : diff === 0 ? '0' : diff}
                       </td>
                       <td style={{ padding: '0.55rem 0.75rem' }}>
                         {isPend ? (
-                          <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#888', background: '#f4f4f5', border: '1px solid #ddd', borderRadius: '4px', padding: '2px 7px' }}>PENDENTE</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--color-text-tertiary)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '4px', padding: '2px 7px' }}>PENDENTE</span>
                         ) : item.has_divergence ? (
-                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#fff', background: '#000', borderRadius: '4px', padding: '2px 7px' }}>DIVERGENTE</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-bg-primary)', background: 'var(--color-text-primary)', borderRadius: '4px', padding: '2px 7px' }}>DIVERGENTE</span>
                         ) : (
-                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#000', background: '#e8f5e9', border: '1px solid #c8e6c9', borderRadius: '4px', padding: '2px 7px' }}>OK</span>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-success)', background: 'var(--color-success)', borderRadius: '4px', padding: '2px 7px', opacity: 0.2 }}>OK</span>
                         )}
                       </td>
                     </tr>
@@ -260,9 +260,9 @@ export default function HistoricoPage() {
       <div style={{ height: '1.5rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700', color: '#888' }}>Carregando...</div>
+        <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
       ) : inventories.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: '#888' }}>Nenhum inventário encontrado</div>
+        <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>Nenhum inventário encontrado</div>
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div className="table-wrapper" style={{ border: 'none' }}>
@@ -291,7 +291,7 @@ export default function HistoricoPage() {
                                    : isRecount ? 'Recontagem'
                                    : getFaseLabel(inv).text;
                   const faseAccent = isFirst   ? '#aaa'
-                                   : isRecount ? '#000'
+                                   : isRecount ? 'var(--color-text-primary)'
                                    : getFaseLabel(inv).accent;
 
                   const displayStatus = isFirst ? 'recount_pending' : inv.status;
@@ -317,37 +317,37 @@ export default function HistoricoPage() {
                     <tr
                       key={`${inv.id}-${inv._rowPhase || 'main'}`}
                       style={{
-                        background:    isFirst ? '#fafafa' : undefined,
-                        borderBottom:  isFirst ? '1px dashed #e4e4e7' : '1px solid #e4e4e7',
+                        background:    isFirst ? 'var(--color-bg-tertiary)' : undefined,
+                        borderBottom:  isFirst ? '1px dashed var(--color-border-light)' : '1px solid var(--color-border-light)',
                         opacity:       isFirst ? 0.75 : 1,
                       }}
                     >
-                      <td style={{ fontWeight: '800', color: '#000', paddingLeft: isRecount ? '1.5rem' : undefined }}>
+                      <td style={{ fontWeight: '800', color: 'var(--color-text-primary)', paddingLeft: isRecount ? '1.5rem' : undefined }}>
                         {inv.technicians?.name || '—'}
                       </td>
-                      <td style={{ color: '#666', fontSize: '0.8rem' }}>{inv.technicians?.region || '—'}</td>
+                      <td style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>{inv.technicians?.region || '—'}</td>
                       <td style={{ fontWeight: '700' }}>{inv.week_ref || '—'}</td>
-                      <td style={{ color: '#666', fontSize: '0.8rem' }}>{sched?.scheduled_subgroup || '—'}</td>
+                      <td style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>{sched?.scheduled_subgroup || '—'}</td>
                       <td>
                         <span style={{ fontSize: '0.7rem', fontWeight: '700', color: faseAccent, borderLeft: `3px solid ${faseAccent}`, paddingLeft: '0.4rem' }}>
                           {faseText}
                         </span>
                       </td>
-                      <td style={{ textAlign: 'center', fontWeight: '700', color: '#333' }}>{displayPecas}</td>
+                      <td style={{ textAlign: 'center', fontWeight: '700', color: 'var(--color-text-secondary)' }}>{displayPecas}</td>
                       <td style={{ textAlign: 'center', fontWeight: '800' }}>
                         {divQty === null
-                          ? <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>
+                          ? <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>—</span>
                           : hasDiv
-                            ? <span style={{ background: '#000', color: '#fff', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{divQty}</span>
-                            : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>0</span>
+                            ? <span style={{ background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', padding: '1px 7px', borderRadius: '4px', fontSize: '0.72rem' }}>{divQty}</span>
+                            : <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>0</span>
                         }
                       </td>
                       <td><StatusBadge status={displayStatus} /></td>
-                      <td style={{ color: '#888', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>{displayDate}</td>
+                      <td style={{ color: 'var(--color-text-tertiary)', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>{displayDate}</td>
                       <td>
                         <button
                           className="btn btn-secondary"
-                          style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', border: '1px solid #ccc', fontWeight: '700', whiteSpace: 'nowrap' }}
+                          style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', border: '1px solid var(--color-border-light)', fontWeight: '700', whiteSpace: 'nowrap' }}
                           onClick={() => setSelected({ inv, phase: isFirst ? 'first' : isRecount ? 'recount' : null })}
                         >
                           Ver peças

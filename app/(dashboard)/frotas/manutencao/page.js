@@ -78,18 +78,18 @@ export default function ManutencaoPage() {
       </div>
 
       {/* Filtro */}
-      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           type="text"
           placeholder="Buscar por placa..."
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
         />
         <select
           value={filters.tipo}
           onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
-          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
         >
           {tipoOptions.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -98,7 +98,7 @@ export default function ManutencaoPage() {
         <select
           value={filters.uf}
           onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
-          style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem', minWidth: '140px' }}
+          style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem', minWidth: '140px' }}
         >
           <option value="">Todos UF</option>
           {[...new Set(manutencoes.map(m => m.uf).filter(Boolean))].sort().map(uf => (
@@ -108,22 +108,22 @@ export default function ManutencaoPage() {
       </div>
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e5e5e5', marginTop: '1rem' }}>
+      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-light)', marginTop: '1rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhuma manutenção encontrada</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhuma manutenção encontrada</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Realiz.</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Próxima Prev.</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-tertiary)' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Realiz.</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Próxima Prev.</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,16 +137,16 @@ export default function ManutencaoPage() {
                   }
 
                   return (
-                    <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                      <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>{m.placa}</td>
-                      <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{m.tipo}</td>
-                      <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                    <tr key={idx} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-tertiary)' }}>
+                      <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>{m.placa}</td>
+                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>{m.tipo}</td>
+                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                         {m.data_realizada ? new Date(m.data_realizada).toLocaleDateString('pt-BR') : '-'}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                         {m.proxima_preventiva ? new Date(m.proxima_preventiva).toLocaleDateString('pt-BR') : '-'}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
                         R$ {(parseFloat(m.valor) || 0).toFixed(2)}
                       </td>
                       <td style={{ padding: '0.75rem 1rem' }}>
@@ -157,9 +157,9 @@ export default function ManutencaoPage() {
                           fontSize: '0.75rem',
                           fontWeight: '600',
                           whiteSpace: 'nowrap',
-                          background: status === 'Vencida' ? '#f0f0f0' : status === 'Próxima em 30 dias' ? '#f0f0f0' : '#ffffff',
-                          color: status === 'Vencida' ? '#333333' : status === 'Próxima em 30 dias' ? '#333333' : '#000000',
-                          border: '1px solid #dddddd'
+                          background: status === 'Vencida' ? 'var(--color-bg-tertiary)' : status === 'Próxima em 30 dias' ? 'var(--color-bg-tertiary)' : 'var(--color-bg-primary)',
+                          color: status === 'Vencida' ? 'var(--color-text-secondary)' : status === 'Próxima em 30 dias' ? 'var(--color-text-secondary)' : 'var(--color-bg-secondary)',
+                          border: '1px solid var(--color-border-light)'
                         }}>
                           {status === 'Vencida' ? 'Vencida' : status === 'Próxima em 30 dias' ? 'Próximos 30d' : 'Em dia'}
                         </span>
@@ -178,16 +178,18 @@ export default function ManutencaoPage() {
 
 function KPICard({ label, value, sub }) {
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid var(--color-text-secondary)' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000', marginBottom: '0.5rem' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-bg-secondary)', marginBottom: '0.5rem' }}>
         {value}
       </div>
-      <div style={{ fontSize: '0.75rem', color: '#999999' }}>
+      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
         {sub}
       </div>
     </div>
   );
 }
+
+

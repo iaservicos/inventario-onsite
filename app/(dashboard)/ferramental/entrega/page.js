@@ -117,14 +117,14 @@ export default function EntregaFerramentalPage() {
   };
 
   return (
-    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-tertiary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader title="Registrar Entrega" subtitle="Registre a entrega de ferramentas a um técnico" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,2fr)', gap: '1.5rem', alignItems: 'start' }}>
 
         {/* Formulário de entrega */}
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #eeeeee', background: '#f4f4f5' }}>
+        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Nova Entrega
             </span>
@@ -186,8 +186,8 @@ export default function EntregaFerramentalPage() {
                           key={tool.id}
                           style={{
                             borderRadius: '8px',
-                            background: isSelected ? '#f0f7f0' : '#fafafa',
-                            border: `1px solid ${isSelected ? '#4a8a4a' : '#e4e4e7'}`,
+                            background: isSelected ? '#f0f7f0' : 'var(--color-bg-tertiary)',
+                            border: `1px solid ${isSelected ? '#4a8a4a' : 'var(--color-border-light)'}`,
                             overflow: 'hidden', transition: 'all 0.1s',
                           }}
                         >
@@ -204,7 +204,7 @@ export default function EntregaFerramentalPage() {
                             <div style={{
                               width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0,
                               background: isSelected ? '#2d6a2d' : 'transparent',
-                              border: `2px solid ${isSelected ? '#2d6a2d' : '#ccc'}`,
+                              border: `2px solid ${isSelected ? '#2d6a2d' : 'var(--color-border-light)'}`,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               fontSize: '0.65rem', color: '#fff', fontWeight: '900',
                             }}>
@@ -224,7 +224,7 @@ export default function EntregaFerramentalPage() {
                               <span style={{ fontSize: '0.68rem', color: '#666', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>
                                 Qtd:
                               </span>
-                              <div style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid #ccc', borderRadius: '6px', overflow: 'hidden' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid var(--color-border-light)', borderRadius: '6px', overflow: 'hidden' }}>
                                 <button
                                   type="button"
                                   onClick={() => setQty(tool.id, qty - 1)}
@@ -268,7 +268,7 @@ export default function EntregaFerramentalPage() {
                 disabled={submitting || !techId || selectedCount === 0}
                 style={{
                   width: '100%', padding: '0.85rem',
-                  background: (submitting || !techId || selectedCount === 0) ? '#e4e4e7' : '#000',
+                  background: (submitting || !techId || selectedCount === 0) ? 'var(--color-border-light)' : '#000',
                   color: (submitting || !techId || selectedCount === 0) ? '#999' : '#fff',
                   border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900',
                   cursor: (submitting || !techId || selectedCount === 0) ? 'not-allowed' : 'pointer',
@@ -286,8 +286,8 @@ export default function EntregaFerramentalPage() {
         </div>
 
         {/* Histórico de entregas */}
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #eeeeee', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Histórico de Entregas
             </span>
@@ -304,7 +304,7 @@ export default function EntregaFerramentalPage() {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                 <thead>
-                  <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #eeeeee' }}>
+                  <tr style={{ background: 'var(--color-bg-secondary)', borderBottom: '2px solid var(--color-border-light)' }}>
                     {['#', 'Técnico', 'Ferramenta', 'Qtd', 'Entregue por', 'Data'].map(h => (
                       <th key={h} style={{ padding: '0.65rem 0.9rem', textAlign: 'left', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
@@ -312,7 +312,7 @@ export default function EntregaFerramentalPage() {
                 </thead>
                 <tbody>
                   {deliveries.map((r, idx) => (
-                    <tr key={r.id} style={{ borderBottom: '1px solid #f0f0f0', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                    <tr key={r.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? '#fff' : 'var(--color-bg-tertiary)' }}>
                       <td style={{ padding: '0.65rem 0.9rem', color: '#999', fontWeight: '700' }}>#{r.id}</td>
                       <td style={{ padding: '0.65rem 0.9rem', fontWeight: '700', color: '#000', whiteSpace: 'nowrap' }}>
                         {r.technician_name}

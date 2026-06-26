@@ -55,50 +55,50 @@ export default function MovimentacoesPage() {
       </div>
 
       {/* Filtro */}
-      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
+      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Buscar por placa..."
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
         />
       </div>
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #eeeeee' }}>
+      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-light)' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhuma movimentação encontrada</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhuma movimentação encontrada</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e5e5e5', background: '#f5f5f5' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Anterior</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Novo Técnico</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motivo</th>
+                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-tertiary)' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico Anterior</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Novo Técnico</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motivo</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((m, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                  <tr key={idx} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-tertiary)' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                       {m.data_movimentacao ? new Date(m.data_movimentacao).toLocaleDateString('pt-BR') : '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-secondary)', fontFamily: "'JetBrains Mono'" }}>
                       {m.placa}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>
                       {m.tecnico_anterior || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#333333', fontWeight: '600' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
                       {m.novo_tecnico || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>
                       {m.motivo || '-'}
                     </td>
                   </tr>
@@ -114,13 +114,15 @@ export default function MovimentacoesPage() {
 
 function StatCard({ label, value }) {
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid var(--color-text-secondary)' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
         {value}
       </div>
     </div>
   );
 }
+
+

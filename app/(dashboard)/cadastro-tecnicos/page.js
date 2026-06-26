@@ -37,13 +37,13 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
     try {
       const url = tecnico ? `/api/technicians/${tecnico.id}` : '/api/technicians';
       const method = tecnico ? 'PATCH' : 'POST';
-      
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao processar');
       onSaved(data);
@@ -53,15 +53,15 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-      <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
-          <span style={{ fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>
+      <div style={{ background: 'var(--color-bg-primary)', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-bg-tertiary)' }}>
+          <span style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-text-primary)', textTransform: 'uppercase' }}>
             {tecnico ? 'Editar Técnico' : 'Novo Cadastro de Técnico'}
           </span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: '900' }}>✕</button>
         </div>
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
-          {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
+          {error && <div style={{ padding: '0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)', border: '2px solid var(--color-text-primary)', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Nome completo *">
@@ -69,29 +69,29 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
             </Field>
             {/* O campo e-mail só é obrigatório se active for true */}
             <Field label={form.active ? "E-mail *" : "E-mail"}>
-              <input 
-                name="email" 
-                type="email" 
-                value={form.email} 
-                onChange={set} 
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={set}
                 required={form.active}
-                className="input" 
-                placeholder="email@positivo.com.br" 
-                style={inputStyle} 
+                className="input"
+                placeholder="email@positivo.com.br"
+                style={inputStyle}
               />
             </Field>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             {/* O campo telefone só é obrigatório se active for true */}
             <Field label={form.active ? "Telefone (WhatsApp) *" : "Telefone (WhatsApp)"}>
-              <input 
-                name="phone" 
-                value={form.phone} 
-                onChange={set} 
+              <input
+                name="phone"
+                value={form.phone}
+                onChange={set}
                 required={form.active}
-                className="input" 
-                placeholder="5541999999999" 
-                style={inputStyle} 
+                className="input"
+                placeholder="5541999999999"
+                style={inputStyle}
               />
             </Field>
             <Field label="Estado">
@@ -120,13 +120,13 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
           <div style={{ marginBottom: '1rem' }}>
             <Field label="Status do Técnico">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}>
-                <input 
-                  type="checkbox" 
-                  name="active" 
-                  checked={form.active} 
-                  onChange={set} 
-                  id="active-check" 
-                  disabled={!canEditAll} 
+                <input
+                  type="checkbox"
+                  name="active"
+                  checked={form.active}
+                  onChange={set}
+                  id="active-check"
+                  disabled={!canEditAll}
                 />
                 <label htmlFor="active-check" style={{ fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}>
                   {form.active ? 'TÉCNICO ATIVO' : 'TÉCNICO INATIVO'}
@@ -136,8 +136,8 @@ function ModalTecnico({ tecnico, onClose, onSaved, isAdmin, isSupervisor, isCoor
           </div>
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid var(--color-border-light)' }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
               {saving ? 'PROCESSANDO...' : tecnico ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR TÉCNICO'}
             </button>
           </div>
@@ -180,7 +180,7 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coor
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: selecionados, updates }),
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao processar');
       onSaved(data);
@@ -190,15 +190,15 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coor
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-      <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
-          <span style={{ fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>
+      <div style={{ background: 'var(--color-bg-primary)', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-bg-tertiary)' }}>
+          <span style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-text-primary)', textTransform: 'uppercase' }}>
             Editar {selecionados.length} Técnicos
           </span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: '900' }}>✕</button>
         </div>
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
-          {error && <div style={{ padding: '0.75rem', background: '#fafafa', color: '#000000', border: '2px solid #000000', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
+          {error && <div style={{ padding: '0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)', border: '2px solid var(--color-text-primary)', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem', fontWeight: '800' }}>{error}</div>}
 
           <Field label="Novo Coordenador">
             <select name="coordinator_name" value={form.coordinator_name} onChange={set} className="input" style={inputStyle}>
@@ -229,8 +229,8 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coor
           </Field>
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid var(--color-border-light)' }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
               {saving ? 'PROCESSANDO...' : 'ATUALIZAR EM MASSA'}
             </button>
           </div>
@@ -243,13 +243,13 @@ function ModalEdicaoEmMassa({ selecionados, onClose, onSaved, supervisores, coor
 function Field({ label, children }) {
   return (
     <div style={{ marginBottom: '0.75rem' }}>
-      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', color: '#000000', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', color: 'var(--color-text-primary)', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
       {children}
     </div>
   );
 }
 
-const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeight: '600' };
+const inputStyle = { border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600' };
 const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
 
 export default function CadastroTecnicosPage() {
@@ -366,11 +366,11 @@ export default function CadastroTecnicosPage() {
         actions={
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             {selecionados.length > 0 && (
-              <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk' })} style={{ border: '2px solid #000000', fontWeight: '800' }}>
+              <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk' })} style={{ border: '2px solid var(--color-text-primary)', fontWeight: '800' }}>
                 EDITAR SELECIONADOS ({selecionados.length})
               </button>
             )}
-            <button className="btn btn-primary" onClick={() => setModal({ type: 'new' })} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
+            <button className="btn btn-primary" onClick={() => setModal({ type: 'new' })} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
               + NOVO TÉCNICO
             </button>
           </div>
@@ -411,7 +411,7 @@ export default function CadastroTecnicosPage() {
         <div className="table-wrapper" style={{ border: 'none' }}>
           <table>
             <thead>
-              <tr style={{ background: '#f4f4f5' }}>
+              <tr style={{ background: 'var(--color-bg-tertiary)' }}>
                 <th style={{ width: '40px' }}>
                   <input type="checkbox" checked={selecionados.length > 0 && selecionados.length === filteredTecnicos.length} onChange={toggleAll} />
                 </th>
@@ -433,14 +433,14 @@ export default function CadastroTecnicosPage() {
                 filteredTecnicos.map(t => (
                   <tr key={t.id} style={{ background: selecionados.includes(t.id) ? '#f0f9ff' : 'transparent' }}>
                     <td><input type="checkbox" checked={selecionados.includes(t.id)} onChange={() => toggleSelect(t.id)} /></td>
-                    <td style={{ fontWeight: '800', color: '#000000' }}>{t.name}</td>
+                    <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{t.name}</td>
                     <td style={{ fontSize: '0.8rem', fontWeight: '600' }}>{t.email || '—'}</td>
                     <td style={{ fontSize: '0.8rem', fontWeight: '600' }}>{t.phone || '—'}</td>
                     <td><span className="badge badge-info">{t.region || '—'}</span></td>
                     <td>
                       <div style={{ fontSize: '0.7rem', fontWeight: '700' }}>
-                        <div style={{ color: '#000' }}>Coord: {t.coordinator_name || '—'}</div>
-                        <div style={{ color: '#666' }}>Sup: {t.supervisor_name || '—'}</div>
+                        <div style={{ color: 'var(--color-text-primary)' }}>Coord: {t.coordinator_name || '—'}</div>
+                        <div style={{ color: 'var(--color-text-tertiary)' }}>Sup: {t.supervisor_name || '—'}</div>
                       </div>
                     </td>
                     <td>
@@ -454,12 +454,12 @@ export default function CadastroTecnicosPage() {
                       <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                         {confirmDelete === t.id ? (
                           <>
-                            <span style={{ fontSize: '0.7rem', fontWeight: '700', color: '#000' }}>Confirmar exclusão?</span>
+                            <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>Confirmar exclusão?</span>
                             <button
                               className="btn"
                               onClick={() => handleDelete(t.id)}
                               disabled={deleting}
-                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem', fontWeight: '800', background: '#000', color: '#fff', border: '1px solid #000' }}
+                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem', fontWeight: '800', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', border: '1px solid var(--color-text-primary)' }}
                             >
                               {deleting ? '...' : 'SIM'}
                             </button>
@@ -467,21 +467,21 @@ export default function CadastroTecnicosPage() {
                               className="btn btn-secondary"
                               onClick={() => setConfirmDelete(null)}
                               disabled={deleting}
-                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #ccc' }}
+                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem', fontWeight: '700', border: '1px solid var(--color-border-light)' }}
                             >
                               NÃO
                             </button>
                           </>
                         ) : (
                           <>
-                            <button className="btn btn-secondary" onClick={() => setModal({ type: 'edit', data: t })} style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid #000' }}>
+                            <button className="btn btn-secondary" onClick={() => setModal({ type: 'edit', data: t })} style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid var(--color-text-primary)' }}>
                               EDITAR
                             </button>
                             {isAdmin && (
                               <button
                                 className="btn btn-secondary"
                                 onClick={() => setConfirmDelete(t.id)}
-                                style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid #ccc', color: '#666' }}
+                                style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '800', border: '1px solid var(--color-border-light)', color: 'var(--color-text-tertiary)' }}
                               >
                                 EXCLUIR
                               </button>

@@ -41,17 +41,17 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-      <div style={{ background: '#fff', width: '100%', maxWidth: '480px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000' }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000', background: '#f4f4f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ background: 'var(--color-bg-primary)', width: '100%', maxWidth: '480px', borderRadius: '8px', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', background: 'var(--color-bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: '900', fontSize: '0.95rem', textTransform: 'uppercase' }}>Em Tratativa</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', fontWeight: '900' }}>✕</button>
         </div>
 
-        <div style={{ padding: '1rem 1.5rem', background: '#fafafa', borderBottom: '1px solid #eee', fontSize: '0.8rem', color: '#444' }}>
-          <div style={{ fontWeight: '800', color: '#000', marginBottom: '2px' }}>{divergencia.item_name}</div>
-          <div style={{ color: '#666' }}>
+        <div style={{ padding: '1rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-border-light)', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+          <div style={{ fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{divergencia.item_name}</div>
+          <div style={{ color: 'var(--color-text-tertiary)' }}>
             Técnico: <strong>{divergencia.technicians?.name}</strong> &nbsp;|&nbsp;
-            Diferença: <strong style={{ color: '#000' }}>{divergencia.difference}</strong>
+            Diferença: <strong style={{ color: 'var(--color-text-primary)' }}>{divergencia.difference}</strong>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
               placeholder="Ex: INC0012345"
               autoFocus
               className="input"
-              style={{ border: '1px solid #000', borderRadius: '4px', fontWeight: '600', width: '100%' }}
+              style={{ border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600', width: '100%' }}
             />
           </div>
           <div style={{ marginBottom: '1.5rem' }}>
@@ -80,12 +80,12 @@ function ModalTratativa({ divergencia, onClose, onSaved }) {
               placeholder="Descreva a ação em andamento..."
               rows={3}
               className="input"
-              style={{ border: '1px solid #000', borderRadius: '4px', fontWeight: '600', width: '100%', resize: 'vertical' }}
+              style={{ border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600', width: '100%', resize: 'vertical' }}
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000', border: 'none', fontWeight: '900' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid var(--color-border-light)' }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
               {saving ? 'Salvando...' : 'Confirmar Tratativa'}
             </button>
           </div>
@@ -207,7 +207,7 @@ export default function DivergenciasPage() {
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div className="table-wrapper" style={{ border: 'none' }}>
               {divergences.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: '#888' }}>Nenhuma divergência encontrada</div>
+                <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>Nenhuma divergência encontrada</div>
               ) : (
                 <table>
                   <thead>
@@ -230,34 +230,34 @@ export default function DivergenciasPage() {
                       const isCritical = pct >= 30;
                       return (
                         <tr key={d.id}>
-                          <td style={{ fontWeight: '800', color: '#000' }}>{d.technicians?.name}</td>
-                          <td style={{ color: '#666', fontWeight: '600' }}>{d.inventories?.week_ref || '—'}</td>
+                          <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{d.technicians?.name}</td>
+                          <td style={{ color: 'var(--color-text-tertiary)', fontWeight: '600' }}>{d.inventories?.week_ref || '—'}</td>
                           <td>
-                            <code style={{ fontSize: '0.75rem', background: '#f5f5f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #eee' }}>
+                            <code style={{ fontSize: '0.75rem', background: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--color-border-light)' }}>
                               {d.item_code}
                             </code>
                           </td>
                           <td style={{ fontWeight: '600' }}>{d.item_name}</td>
-                          <td style={{ textAlign: 'right', color: '#666' }}>{d.system_qty}</td>
-                          <td style={{ textAlign: 'right', color: '#666' }}>{d.physical_qty}</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: Number(d.difference) < 0 ? '#000' : '#555' }}>
+                          <td style={{ textAlign: 'right', color: 'var(--color-text-tertiary)' }}>{d.system_qty}</td>
+                          <td style={{ textAlign: 'right', color: 'var(--color-text-tertiary)' }}>{d.physical_qty}</td>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: Number(d.difference) < 0 ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>
                             {Number(d.difference) > 0 ? '+' : ''}{d.difference}
                           </td>
                           <td><StatusBadge status={d.status} /></td>
                           <td>
                             {d.ticket_number ? (
                               <div>
-                                <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#000' }}>{d.ticket_number}</div>
-                                {d.ticket_note && <div style={{ fontSize: '0.65rem', color: '#666', marginTop: '1px' }}>{d.ticket_note}</div>}
+                                <div style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>{d.ticket_number}</div>
+                                {d.ticket_note && <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '1px' }}>{d.ticket_note}</div>}
                               </div>
-                            ) : <span style={{ color: '#ccc', fontSize: '0.75rem' }}>—</span>}
+                            ) : <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>—</span>}
                           </td>
                           <td>
                             <div style={{ display: 'flex', gap: '0.3rem' }}>
                               {(d.status === 'open' || d.status === 'recount') && (
                                 <button
                                   className="btn btn-secondary"
-                                  style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: '#000', color: '#fff', border: 'none' }}
+                                  style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', border: 'none' }}
                                   onClick={() => setTratativaModal(d)}
                                 >
                                   Em Tratativa
@@ -286,4 +286,3 @@ export default function DivergenciasPage() {
     </div>
   );
 }
-

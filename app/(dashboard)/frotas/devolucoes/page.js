@@ -48,54 +48,54 @@ export default function DevolucoesPage() {
       <PageHeader title="Devoluções" subtitle="Registro fotográfico ao devolver o veículo" />
 
       {/* Filtro */}
-      <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           type="text"
           placeholder="Filtrar por placa..."
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ flex: 1, minWidth: '200px', padding: '0.5rem 0.75rem', border: '1px solid #eeeeee', borderRadius: '4px', fontSize: '0.9rem' }}
+          style={{ flex: 1, minWidth: '200px', padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
         />
       </div>
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #eeeeee' }}>
+      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-light)' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhuma devolução encontrada</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhuma devolução encontrada</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hodômetro</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motivo</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fotos</th>
+                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-primary)' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Técnico</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hodômetro</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motivo</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fotos</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((d) => (
-                  <tr key={d.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontSize: '0.9rem' }}>
+                  <tr key={d.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                       {new Date(d.data).toLocaleDateString('pt-BR')}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333' }}>{d.placa}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{d.tecnico}</td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>{d.placa}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>{d.tecnico}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
                       {d.hodometro}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>{d.motivo}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>{d.motivo}</td>
                     <td style={{ padding: '0.75rem 1rem' }}>
                       <button
                         onClick={() => handleViewFotos(d)}
                         style={{
                           padding: '0.5rem 0.75rem',
-                          background: '#000000',
-                          color: '#ffffff',
+                          background: 'var(--color-bg-secondary)',
+                          color: 'var(--color-bg-primary)',
                           border: 'none',
                           borderRadius: '4px',
                           fontSize: '0.75rem',
@@ -127,7 +127,7 @@ export default function DevolucoesPage() {
         }} onClick={handleCloseModal}>
           <div
             style={{
-              background: '#ffffff',
+              background: 'var(--color-bg-primary)',
               borderRadius: '8px',
               width: 'min(700px, 96vw)',
               maxHeight: '90vh',
@@ -139,15 +139,15 @@ export default function DevolucoesPage() {
             {/* Header Modal */}
             <div style={{
               padding: '1.5rem',
-              borderBottom: '1px solid #eeeeee',
+              borderBottom: '1px solid var(--color-border-light)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               position: 'sticky',
               top: 0,
-              background: '#ffffff'
+              background: 'var(--color-bg-primary)'
             }}>
-              <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000' }}>
+              <div style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--color-bg-secondary)' }}>
                 Fotos da Devolução - {selectedDevolucao.placa}
               </div>
               <button
@@ -157,7 +157,7 @@ export default function DevolucoesPage() {
                   border: 'none',
                   fontSize: '1.5rem',
                   cursor: 'pointer',
-                  color: '#666666'
+                  color: 'var(--color-text-tertiary)'
                 }}
               >
                 ×
@@ -175,14 +175,14 @@ export default function DevolucoesPage() {
               }}>
                 {selectedDevolucao.fotoUrls.map((foto, idx) => (
                   <div key={idx} style={{
-                    background: '#f0f0f0',
+                    background: 'var(--color-bg-tertiary)',
                     borderRadius: '6px',
                     height: '180px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid #eeeeee',
-                    color: '#999999',
+                    border: '1px solid var(--color-border-light)',
+                    color: 'var(--color-text-tertiary)',
                     fontSize: '0.9rem'
                   }}>
                     Foto: {foto}
@@ -193,15 +193,15 @@ export default function DevolucoesPage() {
               {/* Observações */}
               <div style={{
                 padding: '1rem',
-                background: '#f9f9f9',
+                background: 'var(--color-bg-tertiary)',
                 borderRadius: '6px',
                 marginBottom: '1rem',
-                border: '1px solid #eeeeee'
+                border: '1px solid var(--color-border-light)'
               }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                   Observações
                 </div>
-                <div style={{ color: '#666666', fontSize: '0.9rem' }}>
+                <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                   {selectedDevolucao.observacoes}
                 </div>
               </div>
@@ -212,21 +212,21 @@ export default function DevolucoesPage() {
                 gridTemplateColumns: '1fr 1fr',
                 gap: '1rem',
                 paddingTop: '1rem',
-                borderTop: '1px solid #eeeeee'
+                borderTop: '1px solid var(--color-border-light)'
               }}>
                 <div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                     Técnico
                   </div>
-                  <div style={{ color: '#000000', fontWeight: '600' }}>
+                  <div style={{ color: 'var(--color-bg-secondary)', fontWeight: '600' }}>
                     {selectedDevolucao.tecnico}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                     Hodômetro
                   </div>
-                  <div style={{ color: '#000000', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
+                  <div style={{ color: 'var(--color-bg-secondary)', fontWeight: '600', fontFamily: "'JetBrains Mono'" }}>
                     {selectedDevolucao.hodometro} km
                   </div>
                 </div>
@@ -238,3 +238,5 @@ export default function DevolucoesPage() {
     </div>
   );
 }
+
+

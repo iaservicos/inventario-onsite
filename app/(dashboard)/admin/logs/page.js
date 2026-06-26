@@ -95,7 +95,7 @@ export default function AccessLogsPage() {
         <div style={{ border: '1px solid #eee', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
             <thead>
-              <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #eee' }}>
+              <tr style={{ background: 'var(--color-bg-secondary)', borderBottom: '2px solid #eee' }}>
                 {['Data/Hora', 'Usuário', 'Perfil', 'Evento', 'Página / Ação', 'IP', 'Localização'].map(h => (
                   <th key={h} style={{ padding: '0.6rem 0.9rem', textAlign: 'left', fontWeight: '800', color: '#444', textTransform: 'uppercase', fontSize: '0.62rem', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
@@ -103,21 +103,21 @@ export default function AccessLogsPage() {
             </thead>
             <tbody>
               {logs.map((l, i) => (
-                <tr key={l.id} style={{ borderBottom: '1px solid #f2f2f2', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                <tr key={l.id} style={{ borderBottom: '1px solid #f2f2f2', background: i % 2 === 0 ? '#fff' : 'var(--color-bg-tertiary)' }}>
                   <td style={{ padding: '0.55rem 0.9rem', color: '#555', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{fmt(l.created_at)}</td>
                   <td style={{ padding: '0.55rem 0.9rem' }}>
                     <div style={{ fontWeight: '700', color: '#000' }}>{l.user_name || '—'}</div>
                     <div style={{ fontSize: '0.68rem', color: '#999' }}>{l.user_email}</div>
                   </td>
                   <td style={{ padding: '0.55rem 0.9rem' }}>
-                    <span style={{ fontSize: '0.62rem', fontWeight: '800', textTransform: 'uppercase', background: '#f0f0f0', padding: '0.1rem 0.4rem', borderRadius: '3px', color: '#555' }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: '800', textTransform: 'uppercase', background: 'var(--color-bg-tertiary)', padding: '0.1rem 0.4rem', borderRadius: '3px', color: '#555' }}>
                       {l.user_role || '—'}
                     </span>
                   </td>
                   <td style={{ padding: '0.55rem 0.9rem' }}>
                     <span style={{
                       display: 'inline-block', padding: '0.1rem 0.45rem', borderRadius: '4px', fontSize: '0.62rem', fontWeight: '800', textTransform: 'uppercase', whiteSpace: 'nowrap',
-                      background: l.event_type === 'login' ? '#000' : '#f0f0f0',
+                      background: l.event_type === 'login' ? '#000' : 'var(--color-bg-tertiary)',
                       color:      l.event_type === 'login' ? '#fff' : '#444',
                     }}>
                       {EVENT_LABELS[l.event_type] || l.event_type}

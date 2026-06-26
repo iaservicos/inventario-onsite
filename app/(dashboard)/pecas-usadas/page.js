@@ -335,7 +335,7 @@ export default function PecasUsadasPage() {
       <div style={{
         marginBottom: '1.5rem',
         padding: '0.75rem 1.25rem',
-        background: '#f0f0f0',
+        background: 'var(--color-bg-tertiary)',
         border: '1px solid #ddd',
         borderRadius: '8px',
         display: 'flex',
@@ -384,7 +384,7 @@ export default function PecasUsadasPage() {
         <div style={{
           marginBottom: '1rem',
           padding: '0.6rem 0.75rem',
-          background: '#f0f0f0',
+          background: 'var(--color-bg-tertiary)',
           border: '1px solid #000',
           borderRadius: '4px',
           fontSize: '0.8rem',
@@ -450,7 +450,7 @@ export default function PecasUsadasPage() {
         )}
 
         <div style={{ flex: 1, minWidth: '260px' }}>
-          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#000000', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             Selecionar Técnico
           </label>
           <select
@@ -474,7 +474,7 @@ export default function PecasUsadasPage() {
 
         {selectedTech && items.length > 0 && (
           <div style={{ flex: 1, minWidth: '200px' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#000000', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Filtrar peças
             </label>
             <input
@@ -585,7 +585,7 @@ export default function PecasUsadasPage() {
                   <tbody>
                     {tech.items.map((item, idx) => (
                       <tr key={`${item.item_code}-${idx}`}>
-                        <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
+                        <td><code style={{ background: 'var(--color-bg-tertiary)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
                         <td style={{ fontWeight: '700', fontSize: '0.9rem' }}>{item.item_name}</td>
                         <td style={{ fontWeight: '900', textAlign: 'center' }}>{item.item_quantity}</td>
                         <td style={{ fontSize: '0.85rem', color: '#333' }}>{item.chamado_consumo || '—'}</td>
@@ -606,7 +606,7 @@ export default function PecasUsadasPage() {
       {/* Resultados busca por código */}
       {codeResults && !summaryMode && (
         <div className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '2rem' }}>
-          <div style={{ padding: '1.25rem 1.5rem', background: '#f0f0f0', borderBottom: '2px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ padding: '1.25rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '2px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000' }}>
               Busca: "{codeSearch.toUpperCase()}"
               <span style={{ marginLeft: '0.5rem', background: '#000', color: '#fff', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>{codeResults.total} resultado(s)</span>
@@ -633,7 +633,7 @@ export default function PecasUsadasPage() {
                 <tbody>
                   {codeResults.results.map((r, i) => (
                     <tr key={i}>
-                      <td><code style={{ background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{r.item_code}</code></td>
+                      <td><code style={{ background: 'var(--color-bg-tertiary)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{r.item_code}</code></td>
                       <td style={{ fontWeight: '700', fontSize: '0.95rem' }}>{r.item_name}</td>
                       <td style={{ fontWeight: '900', textAlign: 'center', fontSize: '1.05rem' }}>{r.item_quantity}</td>
                       <td style={{ fontWeight: '700', fontSize: '0.85rem' }}>{r.chamado_consumo || '—'}</td>
@@ -654,18 +654,18 @@ export default function PecasUsadasPage() {
 
       {/* Tabela de peças usadas */}
       {selectedTech && !loading && filteredItems.length > 0 && (
-        <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid #000000' }}>
+        <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
           <div style={{
             padding: '1.25rem 1.5rem',
-            background: '#f0f0f0',
-            borderBottom: '2px solid #000000',
+            background: 'var(--color-bg-tertiary)',
+            borderBottom: '2px solid var(--color-text-primary)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: '0.5rem',
           }}>
-            <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000000' }}>
+            <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-text-primary)' }}>
               Peças Usadas
               <span style={{
                 marginLeft: '0.5rem',
@@ -689,7 +689,7 @@ export default function PecasUsadasPage() {
                   gap: '0.4rem',
                   fontSize: '0.75rem',
                   color: '#1e40af',
-                  background: '#ffffff',
+                  background: 'var(--color-bg-primary)',
                   padding: '0.3rem 0.7rem',
                   borderRadius: '6px',
                   border: '1px solid #bfdbfe',
@@ -701,9 +701,9 @@ export default function PecasUsadasPage() {
               )}
               <span style={{
                 fontSize: '0.75rem',
-                color: '#333333',
+                color: 'var(--color-text-secondary)',
                 fontWeight: '700',
-                background: '#ffffff',
+                background: 'var(--color-bg-primary)',
                 padding: '0.3rem 0.7rem',
                 borderRadius: '6px',
                 border: '1px solid #d0d0d0',
@@ -733,34 +733,34 @@ export default function PecasUsadasPage() {
                   <tr key={item.id}>
                     <td>
                       <code style={{
-                        background: '#f0f0f0',
+                        background: 'var(--color-bg-tertiary)',
                         padding: '4px 8px',
                         borderRadius: '4px',
                         fontSize: '0.85rem',
-                        color: '#000000',
+                        color: 'var(--color-text-primary)',
                         fontWeight: '800',
                         border: '1px solid #d0d0d0',
                       }}>
                         {item.item_code}
                       </code>
                     </td>
-                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.95rem' }}>
+                    <td style={{ color: 'var(--color-text-primary)', fontWeight: '700', fontSize: '0.95rem' }}>
                       {item.item_name}
                     </td>
-                    <td style={{ color: '#000000', fontWeight: '700', textAlign: 'center', fontSize: '1rem' }}>
+                    <td style={{ color: 'var(--color-text-primary)', fontWeight: '700', textAlign: 'center', fontSize: '1rem' }}>
                       {item.item_quantity ?? '—'}
                     </td>
-                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.9rem' }}>
+                    <td style={{ color: 'var(--color-text-primary)', fontWeight: '700', fontSize: '0.9rem' }}>
                       {item.item_num_remessa || '—'}
                     </td>
                     <td>
-                      <div style={{ color: '#000000', fontWeight: '800', fontSize: '0.85rem' }}>{item.atp_centro || '—'}</div>
-                      <div style={{ color: '#666666', fontSize: '0.75rem', fontWeight: '600' }}>{item.atp_nome || '—'}</div>
+                      <div style={{ color: 'var(--color-text-primary)', fontWeight: '800', fontSize: '0.85rem' }}>{item.atp_centro || '—'}</div>
+                      <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem', fontWeight: '600' }}>{item.atp_nome || '—'}</div>
                     </td>
-                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.85rem' }}>
+                    <td style={{ color: 'var(--color-text-primary)', fontWeight: '700', fontSize: '0.85rem' }}>
                       {item.chamado_consumo || '—'}
                     </td>
-                    <td style={{ color: '#000000', fontWeight: '700', fontSize: '0.85rem' }}>
+                    <td style={{ color: 'var(--color-text-primary)', fontWeight: '700', fontSize: '0.85rem' }}>
                       {item.data_encerramento
                         ? new Date(item.data_encerramento).toLocaleDateString('pt-BR')
                         : '—'}
@@ -780,7 +780,7 @@ export default function PecasUsadasPage() {
                         </span>
                       ) : '—'}
                     </td>
-                    <td style={{ color: '#000000', fontWeight: '800', fontSize: '0.85rem' }}>
+                    <td style={{ color: 'var(--color-text-primary)', fontWeight: '800', fontSize: '0.85rem' }}>
                       {item.item_subgroup || 'OUTROS'}
                     </td>
                   </tr>
@@ -793,13 +793,13 @@ export default function PecasUsadasPage() {
 
       {/* Loading */}
       {selectedTech && loading && (
-        <div style={{ padding: '5rem 2rem', textAlign: 'center', color: '#000000' }}>
+        <div style={{ padding: '5rem 2rem', textAlign: 'center', color: 'var(--color-text-primary)' }}>
           <div style={{
             display: 'inline-block',
             width: '36px',
             height: '36px',
-            border: '3px solid #f0f0f0',
-            borderTop: '3px solid #000000',
+            border: '3px solid var(--color-bg-tertiary)',
+            borderTop: '3px solid var(--color-text-primary)',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
             marginBottom: '1rem',
@@ -813,18 +813,18 @@ export default function PecasUsadasPage() {
         <div style={{
           padding: '5rem 2rem',
           textAlign: 'center',
-          color: '#333333',
+          color: 'var(--color-text-secondary)',
           background: '#f9f9f9',
           borderRadius: '10px',
           border: '2px dashed #d0d0d0',
         }}>
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#cccccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1rem' }}>
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-border-light)ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1rem' }}>
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
           </svg>
-          <h3 style={{ fontSize: '1.1rem', color: '#000000', marginBottom: '0.5rem', fontWeight: '800' }}>
+          <h3 style={{ fontSize: '1.1rem', color: 'var(--color-text-primary)', marginBottom: '0.5rem', fontWeight: '800' }}>
             Nenhuma peça usada encontrada
           </h3>
-          <p style={{ fontSize: '0.9rem', color: '#666666', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)', marginBottom: '1rem' }}>
             Este técnico não possui peças usadas no banco local.
           </p>
           {lastSync ? (
@@ -844,7 +844,7 @@ export default function PecasUsadasPage() {
         <div style={{
           padding: '3rem 2rem',
           textAlign: 'center',
-          color: '#666666',
+          color: 'var(--color-text-tertiary)',
           background: '#f9f9f9',
           borderRadius: '10px',
           border: '2px dashed #d0d0d0',
@@ -864,21 +864,21 @@ export default function PecasUsadasPage() {
         <div style={{
           padding: '5rem 2rem',
           textAlign: 'center',
-          color: '#333333',
+          color: 'var(--color-text-secondary)',
           background: '#f9f9f9',
           borderRadius: '10px',
           border: '2px dashed #d0d0d0',
         }}>
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cccccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1.5rem' }}>
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-border-light)ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1.5rem' }}>
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
-          <h3 style={{ fontSize: '1.25rem', color: '#000000', marginBottom: '0.5rem', fontWeight: '900' }}>
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-primary)', marginBottom: '0.5rem', fontWeight: '900' }}>
             Nenhum técnico selecionado
           </h3>
-          <p style={{ fontSize: '0.95rem', color: '#666666' }}>
+          <p style={{ fontSize: '0.95rem', color: 'var(--color-text-tertiary)' }}>
             Selecione um técnico acima para visualizar as peças usadas.
           </p>
         </div>

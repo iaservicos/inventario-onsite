@@ -110,7 +110,7 @@ function SubgruposSection() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1rem', fontWeight: '800', margin: 0 }}>Subgrupos de Inventário</h2>
-          <p style={{ fontSize: '0.75rem', color: '#666', margin: '0.2rem 0 0' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', margin: '0.2rem 0 0' }}>
             Próximos 14 dias — ajuste o subgrupo antes do disparo D-1
           </p>
         </div>
@@ -139,8 +139,8 @@ function SubgruposSection() {
 
       {msg.text && (
         <div style={{
-          padding: '0.6rem 0.75rem', background: '#f0f0f0', color: '#000',
-          border: '1px solid #000', borderRadius: '4px', marginBottom: '1rem',
+          padding: '0.6rem 0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)',
+          border: '1px solid var(--color-text-primary)', borderRadius: '4px', marginBottom: '1rem',
           fontSize: '0.8rem', fontWeight: '700',
         }}>
           {msg.text}
@@ -151,8 +151,8 @@ function SubgruposSection() {
         <div style={{ textAlign: 'center', padding: '2rem', fontWeight: '700' }}>Carregando...</div>
       ) : agendamentosFiltrados.length === 0 ? (
         <div style={{
-          textAlign: 'center', padding: '2rem', color: '#666', fontSize: '0.85rem',
-          border: '1px solid #eee', borderRadius: '8px',
+          textAlign: 'center', padding: '2rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem',
+          border: '1px solid var(--color-border-light)', borderRadius: '8px',
         }}>
           {filterUF ? `Nenhum agendamento para UF ${filterUF}` : 'Nenhum agendamento pendente nos próximos 14 dias'}
         </div>
@@ -182,7 +182,7 @@ function SubgruposSection() {
 
                   return (
                     <tr key={ag.id}>
-                      <td style={{ fontWeight: '800', color: '#000' }}>{ag.technician_name}</td>
+                      <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{ag.technician_name}</td>
                       <td><span className="badge badge-info">{ag.technician_region || '—'}</span></td>
                       <td style={{ fontSize: '0.85rem' }}>{formatDate(ag.scheduled_at)}</td>
                       <td style={{ fontSize: '0.85rem' }}>{formatTime(ag.scheduled_at)}</td>
@@ -204,13 +204,13 @@ function SubgruposSection() {
                             ))}
                           </select>
                         ) : (
-                          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#999' }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>
                             {currentSubgroup || 'Sem subgrupo'}
                           </span>
                         )}
                       </td>
                       <td style={{ textAlign: 'center', fontWeight: '700' }}>
-                        {changed ? <span style={{ color: '#999' }}>?</span> : (ag.items_count ?? '—')}
+                        {changed ? <span style={{ color: 'var(--color-text-tertiary)' }}>?</span> : (ag.items_count ?? '—')}
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
@@ -316,7 +316,7 @@ function InventarioGeralSection({ onMsg }) {
     <div>
       <div style={{ marginBottom: '1rem' }}>
         <h2 style={{ fontSize: '1rem', fontWeight: '800', margin: 0 }}>Inventário Geral</h2>
-        <p style={{ fontSize: '0.75rem', color: '#666', margin: '0.2rem 0 0' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', margin: '0.2rem 0 0' }}>
           Agenda um inventário completo (todas as peças) para o técnico selecionado
         </p>
       </div>
@@ -378,7 +378,7 @@ function InventarioGeralSection({ onMsg }) {
 
       {agendadosGeral.length > 0 && (
         <div style={{ marginTop: '1.25rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#666', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Inventários gerais agendados (próximos 14 dias)
           </div>
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -396,7 +396,7 @@ function InventarioGeralSection({ onMsg }) {
                 <tbody>
                   {agendadosGeral.map(ag => (
                     <tr key={ag.id}>
-                      <td style={{ fontWeight: '800', color: '#000' }}>{ag.technician_name}</td>
+                      <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{ag.technician_name}</td>
                       <td><span className="badge badge-info">{ag.technician_region || '—'}</span></td>
                       <td style={{ fontSize: '0.85rem' }}>{formatDate(ag.scheduled_at)}</td>
                       <td style={{ fontSize: '0.85rem' }}>{formatTime(ag.scheduled_at)}</td>
@@ -496,7 +496,7 @@ function EscalonamentoSection({ onMsg }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1rem', fontWeight: '800', margin: 0 }}>Inventário Semanal Cíclico (Parcial)</h2>
-          <p style={{ fontSize: '0.75rem', color: '#666', margin: '0.2rem 0 0' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', margin: '0.2rem 0 0' }}>
             Defina o dia e horário do inventário para cada técnico ativo
           </p>
         </div>
@@ -564,7 +564,7 @@ function EscalonamentoSection({ onMsg }) {
                   <tr><td colSpan={5} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Nenhum técnico ativo encontrado</td></tr>
                 ) : filtered.map(t => (
                   <tr key={t.id}>
-                    <td style={{ fontWeight: '800', color: '#000' }}>{t.name}</td>
+                    <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{t.name}</td>
                     <td><span className="badge badge-info">{t.region || '—'}</span></td>
                     <td>
                       <select
@@ -635,8 +635,8 @@ export default function AgendamentosPage() {
 
       {msg.text && (
         <div style={{
-          padding: '0.75rem', background: '#f0f0f0', color: '#000',
-          border: '1px solid #000', borderRadius: '4px', marginBottom: '1.5rem',
+          padding: '0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)',
+          border: '1px solid var(--color-text-primary)', borderRadius: '4px', marginBottom: '1.5rem',
           fontSize: '0.8rem', fontWeight: '700',
         }}>
           {msg.text}
@@ -646,14 +646,14 @@ export default function AgendamentosPage() {
       {canViewInventarioGeral && (
         <>
           <InventarioGeralSection onMsg={showMsg} />
-          <hr style={{ margin: '2.5rem 0', border: 'none', borderTop: '2px solid #eee' }} />
+          <hr style={{ margin: '2.5rem 0', border: 'none', borderTop: '2px solid var(--color-border-light)' }} />
         </>
       )}
 
       {isAdmin && (
         <>
           <SubgruposSection />
-          <hr style={{ margin: '2.5rem 0', border: 'none', borderTop: '2px solid #eee' }} />
+          <hr style={{ margin: '2.5rem 0', border: 'none', borderTop: '2px solid var(--color-border-light)' }} />
         </>
       )}
 

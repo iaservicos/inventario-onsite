@@ -97,19 +97,19 @@ export default function FrotasImportPage() {
 
       <div style={{ maxWidth: '600px', marginTop: '2rem' }}>
         {/* Template */}
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#000000', marginBottom: '0.75rem' }}>
+        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
             Template de Importação
           </h3>
-          <p style={{ fontSize: '0.85rem', color: '#666666', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginBottom: '1rem' }}>
             Baixe o template em CSV com os campos necessários
           </p>
           <button
             onClick={downloadTemplate}
             style={{
               padding: '0.5rem 1rem',
-              background: '#000000',
-              color: '#ffffff',
+              background: 'var(--color-text-primary)',
+              color: 'var(--color-bg-primary)',
               border: 'none',
               borderRadius: '3px',
               fontSize: '0.75rem',
@@ -121,13 +121,13 @@ export default function FrotasImportPage() {
         </div>
 
         {/* Upload */}
-        <form onSubmit={handleImport} style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#000000', marginBottom: '0.75rem' }}>
+        <form onSubmit={handleImport} style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
             Selecione o Arquivo
           </h3>
 
           <div style={{
-            border: '2px dashed #cccccc',
+            border: '2px dashed var(--color-border-light)ccc',
             borderRadius: '6px',
             padding: '2rem',
             textAlign: 'center',
@@ -141,13 +141,13 @@ export default function FrotasImportPage() {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #e0e0e0',
+                border: '1px solid var(--color-border-light)',
                 borderRadius: '3px',
                 cursor: 'pointer'
               }}
             />
             {arquivo && (
-              <p style={{ fontSize: '0.85rem', color: '#666666', marginTop: '0.5rem' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem' }}>
                 Arquivo: <strong>{arquivo.name}</strong>
               </p>
             )}
@@ -159,8 +159,8 @@ export default function FrotasImportPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              background: !arquivo || importando ? '#cccccc' : '#000000',
-              color: '#ffffff',
+              background: !arquivo || importando ? 'var(--color-border-light)ccc' : 'var(--color-text-primary)',
+              color: 'var(--color-bg-primary)',
               border: 'none',
               borderRadius: '3px',
               fontSize: '0.9rem',
@@ -188,11 +188,11 @@ export default function FrotasImportPage() {
             }}>
               {resultado.sucesso ? '✓ Sucesso!' : '✗ Erro'}
             </h4>
-            <p style={{ fontSize: '0.85rem', color: '#333333' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
               {resultado.message}
             </p>
             {resultado.sucesso && (
-              <p style={{ fontSize: '0.8rem', color: '#666666', marginTop: '0.5rem' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem' }}>
                 Total de veículos no sistema: <strong>{resultado.total}</strong>
               </p>
             )}
@@ -200,11 +200,11 @@ export default function FrotasImportPage() {
         )}
 
         {/* Instruções */}
-        <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', marginTop: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#000000', marginBottom: '0.75rem' }}>
+        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem', marginTop: '1.5rem' }}>
+          <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
             Instruções
           </h4>
-          <ul style={{ fontSize: '0.85rem', color: '#666666', listStyle: 'none', padding: 0 }}>
+          <ul style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', listStyle: 'none', padding: 0 }}>
             <li style={{ marginBottom: '0.5rem' }}>1. Baixe o template CSV</li>
             <li style={{ marginBottom: '0.5rem' }}>2. Preenchaa com seus dados de veículos</li>
             <li style={{ marginBottom: '0.5rem' }}>3. Campos obrigatórios: placa e modelo</li>

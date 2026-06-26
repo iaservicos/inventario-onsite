@@ -4,14 +4,14 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/ui/PageHeader';
 
-const selSt = { width: '100%', padding: '0.65rem 0.9rem', border: '1px solid #dddddd', borderRadius: '6px', fontSize: '0.82rem', fontWeight: '600', color: '#000', background: '#fff', cursor: 'pointer', outline: 'none' };
+const selSt = { width: '100%', padding: '0.65rem 0.9rem', border: '1px solid var(--color-border-light)', borderRadius: '6px', fontSize: '0.82rem', fontWeight: '600', color: '#000', background: '#fff', cursor: 'pointer', outline: 'none' };
 const labelSt = { fontSize: '0.68rem', fontWeight: '800', color: '#888', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
 function QuantityControl({ value, onChange, disabled }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <button onClick={() => onChange(Math.max(0, value - 1))} disabled={disabled || value <= 0}
-        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: value <= 0 ? '#f8f8f8' : '#fff', color: value <= 0 ? '#ccc' : '#000', fontSize: '1rem', fontWeight: '900', cursor: value <= 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: value <= 0 ? 'var(--color-bg-tertiary)' : '#fff', color: value <= 0 ? 'var(--color-border-light)' : '#000', fontSize: '1rem', fontWeight: '900', cursor: value <= 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
       <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: '800', fontSize: '0.9rem', color: value > 0 ? '#000' : '#bbb' }}>{value}</span>
       <button onClick={() => onChange(value + 1)} disabled={disabled}
         style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
@@ -104,7 +104,7 @@ export default function FerramentalEstoquePage() {
   const hasDirty = Object.values(dirty).some(Boolean);
 
   return (
-    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: '#f8f8f8', fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-tertiary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader title="Estoque por Técnico" subtitle="Controle de ferramentas em posse de cada técnico" />
 
       <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
@@ -160,16 +160,16 @@ export default function FerramentalEstoquePage() {
         </div>
 
         {(filterSup || filterRegion) && (
-          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-bg-tertiary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <span style={{ fontSize: '0.72rem', color: '#888' }}>Filtros ativos:</span>
             {filterSup && (
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: '#f0f0f0', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: 'var(--color-bg-tertiary)', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 {filterSup}
                 <button onClick={() => setFilterSup('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
               </span>
             )}
             {filterRegion && (
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: '#f0f0f0', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: 'var(--color-bg-tertiary)', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 {filterRegion}
                 <button onClick={() => setFilterRegion('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
               </span>
@@ -220,7 +220,7 @@ export default function FerramentalEstoquePage() {
         <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
             <thead>
-              <tr style={{ background: '#f4f4f5', borderBottom: '2px solid #eee' }}>
+              <tr style={{ background: 'var(--color-bg-secondary)', borderBottom: '2px solid #eee' }}>
                 <th style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ferramenta</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Em Posse</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Status</th>
@@ -235,7 +235,7 @@ export default function FerramentalEstoquePage() {
                 const temFerramentas = qty > 0;
 
                 return (
-                  <tr key={item.tool_id} style={{ borderBottom: '1px solid #f0f0f0', background: isDirtyItem ? '#f5f5f5' : idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                  <tr key={item.tool_id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: isDirtyItem ? 'var(--color-bg-tertiary)' : idx % 2 === 0 ? '#fff' : 'var(--color-bg-tertiary)' }}>
                     <td style={{ padding: '0.85rem 1.25rem' }}>
                       <div style={{ fontWeight: '700', color: '#000' }}>{item.tool_name}</div>
                       {item.tool_notes && <div style={{ fontSize: '0.7rem', color: '#555', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
@@ -246,7 +246,7 @@ export default function FerramentalEstoquePage() {
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                       <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
                         color: temFerramentas ? '#000' : '#fff',
-                        background: temFerramentas ? '#e0e0e0' : '#000',
+                        background: temFerramentas ? 'var(--color-border-light)' : '#000',
                       }}>
                         {temFerramentas ? 'Em Posse' : 'Sem Ferramenta'}
                       </span>

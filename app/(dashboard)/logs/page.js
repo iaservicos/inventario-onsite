@@ -74,7 +74,7 @@ export default function LogsPage() {
           {loading ? (
             <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: '#888' }}>
+            <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>
               Nenhum registro encontrado
             </div>
           ) : (
@@ -97,18 +97,18 @@ export default function LogsPage() {
                   const diff = Number(r.physical_qty) - Number(r.system_qty);
                   const isRecount = r.count_number > 1;
                   return (
-                    <tr key={r.id} style={{ background: isRecount ? '#fafafa' : 'transparent' }}>
-                      <td style={{ fontWeight: '800', color: '#000' }}>{r.technicians?.name || '—'}</td>
+                    <tr key={r.id} style={{ background: isRecount ? 'var(--color-bg-tertiary)' : 'transparent' }}>
+                      <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{r.technicians?.name || '—'}</td>
                       <td><span className="badge badge-info">{r.technicians?.region || '—'}</span></td>
                       <td>
-                        <code style={{ fontSize: '0.75rem', background: '#f5f5f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #eee' }}>
+                        <code style={{ fontSize: '0.75rem', background: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--color-border-light)' }}>
                           {r.item_code}
                         </code>
                       </td>
                       <td style={{ fontWeight: '600', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.item_name}</td>
                       <td style={{ textAlign: 'center' }}>
                         {isRecount ? (
-                          <span style={{ fontWeight: '800', fontSize: '0.75rem', background: '#000', color: '#fff', padding: '2px 8px', borderRadius: '999px' }}>
+                          <span style={{ fontWeight: '800', fontSize: '0.75rem', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', padding: '2px 8px', borderRadius: '999px' }}>
                             #{r.count_number}
                           </span>
                         ) : (
@@ -116,11 +116,11 @@ export default function LogsPage() {
                         )}
                       </td>
                       <td style={{ textAlign: 'right', fontWeight: '800' }}>{r.physical_qty}</td>
-                      <td style={{ textAlign: 'right', color: '#666' }}>{r.system_qty}</td>
-                      <td style={{ textAlign: 'right', fontWeight: '800', color: diff !== 0 ? '#000' : '#bbb' }}>
+                      <td style={{ textAlign: 'right', color: 'var(--color-text-tertiary)' }}>{r.system_qty}</td>
+                      <td style={{ textAlign: 'right', fontWeight: '800', color: diff !== 0 ? 'var(--color-text-primary)' : '#bbb' }}>
                         {diff !== 0 ? (diff > 0 ? `+${diff}` : diff) : '—'}
                       </td>
-                      <td style={{ fontSize: '0.78rem', color: '#666', whiteSpace: 'nowrap' }}>
+                      <td style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)', whiteSpace: 'nowrap' }}>
                         {formatDate(r.counted_at)}
                       </td>
                     </tr>
@@ -138,13 +138,13 @@ export default function LogsPage() {
 function KpiCard({ label, value, alert: isAlert }) {
   return (
     <div className="card" style={{
-      border: `1px solid ${isAlert && value > 0 ? '#000' : '#e8e8e8'}`,
-      background: isAlert && value > 0 ? '#000' : '#fff',
+      border: `1px solid ${isAlert && value > 0 ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`,
+      background: isAlert && value > 0 ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
     }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert && value > 0 ? '#fff' : '#888', marginBottom: '0.4rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert && value > 0 ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert && value > 0 ? '#fff' : '#000', lineHeight: 1 }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert && value > 0 ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', lineHeight: 1 }}>
         {value}
       </div>
     </div>

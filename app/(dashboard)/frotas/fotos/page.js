@@ -54,25 +54,25 @@ export default function FotosPage() {
       </div>
 
       {/* Filtro */}
-      <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
+      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Filtrar por placa..."
           value={filters.placa}
           onChange={(e) => setFilters({ ...filters, placa: e.target.value })}
-          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid #e5e5e5', borderRadius: '4px', fontSize: '0.9rem' }}
+          style={{ width: '100%', maxWidth: '300px', padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
         />
       </div>
 
       {/* Grid de Fotos */}
       <div style={{ marginTop: '1.5rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
         ) : fotosPendentes.length === 0 ? (
           <div style={{
             textAlign: 'center',
             padding: '3rem 2rem',
-            color: '#999999'
+            color: 'var(--color-text-tertiary)'
           }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.3 }}>✓</div>
             <div>Nenhuma foto pendente de validação.</div>
@@ -87,8 +87,8 @@ export default function FotosPage() {
               <div
                 key={foto.id}
                 style={{
-                  background: '#ffffff',
-                  border: '1px solid #eeeeee',
+                  background: 'var(--color-bg-primary)',
+                  border: '1px solid var(--color-border-light)',
                   borderRadius: '8px',
                   overflow: 'hidden'
                 }}
@@ -96,12 +96,12 @@ export default function FotosPage() {
                 {/* Imagem */}
                 <div style={{
                   height: '200px',
-                  background: '#f5f5f5',
+                  background: 'var(--color-bg-tertiary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderBottom: '1px solid #eeeeee',
-                  color: '#999999',
+                  borderBottom: '1px solid var(--color-border-light)',
+                  color: 'var(--color-text-tertiary)',
                   fontSize: '0.9rem'
                 }}>
                   Foto Hodômetro
@@ -110,34 +110,34 @@ export default function FotosPage() {
                 {/* Info */}
                 <div style={{ padding: '1rem' }}>
                   <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                       Placa
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#000000', marginBottom: '0.75rem' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--color-bg-secondary)', marginBottom: '0.75rem' }}>
                       {foto.placa}
                     </div>
 
-                    <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                       Motorista
                     </div>
-                    <div style={{ color: '#666666', marginBottom: '0.75rem' }}>
+                    <div style={{ color: 'var(--color-text-tertiary)', marginBottom: '0.75rem' }}>
                       {foto.motorista}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                           Data
                         </div>
-                        <div style={{ color: '#666666', fontSize: '0.9rem' }}>
+                        <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                           {new Date(foto.data).toLocaleDateString('pt-BR')}
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: '#999999', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                           Hodômetro
                         </div>
-                        <div style={{ color: '#666666', fontSize: '0.9rem', fontFamily: "'JetBrains Mono'" }}>
+                        <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', fontFamily: "'JetBrains Mono'" }}>
                           {foto.hodometro} km
                         </div>
                       </div>
@@ -151,8 +151,8 @@ export default function FotosPage() {
                       style={{
                         flex: 1,
                         padding: '0.75rem',
-                        background: '#000000',
-                        color: '#ffffff',
+                        background: 'var(--color-bg-secondary)',
+                        color: 'var(--color-bg-primary)',
                         border: 'none',
                         borderRadius: '4px',
                         fontSize: '0.85rem',
@@ -167,9 +167,9 @@ export default function FotosPage() {
                       style={{
                         flex: 1,
                         padding: '0.75rem',
-                        background: '#f0f0f0',
-                        color: '#333333',
-                        border: '1px solid #dddddd',
+                        background: 'var(--color-bg-tertiary)',
+                        color: 'var(--color-text-secondary)',
+                        border: '1px solid var(--color-border-light)',
                         borderRadius: '4px',
                         fontSize: '0.85rem',
                         fontWeight: '600',
@@ -192,13 +192,15 @@ export default function FotosPage() {
 
 function StatCard({ label, value }) {
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid #333333' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid var(--color-text-secondary)' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
         {value}
       </div>
     </div>
   );
 }
+
+

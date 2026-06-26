@@ -30,12 +30,12 @@ function ModalUsuario({ usuario, onClose, onSaved, saving, supervisores }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-      <div style={{ background: '#ffffff', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #000000' }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f4f4f5' }}>
-          <span style={{ fontSize: '1rem', fontWeight: '900', color: '#000000', textTransform: 'uppercase' }}>
+      <div style={{ background: 'var(--color-bg-primary)', width: '100%', maxWidth: '600px', borderRadius: '8px', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-bg-secondary)' }}>
+          <span style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-text-primary)', textTransform: 'uppercase' }}>
             {usuario ? 'Editar Usuário' : 'Novo Usuário do Sistema'}
           </span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#000000', fontWeight: '900' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: 'var(--color-text-primary)', fontWeight: '900' }}>✕</button>
         </div>
         <form onSubmit={submit} style={{ padding: '1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
@@ -115,8 +115,8 @@ function ModalUsuario({ usuario, onClose, onSaved, saving, supervisores }) {
           )}
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid #e4e4e7' }}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: '#000000', border: 'none', fontWeight: '900' }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving} style={{ border: '1px solid var(--color-border-light)' }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
               {saving ? 'PROCESSANDO...' : usuario ? 'SALVAR ALTERAÇÕES' : 'CRIAR USUÁRIO'}
             </button>
           </div>
@@ -129,13 +129,13 @@ function ModalUsuario({ usuario, onClose, onSaved, saving, supervisores }) {
 function Field({ label, children }) {
   return (
     <div style={{ marginBottom: '0.75rem' }}>
-      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', color: '#000000', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '900', color: 'var(--color-text-primary)', marginBottom: '0.35rem', textTransform: 'uppercase' }}>{label}</label>
       {children}
     </div>
   );
 }
 
-const inputStyle = { border: '1px solid #000000', borderRadius: '4px', fontWeight: '600' };
+const inputStyle = { border: '1px solid var(--color-text-primary)', borderRadius: '4px', fontWeight: '600' };
 const labelMiniStyle = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#71717a', marginBottom: '0.25rem', textTransform: 'uppercase' };
 
 export default function UsuariosPage() {
@@ -243,14 +243,14 @@ export default function UsuariosPage() {
           <button 
             className="btn btn-primary" 
             onClick={() => setModal({ type: 'new', data: null })}
-            style={{ background: '#000000', border: 'none', fontWeight: '900' }}
+            style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}
           >
             + NOVO USUÁRIO
           </button>
         }
       />
 
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid #e4e4e7' }}>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid var(--color-border-light)' }}>
         <div style={{ flex: 1 }}>
           <label style={labelMiniStyle}>Busca</label>
           <input
@@ -264,11 +264,11 @@ export default function UsuariosPage() {
         </div>
       </div>
 
-      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid #e4e4e7' }}>
+      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--color-border-light)' }}>
         <div className="table-wrapper" style={{ border: 'none' }}>
           <table>
             <thead>
-              <tr style={{ background: '#f4f4f5' }}>
+              <tr style={{ background: 'var(--color-bg-secondary)' }}>
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Perfil</th>
@@ -290,10 +290,10 @@ export default function UsuariosPage() {
                     : null;
                   return (
                   <tr key={u.id} style={{ opacity: u.active ? 1 : 0.6 }}>
-                    <td style={{ fontWeight: '800', color: '#000000' }}>{u.name}</td>
+                    <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{u.name}</td>
                     <td style={{ fontWeight: '600' }}>{u.email}</td>
                     <td>
-                      <span className="badge" style={{ textTransform: 'uppercase', background: '#f0f0f0', color: '#000000', border: '1px solid #ccc', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                      <span className="badge" style={{ textTransform: 'uppercase', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-light)', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                         {ROLE_LABELS[u.role] || u.role}
                       </span>
                     </td>
@@ -303,7 +303,7 @@ export default function UsuariosPage() {
                       ) : '—'}
                     </td>
                     <td>
-                      <span className="badge" style={{ textTransform: 'uppercase', background: u.active ? '#000000' : '#ffffff', color: u.active ? '#ffffff' : '#000000', border: '1px solid #000000', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                      <span className="badge" style={{ textTransform: 'uppercase', background: u.active ? 'var(--color-text-primary)' : 'var(--color-bg-primary)', color: u.active ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', border: '1px solid var(--color-text-primary)', fontWeight: '800', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                         {u.active ? 'ATIVO' : 'INATIVO'}
                       </span>
                     </td>
@@ -311,7 +311,7 @@ export default function UsuariosPage() {
                     <td style={{ textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                       <button 
                         className="btn btn-secondary" 
-                        style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid #000000', background: '#ffffff', color: '#000000' }} 
+                        style={{ padding: '0.3rem 0.8rem', fontWeight: '800', border: '1px solid var(--color-text-primary)', background: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }} 
                         onClick={() => setModal({ type: 'edit', data: u })}
                       >
                         EDITAR
@@ -322,9 +322,9 @@ export default function UsuariosPage() {
                           style={{ 
                             padding: '0.3rem 0.8rem', 
                             fontWeight: '800', 
-                            border: '1px solid #000000',
-                            background: '#ffffff',
-                            color: '#000000'
+                            border: '1px solid var(--color-text-primary)',
+                            background: 'var(--color-bg-primary)',
+                            color: 'var(--color-text-primary)'
                           }} 
                           onClick={() => toggleActive(u)}
                         >

@@ -29,10 +29,10 @@ const TYPE_ICON = {
 };
 
 const SEVERITY_STYLE = {
-  low:      { border: '#ddd',  bg: '#fff',   label: 'Baixo' },
-  medium:   { border: '#888',  bg: '#fff',   label: 'Médio' },
-  high:     { border: '#333',  bg: '#fafafa', label: 'Alto' },
-  critical: { border: '#000',  bg: '#000',   label: 'Crítico', dark: true },
+  low:      { border: 'var(--color-border-light)',  bg: 'var(--color-bg-primary)',   label: 'Baixo' },
+  medium:   { border: 'var(--color-text-tertiary)',  bg: 'var(--color-bg-primary)',   label: 'Médio' },
+  high:     { border: 'var(--color-text-secondary)',  bg: 'var(--color-bg-tertiary)', label: 'Alto' },
+  critical: { border: 'var(--color-text-primary)',  bg: 'var(--color-text-primary)',   label: 'Crítico', dark: true },
 };
 
 const statusOptions = [
@@ -147,13 +147,13 @@ export default function AlertasPage() {
             <div className="card" style={{ textAlign: 'center', padding: '4rem' }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>✓</div>
               <div style={{ fontWeight: '800', fontSize: '1rem' }}>Nenhum alerta ativo</div>
-              <div style={{ color: '#888', fontSize: '0.85rem', marginTop: '0.25rem' }}>Todos os inventários estão dentro do esperado</div>
+              <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>Todos os inventários estão dentro do esperado</div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {/* Peças de outro subgrupo primeiro — são as mais críticas para o supervisor */}
               {surplusSubgroup.length > 0 && !filters.status && (
-                <div style={{ fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#888', marginBottom: '0.25rem', marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-tertiary)', marginBottom: '0.25rem', marginTop: '0.5rem' }}>
                   Peças de outro subgrupo
                 </div>
               )}
@@ -162,7 +162,7 @@ export default function AlertasPage() {
               ))}
 
               {outros.length > 0 && !filters.status && surplusSubgroup.length > 0 && (
-                <div style={{ fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#888', marginBottom: '0.25rem', marginTop: '0.75rem' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-tertiary)', marginBottom: '0.25rem', marginTop: '0.75rem' }}>
                   Outros alertas
                 </div>
               )}
@@ -194,7 +194,7 @@ function AlertCard({ alert: a, onResolve, resolving, isResolved, getElapsed }) {
 
   return (
     <div style={{
-      background: isResolved ? '#fafafa' : sev.bg,
+      background: isResolved ? 'var(--color-bg-tertiary)' : sev.bg,
       border: `1px solid ${sev.border}`,
       borderLeft: `4px solid ${sev.border}`,
       borderRadius: '6px',
@@ -211,32 +211,32 @@ function AlertCard({ alert: a, onResolve, resolving, isResolved, getElapsed }) {
           <span style={{
             fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em',
             padding: '2px 7px', borderRadius: '4px',
-            background: sev.dark ? '#fff' : '#000',
-            color: sev.dark ? '#000' : '#fff',
+            background: sev.dark ? 'var(--color-bg-primary)' : 'var(--color-text-primary)',
+            color: sev.dark ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
           }}>
             {sev.label}
           </span>
           <span style={{
-            fontSize: '0.7rem', fontWeight: '700', color: '#555',
-            background: '#f0f0f0', padding: '2px 8px', borderRadius: '4px',
+            fontSize: '0.7rem', fontWeight: '700', color: 'var(--color-text-secondary)',
+            background: 'var(--color-bg-tertiary)', padding: '2px 8px', borderRadius: '4px',
           }}>
             {TYPE_ICON[a.type] || '•'} {TYPE_LABELS[a.type] || a.type}
           </span>
           {!isResolved && elapsed >= 4 && (
-            <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#fff', background: '#333', padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-primary)', background: 'var(--color-text-secondary)', padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.04em' }}>
               PENDENTE {Math.floor(elapsed)}H
             </span>
           )}
         </div>
 
-        <div style={{ fontWeight: '800', color: '#000', marginBottom: '0.25rem', fontSize: '0.9rem' }}>{a.title}</div>
+        <div style={{ fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '0.25rem', fontSize: '0.9rem' }}>{a.title}</div>
 
         {a.description && (
-          <div style={{ fontSize: '0.8rem', color: '#444', marginBottom: '0.375rem', lineHeight: 1.5 }}>{a.description}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: '0.375rem', lineHeight: 1.5 }}>{a.description}</div>
         )}
 
-        <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.72rem', color: '#888', fontWeight: '600', flexWrap: 'wrap' }}>
-          {a.technicians?.name && <span>Técnico: <strong style={{ color: '#000' }}>{a.technicians.name}</strong></span>}
+        <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.72rem', color: 'var(--color-text-tertiary)', fontWeight: '600', flexWrap: 'wrap' }}>
+          {a.technicians?.name && <span>Técnico: <strong style={{ color: 'var(--color-text-primary)' }}>{a.technicians.name}</strong></span>}
           <span>{getElapsed(a.created_at)}</span>
           {isResolved && a.resolved_by && <span>Resolvido por: {a.resolved_by}</span>}
           {isResolved && a.resolved_at && <span>em {formatDate(a.resolved_at)}</span>}
@@ -260,13 +260,13 @@ function AlertCard({ alert: a, onResolve, resolving, isResolved, getElapsed }) {
 function KpiCard({ label, value, alert: isAlert }) {
   return (
     <div className="card" style={{
-      border: `1px solid ${isAlert ? '#000' : '#e8e8e8'}`,
-      background: isAlert ? '#000' : '#fff',
+      border: `1px solid ${isAlert ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`,
+      background: isAlert ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
     }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert ? '#fff' : '#888', marginBottom: '0.4rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert ? '#fff' : '#000', lineHeight: 1 }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', lineHeight: 1 }}>
         {value}
       </div>
     </div>

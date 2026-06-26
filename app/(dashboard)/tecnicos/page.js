@@ -87,7 +87,7 @@ export default function TecnicosPage() {
 
           {/* Tabela de técnicos */}
           <div className="card" style={{ padding: 0, marginBottom: '2rem' }}>
-            <div style={{ padding: '1rem 1.5rem', borderBottom: '2px solid #000', background: '#f9f9f9', borderRadius: '8px 8px 0 0' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', background: '#f9f9f9', borderRadius: '8px 8px 0 0' }}>
               <span style={{ fontSize: '0.85rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Desempenho por Técnico
               </span>
@@ -108,7 +108,7 @@ export default function TecnicosPage() {
                 </thead>
                 <tbody>
                   {byTech.length === 0 ? (
-                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700', color: '#888' }}>Nenhum dado no período</td></tr>
+                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '3rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>Nenhum dado no período</td></tr>
                   ) : byTech.map((t) => (
                     <Fragment key={t.id}>
                       <tr
@@ -133,7 +133,7 @@ export default function TecnicosPage() {
                         <td style={{ textAlign: 'center' }}>
                           <span style={{
                             display: 'inline-block', minWidth: '28px', padding: '2px 8px',
-                            background: t.corretos > 0 ? '#000' : '#f0f0f0',
+                            background: t.corretos > 0 ? '#000' : 'var(--color-bg-tertiary)',
                             color: t.corretos > 0 ? '#fff' : '#999',
                             borderRadius: '999px', fontSize: '0.75rem', fontWeight: '800',
                           }}>{t.corretos}</span>
@@ -141,7 +141,7 @@ export default function TecnicosPage() {
                         <td style={{ textAlign: 'center' }}>
                           <span style={{
                             display: 'inline-block', minWidth: '28px', padding: '2px 8px',
-                            background: t.comDiv > 0 ? '#555' : '#f0f0f0',
+                            background: t.comDiv > 0 ? '#555' : 'var(--color-bg-tertiary)',
                             color: t.comDiv > 0 ? '#fff' : '#999',
                             borderRadius: '999px', fontSize: '0.75rem', fontWeight: '800',
                           }}>{t.comDiv}</span>
@@ -149,7 +149,7 @@ export default function TecnicosPage() {
                         <td style={{ textAlign: 'center' }}>
                           <span style={{
                             display: 'inline-block', minWidth: '28px', padding: '2px 8px',
-                            background: t.recontagens > 0 ? '#888' : '#f0f0f0',
+                            background: t.recontagens > 0 ? '#888' : 'var(--color-bg-tertiary)',
                             color: t.recontagens > 0 ? '#fff' : '#999',
                             borderRadius: '999px', fontSize: '0.75rem', fontWeight: '700',
                           }}>{t.recontagens}</span>
@@ -172,10 +172,10 @@ export default function TecnicosPage() {
                       {/* Linha expandida: inventários do técnico */}
                       {expanded === t.id && (
                         <tr>
-                          <td colSpan={8} style={{ padding: 0, background: '#fafafa', borderBottom: '2px solid #eee' }}>
+                          <td colSpan={8} style={{ padding: 0, background: 'var(--color-bg-tertiary)', borderBottom: '2px solid #eee' }}>
                             <table style={{ width: '100%', fontSize: '0.8rem' }}>
                               <thead>
-                                <tr style={{ background: '#f0f0f0' }}>
+                                <tr style={{ background: 'var(--color-bg-tertiary)' }}>
                                   <th style={{ padding: '0.4rem 1rem' }}>Semana</th>
                                   <th style={{ padding: '0.4rem 0.5rem' }}>Status</th>
                                   <th style={{ padding: '0.4rem 0.5rem', textAlign: 'center' }}>Progresso</th>
@@ -190,7 +190,7 @@ export default function TecnicosPage() {
                                     ? Math.round((inv.counted_items / inv.total_items) * 100)
                                     : 0;
                                   return (
-                                    <tr key={inv.id} style={{ borderTop: '1px solid #eee' }}>
+                                    <tr key={inv.id} style={{ borderTop: '1px solid var(--color-border-light)' }}>
                                       <td style={{ padding: '0.5rem 1rem', fontWeight: '700' }}>{inv.week_ref || '—'}</td>
                                       <td style={{ padding: '0.5rem' }}><StatusBadge status={inv.status} /></td>
                                       <td style={{ padding: '0.5rem', textAlign: 'center' }}>
@@ -204,8 +204,8 @@ export default function TecnicosPage() {
                                       <td style={{ padding: '0.5rem', textAlign: 'center', fontWeight: '800', color: inv.divergence_count > 0 ? '#000' : '#bbb' }}>
                                         {inv.divergence_count}
                                       </td>
-                                      <td style={{ padding: '0.5rem', color: '#666' }}>{formatDuration(inv.started_at, inv.completed_at)}</td>
-                                      <td style={{ padding: '0.5rem 1rem', color: '#666' }}>{formatDate(inv.started_at || inv.created_at)}</td>
+                                      <td style={{ padding: '0.5rem', color: 'var(--color-text-tertiary)' }}>{formatDuration(inv.started_at, inv.completed_at)}</td>
+                                      <td style={{ padding: '0.5rem 1rem', color: 'var(--color-text-tertiary)' }}>{formatDate(inv.started_at || inv.created_at)}</td>
                                     </tr>
                                   );
                                 })}
@@ -229,13 +229,13 @@ export default function TecnicosPage() {
 function KpiCard({ label, value, highlight, alert }) {
   return (
     <div className="card" style={{
-      border: `1px solid ${alert ? '#000' : '#e8e8e8'}`,
-      background: alert ? '#000' : '#fff',
+      border: `1px solid ${alert ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`,
+      background: alert ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
     }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: alert ? '#fff' : '#888', marginBottom: '0.4rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: alert ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: alert ? '#fff' : '#000', lineHeight: 1 }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: alert ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', lineHeight: 1 }}>
         {value}
       </div>
     </div>

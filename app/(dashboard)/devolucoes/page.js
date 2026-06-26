@@ -275,7 +275,7 @@ export default function DevolucoesPage() {
 
       {syncMsg && (
         <div style={{
-          padding: '0.6rem 0.75rem', background: '#f0f0f0', color: '#000',
+          padding: '0.6rem 0.75rem', background: 'var(--color-bg-tertiary)', color: '#000',
           border: '1px solid #000', borderRadius: '4px', marginBottom: '1rem',
           fontSize: '0.8rem', fontWeight: '700',
         }}>

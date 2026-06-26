@@ -89,49 +89,49 @@ export default function FrotasPage() {
       />
 
       {/* Tabela */}
-      <div style={{ background: '#ffffff', borderRadius: '6px', overflow: 'hidden', border: '1px solid #eeeeee', marginTop: '1rem' }}>
+      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-light)', marginTop: '1rem' }}>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Carregando frotas...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando frotas...</div>
         ) : frotas.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#666666' }}>Nenhum veículo encontrado</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhum veículo encontrado</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#ffffff' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-primary)' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Placa
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Modelo
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Ano
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     KM
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Status
                   </th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Ações
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {frotas.map((frota) => (
-                  <tr key={frota.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: '#333333', fontFamily: "'JetBrains Mono'" }}>
+                  <tr key={frota.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)' }}>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-secondary)', fontFamily: "'JetBrains Mono'" }}>
                       {frota.placa}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#333333' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-secondary)' }}>
                       {frota.modelo}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>
                       {frota.ano}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: '#666666', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
                       {frota.kmAtual.toLocaleString('pt-BR')}
                     </td>
                     <td style={{ padding: '1rem' }}>
@@ -141,8 +141,8 @@ export default function FrotasPage() {
                       <Link href={`/frotas/veiculos/${frota.id}`}>
                         <button style={{
                           padding: '0.4rem 0.75rem',
-                          background: '#000000',
-                          color: '#ffffff',
+                          background: 'var(--color-bg-secondary)',
+                          color: 'var(--color-bg-primary)',
                           border: 'none',
                           borderRadius: '3px',
                           fontSize: '0.7rem',
@@ -156,9 +156,9 @@ export default function FrotasPage() {
                         onClick={() => deletarVeiculo(frota.id)}
                         style={{
                           padding: '0.4rem 0.75rem',
-                          background: '#f0f0f0',
-                          color: '#333333',
-                          border: '1px solid #e0e0e0',
+                          background: 'var(--color-bg-tertiary)',
+                          color: 'var(--color-text-secondary)',
+                          border: '1px solid var(--color-border-light)',
                           borderRadius: '3px',
                           fontSize: '0.7rem',
                           cursor: 'pointer',
@@ -180,13 +180,15 @@ export default function FrotasPage() {
 
 function KPICard({ label, value }) {
   return (
-    <div style={{ background: '#ffffff', border: '1px solid #eeeeee', borderRadius: '6px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+    <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: '#000000' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
         {value}
       </div>
     </div>
   );
 }
+
+

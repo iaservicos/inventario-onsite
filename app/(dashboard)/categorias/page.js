@@ -1,8 +1,10 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 function IconInventario() {
   return (
@@ -114,6 +116,35 @@ function CategoriaCard({ titulo, descricao, icon: Icon, href, temAcesso }) {
 export default function CategoriasPage() {
   const { data: session, status } = useSession();
 
+  useEffect(() => {
+    // Forçar Dark Mode na página de categorias
+    localStorage.setItem('theme', 'dark');
+
+    const root = document.documentElement;
+    const darkTheme = {
+      bg_primary: '#0d1117',
+      bg_secondary: '#161b22',
+      bg_tertiary: '#21262d',
+      sidebar_bg: '#0d1117',
+      text_primary: '#c9d1d9',
+      text_secondary: '#e0e0e0',
+      text_tertiary: '#8b949e',
+      text_disabled: '#6e7681',
+      border_light: '#30363d',
+      border_default: '#444c56',
+      border_dark: '#6e7681',
+      accent: '#39c5cf',
+      accent_hover: '#1f8f9c',
+    };
+
+    Object.entries(darkTheme).forEach(([key, value]) => {
+      root.style.setProperty(`--color-${key}`, value);
+    });
+
+    document.body.style.backgroundColor = '#0d1117';
+    document.body.style.color = '#c9d1d9';
+  }, []);
+
   if (status === 'loading') {
     return <div style={{ padding: '2rem', textAlign: 'center', fontWeight: '700' }}>Carregando...</div>;
   }
@@ -134,30 +165,43 @@ export default function CategoriasPage() {
 
   return (
     <div style={{
-      padding: '3rem 2rem',
+      padding: 0,
       width: '100%',
       minHeight: '100vh',
       background: 'var(--color-bg-primary)',
       color: 'var(--color-text-primary)',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       {/* Header */}
-      <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+      <div style={{
+        padding: '2rem',
+        textAlign: 'center',
+        borderBottom: '1px solid var(--color-border-light)',
+      }}>
         <h1 style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-text-primary)', margin: '0 0 0.5rem' }}>
           Bem-vindo ao Portal
         </h1>
         <p style={{ fontSize: '1rem', color: 'var(--color-text-tertiary)', margin: 0 }}>
-          Olá, <strong>{session.user.name}</strong>. Selecione uma categoria para começar.
+          Selecione uma categoria para começar
         </p>
       </div>
 
-      {/* Grid de categorias */}
+      {/* Main content - Grid de categorias */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '2rem',
-        maxWidth: '1200px',
-        margin: '0 auto',
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '3rem 2rem',
       }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2rem',
+          maxWidth: '1200px',
+          width: '100%',
+        }}>
         <CategoriaCard
           titulo="Inventário & Peças"
           descricao="Gerencie inventários, peças novas, peças usadas e agendamentos"
@@ -189,6 +233,67 @@ export default function CategoriasPage() {
           href="/cadastro-tecnicos"
           temAcesso={permissoes.cadastro}
         />
+        </div>
+      </div>
+
+      {/* Footer com user info */}
+      <div style={{
+        padding: '1rem 2rem',
+        borderTop: '1px solid var(--color-border-light)',
+        background: 'var(--color-bg-secondary)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            background: 'var(--color-bg-tertiary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.75rem',
+            fontWeight: '700',
+            color: 'var(--color-text-primary)',
+          }}>
+            {session.user.name?.charAt(0)?.toUpperCase()}
+          </div>
+          <div style={{ overflow: 'hidden' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>
+              {session.user.name}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <ThemeToggle />
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--color-border-default)',
+              borderRadius: '6px',
+              padding: '0.5rem 0.75rem',
+              cursor: 'pointer',
+              color: 'var(--color-text-tertiary)',
+              fontSize: '0.7rem',
+              fontWeight: '700',
+              transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border-dark)';
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border-default)';
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+            }}
+          >
+            Sair
+          </button>
+        </div>
       </div>
     </div>
   );

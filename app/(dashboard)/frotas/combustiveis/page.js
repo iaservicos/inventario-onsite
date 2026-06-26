@@ -36,13 +36,13 @@ export default function CombustiveisPage() {
   return (
     <div style={{ padding: '2rem', width: '100%' }}>
       <PageHeader
-        title="Combustíveis"
+        title="CombustÃ­veis"
         subtitle="Resumo de consumo importado"
       />
 
       <div style={{ maxWidth: '1200px', marginTop: '2rem' }}>
         {loading && (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#666666' }}>
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-tertiary)' }}>
             Carregando dados...
           </div>
         )}
@@ -50,11 +50,11 @@ export default function CombustiveisPage() {
         {error && (
           <div
             style={{
-              background: '#fef2f2',
-              border: '1px solid #f8d7da',
+              background: 'var(--color-error)',
+              border: '1px solid var(--color-error)',
               borderRadius: '6px',
               padding: '1rem',
-              color: '#721c24',
+              color: 'var(--color-error)',
               marginBottom: '1.5rem'
             }}>
             {error}
@@ -70,60 +70,60 @@ export default function CombustiveisPage() {
             }}>
             <div
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
+                background: 'var(--color-bg-primary)',
+                border: '1px solid var(--color-border-light)',
                 borderRadius: '6px',
                 padding: '1.5rem'
               }}>
-              <div style={{ fontSize: '0.85rem', color: '#999999', fontWeight: '700', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
                 TOTAL DE REGISTROS
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000000' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
                 {stats.total}
               </div>
             </div>
 
             <div
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
+                background: 'var(--color-bg-primary)',
+                border: '1px solid var(--color-border-light)',
                 borderRadius: '6px',
                 padding: '1.5rem'
               }}>
-              <div style={{ fontSize: '0.85rem', color: '#999999', fontWeight: '700', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
                 TOTAL GASTO
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000000' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
                 R$ {stats.totalGasto.toFixed(2)}
               </div>
             </div>
 
             <div
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
+                background: 'var(--color-bg-primary)',
+                border: '1px solid var(--color-border-light)',
                 borderRadius: '6px',
                 padding: '1.5rem'
               }}>
-              <div style={{ fontSize: '0.85rem', color: '#999999', fontWeight: '700', marginBottom: '0.5rem' }}>
-                CONSUMO MÉDIO
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
+                CONSUMO MÃ‰DIO
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000000' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
                 {stats.consumoMedio.toFixed(2)} L
               </div>
             </div>
 
             <div
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
+                background: 'var(--color-bg-primary)',
+                border: '1px solid var(--color-border-light)',
                 borderRadius: '6px',
                 padding: '1.5rem'
               }}>
-              <div style={{ fontSize: '0.85rem', color: '#999999', fontWeight: '700', marginBottom: '0.5rem' }}>
-                DISTÂNCIA MÉDIA
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
+                DISTÃ‚NCIA MÃ‰DIA
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#000000' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
                 {stats.distanciaMedia.toFixed(0)} km
               </div>
             </div>
@@ -133,3 +133,4 @@ export default function CombustiveisPage() {
     </div>
   );
 }
+

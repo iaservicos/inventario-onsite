@@ -71,7 +71,7 @@ export default function FinanceiroCadastroPage() {
       <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
         {/* Placa */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#333333', marginBottom: '0.5rem' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
             Placa do Veículo *
           </label>
           <input
@@ -83,7 +83,7 @@ export default function FinanceiroCadastroPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #e5e5e5',
+              border: '1px solid var(--color-border-light)',
               borderRadius: '4px',
               fontSize: '0.9rem',
               boxSizing: 'border-box'
@@ -93,7 +93,7 @@ export default function FinanceiroCadastroPage() {
 
         {/* Tipo */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#333333', marginBottom: '0.5rem' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
             Tipo de Despesa *
           </label>
           <select
@@ -103,7 +103,7 @@ export default function FinanceiroCadastroPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #e5e5e5',
+              border: '1px solid var(--color-border-light)',
               borderRadius: '4px',
               fontSize: '0.9rem',
               boxSizing: 'border-box'
@@ -117,7 +117,7 @@ export default function FinanceiroCadastroPage() {
 
         {/* Data */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#333333', marginBottom: '0.5rem' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
             Data da Despesa
           </label>
           <input
@@ -128,7 +128,7 @@ export default function FinanceiroCadastroPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #e5e5e5',
+              border: '1px solid var(--color-border-light)',
               borderRadius: '4px',
               fontSize: '0.9rem',
               boxSizing: 'border-box'
@@ -138,7 +138,7 @@ export default function FinanceiroCadastroPage() {
 
         {/* Descrição */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#333333', marginBottom: '0.5rem' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
             Descrição
           </label>
           <textarea
@@ -150,7 +150,7 @@ export default function FinanceiroCadastroPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #e5e5e5',
+              border: '1px solid var(--color-border-light)',
               borderRadius: '4px',
               fontSize: '0.9rem',
               boxSizing: 'border-box',
@@ -161,7 +161,7 @@ export default function FinanceiroCadastroPage() {
 
         {/* Valor */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#333333', marginBottom: '0.5rem' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
             Valor (R$) *
           </label>
           <input
@@ -175,7 +175,7 @@ export default function FinanceiroCadastroPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #e5e5e5',
+              border: '1px solid var(--color-border-light)',
               borderRadius: '4px',
               fontSize: '0.9rem',
               boxSizing: 'border-box',
@@ -191,9 +191,9 @@ export default function FinanceiroCadastroPage() {
             marginBottom: '1rem',
             borderRadius: '4px',
             fontSize: '0.9rem',
-            background: message.includes('✓') ? '#f0f9ff' : '#fef2f2',
-            color: message.includes('✓') ? '#0369a1' : '#dc2626',
-            border: `1px solid ${message.includes('✓') ? '#bfdbfe' : '#fecaca'}`
+            background: message.includes('✓') ? 'var(--color-success)' : 'var(--color-error)',
+            color: message.includes('✓') ? 'var(--color-success)' : 'var(--color-error)',
+            border: `1px solid ${message.includes('✓') ? 'var(--color-success)' : 'var(--color-error)'}`
           }}>
             {message}
           </div>
@@ -207,8 +207,8 @@ export default function FinanceiroCadastroPage() {
             style={{
               flex: 1,
               padding: '0.75rem 1rem',
-              background: loading ? '#cccccc' : '#000000',
-              color: '#ffffff',
+              background: loading ? 'var(--color-bg-secondary)' : 'var(--color-bg-secondary)',
+              color: 'var(--color-bg-primary)',
               border: 'none',
               borderRadius: '4px',
               fontSize: '0.9rem',
@@ -225,9 +225,9 @@ export default function FinanceiroCadastroPage() {
             style={{
               flex: 1,
               padding: '0.75rem 1rem',
-              background: '#f0f0f0',
-              color: '#333333',
-              border: '1px solid #dddddd',
+              background: 'var(--color-bg-tertiary)',
+              color: 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border-light)',
               borderRadius: '4px',
               fontSize: '0.9rem',
               fontWeight: '600',
@@ -242,3 +242,5 @@ export default function FinanceiroCadastroPage() {
     </div>
   );
 }
+
+
