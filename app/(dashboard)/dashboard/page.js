@@ -126,23 +126,6 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Padrão de Grid Tech */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 0,
-          backgroundImage: `
-            linear-gradient(0deg, transparent 24%, rgba(38, 208, 206, 0.05) 25%, rgba(38, 208, 206, 0.05) 26%, transparent 27%, transparent 74%, rgba(38, 208, 206, 0.05) 75%, rgba(38, 208, 206, 0.05) 76%, transparent 77%, transparent),
-            linear-gradient(90deg, transparent 24%, rgba(38, 208, 206, 0.05) 25%, rgba(38, 208, 206, 0.05) 26%, transparent 27%, transparent 74%, rgba(38, 208, 206, 0.05) 75%, rgba(38, 208, 206, 0.05) 76%, transparent 77%, transparent)
-          `,
-          backgroundSize: '50px 50px',
-          pointerEvents: 'none',
-        }}
-      />
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem', position: 'relative', zIndex: 1 }}>
         <PageHeader
           title="Dashboard"
