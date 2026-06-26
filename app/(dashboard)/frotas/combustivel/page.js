@@ -128,28 +128,30 @@ export default function CombustvelPage() {
     <DashboardLayout
       title="Combustível Serviço"
       subtitle="Consumo, gastos e eficiência por veículo e motorista"
-      actions={
-        <button
-          onClick={() => router.push('/frotas/combustivel-import')}
-          style={{
-            padding: '0.6rem 1.2rem',
-            background: 'var(--color-accent-cyan)',
-            color: 'var(--color-bg-primary)',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            transition: 'all 0.3s'
-          }}
-          onMouseOver={(e) => (e.target.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.4)')}
-          onMouseOut={(e) => (e.target.style.boxShadow = 'none')}>
-          Importar Relatório
-        </button>
-      }
+    >
+      <div style={{ width: '100%' }}>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => router.push('/frotas/combustivel-import')}
+            style={{
+              padding: '0.6rem 1.2rem',
+              background: 'var(--color-accent-cyan)',
+              color: 'var(--color-bg-primary)',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.3s'
+            }}
+            onMouseOver={(e) => (e.target.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.4)')}
+            onMouseOut={(e) => (e.target.style.boxShadow = 'none')}>
+            Importar Relatório
+          </button>
+        </div>
 
-      {/* KPIs */}
+        {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
         <KPICard label="Total Gasto" value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalGasto)} />
         <KPICard label="Litros" value={parseFloat(stats.totalLitros).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' L'} />
