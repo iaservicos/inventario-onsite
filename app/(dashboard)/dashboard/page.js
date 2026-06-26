@@ -38,38 +38,31 @@ const GridPattern = () => (
   </svg>
 );
 
-// Elementos Tecnológicos
-const TechElements = () => (
+// Elementos Elegantes Sutis
+const ElegantElements = () => (
   <div style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, overflow: 'hidden', zIndex: 0 }}>
-    {/* Quadrado Tech Top Right */}
-    <svg style={{ position: 'absolute', top: '20px', right: '20px', opacity: 0.15 }} width="80" height="80" viewBox="0 0 80 80">
-      <rect x="0" y="0" width="80" height="80" fill="none" stroke="#26d0ce" strokeWidth="1.5" />
-      <rect x="15" y="15" width="50" height="50" fill="none" stroke="#26d0ce" strokeWidth="1" />
-      <rect x="30" y="30" width="20" height="20" fill="none" stroke="#26d0ce" strokeWidth="0.8" />
+    {/* Corner Accent Top Right */}
+    <svg style={{ position: 'absolute', top: 0, right: 0, opacity: 0.08 }} width="120" height="120" viewBox="0 0 120 120">
+      <path d="M 0 20 L 20 0 L 120 0" fill="none" stroke="#26d0ce" strokeWidth="1" />
+      <path d="M 0 40 L 40 0" fill="none" stroke="#26d0ce" strokeWidth="0.8" />
     </svg>
 
-    {/* Círculos Concêntricos Bottom Left */}
-    <svg style={{ position: 'absolute', bottom: '-30px', left: '-30px', opacity: 0.12 }} width="150" height="150" viewBox="0 0 150 150">
-      <circle cx="75" cy="75" r="70" fill="none" stroke="#26d0ce" strokeWidth="1" />
-      <circle cx="75" cy="75" r="50" fill="none" stroke="#26d0ce" strokeWidth="1" />
-      <circle cx="75" cy="75" r="30" fill="none" stroke="#26d0ce" strokeWidth="1" />
-      <circle cx="75" cy="75" r="10" fill="none" stroke="#26d0ce" strokeWidth="1" />
-    </svg>
+    {/* Accent Line Bottom */}
+    <div style={{
+      position: 'absolute',
+      bottom: 0,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '200px',
+      height: '1px',
+      background: 'linear-gradient(90deg, transparent, rgba(38, 208, 206, 0.2), transparent)',
+      opacity: 0.6,
+    }} />
 
-    {/* Linhas Diagonais Top Left */}
-    <svg style={{ position: 'absolute', top: '10px', left: '10px', opacity: 0.1 }} width="120" height="120" viewBox="0 0 120 120">
-      <line x1="0" y1="0" x2="120" y2="120" stroke="#26d0ce" strokeWidth="1" />
-      <line x1="20" y1="0" x2="120" y2="100" stroke="#26d0ce" strokeWidth="1" />
-      <line x1="0" y1="20" x2="100" y2="120" stroke="#26d0ce" strokeWidth="1" />
-      <line x1="0" y1="120" x2="120" y2="0" stroke="#26d0ce" strokeWidth="1" />
-      <line x1="20" y1="120" x2="120" y2="20" stroke="#26d0ce" strokeWidth="1" />
-    </svg>
-
-    {/* Quadrado Tech Bottom Right */}
-    <svg style={{ position: 'absolute', bottom: '40px', right: '40px', opacity: 0.1 }} width="60" height="60" viewBox="0 0 60 60">
-      <rect x="0" y="0" width="60" height="60" fill="none" stroke="#26d0ce" strokeWidth="1.2" />
-      <line x1="0" y1="30" x2="60" y2="30" stroke="#26d0ce" strokeWidth="0.8" />
-      <line x1="30" y1="0" x2="30" y2="60" stroke="#26d0ce" strokeWidth="0.8" />
+    {/* Subtle Corner Bottom Left */}
+    <svg style={{ position: 'absolute', bottom: 0, left: 0, opacity: 0.07 }} width="100" height="100" viewBox="0 0 100 100">
+      <path d="M 100 0 L 0 0 L 0 40" fill="none" stroke="#26d0ce" strokeWidth="0.8" />
+      <circle cx="0" cy="0" r="8" fill="none" stroke="#26d0ce" strokeWidth="0.6" />
     </svg>
   </div>
 );
@@ -218,7 +211,7 @@ export default function DashboardPage() {
               overflow: 'hidden',
             }}>
               <GridPattern />
-              <TechElements />
+              <ElegantElements />
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{
                   display: 'flex',

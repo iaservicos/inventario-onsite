@@ -117,37 +117,39 @@ export default function Sidebar({ user, isOpen }) {
       <div style={{ padding: '1.5rem 1rem 1rem', borderBottom: '1.5px solid var(--color-border-light)' }}>
         <Link href="/categorias" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none' }}>
           <div style={{
-            background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, transparent 100%)',
-            padding: '0.75rem',
-            borderRadius: '8px',
+            background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.12) 0%, transparent 100%)',
+            padding: '1rem',
+            borderRadius: '12px',
             display: 'flex',
             justifyContent: 'center',
-            border: '1.5px solid rgba(0, 212, 255, 0.4)',
-            boxShadow: '0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.08)',
+            alignItems: 'center',
+            border: '1px solid rgba(38, 208, 206, 0.3)',
+            boxShadow: '0 0 20px rgba(38, 208, 206, 0.15)',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             width: '100%',
+            minHeight: '60px',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.8)';
-            e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 10px rgba(0, 212, 255, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.6)';
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(38, 208, 206, 0.25)';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.18) 0%, transparent 100%)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.4)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.08)';
+            e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.3)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(38, 208, 206, 0.15)';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.12) 0%, transparent 100%)';
           }}>
-            <Image
+            <img
               src="https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-(1).png"
               alt="Positivo Tecnologia"
-              width={200}
-              height={50}
               style={{
-                objectFit: 'contain',
-                maxWidth: '100%',
+                maxWidth: '170px',
                 height: 'auto',
-                filter: 'brightness(1.15) contrast(1.1)',
+                maxHeight: '45px',
+                objectFit: 'contain',
+                filter: 'brightness(1.1)',
               }}
-              priority
             />
           </div>
         </Link>
