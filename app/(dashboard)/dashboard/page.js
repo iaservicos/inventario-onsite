@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -18,11 +18,11 @@ function formatDateShort(date) {
 }
 
 const STATUS_COLORS = {
-  completed:       'var(--color-accent)',
-  in_progress:     'var(--color-info)',
-  abandoned:       'var(--color-error)',
+  completed: 'var(--color-accent)',
+  in_progress: 'var(--color-info)',
+  abandoned: 'var(--color-error)',
   recount_pending: 'var(--color-warning)',
-  pending:         'var(--color-text-tertiary)',
+  pending: 'var(--color-text-tertiary)',
 };
 
 export default function DashboardPage() {
@@ -71,37 +71,21 @@ export default function DashboardPage() {
   const alerts = data?.alerts || [];
 
   const pieData = [
-    { name: 'Concluido',    value: kpis.completed || 0,       color: STATUS_COLORS.completed },
-    { name: 'Em Andamento', value: kpis.in_progress || 0,     color: STATUS_COLORS.in_progress },
-    { name: 'Abandonado',   value: kpis.abandoned || 0,       color: STATUS_COLORS.abandoned },
-    { name: 'Recontagem',   value: kpis.recount_pending || 0, color: STATUS_COLORS.recount_pending },
-    { name: 'Pendente',     value: kpis.pending || 0,         color: STATUS_COLORS.pending },
+    { name: 'Concluído', value: kpis.completed || 0, color: STATUS_COLORS.completed },
+    { name: 'Em Andamento', value: kpis.in_progress || 0, color: STATUS_COLORS.in_progress },
+    { name: 'Abandonado', value: kpis.abandoned || 0, color: STATUS_COLORS.abandoned },
+    { name: 'Recontagem', value: kpis.recount_pending || 0, color: STATUS_COLORS.recount_pending },
+    { name: 'Pendente', value: kpis.pending || 0, color: STATUS_COLORS.pending },
   ].filter((d) => d.value > 0);
 
   const completionRate = kpis.total > 0 ? Math.round((kpis.completed / kpis.total) * 100) : 0;
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-        <PageHeader
-          title="Dashboard"
-          subtitle="Visão geral do inventário cíclico de técnicos"
-        />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {lastUpdated && (
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>
-              Atualizado às {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
-          )}
-          <button
-            className="btn"
-            style={{ fontSize: '0.7rem', padding: '0.35rem 0.75rem' }}
-            onClick={load}
-            disabled={loading}
-          >
-            {loading ? '...' : 'Atualizar'}
-          </button>
-        </div>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
+      {/* Header Limpo */}
+      <div style={{ marginBottom: '3rem' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--color-text-primary)', margin: 0, letterSpacing: '-0.02em' }}>Dashboard</h1>
+        <p style={{ fontSize: '0.95rem', color: 'var(--color-text-tertiary)', margin: '0.5rem 0 0 0' }}>Visão geral do inventário cíclico</p>
       </div>
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
@@ -109,60 +93,88 @@ export default function DashboardPage() {
       <div style={{ height: '2rem' }} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--color-text-primary)', fontWeight: '700' }}>Carregando dados...</div>
+        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-primary)', fontWeight: '700' }}>Carregando dados...</div>
       ) : (
         <>
-          {/* KPIs - Grid Fluido */}
-          <div className="grid-fluid" style={{ marginBottom: '2rem' }}>
-            <KpiCard label="Total Inventários" value={kpis.total || 0} sub="No período selecionado" />
-            <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}% de taxa de sucesso`} />
-            <KpiCard label="Em Andamento" value={kpis.in_progress || 0} sub="Execução em tempo real" />
-            <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Requerem atenção imediata" />
+          {/* KPIs - Grid Limpo */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '3rem',
+          }}>
+            <KpiCard label="Total" value={kpis.total || 0} sub="Inventários" />
+            <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}% concluído`} accent />
+            <KpiCard label="Em Andamento" value={kpis.in_progress || 0} sub="Execução ativa" />
+            <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Requerem atenção" />
           </div>
 
-          {/* Gráficos e Alertas - Grid Fluido */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-            <div className="card">
-              <div className="section-title" style={{ marginBottom: '1.5rem' }}>Distribuição de Status</div>
-              <div style={{ height: '250px', width: '100%' }}>
+          {/* Seção Principal - 2 Colunas */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '2rem',
+            marginBottom: '2rem',
+          }}>
+            {/* Gráfico Pizza */}
+            <div style={{
+              background: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: '12px',
+              padding: '2rem',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            }}>
+              <h3 style={{ color: 'var(--color-accent)', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>Distribuição de Status</h3>
+              <div style={{ height: '280px' }}>
                 {pieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
+                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={3} dataKey="value">
                         {pieData.map((entry, i) => (
                           <Cell key={i} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip
-                        contentStyle={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}
-                      />
+                      <Tooltip contentStyle={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: '6px', fontSize: '0.75rem' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>Sem dados para exibir</div>
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-tertiary)' }}>Sem dados</div>
                 )}
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1.5rem', justifyContent: 'center' }}>
                 {pieData.map((d) => (
-                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.7rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>
-                    <span style={{ width: 10, height: 10, borderRadius: '2px', background: d.color }} />
-                    {d.name.toUpperCase()}
+                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '2px', background: d.color }} />
+                    {d.name}
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="card">
-              <div className="section-title" style={{ marginBottom: '1.5rem' }}>Alertas Críticos</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {/* Alertas */}
+            <div style={{
+              background: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: '12px',
+              padding: '2rem',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              <h3 style={{ color: 'var(--color-accent)', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>Alertas Críticos</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1, overflowY: 'auto', maxHeight: '320px' }}>
                 {alerts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>Nenhum alerta ativo</div>
+                  <div style={{ textAlign: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.9rem', padding: '2rem 0' }}>Nenhum alerta ativo</div>
                 ) : (
-                  alerts.map((a) => (
-                    <div key={a.id} style={{ padding: '1rem', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '6px' }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>{a.title}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px', fontWeight: '500' }}>{a.description}</div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '6px', fontWeight: '700' }}>{formatDate(a.created_at)}</div>
+                  alerts.slice(0, 5).map((a) => (
+                    <div key={a.id} style={{
+                      padding: '0.85rem',
+                      background: 'rgba(255, 68, 68, 0.05)',
+                      border: '1px solid rgba(255, 68, 68, 0.2)',
+                      borderRadius: '8px',
+                    }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{a.title}</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '0.3rem' }}>{a.description}</div>
                     </div>
                   ))
                 )}
@@ -170,88 +182,56 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Tabela Recente - Full Width */}
-          <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-            <div style={{ padding: '1.25rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-border-default)' }}>
-              <div className="section-title">Atividade Recente</div>
+          {/* Tabela - Full Width */}
+          <div style={{
+            background: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-border-light)',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+          }}>
+            <div style={{ padding: '1.5rem 2rem', background: 'rgba(0, 212, 255, 0.05)', borderBottom: '1px solid var(--color-border-light)' }}>
+              <h3 style={{ color: 'var(--color-accent)', margin: 0, fontWeight: '700', fontSize: '1rem' }}>Atividade Recente</h3>
             </div>
-            <div className="table-wrapper" style={{ border: 'none' }}>
-              <table>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
-                  <tr>
-                    <th>Técnico</th>
-                    <th>Região</th>
-                    <th>Semana</th>
-                    <th>Tipo</th>
-                    <th>Status</th>
-                    <th>Progresso</th>
-                    <th>Divergências</th>
-                    <th>Agendado</th>
-                    <th>1ª Resposta</th>
+                  <tr style={{ background: 'rgba(0, 0, 0, 0.2)' }}>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Técnico</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Região</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Semana</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Status</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Progresso</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Divergências</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--color-accent)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border-light)' }}>Data</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recent.length === 0 ? (
-                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '4rem', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
+                    <tr>
+                      <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Nenhum inventário recente</td>
+                    </tr>
                   ) : (
-                    recent.map((inv) => {
-                      const pct = inv.total_items > 0
-                        ? Math.min(100, Math.round((inv.counted_items / inv.total_items) * 100))
-                        : 0;
-                      const sched       = inv.inventory_schedules?.[0];
-                      const scheduledAt = sched?.scheduled_at;
-                      const isPending   = inv.status === 'pending';
-                      const isOverdue   = isPending && scheduledAt && new Date(scheduledAt) < new Date();
-                      const isGeral     = sched?.inventory_type === 'general';
-                      const subgrupo    = sched?.scheduled_subgroup;
+                    recent.slice(0, 8).map((inv) => {
+                      const pct = inv.total_items > 0 ? Math.min(100, Math.round((inv.counted_items / inv.total_items) * 100)) : 0;
                       return (
-                        <tr key={inv.id}>
-                          <td style={{ fontWeight: '800', color: 'var(--color-text-primary)' }}>{inv.technicians?.name}</td>
-                          <td style={{ fontWeight: '600' }}>{inv.technicians?.region || '—'}</td>
-                          <td style={{ fontWeight: '600' }}>{inv.week_ref || '—'}</td>
-                          <td>
-                            {isGeral
-                              ? <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>GERAL</span>
-                              : subgrupo
-                                ? <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>{subgrupo}</span>
-                                : <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>—</span>
-                            }
-                          </td>
-                          <td><StatusBadge status={inv.status} /></td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                              <div className="progress-bar" style={{ width: '80px' }}>
-                                <div className="progress-fill" style={{ width: `${pct}%` }} />
-                              </div>
-                              <span style={{ fontSize: '0.75rem', fontWeight: '800' }}>{pct}%</span>
+                        <tr key={inv.id} style={{ borderBottom: '1px solid var(--color-border-light)', transition: 'all 0.2s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 212, 255, 0.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                          <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-primary)', fontWeight: '600' }}>{inv.technicians?.name}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-secondary)' }}>{inv.technicians?.region || '—'}</td>
+                          <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-secondary)' }}>{inv.week_ref || '—'}</td>
+                          <td style={{ padding: '1rem 1.5rem' }}><StatusBadge status={inv.status} /></td>
+                          <td style={{ padding: '1rem 1.5rem' }}>
+                            <div style={{ width: '80px', height: '5px', background: 'var(--color-border-default)', borderRadius: '10px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, var(--color-accent), #00b8d4)', transition: 'width 0.3s ease' }} />
                             </div>
                           </td>
-                          <td style={{ fontWeight: '900', color: (inv.divergence_quantity ?? inv.divergence_count) > 0 ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}>
+                          <td style={{ padding: '1rem 1.5rem', color: (inv.divergence_quantity ?? inv.divergence_count) > 0 ? 'var(--color-error)' : 'var(--color-text-tertiary)', fontWeight: '600' }}>
                             {inv.divergence_quantity ?? inv.divergence_count}
                           </td>
-                          <td>
-                            {scheduledAt ? (
-                              <span style={{
-                                fontSize: '0.75rem',
-                                fontWeight: isPending ? '800' : '600',
-                                color: isOverdue ? 'var(--color-error)' : isPending ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)',
-                                background: isOverdue ? 'var(--color-bg-tertiary)' : 'transparent',
-                                padding: isOverdue ? '2px 6px' : '0',
-                                borderRadius: '4px',
-                                border: isOverdue ? '1px solid var(--color-border-light)' : 'none',
-                              }}>
-                                {formatDateShort(scheduledAt)}
-                              </span>
-                            ) : (
-                              <span style={{ color: 'var(--color-border-light)', fontSize: '0.75rem' }}>—</span>
-                            )}
-                          </td>
-                          <td>
-                            {inv.started_at ? (
-                              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>{formatDateShort(inv.started_at)}</span>
-                            ) : (
-                              <span style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--color-text-tertiary)' }}>Aguardando</span>
-                            )}
+                          <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
+                            {inv.created_at ? new Date(inv.created_at).toLocaleDateString('pt-BR') : '—'}
                           </td>
                         </tr>
                       );
@@ -267,12 +247,37 @@ export default function DashboardPage() {
   );
 }
 
-function KpiCard({ label, value, sub }) {
+function KpiCard({ label, value, sub, accent }) {
   return (
-    <div className="card" style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-primary)' }}>
-      <div style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{label}</div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-text-primary)', lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '600', marginTop: '0.5rem' }}>{sub}</div>}
+    <div style={{
+      background: accent ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 212, 255, 0.02) 100%)' : 'var(--color-bg-secondary)',
+      border: accent ? '1.5px solid var(--color-accent)' : '1px solid var(--color-border-light)',
+      borderRadius: '12px',
+      padding: '1.5rem',
+      boxShadow: accent ? '0 0 20px rgba(0, 212, 255, 0.2)' : '0 4px 20px rgba(0, 0, 0, 0.2)',
+      transition: 'all 0.3s ease',
+    }}
+    onMouseEnter={(e) => {
+      if (accent) {
+        e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 212, 255, 0.35)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (accent) {
+        e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }
+    }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '2.5rem', fontWeight: '900', color: accent ? 'var(--color-accent)' : 'var(--color-text-primary)', lineHeight: 1, marginBottom: '0.5rem' }}>
+        {value}
+      </div>
+      <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
+        {sub}
+      </div>
     </div>
   );
 }
