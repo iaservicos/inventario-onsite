@@ -137,7 +137,7 @@ export default function Sidebar({ user, isOpen }) {
             e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.08)';
           }}>
             <Image
-              src="https://raw.githubusercontent.com/iaservicos/IMAGENS/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-%281%29.png"
+              src="https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-(1).png"
               alt="Positivo Tecnologia"
               width={200}
               height={50}
@@ -145,7 +145,7 @@ export default function Sidebar({ user, isOpen }) {
                 objectFit: 'contain',
                 maxWidth: '100%',
                 height: 'auto',
-                filter: 'brightness(1.1) contrast(1.05)',
+                filter: 'brightness(1.15) contrast(1.1)',
               }}
               priority
             />
