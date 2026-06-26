@@ -17,27 +17,58 @@ function formatDateShort(date) {
   }).format(new Date(date));
 }
 
-const CARD_STYLE = {
-  background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
-  backdropFilter: 'blur(20px)',
-  border: '1.5px solid rgba(38, 208, 206, 0.4)',
-  borderRadius: '12px',
-  overflow: 'hidden',
-  boxShadow: '0 0 50px rgba(38, 208, 206, 0.35), inset 0 0 30px rgba(38, 208, 206, 0.08)',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  position: 'relative',
-};
-
-// SVG Pattern Background
-const PatternSVG = () => (
-  <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.03 }}>
-    <defs>
-      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(38, 208, 206, 0.5)" strokeWidth="0.5" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
+// SVG Icons Minimalistas
+const IconBox = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <rect x="6" y="8" width="20" height="16" rx="2" />
+    <path d="M6 14h20M12 8v-2M20 8v-2" />
   </svg>
+);
+
+const IconCheck = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="16" cy="16" r="10" />
+    <path d="M12 16l2 2 4-4" />
+  </svg>
+);
+
+const IconPlay = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="16" cy="16" r="10" />
+    <path d="M12 12v8l6-4z" fill="currentColor" />
+  </svg>
+);
+
+const IconAlert = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M16 4l10 18H6L16 4Z" />
+    <path d="M16 14v4M16 22v0.5" />
+  </svg>
+);
+
+const BackgroundOrbs = () => (
+  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', zIndex: 0 }}>
+    <div style={{
+      position: 'absolute',
+      width: '400px',
+      height: '400px',
+      background: 'radial-gradient(circle, rgba(38, 208, 206, 0.1) 0%, transparent 70%)',
+      borderRadius: '50%',
+      top: '-100px',
+      right: '-100px',
+      filter: 'blur(40px)',
+    }} />
+    <div style={{
+      position: 'absolute',
+      width: '300px',
+      height: '300px',
+      background: 'radial-gradient(circle, rgba(38, 208, 206, 0.08) 0%, transparent 70%)',
+      borderRadius: '50%',
+      bottom: '-50px',
+      left: '-50px',
+      filter: 'blur(40px)',
+    }} />
+  </div>
 );
 
 export default function DashboardPage() {
@@ -102,7 +133,7 @@ export default function DashboardPage() {
       minHeight: '100vh',
       position: 'relative',
     }}>
-      <PatternSVG />
+      <BackgroundOrbs />
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', position: 'relative', zIndex: 1 }}>
         <PageHeader
@@ -143,10 +174,10 @@ export default function DashboardPage() {
             position: 'relative',
             zIndex: 1,
           }}>
-            <KpiCard label="Total Inventários" value={kpis.total || 0} sub="No período" color="#26d0ce" />
-            <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}% sucesso`} color="#26d0ce" highlight />
-            <KpiCard label="Em Andamento" value={kpis.in_progress || 0} sub="Execução ativa" color="#79c0ff" />
-            <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Atenção" color="#f85149" />
+            <KpiCard icon={<IconBox />} label="Total" value={kpis.total || 0} sub="No período" color="#26d0ce" />
+            <KpiCard icon={<IconCheck />} label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}%`} color="#26d0ce" highlight />
+            <KpiCard icon={<IconPlay />} label="Em Andamento" value={kpis.in_progress || 0} sub="Ativo" color="#79c0ff" />
+            <KpiCard icon={<IconAlert />} label="Divergências" value={kpis.abandoned || 0} sub="Atenção" color="#f85149" />
           </div>
 
           {/* Gráficos e Alertas */}
@@ -159,99 +190,68 @@ export default function DashboardPage() {
             zIndex: 1,
           }}>
             {/* Gráfico */}
-            <div style={{...CARD_STYLE, padding: '1.5rem'}}>
-              <PatternSVG />
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{
-                  height: '3px',
-                  background: 'linear-gradient(90deg, #26d0ce, transparent)',
-                  marginBottom: '1rem',
-                  borderRadius: '2px',
-                }} />
-                <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>
-                  Distribuição de Status
-                </h3>
-                <div style={{ height: '280px', width: '100%' }}>
-                  {pieData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
-                          {pieData.map((entry, i) => (
-                            <Cell key={i} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            background: 'rgba(30, 45, 64, 0.95)',
-                            border: '1px solid rgba(38, 208, 206, 0.3)',
-                            borderRadius: '8px',
-                            fontSize: '0.75rem',
-                            fontWeight: '700',
-                            color: '#ffffff',
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b95a5' }}>Sem dados</div>
-                  )}
-                </div>
+            <CardContainer>
+              <CardAccentBar />
+              <CardTitle>Distribuição de Status</CardTitle>
+              <div style={{ height: '280px', width: '100%' }}>
+                {pieData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
+                        {pieData.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          background: 'rgba(30, 45, 64, 0.95)',
+                          border: '1px solid rgba(38, 208, 206, 0.3)',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          color: '#ffffff',
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b95a5' }}>Sem dados</div>
+                )}
               </div>
-            </div>
+            </CardContainer>
 
             {/* Alertas */}
-            <div style={{...CARD_STYLE, padding: '1.5rem', display: 'flex', flexDirection: 'column'}}>
-              <PatternSVG />
-              <div style={{ position: 'relative', zIndex: 2, flex: 1 }}>
-                <div style={{
-                  height: '3px',
-                  background: 'linear-gradient(90deg, #26d0ce, transparent)',
-                  marginBottom: '1rem',
-                  borderRadius: '2px',
-                }} />
-                <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>
-                  Alertas Críticos
-                </h3>
-                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {alerts.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2rem', color: '#8b95a5', fontWeight: '600' }}>Nenhum alerta</div>
-                  ) : (
-                    alerts.slice(0, 4).map((a) => (
-                      <div key={a.id} style={{
-                        padding: '0.85rem',
-                        background: 'rgba(38, 208, 206, 0.12)',
-                        border: '1px solid rgba(38, 208, 206, 0.25)',
-                        borderRadius: '8px',
-                        borderLeft: '3px solid #26d0ce',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(38, 208, 206, 0.18)';
-                        e.currentTarget.style.transform = 'translateX(4px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(38, 208, 206, 0.12)';
-                        e.currentTarget.style.transform = 'translateX(0)';
-                      }}>
-                        <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#26d0ce' }}>{a.title}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#8b95a5', marginTop: '2px' }}>{a.description}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
+            <CardContainer column>
+              <CardAccentBar />
+              <CardTitle>Alertas Críticos</CardTitle>
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {alerts.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem', color: '#8b95a5', fontWeight: '600' }}>Nenhum alerta</div>
+                ) : (
+                  alerts.slice(0, 4).map((a) => (
+                    <AlertItem key={a.id} title={a.title} desc={a.description} />
+                  ))
+                )}
               </div>
-            </div>
+            </CardContainer>
           </div>
 
           {/* Tabela */}
-          <div style={{...CARD_STYLE, padding: 0, position: 'relative', zIndex: 1}}>
-            <PatternSVG />
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1.5px solid rgba(38, 208, 206, 0.4)',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 0 50px rgba(38, 208, 206, 0.35), inset 0 0 30px rgba(38, 208, 206, 0.08)',
+            position: 'relative',
+            zIndex: 1,
+          }}>
             <div style={{
-              padding: '1.25rem 1.5rem',
+              padding: '1.5rem 1.5rem',
               background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, transparent 100%)',
               borderBottom: '1px solid rgba(38, 208, 206, 0.2)',
               position: 'relative',
-              zIndex: 2,
             }}>
               <div style={{
                 height: '3px',
@@ -263,14 +263,13 @@ export default function DashboardPage() {
                 Atividade Recente
               </h3>
             </div>
-            <div style={{ overflow: 'x', overflowX: 'auto', position: 'relative', zIndex: 2 }}>
+            <div style={{ overflow: 'x', overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: 'transparent' }}>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Técnico</th>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Região</th>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Semana</th>
-                    <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Tipo</th>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Status</th>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Progresso</th>
                     <th style={{ color: '#26d0ce', padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '700', textTransform: 'uppercase', fontSize: '0.75rem', borderBottom: '1px solid rgba(38, 208, 206, 0.1)' }}>Divergências</th>
@@ -279,7 +278,7 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {recent.length === 0 ? (
-                    <tr><td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#8b95a5', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
+                    <tr><td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#8b95a5', fontWeight: '700' }}>Nenhum inventário recente</td></tr>
                   ) : (
                     recent.slice(0, 8).map((inv) => {
                       const pct = inv.total_items > 0 ? Math.min(100, Math.round((inv.counted_items / inv.total_items) * 100)) : 0;
@@ -293,11 +292,10 @@ export default function DashboardPage() {
                           <td style={{ padding: '0.85rem 1.5rem', color: '#ffffff', fontWeight: '700' }}>{inv.technicians?.name}</td>
                           <td style={{ padding: '0.85rem 1.5rem', color: '#e8eef7' }}>{inv.technicians?.region || '—'}</td>
                           <td style={{ padding: '0.85rem 1.5rem', color: '#e8eef7' }}>{inv.week_ref || '—'}</td>
-                          <td style={{ padding: '0.85rem 1.5rem', color: '#8b95a5', fontSize: '0.75rem' }}>—</td>
                           <td style={{ padding: '0.85rem 1.5rem' }}><StatusBadge status={inv.status} /></td>
                           <td style={{ padding: '0.85rem 1.5rem' }}>
                             <div style={{ width: '80px', height: '5px', background: 'rgba(38, 208, 206, 0.15)', borderRadius: '10px', overflow: 'hidden' }}>
-                              <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #26d0ce, #3ae6e4)', boxShadow: '0 0 10px rgba(38, 208, 206, 0.5)' }} />
+                              <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #26d0ce, #3ae6e4)', boxShadow: '0 0 10px rgba(38, 208, 206, 0.6)' }} />
                             </div>
                           </td>
                           <td style={{ padding: '0.85rem 1.5rem', color: (inv.divergence_quantity ?? 0) > 0 ? '#26d0ce' : '#8b95a5', fontWeight: '800' }}>
@@ -320,7 +318,85 @@ export default function DashboardPage() {
   );
 }
 
-function KpiCard({ label, value, sub, color, highlight }) {
+function CardContainer({ children, column }) {
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
+      backdropFilter: 'blur(20px)',
+      border: '1.5px solid rgba(38, 208, 206, 0.4)',
+      borderRadius: '16px',
+      padding: '1.5rem',
+      boxShadow: '0 0 50px rgba(38, 208, 206, 0.35), inset 0 0 30px rgba(38, 208, 206, 0.08)',
+      transition: 'all 0.3s ease',
+      cursor: 'pointer',
+      display: 'flex',
+      flexDirection: column,
+      ...(column && { flex: 1 }),
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.boxShadow = '0 0 70px rgba(38, 208, 206, 0.45), inset 0 0 40px rgba(38, 208, 206, 0.12)';
+      e.currentTarget.style.transform = 'translateY(-4px)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.boxShadow = '0 0 50px rgba(38, 208, 206, 0.35), inset 0 0 30px rgba(38, 208, 206, 0.08)';
+      e.currentTarget.style.transform = 'translateY(0)';
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function CardAccentBar() {
+  return (
+    <div style={{
+      height: '3px',
+      background: 'linear-gradient(90deg, #26d0ce, rgba(38, 208, 206, 0.3))',
+      marginBottom: '1rem',
+      borderRadius: '2px',
+      boxShadow: '0 0 15px rgba(38, 208, 206, 0.4)',
+    }} />
+  );
+}
+
+function CardTitle({ children }) {
+  return (
+    <h3 style={{
+      color: '#26d0ce',
+      marginBottom: '1.5rem',
+      fontWeight: '700',
+      fontSize: '1rem',
+      letterSpacing: '0.02em',
+    }}>
+      {children}
+    </h3>
+  );
+}
+
+function AlertItem({ title, desc }) {
+  return (
+    <div style={{
+      padding: '0.85rem',
+      background: 'rgba(38, 208, 206, 0.12)',
+      border: '1px solid rgba(38, 208, 206, 0.25)',
+      borderRadius: '8px',
+      borderLeft: '3px solid #26d0ce',
+      transition: 'all 0.2s ease',
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.18)';
+      e.currentTarget.style.transform = 'translateX(4px)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.12)';
+      e.currentTarget.style.transform = 'translateX(0)';
+    }}>
+      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#26d0ce' }}>{title}</div>
+      <div style={{ fontSize: '0.75rem', color: '#8b95a5', marginTop: '2px' }}>{desc}</div>
+    </div>
+  );
+}
+
+function KpiCard({ icon, label, value, sub, color, highlight }) {
   return (
     <div style={{
       background: highlight
@@ -328,7 +404,7 @@ function KpiCard({ label, value, sub, color, highlight }) {
         : 'linear-gradient(135deg, rgba(30, 45, 64, 0.8) 0%, rgba(42, 56, 80, 0.6) 100%)',
       backdropFilter: 'blur(20px)',
       border: highlight ? '1.5px solid #26d0ce' : '1.5px solid rgba(38, 208, 206, 0.3)',
-      borderRadius: '12px',
+      borderRadius: '16px',
       padding: '1.5rem',
       boxShadow: highlight
         ? '0 0 60px rgba(38, 208, 206, 0.4), inset 0 0 20px rgba(38, 208, 206, 0.15)'
@@ -340,11 +416,11 @@ function KpiCard({ label, value, sub, color, highlight }) {
     }}
     onMouseEnter={(e) => {
       if (highlight) {
-        e.currentTarget.style.boxShadow = '0 0 80px rgba(38, 208, 206, 0.5), inset 0 0 20px rgba(38, 208, 206, 0.2)';
-        e.currentTarget.style.transform = 'translateY(-6px)';
+        e.currentTarget.style.boxShadow = '0 0 80px rgba(38, 208, 206, 0.5), inset 0 0 25px rgba(38, 208, 206, 0.2)';
+        e.currentTarget.style.transform = 'translateY(-8px)';
       } else {
         e.currentTarget.style.boxShadow = '0 0 60px rgba(38, 208, 206, 0.35), inset 0 0 20px rgba(38, 208, 206, 0.12)';
-        e.currentTarget.style.transform = 'translateY(-3px)';
+        e.currentTarget.style.transform = 'translateY(-4px)';
       }
     }}
     onMouseLeave={(e) => {
@@ -356,11 +432,22 @@ function KpiCard({ label, value, sub, color, highlight }) {
         e.currentTarget.style.transform = 'translateY(0)';
       }
     }}>
-      <PatternSVG />
-      <div style={{ position: 'relative', zIndex: 2 }}>
-        <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>{label}</div>
-        <div style={{ fontSize: '2.5rem', fontWeight: '900', color: color, lineHeight: 1, marginBottom: '0.75rem' }}>{value}</div>
-        {sub && <div style={{ fontSize: '0.75rem', color: '#8b95a5', fontWeight: '600' }}>{sub}</div>}
+      <div style={{
+        height: '3px',
+        background: 'linear-gradient(90deg, ' + color + ', transparent)',
+        marginBottom: '1rem',
+        borderRadius: '2px',
+        boxShadow: `0 0 15px ${color}40`,
+      }} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>{label}</div>
+          <div style={{ fontSize: '2.5rem', fontWeight: '900', color: color, lineHeight: 1, marginBottom: '0.5rem' }}>{value}</div>
+          {sub && <div style={{ fontSize: '0.75rem', color: '#8b95a5', fontWeight: '600' }}>{sub}</div>}
+        </div>
+        <div style={{ color: color, opacity: 0.7 }}>
+          {icon}
+        </div>
       </div>
     </div>
   );
