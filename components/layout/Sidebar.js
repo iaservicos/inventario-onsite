@@ -143,7 +143,6 @@ export default function Sidebar({ user, isOpen }) {
               height={45}
               style={{
                 objectFit: 'contain',
-                filter: 'brightness(1.2) drop-shadow(0 0 8px rgba(38, 208, 206, 0.3))',
               }}
               priority
             />

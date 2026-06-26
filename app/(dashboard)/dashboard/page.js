@@ -185,11 +185,11 @@ export default function DashboardPage() {
                   alerts.slice(0, 4).map((a) => (
                     <div key={a.id} style={{
                       padding: '0.85rem',
-                      background: 'rgba(248, 81, 73, 0.12)',
-                      border: '1px solid rgba(248, 81, 73, 0.25)',
+                      background: 'rgba(38, 208, 206, 0.12)',
+                      border: '1px solid rgba(38, 208, 206, 0.25)',
                       borderRadius: '8px',
                     }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#ffffff' }}>{a.title}</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#26d0ce' }}>{a.title}</div>
                       <div style={{ fontSize: '0.75rem', color: '#8b95a5', marginTop: '2px' }}>{a.description}</div>
                     </div>
                   ))
