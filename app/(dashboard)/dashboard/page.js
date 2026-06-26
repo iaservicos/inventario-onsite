@@ -112,8 +112,8 @@ export default function DashboardPage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1rem',
-            marginBottom: '2rem',
+            gap: '1.25rem',
+            marginBottom: '2.5rem',
           }}>
             <KpiCard label="Total Inventários" value={kpis.total || 0} sub="No período" />
             <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}%`} highlight />
@@ -175,20 +175,20 @@ export default function DashboardPage() {
               display: 'flex',
               flexDirection: 'column',
             }}>
-              <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '0.95rem' }}>Alertas Críticos</h3>
-              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <h3 style={{ color: '#26d0ce', marginBottom: '1.25rem', fontWeight: '700', fontSize: '0.95rem' }}>Alertas Críticos</h3>
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                 {alerts.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '2rem', color: '#8b95a5', fontWeight: '600' }}>Nenhum alerta</div>
                 ) : (
                   alerts.slice(0, 4).map((a) => (
                     <div key={a.id} style={{
-                      padding: '0.75rem',
+                      padding: '0.85rem',
                       background: 'rgba(38, 208, 206, 0.08)',
                       border: '1px solid rgba(38, 208, 206, 0.2)',
                       borderRadius: '6px',
                     }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#ffffff' }}>{a.title}</div>
-                      <div style={{ fontSize: '0.7rem', color: '#8b95a5', marginTop: '2px' }}>{a.description}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#8b95a5', marginTop: '3px' }}>{a.description}</div>
                     </div>
                   ))
                 )}
@@ -243,8 +243,8 @@ export default function DashboardPage() {
                           <td style={{ padding: '0.75rem 1rem', color: '#e8eef7' }}>{inv.week_ref || '—'}</td>
                           <td style={{ padding: '0.75rem 1rem' }}><StatusBadge status={inv.status} /></td>
                           <td style={{ padding: '0.75rem 1rem' }}>
-                            <div style={{ width: '60px', height: '4px', background: 'rgba(38, 208, 206, 0.15)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${pct}%`, height: '100%', background: '#26d0ce' }} />
+                            <div style={{ width: '70px', height: '3px', background: 'rgba(38, 208, 206, 0.12)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pct}%`, height: '100%', background: '#26d0ce', boxShadow: '0 0 8px rgba(38, 208, 206, 0.4)' }} />
                             </div>
                           </td>
                           <td style={{ padding: '0.75rem 1rem', color: (inv.divergence_quantity ?? 0) > 0 ? '#26d0ce' : '#8b95a5', fontWeight: '800' }}>
@@ -274,22 +274,22 @@ function KpiCard({ label, value, sub, highlight }) {
       backdropFilter: 'blur(20px)',
       border: highlight ? '1px solid rgba(38, 208, 206, 0.5)' : '1px solid rgba(38, 208, 206, 0.3)',
       borderRadius: '12px',
-      padding: '1.25rem',
-      boxShadow: highlight ? '0 0 20px rgba(38, 208, 206, 0.25)' : '0 0 15px rgba(38, 208, 206, 0.15)',
-      transition: 'all 0.2s ease',
+      padding: '1.5rem',
+      boxShadow: highlight ? '0 0 25px rgba(38, 208, 206, 0.3)' : '0 0 20px rgba(38, 208, 206, 0.18)',
+      transition: 'all 0.25s ease',
       cursor: 'pointer',
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow = highlight ? '0 0 30px rgba(38, 208, 206, 0.35)' : '0 0 25px rgba(38, 208, 206, 0.25)';
+      e.currentTarget.style.boxShadow = highlight ? '0 0 35px rgba(38, 208, 206, 0.4)' : '0 0 30px rgba(38, 208, 206, 0.28)';
       e.currentTarget.style.transform = 'translateY(-2px)';
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow = highlight ? '0 0 20px rgba(38, 208, 206, 0.25)' : '0 0 15px rgba(38, 208, 206, 0.15)';
+      e.currentTarget.style.boxShadow = highlight ? '0 0 25px rgba(38, 208, 206, 0.3)' : '0 0 20px rgba(38, 208, 206, 0.18)';
       e.currentTarget.style.transform = 'translateY(0)';
     }}>
-      <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>{label}</div>
-      <div style={{ fontSize: '1.8rem', fontWeight: '900', color: highlight ? '#26d0ce' : '#ffffff', lineHeight: 1, marginBottom: '0.3rem' }}>{value}</div>
-      {sub && <div style={{ fontSize: '0.7rem', color: '#8b95a5' }}>{sub}</div>}
+      <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>{label}</div>
+      <div style={{ fontSize: '2rem', fontWeight: '900', color: highlight ? '#26d0ce' : '#ffffff', lineHeight: 1, marginBottom: '0.5rem' }}>{value}</div>
+      {sub && <div style={{ fontSize: '0.7rem', color: '#8b95a5', fontWeight: '600' }}>{sub}</div>}
     </div>
   );
 }
