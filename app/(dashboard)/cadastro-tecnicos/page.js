@@ -359,7 +359,7 @@ export default function CadastroTecnicosPage() {
   const canEditAll = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Cadastro de Técnicos"
         subtitle="Gerenciamento de técnicos e vínculos de gestão"
@@ -377,8 +377,8 @@ export default function CadastroTecnicosPage() {
         }
       />
 
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+      <div className="card" style={{ marginBottom: '2rem', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
           <div>
             <label style={labelMiniStyle}>Buscar por nome ou e-mail</label>
             <input type="text" className="input" placeholder="Ex: João Silva..." value={search} onChange={e => setSearch(e.target.value)} style={inputStyle} />
@@ -407,7 +407,7 @@ export default function CadastroTecnicosPage() {
         </div>
       </div>
 
-      <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+      <div className="card" style={{ padding: '0', overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}>
         <div className="table-wrapper" style={{ border: 'none' }}>
           <table>
             <thead>

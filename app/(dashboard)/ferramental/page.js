@@ -35,7 +35,7 @@ const ANALISTA_TRANSITIONS = [
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status] || { label: status, color: 'var(--color-text-tertiary)', bg: 'var(--color-bg-tertiary)' };
   return (
-    <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', color: cfg.color, background: cfg.bg, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+    <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '800', color: cfg.color, background: cfg.bg, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
       {cfg.label}
     </span>
   );
@@ -98,7 +98,7 @@ function ModalAcao({ request, role, onClose, onUpdated }) {
         </div>
 
         <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
+          <div style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1rem 1.5rem', fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
             <div><strong style={{ color: 'var(--color-text-primary)' }}>{request.technician_name}</strong>{request.technician_email ? ` — ${request.technician_email}` : ''}</div>
             <div style={{ marginTop: '0.2rem', color: 'var(--color-text-secondary)', fontWeight: '600' }}>{request.tool_name}</div>
             {request.comment && <div style={{ marginTop: '0.2rem', fontStyle: 'italic', color: 'var(--color-text-tertiary)' }}>"{request.comment}"</div>}
@@ -266,7 +266,7 @@ function ModalSolicitarTecnico({ onClose, onSaved }) {
                         {isSelected && (
                           <div style={{ padding: '0 0.85rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }} onClick={e => e.stopPropagation()}>
                             <span style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase' }}>Qtd:</span>
-                            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', overflow: 'hidden' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', overflow: 'hidden' }}>
                               <button type="button" onClick={() => setQty(tool.id, qty - 1)} style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}>−</button>
                               <input type="number" min="1" value={qty} onChange={e => setQty(tool.id, e.target.value)}
                                 style={{ width: '44px', background: 'transparent', border: 'none', color: 'var(--color-text-primary)', fontSize: '0.85rem', fontWeight: '800', textAlign: 'center', outline: 'none', fontFamily: 'inherit', padding: '0' }} />
@@ -361,30 +361,30 @@ export default function FerramentalPage() {
   const entregues  = requests.filter(r => r.status === 'entregue').length;
 
   return (
-    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-secondary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader
         title="Ferramental"
         subtitle="Controle de solicitações e entrega de ferramentas"
         actions={isGestor && (
           <button
             onClick={() => setShowSolicitar(true)}
-            style={{ padding: '0.55rem 1rem', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+            style={{ padding: '0.5rem 1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em', transition: 'all 0.2s', transform: 'translateY(0)', boxShadow: '0 2px 4px rgba(0, 212, 255, 0.1)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 2px 4px rgba(0, 212, 255, 0.1)'; }}
           >
             + Solicitar para Técnico
           </button>
         )}
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         {[
           { label: 'Total', value: total },
           { label: 'Aguard. Aprovação', value: aguardando },
           { label: 'Aprovados', value: aprovados },
           { label: 'Entregues', value: entregues },
         ].map(kpi => (
-          <div key={kpi.label} className="card">
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--color-text-primary)', lineHeight: 1 }}>{kpi.value}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginTop: '0.4rem', textTransform: 'uppercase' }}>{kpi.label}</div>
+          <div key={kpi.label} style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', transition: 'all 0.3s', transform: 'translateY(0)', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)'; }}>
+            <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)', lineHeight: 1 }}>{kpi.value}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginTop: '0.75rem', textTransform: 'uppercase' }}>{kpi.label}</div>
           </div>
         ))}
       </div>
@@ -414,19 +414,19 @@ export default function FerramentalPage() {
         </div>
       )}
 
-      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.25rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Status:</span>
         {[{ value: 'all', label: 'Todos' }, ...ALL_STATUSES].map(opt => (
-          <button key={opt.value} onClick={() => setFilterStatus(opt.value)} style={{ padding: '0.35rem 0.85rem', borderRadius: '6px', border: `1px solid ${filterStatus === opt.value ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`, background: filterStatus === opt.value ? 'var(--color-text-primary)' : 'transparent', color: filterStatus === opt.value ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
+          <button key={opt.value} onClick={() => setFilterStatus(opt.value)} style={{ padding: '0.4rem 0.9rem', borderRadius: '8px', border: `1px solid ${filterStatus === opt.value ? 'var(--color-accent-cyan)' : 'var(--color-border-light)'}`, background: filterStatus === opt.value ? 'var(--color-accent-cyan)' : 'transparent', color: filterStatus === opt.value ? 'var(--color-bg-primary)' : 'var(--color-text-secondary)', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.15s' }}>
             {opt.label}
           </button>
         ))}
-        <button onClick={load} style={{ marginLeft: 'auto', padding: '0.35rem 0.85rem', borderRadius: '6px', border: '1px solid var(--color-border-light)', background: 'transparent', color: 'var(--color-text-tertiary)', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}>
+        <button onClick={load} style={{ marginLeft: 'auto', padding: '0.4rem 0.9rem', borderRadius: '8px', border: '1px solid var(--color-border-light)', background: 'transparent', color: 'var(--color-text-secondary)', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.target.style.borderColor = 'var(--color-accent-cyan)'; e.target.style.color = 'var(--color-accent-cyan)'; }} onMouseLeave={(e) => { e.target.style.borderColor = 'var(--color-border-light)'; e.target.style.color = 'var(--color-text-secondary)'; }}>
           ↻ Atualizar
         </button>
       </div>
 
-      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>Carregando...</div>
         ) : requests.length === 0 ? (
@@ -435,9 +435,9 @@ export default function FerramentalPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
               <thead>
-                <tr style={{ background: 'var(--color-bg-tertiary)', borderBottom: '2px solid var(--color-border-light)' }}>
+                <tr style={{ background: 'var(--color-bg-secondary)', borderBottom: '1px solid var(--color-border-light)' }}>
                   {['#', 'Técnico', 'E-mail', 'Ferramenta', 'Comentário', 'Status', 'Criado em', 'Ação'].map(h => (
-                    <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: '800', color: 'var(--color-text-secondary)', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                    <th key={h} style={{ padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -450,9 +450,9 @@ export default function FerramentalPage() {
                   const canConcluirTermo = isAnalista && r.status === 'entregue' && !r.termo_emitido_em;
 
                   return (
-                    <tr key={r.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-tertiary)' }}>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>#{r.id}</td>
-                      <td style={{ padding: '0.75rem 1rem', fontWeight: '700', color: 'var(--color-text-primary)', whiteSpace: 'nowrap' }}>
+                    <tr key={r.id} style={{ borderBottom: '1px solid var(--color-border-light)', background: 'transparent', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>#{r.id}</td>
+                      <td style={{ padding: '1rem 1.5rem', fontWeight: '700', color: 'var(--color-text-primary)', whiteSpace: 'nowrap' }}>
                         {r.technician_name}
                         {r.technicians?.supervisor_name && (
                           <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: '500' }}>
@@ -460,9 +460,9 @@ export default function FerramentalPage() {
                           </div>
                         )}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-secondary)' }}>{r.technician_email || '—'}</td>
-                      <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-primary)', maxWidth: '180px' }}>{r.tool_name}</td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-secondary)', maxWidth: '200px', fontStyle: r.comment ? 'italic' : 'normal' }}>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-secondary)' }}>{r.technician_email || '—'}</td>
+                      <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: 'var(--color-text-primary)', maxWidth: '180px' }}>{r.tool_name}</td>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-secondary)', maxWidth: '200px', fontStyle: r.comment ? 'italic' : 'normal' }}>
                         {r.comment ? `"${r.comment}"` : '—'}
                       </td>
                       <td style={{ padding: '0.75rem 1rem' }}>
@@ -480,16 +480,16 @@ export default function FerramentalPage() {
                           )}
                         </div>
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(r.created_at)}</td>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(r.created_at)}</td>
                       <td style={{ padding: '0.75rem 1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', alignItems: 'flex-start' }}>
                           {canAct && (
-                            <button onClick={() => setSelected(r)} style={{ padding: '0.3rem 0.7rem', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '6px', fontSize: '0.73rem', fontWeight: '700', cursor: 'pointer' }}>
+                            <button onClick={() => setSelected(r)} style={{ padding: '0.3rem 0.7rem', background: 'var(--color-text-primary)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.73rem', fontWeight: '700', cursor: 'pointer' }}>
                               Atualizar
                             </button>
                           )}
                           {canConcluirTermo && (
-                            <button onClick={() => confirmarTermo(r.id)} style={{ padding: '0.3rem 0.7rem', background: 'transparent', color: 'var(--color-text-primary)', border: '1px solid var(--color-text-secondary)', borderRadius: '6px', fontSize: '0.73rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                            <button onClick={() => confirmarTermo(r.id)} style={{ padding: '0.3rem 0.7rem', background: 'transparent', color: 'var(--color-text-primary)', border: '1px solid var(--color-text-secondary)', borderRadius: '8px', fontSize: '0.73rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                               Termo Concluído
                             </button>
                           )}

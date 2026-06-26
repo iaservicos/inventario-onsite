@@ -77,7 +77,7 @@ export default function EditarVeiculoPage() {
     return (
       <>
         <PageHeader title="Carregando..." subtitle="" />
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando dados do veículo...</div>
+        <div style={{ padding: '2.5rem 3rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando dados do veículo...</div>
       </>
     );
   }
@@ -86,16 +86,16 @@ export default function EditarVeiculoPage() {
     return (
       <>
         <PageHeader title="Erro" subtitle="" />
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Veículo não encontrado</div>
+        <div style={{ padding: '2.5rem 3rem', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Veículo não encontrado</div>
       </>
     );
   }
 
   return (
-    <div>
+    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
       <PageHeader title={form.placa} subtitle={`${form.modelo} · ${form.ano}`} />
 
-      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '8px', border: '1px solid var(--color-border-light)', padding: '2rem', maxWidth: '600px' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', border: '1px solid var(--color-border-light)', padding: '2rem', maxWidth: '600px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Placa */}
           <div>
@@ -111,7 +111,7 @@ export default function EditarVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box',
@@ -135,7 +135,7 @@ export default function EditarVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box'
@@ -156,7 +156,7 @@ export default function EditarVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box'
@@ -178,7 +178,7 @@ export default function EditarVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -197,7 +197,7 @@ export default function EditarVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -219,7 +219,7 @@ export default function EditarVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -243,7 +243,7 @@ export default function EditarVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -265,7 +265,7 @@ export default function EditarVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box',
@@ -283,21 +283,22 @@ export default function EditarVeiculoPage() {
           )}
 
           {/* Botões */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
             <Link href="/frotas/veiculos">
               <button
                 type="button"
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  background: 'var(--color-bg-tertiary)',
-                  color: 'var(--color-text-tertiary)',
+                  background: 'transparent',
+                  color: 'var(--color-text-secondary)',
                   border: '1px solid var(--color-border-light)',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   fontSize: '0.9rem',
                   fontWeight: '700',
-                  cursor: 'pointer'
-                }}
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }} onMouseEnter={(e) => { e.target.style.borderColor = 'var(--color-accent-cyan)'; e.target.style.color = 'var(--color-accent-cyan)'; }} onMouseLeave={(e) => { e.target.style.borderColor = 'var(--color-border-light)'; e.target.style.color = 'var(--color-text-secondary)'; }}
               >
                 Cancelar
               </button>
@@ -308,15 +309,18 @@ export default function EditarVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                background: salvando ? 'var(--color-bg-secondary)' : 'var(--color-bg-secondary)',
+                background: 'var(--color-accent-cyan)',
                 color: 'var(--color-bg-primary)',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 fontSize: '0.9rem',
                 fontWeight: '700',
                 cursor: salvando ? 'not-allowed' : 'pointer',
-                opacity: salvando ? 0.6 : 1
-              }}
+                opacity: salvando ? 0.6 : 1,
+                transition: 'all 0.2s',
+                transform: 'translateY(0)',
+                boxShadow: '0 2px 4px rgba(0, 212, 255, 0.1)'
+              }} onMouseEnter={(e) => !salvando && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)')} onMouseLeave={(e) => !salvando && (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = '0 2px 4px rgba(0, 212, 255, 0.1)')}
             >
               {salvando ? 'Salvando...' : 'Salvar Alterações'}
             </button>

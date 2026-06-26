@@ -112,7 +112,7 @@ export default function AlertasPage() {
   const outros          = active.filter((a) => !['surplus_subgroup', 'surplus', 'recount', 'recount_pending'].includes(a.type));
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Alertas"
         subtitle="Monitoramento de excedentes, recontagens e erros"
@@ -120,6 +120,7 @@ export default function AlertasPage() {
           <button
             className={`btn ${showResolved ? '' : 'btn-secondary'}`}
             onClick={() => setShowResolved(!showResolved)}
+            style={{ borderRadius: '8px', transition: '0.2s' }}
           >
             {showResolved ? 'Ocultar resolvidos' : 'Ver resolvidos'}
           </button>
@@ -135,7 +136,7 @@ export default function AlertasPage() {
       ) : (
         <>
           {/* KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
             <KpiCard label="Ativos"                 value={active.length}           alert={active.length > 0} />
             <KpiCard label="Peça outro subgrupo"    value={surplusSubgroup.length}  alert={surplusSubgroup.length > 0} />
             <KpiCard label="Excedentes"             value={surplusItems.length}     alert={surplusItems.length > 0} />
@@ -260,13 +261,16 @@ function AlertCard({ alert: a, onResolve, resolving, isResolved, getElapsed }) {
 function KpiCard({ label, value, alert: isAlert }) {
   return (
     <div className="card" style={{
-      border: `1px solid ${isAlert ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`,
-      background: isAlert ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
+      border: `2px solid ${isAlert ? 'var(--color-accent-cyan)' : 'var(--color-border-light)'}`,
+      background: 'var(--color-bg-secondary)',
+      borderRadius: '12px',
+      padding: '1.5rem',
+      transition: '0.3s'
     }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert ? 'var(--color-accent-cyan)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', lineHeight: 1 }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert ? 'var(--color-accent-cyan)' : 'var(--color-text-primary)', lineHeight: 1 }}>
         {value}
       </div>
     </div>

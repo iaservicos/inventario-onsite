@@ -92,47 +92,57 @@ export default function FrotasImportPage() {
   }
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)', minHeight: '100vh' }}>
       <PageHeader title="Importar Frotas" subtitle="Importe dados de veículos via arquivo CSV" />
 
       <div style={{ maxWidth: '600px', marginTop: '2rem' }}>
         {/* Template */}
-        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '2rem', marginBottom: '2rem', transition: 'all 0.3s ease' }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.1)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Template de Importação
           </h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
             Baixe o template em CSV com os campos necessários
           </p>
           <button
             onClick={downloadTemplate}
             style={{
               padding: '0.5rem 1rem',
-              background: 'var(--color-text-primary)',
-              color: 'var(--color-bg-primary)',
+              background: 'var(--color-accent-cyan)',
+              color: '#000',
               border: 'none',
-              borderRadius: '3px',
-              fontSize: '0.75rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
               fontWeight: '700',
-              cursor: 'pointer'
-            }}>
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 12px rgba(0, 255, 255, 0.4)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
             Baixar Template CSV
           </button>
         </div>
 
         {/* Upload */}
-        <form onSubmit={handleImport} style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
+        <form onSubmit={handleImport} style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '2rem', marginBottom: '2rem', transition: 'all 0.3s ease' }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.1)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Selecione o Arquivo
           </h3>
 
           <div style={{
-            border: '2px dashed var(--color-border-light)ccc',
-            borderRadius: '6px',
+            border: '2px dashed var(--color-border-light)',
+            borderRadius: '8px',
             padding: '2rem',
             textAlign: 'center',
-            marginBottom: '1.5rem',
-            background: '#f9f9f9'
+            marginBottom: '2rem',
+            background: 'var(--color-bg-primary)',
+            transition: 'all 0.2s ease'
           }}>
             <input
               type="file"
@@ -140,15 +150,18 @@ export default function FrotasImportPage() {
               onChange={(e) => setArquivo(e.target.files?.[0] || null)}
               style={{
                 width: '100%',
-                padding: '0.5rem',
+                padding: '0.75rem',
                 border: '1px solid var(--color-border-light)',
-                borderRadius: '3px',
-                cursor: 'pointer'
+                borderRadius: '8px',
+                cursor: 'pointer',
+                background: 'var(--color-bg-secondary)',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'inherit'
               }}
             />
             {arquivo && (
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem' }}>
-                Arquivo: <strong>{arquivo.name}</strong>
+              <p style={{ fontSize: '0.9rem', color: 'var(--color-accent-cyan)', marginTop: '0.75rem', fontWeight: '600' }}>
+                ✓ Arquivo: <strong>{arquivo.name}</strong>
               </p>
             )}
           </div>
@@ -159,14 +172,19 @@ export default function FrotasImportPage() {
             style={{
               width: '100%',
               padding: '0.75rem',
-              background: !arquivo || importando ? 'var(--color-border-light)ccc' : 'var(--color-text-primary)',
-              color: 'var(--color-bg-primary)',
+              background: !arquivo || importando ? '#333' : 'var(--color-accent-cyan)',
+              color: !arquivo || importando ? '#666' : '#000',
               border: 'none',
-              borderRadius: '3px',
+              borderRadius: '8px',
               fontSize: '0.9rem',
-              fontWeight: '700',
-              cursor: !arquivo || importando ? 'not-allowed' : 'pointer'
-            }}>
+              fontWeight: '800',
+              cursor: !arquivo || importando ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}
+            onMouseEnter={(e) => { if (!(!arquivo || importando)) e.currentTarget.style.boxShadow = '0 0 12px rgba(0, 255, 255, 0.4)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
             {importando ? 'Importando...' : 'Importar'}
           </button>
         </form>
@@ -174,41 +192,45 @@ export default function FrotasImportPage() {
         {/* Resultado */}
         {resultado && (
           <div style={{
-            background: resultado.sucesso ? '#f0fdf4' : '#fef2f2',
-            border: `1px solid ${resultado.sucesso ? '#86efac' : '#fca5a5'}`,
-            borderRadius: '6px',
-            padding: '1.5rem',
-            marginTop: '1.5rem'
+            background: resultado.sucesso ? 'var(--color-bg-secondary)' : 'var(--color-bg-secondary)',
+            border: `1px solid ${resultado.sucesso ? 'var(--color-success)' : 'var(--color-error)'}`,
+            borderRadius: '12px',
+            padding: '2rem',
+            marginBottom: '2rem'
           }}>
             <h4 style={{
-              fontSize: '0.9rem',
-              fontWeight: '700',
-              color: resultado.sucesso ? '#16a34a' : '#dc2626',
-              marginBottom: '0.5rem'
+              fontSize: '0.95rem',
+              fontWeight: '800',
+              color: resultado.sucesso ? 'var(--color-success)' : 'var(--color-error)',
+              marginBottom: '0.75rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
             }}>
               {resultado.sucesso ? '✓ Sucesso!' : '✗ Erro'}
             </h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
               {resultado.message}
             </p>
             {resultado.sucesso && (
-              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem' }}>
-                Total de veículos no sistema: <strong>{resultado.total}</strong>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginTop: '0.75rem' }}>
+                Total de veículos no sistema: <strong style={{ color: 'var(--color-accent-cyan)' }}>{resultado.total}</strong>
               </p>
             )}
           </div>
         )}
 
         {/* Instruções */}
-        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1.5rem', marginTop: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '2rem', transition: 'all 0.3s ease' }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.1)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Instruções
           </h4>
-          <ul style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', listStyle: 'none', padding: 0 }}>
-            <li style={{ marginBottom: '0.5rem' }}>1. Baixe o template CSV</li>
-            <li style={{ marginBottom: '0.5rem' }}>2. Preenchaa com seus dados de veículos</li>
-            <li style={{ marginBottom: '0.5rem' }}>3. Campos obrigatórios: placa e modelo</li>
-            <li style={{ marginBottom: '0.5rem' }}>4. Selecione o arquivo e clique em Importar</li>
+          <ul style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)', listStyle: 'none', padding: 0, lineHeight: '1.8' }}>
+            <li style={{ marginBottom: '0.75rem' }}>1. Baixe o template CSV</li>
+            <li style={{ marginBottom: '0.75rem' }}>2. Preenchaa com seus dados de veículos</li>
+            <li style={{ marginBottom: '0.75rem' }}>3. Campos obrigatórios: placa e modelo</li>
+            <li style={{ marginBottom: '0.75rem' }}>4. Selecione o arquivo e clique em Importar</li>
             <li>5. Os dados serão adicionados ao sistema</li>
           </ul>
         </div>

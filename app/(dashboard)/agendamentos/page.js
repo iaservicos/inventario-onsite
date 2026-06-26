@@ -139,9 +139,9 @@ function SubgruposSection() {
 
       {msg.text && (
         <div style={{
-          padding: '0.6rem 0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)',
-          border: '1px solid var(--color-text-primary)', borderRadius: '4px', marginBottom: '1rem',
-          fontSize: '0.8rem', fontWeight: '700',
+          padding: '0.75rem 1rem', background: 'var(--color-bg-secondary)', color: 'var(--color-accent-cyan)',
+          border: '1px solid var(--color-border-light)', borderRadius: '8px', marginBottom: '1.5rem',
+          fontSize: '0.8rem', fontWeight: '700', transition: '0.2s'
         }}>
           {msg.text}
         </div>
@@ -624,7 +624,7 @@ export default function AgendamentosPage() {
   const canViewInventarioGeral = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Agendamentos"
         subtitle={isAdmin
@@ -635,9 +635,9 @@ export default function AgendamentosPage() {
 
       {msg.text && (
         <div style={{
-          padding: '0.75rem', background: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)',
-          border: '1px solid var(--color-text-primary)', borderRadius: '4px', marginBottom: '1.5rem',
-          fontSize: '0.8rem', fontWeight: '700',
+          padding: '0.75rem 1rem', background: 'var(--color-bg-secondary)', color: 'var(--color-accent-cyan)',
+          border: '2px solid var(--color-accent-cyan)', borderRadius: '8px', marginBottom: '2rem',
+          fontSize: '0.8rem', fontWeight: '700', transition: '0.2s'
         }}>
           {msg.text}
         </div>

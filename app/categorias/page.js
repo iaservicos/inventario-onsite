@@ -76,7 +76,7 @@ function CategoriaCard({ titulo, descricao, icon: Icon, href, temAcesso }) {
     <Link href={href}>
       <div style={{
         background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-default)',
+        border: '1px solid var(--color-border-light)',
         borderRadius: '12px',
         padding: '2rem 1.5rem',
         textAlign: 'center',
@@ -89,17 +89,17 @@ function CategoriaCard({ titulo, descricao, icon: Icon, href, temAcesso }) {
         justifyContent: 'center',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--color-accent)';
-        e.currentTarget.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.2)';
+        e.currentTarget.style.borderColor = 'var(--color-accent-cyan)';
+        e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)';
         e.currentTarget.style.transform = 'translateY(-4px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--color-border-default)';
+        e.currentTarget.style.borderColor = 'var(--color-border-light)';
         e.currentTarget.style.boxShadow = 'none';
         e.currentTarget.style.transform = 'translateY(0)';
       }}
       >
-        <div style={{ marginBottom: '1rem', color: 'var(--color-accent)' }}>
+        <div style={{ marginBottom: '1rem', color: 'var(--color-accent-cyan)' }}>
           <Icon />
         </div>
         <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--color-text-primary)', margin: '0 0 0.5rem' }}>
@@ -179,14 +179,14 @@ export default function CategoriasPage() {
     }}>
       {/* Header */}
       <div style={{
-        padding: '2rem',
+        padding: '2.5rem 3rem',
         textAlign: 'center',
         borderBottom: '1px solid var(--color-border-light)',
       }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-text-primary)', margin: '0 0 0.5rem' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--color-text-primary)', margin: '0 0 0.75rem' }}>
           Bem-vindo ao Portal
         </h1>
-        <p style={{ fontSize: '1rem', color: 'var(--color-text-tertiary)', margin: 0 }}>
+        <p style={{ fontSize: '1rem', color: 'var(--color-text-tertiary)', margin: 0, lineHeight: '1.5' }}>
           Selecione uma categoria para começar
         </p>
       </div>
@@ -201,8 +201,8 @@ export default function CategoriasPage() {
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '2rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '1.5rem',
           maxWidth: '1200px',
           width: '100%',
         }}>
@@ -298,7 +298,3 @@ export default function CategoriasPage() {
             Sair
           </button>
         </div>
-      </div>
-    </div>
-  );
-}

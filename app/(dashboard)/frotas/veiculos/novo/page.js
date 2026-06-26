@@ -62,10 +62,10 @@ export default function NovoVeiculoPage() {
   };
 
   return (
-    <div>
+    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
       <PageHeader title="Novo Veículo" subtitle="Cadastre um novo veículo na frota" />
 
-      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '8px', border: '1px solid var(--color-border-light)', padding: '2rem', maxWidth: '600px' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', border: '1px solid var(--color-border-light)', padding: '2rem', maxWidth: '600px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Placa */}
           <div>
@@ -81,7 +81,7 @@ export default function NovoVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box',
@@ -104,7 +104,7 @@ export default function NovoVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box'
@@ -126,7 +126,7 @@ export default function NovoVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box'
@@ -148,7 +148,7 @@ export default function NovoVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -167,7 +167,7 @@ export default function NovoVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -189,7 +189,7 @@ export default function NovoVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -213,7 +213,7 @@ export default function NovoVeiculoPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   border: '1px solid var(--color-border-light)',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box'
@@ -236,7 +236,7 @@ export default function NovoVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 border: '1px solid var(--color-border-light)',
                 fontSize: '0.9rem',
                 boxSizing: 'border-box',
@@ -248,27 +248,28 @@ export default function NovoVeiculoPage() {
 
           {/* Erro */}
           {erro && (
-            <div style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '0.75rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
+            <div style={{ background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '0.75rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
               {erro}
             </div>
           )}
 
           {/* Botões */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
             <Link href="/frotas/veiculos">
               <button
                 type="button"
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  background: 'var(--color-bg-tertiary)',
-                  color: 'var(--color-text-tertiary)',
+                  background: 'transparent',
+                  color: 'var(--color-text-secondary)',
                   border: '1px solid var(--color-border-light)',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   fontSize: '0.9rem',
                   fontWeight: '700',
-                  cursor: 'pointer'
-                }}
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }} onMouseEnter={(e) => { e.target.style.borderColor = 'var(--color-accent-cyan)'; e.target.style.color = 'var(--color-accent-cyan)'; }} onMouseLeave={(e) => { e.target.style.borderColor = 'var(--color-border-light)'; e.target.style.color = 'var(--color-text-secondary)'; }}
               >
                 Cancelar
               </button>
@@ -279,15 +280,18 @@ export default function NovoVeiculoPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                background: loading ? 'var(--color-bg-secondary)' : 'var(--color-bg-secondary)',
+                background: 'var(--color-accent-cyan)',
                 color: 'var(--color-bg-primary)',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 fontSize: '0.9rem',
                 fontWeight: '700',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1
-              }}
+                opacity: loading ? 0.6 : 1,
+                transition: 'all 0.2s',
+                transform: 'translateY(0)',
+                boxShadow: '0 2px 4px rgba(0, 212, 255, 0.1)'
+              }} onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)')} onMouseLeave={(e) => !loading && (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = '0 2px 4px rgba(0, 212, 255, 0.1)')}
             >
               {loading ? 'Criando...' : 'Criar Veículo'}
             </button>

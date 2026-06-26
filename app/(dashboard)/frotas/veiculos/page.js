@@ -113,49 +113,54 @@ export default function VeiculosPage() {
               </thead>
               <tbody>
                 {veiculos.map((veiculo) => (
-                  <tr key={veiculo.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-secondary)', fontFamily: "'JetBrains Mono'" }}>
+                  <tr key={veiculo.id} style={{ borderBottom: '1px solid var(--color-border-light)', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: 'var(--color-text-secondary)', fontFamily: "'JetBrains Mono'" }}>
                       {veiculo.placa}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-secondary)' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-secondary)' }}>
                       {veiculo.modelo}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)' }}>
                       {veiculo.ano}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
                       {veiculo.kmAtual.toLocaleString('pt-BR')}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem' }}>
+                    <td style={{ padding: '1rem 1.5rem' }}>
                       <StatusBadge status={veiculo.status} />
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', display: 'flex', gap: '0.5rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', display: 'flex', gap: '0.75rem' }}>
                       <Link href={`/frotas/veiculos/${veiculo.id}`}>
                         <button style={{
-                          padding: '0.4rem 0.75rem',
-                          background: 'var(--color-bg-secondary)',
+                          padding: '0.5rem 1rem',
+                          background: 'var(--color-accent-cyan)',
                           color: 'var(--color-bg-primary)',
                           border: 'none',
-                          borderRadius: '3px',
-                          fontSize: '0.7rem',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
                           cursor: 'pointer',
-                          fontWeight: '700'
-                        }}>
+                          fontWeight: '700',
+                          transition: 'all 0.2s',
+                          transform: 'translateY(0)',
+                          boxShadow: '0 2px 4px rgba(0, 212, 255, 0.1)'
+                        }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 2px 4px rgba(0, 212, 255, 0.1)'; }}>
                           Editar
                         </button>
                       </Link>
                       <button
                         onClick={() => deletarVeiculo(veiculo.id)}
                         style={{
-                          padding: '0.4rem 0.75rem',
-                          background: 'var(--color-bg-tertiary)',
+                          padding: '0.5rem 1rem',
+                          background: 'transparent',
                           color: 'var(--color-text-secondary)',
                           border: '1px solid var(--color-border-light)',
-                          borderRadius: '3px',
-                          fontSize: '0.7rem',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
                           cursor: 'pointer',
-                          fontWeight: '700'
-                        }}>
+                          fontWeight: '700',
+                          transition: 'all 0.2s',
+                          transform: 'translateY(0)'
+                        }} onMouseEnter={(e) => { e.target.style.borderColor = 'var(--color-accent-cyan)'; e.target.style.color = 'var(--color-accent-cyan)'; e.target.style.transform = 'translateY(-2px)'; }} onMouseLeave={(e) => { e.target.style.borderColor = 'var(--color-border-light)'; e.target.style.color = 'var(--color-text-secondary)'; e.target.style.transform = 'translateY(0)'; }}>
                         Deletar
                       </button>
                     </td>

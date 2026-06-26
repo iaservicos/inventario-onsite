@@ -43,7 +43,7 @@ export default function LogsPage() {
   const totalContagens = history.length;
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Histórico de Contagens"
         subtitle="Registro completo de cada item contado, com recontagens e quantidades informadas"
@@ -53,23 +53,24 @@ export default function LogsPage() {
 
       <div style={{ height: '1.5rem' }} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
         <KpiCard label="Total de registros" value={totalContagens} />
         <KpiCard label="Recontagens"         value={recontagens} alert={recontagens > 0} />
         <KpiCard label="Técnicos"            value={tecnicos} />
       </div>
 
-      <div className="card" style={{ marginBottom: '1rem' }}>
+      <div className="card" style={{ marginBottom: '2rem', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
         <input
           type="text"
           className="input"
           placeholder="Buscar por código, nome da peça ou técnico..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          style={{ borderRadius: '8px', border: '1px solid var(--color-border-light)' }}
         />
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}>
         <div className="table-wrapper" style={{ border: 'none' }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
@@ -138,13 +139,16 @@ export default function LogsPage() {
 function KpiCard({ label, value, alert: isAlert }) {
   return (
     <div className="card" style={{
-      border: `1px solid ${isAlert && value > 0 ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`,
-      background: isAlert && value > 0 ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
+      border: `2px solid ${isAlert && value > 0 ? 'var(--color-accent-cyan)' : 'var(--color-border-light)'}`,
+      background: 'var(--color-bg-secondary)',
+      borderRadius: '12px',
+      padding: '1.5rem',
+      transition: '0.3s'
     }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert && value > 0 ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: isAlert && value > 0 ? 'var(--color-accent-cyan)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert && value > 0 ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', lineHeight: 1 }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: isAlert && value > 0 ? 'var(--color-accent-cyan)' : 'var(--color-text-primary)', lineHeight: 1 }}>
         {value}
       </div>
     </div>

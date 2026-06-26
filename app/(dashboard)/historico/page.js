@@ -249,7 +249,7 @@ export default function HistoricoPage() {
   useEffect(() => { load(); }, [load]);
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Histórico de Inventário"
         subtitle="Log de contagens por técnico"
@@ -264,7 +264,7 @@ export default function HistoricoPage() {
       ) : inventories.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>Nenhum inventário encontrado</div>
       ) : (
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}>
           <div className="table-wrapper" style={{ border: 'none' }}>
             <table>
               <thead>

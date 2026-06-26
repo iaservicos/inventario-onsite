@@ -4,17 +4,17 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/ui/PageHeader';
 
-const selSt = { width: '100%', padding: '0.65rem 0.9rem', border: '1px solid var(--color-border-light)', borderRadius: '6px', fontSize: '0.82rem', fontWeight: '600', color: '#000', background: '#fff', cursor: 'pointer', outline: 'none' };
-const labelSt = { fontSize: '0.68rem', fontWeight: '800', color: '#888', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
+const selSt = { width: '100%', padding: '0.65rem 0.9rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.82rem', fontWeight: '600', color: 'var(--color-text-primary)', background: 'var(--color-bg-primary)', cursor: 'pointer', outline: 'none' };
+const labelSt = { fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
 
 function QuantityControl({ value, onChange, disabled }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <button onClick={() => onChange(Math.max(0, value - 1))} disabled={disabled || value <= 0}
-        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: value <= 0 ? 'var(--color-bg-tertiary)' : '#fff', color: value <= 0 ? 'var(--color-border-light)' : '#000', fontSize: '1rem', fontWeight: '900', cursor: value <= 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
-      <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: '800', fontSize: '0.9rem', color: value > 0 ? '#000' : '#bbb' }}>{value}</span>
+        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid var(--color-border-light)', background: value <= 0 ? 'var(--color-bg-secondary)' : 'var(--color-bg-primary)', color: value <= 0 ? 'var(--color-border-light)' : 'var(--color-text-primary)', fontSize: '1rem', fontWeight: '900', cursor: value <= 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+      <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: '800', fontSize: '0.9rem', color: value > 0 ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}>{value}</span>
       <button onClick={() => onChange(value + 1)} disabled={disabled}
-        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+        style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid var(--color-border-light)', background: 'var(--color-bg-primary)', color: 'var(--color-text-primary)', fontSize: '1rem', fontWeight: '900', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
     </div>
   );
 }
@@ -104,10 +104,10 @@ export default function FerramentalEstoquePage() {
   const hasDirty = Object.values(dirty).some(Boolean);
 
   return (
-    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-tertiary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader title="Estoque por Técnico" subtitle="Controle de ferramentas em posse de cada técnico" />
 
-      <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
 
           <div>
@@ -266,8 +266,4 @@ export default function FerramentalEstoquePage() {
               })}
             </tbody>
           </table>
-        </div>
-      )}
-    </div>
-  );
-}
+     

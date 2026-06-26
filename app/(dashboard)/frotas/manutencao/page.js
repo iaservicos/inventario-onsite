@@ -64,32 +64,32 @@ export default function ManutencaoPage() {
   ];
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
       <PageHeader
         title="Manutenções"
         subtitle="Histórico e programação de manutenções dos veículos"
       />
 
       {/* KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
         <KPICard label="Vencidas" value={kpis.vencidas} sub="Atenção imediata" />
         <KPICard label="Próx. 30 dias" value={kpis.proximos30} sub="Agendar" />
         <KPICard label="Em dia" value={kpis.emDia} sub="Ok" />
       </div>
 
       {/* Filtro */}
-      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '2rem', marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           type="text"
           placeholder="Buscar por placa..."
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
+          style={{ flex: 1, minWidth: '160px', padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem' }}
         />
         <select
           value={filters.tipo}
           onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
-          style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
+          style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem', minWidth: '160px' }}
         >
           {tipoOptions.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -98,7 +98,7 @@ export default function ManutencaoPage() {
         <select
           value={filters.uf}
           onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
-          style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem', minWidth: '140px' }}
+          style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem', minWidth: '140px' }}
         >
           <option value="">Todos UF</option>
           {[...new Set(manutencoes.map(m => m.uf).filter(Boolean))].sort().map(uf => (
@@ -108,7 +108,7 @@ export default function ManutencaoPage() {
       </div>
 
       {/* Tabela */}
-      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-light)', marginTop: '1rem' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--color-border-light)', marginTop: '2rem' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
@@ -117,13 +117,13 @@ export default function ManutencaoPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-tertiary)' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Realiz.</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Próxima Prev.</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)' }}>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placa</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Realiz.</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Próxima Prev.</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Valor (R$)</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,28 +137,28 @@ export default function ManutencaoPage() {
                   }
 
                   return (
-                    <tr key={idx} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-tertiary)' }}>
-                      <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>{m.placa}</td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)' }}>{m.tipo}</td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
+                    <tr key={idx} style={{ borderBottom: '1px solid var(--color-border-light)' }}>
+                      <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>{m.placa}</td>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)' }}>{m.tipo}</td>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                         {m.data_realizada ? new Date(m.data_realizada).toLocaleDateString('pt-BR') : '-'}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
                         {m.proxima_preventiva ? new Date(m.proxima_preventiva).toLocaleDateString('pt-BR') : '-'}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
+                      <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'" }}>
                         R$ {(parseFloat(m.valor) || 0).toFixed(2)}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem' }}>
+                      <td style={{ padding: '1rem 1.5rem' }}>
                         <span style={{
                           display: 'inline-block',
                           padding: '0.25rem 0.75rem',
-                          borderRadius: '4px',
+                          borderRadius: '8px',
                           fontSize: '0.75rem',
                           fontWeight: '600',
                           whiteSpace: 'nowrap',
-                          background: status === 'Vencida' ? 'var(--color-bg-tertiary)' : status === 'Próxima em 30 dias' ? 'var(--color-bg-tertiary)' : 'var(--color-bg-primary)',
-                          color: status === 'Vencida' ? 'var(--color-text-secondary)' : status === 'Próxima em 30 dias' ? 'var(--color-text-secondary)' : 'var(--color-bg-secondary)',
+                          background: status === 'Vencida' ? 'var(--color-bg-primary)' : status === 'Próxima em 30 dias' ? 'var(--color-bg-primary)' : 'var(--color-accent-cyan)',
+                          color: status === 'Vencida' ? 'var(--color-text-secondary)' : status === 'Próxima em 30 dias' ? 'var(--color-text-secondary)' : 'var(--color-bg-primary)',
                           border: '1px solid var(--color-border-light)'
                         }}>
                           {status === 'Vencida' ? 'Vencida' : status === 'Próxima em 30 dias' ? 'Próximos 30d' : 'Em dia'}
@@ -178,11 +178,11 @@ export default function ManutencaoPage() {
 
 function KPICard({ label, value, sub }) {
   return (
-    <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid var(--color-text-secondary)' }}>
+    <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', borderTop: '3px solid var(--color-accent-cyan)', cursor: 'pointer', transition: 'all 0.3s', transform: 'translateY(0)' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
       <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-bg-secondary)', marginBottom: '0.5rem' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)', marginBottom: '0.5rem' }}>
         {value}
       </div>
       <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>

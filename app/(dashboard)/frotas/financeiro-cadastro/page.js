@@ -62,13 +62,13 @@ export default function FinanceiroCadastroPage() {
   };
 
   return (
-    <div style={{ padding: '2rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
       <PageHeader
         title="Cadastrar Despesa"
         subtitle="Adicione multas, manutenções ou outras despesas"
       />
 
-      <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
+      <form onSubmit={handleSubmit} style={{ marginTop: '3rem' }}>
         {/* Placa */}
         <div style={{ marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>

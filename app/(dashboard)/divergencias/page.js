@@ -185,12 +185,12 @@ export default function DivergenciasPage() {
 
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Divergências"
         subtitle="Comparativo entre estoque físico e sistema"
         actions={
-          <button className="btn btn-secondary" onClick={exportExcel} disabled={exporting}>
+          <button className="btn btn-secondary" onClick={exportExcel} disabled={exporting} style={{ borderRadius: '8px', transition: '0.2s' }}>
             {exporting ? 'Exportando...' : 'Exportar Excel'}
           </button>
         }
@@ -204,7 +204,7 @@ export default function DivergenciasPage() {
         <div style={{ textAlign: 'center', padding: '3rem', fontWeight: '700' }}>Carregando...</div>
       ) : (
         <>
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}>
             <div className="table-wrapper" style={{ border: 'none' }}>
               {divergences.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '4rem', fontWeight: '700', color: 'var(--color-text-tertiary)' }}>Nenhuma divergência encontrada</div>
