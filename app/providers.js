@@ -2,21 +2,24 @@
 
 import { SessionProvider } from 'next-auth/react';
 import { Toaster } from 'sonner';
+import { ThemeProvider } from './providers/ThemeProvider';
 
 export function Providers({ children }) {
   return (
-    <SessionProvider>
-      {children}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#0f2040',
-            border: '1px solid #1e3a6e',
-            color: '#e2e8f0',
-          },
-        }}
-      />
-    </SessionProvider>
+    <ThemeProvider>
+      <SessionProvider>
+        {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border-default)',
+              color: 'var(--color-text-primary)',
+            },
+          }}
+        />
+      </SessionProvider>
+    </ThemeProvider>
   );
 }
