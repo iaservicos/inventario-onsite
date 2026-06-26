@@ -1,18 +1,18 @@
 :root {
-  /* Cores padrão Light Mode */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8f8f8;
-  --color-bg-tertiary: #f0f0f0;
-  --color-sidebar-bg: #2c3e50;
-  --color-text-primary: #000000;
-  --color-text-secondary: #333333;
-  --color-text-tertiary: #666666;
-  --color-text-disabled: #999999;
-  --color-border-light: #e5e5e5;
-  --color-border-default: #d0d0d0;
-  --color-border-dark: #999999;
-  --color-accent: #000000;
-  --color-accent-hover: #333333;
+  /* Cores padrão DARK MODE */
+  --color-bg-primary: #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-bg-tertiary: #21262d;
+  --color-sidebar-bg: #0d1117;
+  --color-text-primary: #c9d1d9;
+  --color-text-secondary: #e0e0e0;
+  --color-text-tertiary: #8b949e;
+  --color-text-disabled: #6e7681;
+  --color-border-light: #30363d;
+  --color-border-default: #444c56;
+  --color-border-dark: #6e7681;
+  --color-accent: #39c5cf;
+  --color-accent-hover: #1f8f9c;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
