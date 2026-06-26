@@ -109,9 +109,10 @@ export default function Sidebar({ user, isOpen }) {
 
   const bottomButtonStyle = {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-    padding: '0.45rem', borderRadius: '6px', border: '1px solid var(--color-border-default)',
+    padding: '0.55rem 0.75rem', borderRadius: '8px', border: '1.5px solid var(--color-border-light)',
     background: 'transparent', color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: '700',
     cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', width: '100%',
+    transition: 'all 0.25s ease',
   };
 
   return (

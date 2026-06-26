@@ -1,16 +1,16 @@
 :root {
-  /* Cores padrão DARK MODE - NexProp Style */
-  --color-bg-primary: #1a1f2e;
-  --color-bg-secondary: #2d3748;
-  --color-bg-tertiary: #374151;
-  --color-sidebar-bg: #0f1419;
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #cbd5e0;
+  /* Cores padrão DARK MODE - Elegante com contraste */
+  --color-bg-primary: #1f2937;
+  --color-bg-secondary: #374151;
+  --color-bg-tertiary: #4b5563;
+  --color-sidebar-bg: #111827;
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #e5e7eb;
   --color-text-tertiary: #9ca3af;
   --color-text-disabled: #6b7280;
-  --color-border-light: #374151;
-  --color-border-default: #4b5563;
-  --color-border-dark: #6b7280;
+  --color-border-light: #4b5563;
+  --color-border-default: #6b7280;
+  --color-border-dark: #9ca3af;
   --color-accent: #14b8a6;
   --color-accent-hover: #0d9488;
 }
