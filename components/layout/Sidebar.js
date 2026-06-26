@@ -139,10 +139,13 @@ export default function Sidebar({ user, isOpen }) {
             <Image
               src="https://raw.githubusercontent.com/iaservicos/IMAGENS/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-%281%29.png"
               alt="Positivo Tecnologia"
-              width={180}
-              height={45}
+              width={200}
+              height={50}
               style={{
                 objectFit: 'contain',
+                maxWidth: '100%',
+                height: 'auto',
+                filter: 'brightness(1.1) contrast(1.05)',
               }}
               priority
             />

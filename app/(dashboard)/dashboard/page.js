@@ -133,8 +133,8 @@ export default function DashboardPage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1.25rem',
-            marginBottom: '2.5rem',
+            gap: '1.5rem',
+            marginBottom: '3rem',
           }}>
             <PremiumKpiCard
               label="Total Inventários"
@@ -172,12 +172,12 @@ export default function DashboardPage() {
           }}>
             {/* Card Gráfico */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
-              backdropFilter: 'blur(30px)',
-              border: '1px solid rgba(38, 208, 206, 0.35)',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)',
+              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
+              backdropFilter: 'blur(40px)',
+              border: '1px solid rgba(38, 208, 206, 0.4)',
+              borderRadius: '20px',
+              padding: '2.5rem',
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
               position: 'relative',
               overflow: 'hidden',
             }}>
@@ -240,12 +240,12 @@ export default function DashboardPage() {
 
             {/* Card Alertas */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
-              backdropFilter: 'blur(30px)',
-              border: '1px solid rgba(38, 208, 206, 0.35)',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)',
+              background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
+              backdropFilter: 'blur(40px)',
+              border: '1px solid rgba(38, 208, 206, 0.4)',
+              borderRadius: '20px',
+              padding: '2.5rem',
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
               position: 'relative',
               overflow: 'hidden',
               display: 'flex',
@@ -298,12 +298,12 @@ export default function DashboardPage() {
 
           {/* Tabela */}
           <div style={{
-            background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
-            backdropFilter: 'blur(30px)',
-            border: '1px solid rgba(38, 208, 206, 0.35)',
-            borderRadius: '16px',
+            background: 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
+            backdropFilter: 'blur(40px)',
+            border: '1px solid rgba(38, 208, 206, 0.4)',
+            borderRadius: '20px',
             overflow: 'hidden',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.25)',
+            boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
           }}>
             <div style={{
               padding: '1.75rem 2rem',
@@ -373,50 +373,52 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
   return (
     <div style={{
       background: highlight
-        ? 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, rgba(38, 208, 206, 0.05) 100%)'
-        : 'linear-gradient(135deg, rgba(30, 45, 64, 0.85) 0%, rgba(42, 56, 80, 0.65) 100%)',
-      backdropFilter: 'blur(30px)',
-      border: highlight ? '1.5px solid rgba(38, 208, 206, 0.5)' : '1px solid rgba(38, 208, 206, 0.35)',
-      borderRadius: '16px',
-      padding: '1.75rem',
+        ? 'linear-gradient(135deg, rgba(38, 208, 206, 0.18) 0%, rgba(38, 208, 206, 0.08) 100%)'
+        : 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
+      backdropFilter: 'blur(40px)',
+      border: highlight ? '1.5px solid rgba(38, 208, 206, 0.6)' : '1px solid rgba(38, 208, 206, 0.4)',
+      borderRadius: '20px',
+      padding: '2rem',
       boxShadow: highlight
-        ? '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.3)'
-        : '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 20px rgba(38, 208, 206, 0.15)',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        ? '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.35)'
+        : '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 30px rgba(38, 208, 206, 0.2)',
+      transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
       cursor: 'pointer',
       position: 'relative',
       overflow: 'hidden',
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-4px)';
+      e.currentTarget.style.transform = 'translateY(-6px)';
       e.currentTarget.style.boxShadow = highlight
-        ? '0 30px 80px rgba(0, 0, 0, 0.5), 0 0 50px rgba(38, 208, 206, 0.4)'
-        : '0 30px 80px rgba(0, 0, 0, 0.5), 0 0 30px rgba(38, 208, 206, 0.25)';
+        ? '0 35px 90px rgba(0, 0, 0, 0.5), 0 0 60px rgba(38, 208, 206, 0.45)'
+        : '0 35px 90px rgba(0, 0, 0, 0.5), 0 0 40px rgba(38, 208, 206, 0.3)';
     }}
     onMouseLeave={(e) => {
       e.currentTarget.style.transform = 'translateY(0)';
       e.currentTarget.style.boxShadow = highlight
-        ? '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.3)'
-        : '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 20px rgba(38, 208, 206, 0.15)';
+        ? '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.35)'
+        : '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 30px rgba(38, 208, 206, 0.2)';
     }}>
       <GridPattern />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
-          fontSize: '0.75rem',
-          fontWeight: '700',
+          fontSize: '0.7rem',
+          fontWeight: '800',
           color: '#8b95a5',
           textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '1rem',
+          letterSpacing: '0.12em',
+          marginBottom: '1.25rem',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
         }}>
           {label}
         </div>
         <div style={{
-          fontSize: '2.5rem',
-          fontWeight: '900',
+          fontSize: '3rem',
+          fontWeight: '950',
           color: highlight ? color : '#ffffff',
           lineHeight: 1,
-          marginBottom: '0.75rem',
+          marginBottom: '0.5rem',
+          textShadow: highlight ? `0 0 20px ${color}40` : 'none',
         }}>
           {value}
         </div>
@@ -425,6 +427,7 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
             fontSize: '0.8rem',
             color: '#8b95a5',
             fontWeight: '600',
+            letterSpacing: '0.02em',
           }}>
             {sub}
           </div>
@@ -433,13 +436,14 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
       {highlight && (
         <div style={{
           position: 'absolute',
-          bottom: 0,
-          right: 0,
-          width: '100px',
-          height: '100px',
-          background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`,
+          bottom: '-20px',
+          right: '-20px',
+          width: '140px',
+          height: '140px',
+          background: `radial-gradient(circle, ${color}25 0%, transparent 70%)`,
           borderRadius: '50%',
           zIndex: 0,
+          filter: 'blur(20px)',
         }} />
       )}
     </div>
