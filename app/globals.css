@@ -36,16 +36,7 @@ html, body {
 
 body::before {
   content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    radial-gradient(circle at 20% 50%, rgba(29, 209, 161, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(29, 209, 161, 0.03) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 /* Light Mode */
