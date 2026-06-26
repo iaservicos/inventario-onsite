@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { formatDate } from '@/lib/utils';
 
 const STATUS_CONFIG = {
@@ -81,16 +82,10 @@ export default function FerramentalDashboardPage() {
   const greeting = now.getHours() < 12 ? 'Bom dia' : now.getHours() < 18 ? 'Boa tarde' : 'Boa noite';
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
-
-      <div style={{ marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>
-          {greeting}, {session?.user?.name?.split(' ')[0] || 'Analista'}
-        </h1>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginTop: '0.3rem', fontWeight: '500' }}>
-          Dashboard Ferramental — visão geral das solicitações e estoque
-        </p>
-      </div>
+    <DashboardLayout
+      title={`${greeting}, ${session?.user?.name?.split(' ')[0] || 'Analista'}`}
+      subtitle="Dashboard Ferramental — visão geral das solicitações e estoque"
+    >
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>Carregando...</div>
@@ -214,6 +209,6 @@ export default function FerramentalDashboardPage() {
           </div>
         </>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
