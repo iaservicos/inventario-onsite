@@ -1,8 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+export default function DashboardPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/categorias');
+  }, [router]);
+
+  return null;
+}
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
