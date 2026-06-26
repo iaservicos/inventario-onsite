@@ -11,13 +11,10 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     setMounted(true);
-    // Detectar preferência do sistema
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-
-    setTheme(initialTheme);
-    applyTheme(initialTheme);
+    // Forçar Dark Mode como padrão
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+    applyTheme(savedTheme);
   }, []);
 
   const applyTheme = (themeName) => {
