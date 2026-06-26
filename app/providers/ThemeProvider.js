@@ -29,6 +29,11 @@ export function ThemeProvider({ children }) {
       root.style.setProperty(`--color-${key}`, value);
     });
 
+    // Exportar para window para ThemeToggle acessar
+    window.__currentTheme__ = themeName;
+    window.__lightTheme__ = getTheme('light').colors;
+    window.__darkTheme__ = getTheme('dark').colors;
+
     // Aplicar no body para background
     document.body.style.backgroundColor = themeData.colors.bg_primary;
     document.body.style.color = themeData.colors.text_primary;

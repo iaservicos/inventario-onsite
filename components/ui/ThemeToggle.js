@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from '@/app/providers/ThemeProvider';
+import { useState, useEffect } from 'react';
 
 function IconSun() {
   return (
@@ -27,7 +27,36 @@ function IconMoon() {
 }
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const [theme, setTheme] = useState('light');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    const root = document.documentElement;
+    const themeData = newTheme === 'light'
+      ? window.__lightTheme__
+      : window.__darkTheme__;
+
+    if (themeData) {
+      Object.entries(themeData).forEach(([key, value]) => {
+        root.style.setProperty(`--color-${key}`, value);
+      });
+    }
+
+    document.body.style.backgroundColor = newTheme === 'light' ? '#ffffff' : '#0d1117';
+    document.body.style.color = newTheme === 'light' ? '#000000' : '#c9d1d9';
+  };
+
+  if (!mounted) return null;
 
   return (
     <button
