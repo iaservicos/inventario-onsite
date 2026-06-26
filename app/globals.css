@@ -1,22 +1,22 @@
 :root {
-  /* Cores padrão DARK MODE - NexProp Style Escuro */
-  --color-bg-primary: #0a0e27;
-  --color-bg-secondary: #141829;
-  --color-bg-tertiary: #1f2937;
-  --color-sidebar-bg: #050608;
+  /* Cores padrão DARK MODE - POSITIVO Preto + Vermelho Neon */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2d2d2d;
+  --color-sidebar-bg: #000000;
   --color-text-primary: #ffffff;
-  --color-text-secondary: #e0e0e0;
-  --color-text-tertiary: #8b8b8b;
-  --color-text-disabled: #5a5a5a;
-  --color-border-light: #1f2937;
-  --color-border-default: #2d3748;
-  --color-border-dark: #4a5568;
-  --color-accent: #1dd1a1;
-  --color-accent-hover: #10b981;
-  --color-success: #1dd1a1;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-text-secondary: #e5e5e5;
+  --color-text-tertiary: #a0a0a0;
+  --color-text-disabled: #6b6b6b;
+  --color-border-light: #2d2d2d;
+  --color-border-default: #3d3d3d;
+  --color-border-dark: #5d5d5d;
+  --color-accent: #00ff41;
+  --color-accent-hover: #00cc34;
+  --color-success: #00ff41;
+  --color-warning: #ffff00;
+  --color-error: #ff0000;
+  --color-info: #00ffff;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
