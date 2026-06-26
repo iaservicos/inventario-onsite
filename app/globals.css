@@ -1,16 +1,16 @@
 :root {
-  /* Cores padrão DARK MODE - Elegante com contraste */
-  --color-bg-primary: #1f2937;
-  --color-bg-secondary: #374151;
-  --color-bg-tertiary: #4b5563;
-  --color-sidebar-bg: #111827;
-  --color-text-primary: #f3f4f6;
-  --color-text-secondary: #e5e7eb;
-  --color-text-tertiary: #9ca3af;
-  --color-text-disabled: #6b7280;
-  --color-border-light: #4b5563;
-  --color-border-default: #6b7280;
-  --color-border-dark: #9ca3af;
+  /* Cores padrão DARK MODE - Preto elegante */
+  --color-bg-primary: #0f0f0f;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2d2d2d;
+  --color-sidebar-bg: #0a0a0a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e5e5e5;
+  --color-text-tertiary: #a0a0a0;
+  --color-text-disabled: #707070;
+  --color-border-light: #2d2d2d;
+  --color-border-default: #3d3d3d;
+  --color-border-dark: #5d5d5d;
   --color-accent: #14b8a6;
   --color-accent-hover: #0d9488;
 }
