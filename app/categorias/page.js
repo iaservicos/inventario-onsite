@@ -372,7 +372,7 @@ export default function CategoriasPage() {
           gap: '2rem',
           maxWidth: '1300px',
           width: '100%',
-        }}
+        }}>
         <CategoriaCard
           titulo="Inventário & Peças"
           descricao="Gerencie inventários, peças novas, peças usadas e agendamentos"
