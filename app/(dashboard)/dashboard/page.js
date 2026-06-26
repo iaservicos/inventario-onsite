@@ -143,10 +143,10 @@ export default function DashboardPage() {
             position: 'relative',
             zIndex: 1,
           }}>
-            <KpiCard icon="📦" label="Total Inventários" value={kpis.total || 0} sub="No período" color="#26d0ce" />
-            <KpiCard icon="✅" label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}% sucesso`} color="#26d0ce" highlight />
-            <KpiCard icon="⚙️" label="Em Andamento" value={kpis.in_progress || 0} sub="Execução ativa" color="#79c0ff" />
-            <KpiCard icon="⚠️" label="Divergências" value={kpis.abandoned || 0} sub="Atenção" color="#f85149" />
+            <KpiCard label="Total Inventários" value={kpis.total || 0} sub="No período" color="#26d0ce" />
+            <KpiCard label="Concluídos" value={kpis.completed || 0} sub={`${completionRate}% sucesso`} color="#26d0ce" highlight />
+            <KpiCard label="Em Andamento" value={kpis.in_progress || 0} sub="Execução ativa" color="#79c0ff" />
+            <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Atenção" color="#f85149" />
           </div>
 
           {/* Gráficos e Alertas */}
@@ -168,8 +168,8 @@ export default function DashboardPage() {
                   marginBottom: '1rem',
                   borderRadius: '2px',
                 }} />
-                <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📊</span> Distribuição de Status
+                <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>
+                  Distribuição de Status
                 </h3>
                 <div style={{ height: '280px', width: '100%' }}>
                   {pieData.length > 0 ? (
@@ -209,8 +209,8 @@ export default function DashboardPage() {
                   marginBottom: '1rem',
                   borderRadius: '2px',
                 }} />
-                <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>⚠️</span> Alertas Críticos
+                <h3 style={{ color: '#26d0ce', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>
+                  Alertas Críticos
                 </h3>
                 <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {alerts.length === 0 ? (
@@ -259,8 +259,8 @@ export default function DashboardPage() {
                 marginBottom: '0.75rem',
                 borderRadius: '2px',
               }} />
-              <h3 style={{ color: '#26d0ce', margin: 0, fontWeight: '700', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span>📋</span> Atividade Recente
+              <h3 style={{ color: '#26d0ce', margin: 0, fontWeight: '700', fontSize: '1rem' }}>
+                Atividade Recente
               </h3>
             </div>
             <div style={{ overflow: 'x', overflowX: 'auto', position: 'relative', zIndex: 2 }}>
