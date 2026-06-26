@@ -320,7 +320,7 @@ export default function DashboardPage() {
   );
 }
 
-function KpiCard({ icon, label, value, sub, color, highlight }) {
+function KpiCard({ label, value, sub, color, highlight }) {
   return (
     <div style={{
       background: highlight
@@ -358,9 +358,8 @@ function KpiCard({ icon, label, value, sub, color, highlight }) {
     }}>
       <PatternSVG />
       <div style={{ position: 'relative', zIndex: 2 }}>
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{icon}</div>
-        <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{label}</div>
-        <div style={{ fontSize: '2.5rem', fontWeight: '900', color: color, lineHeight: 1, marginBottom: '0.5rem' }}>{value}</div>
+        <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#8b95a5', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>{label}</div>
+        <div style={{ fontSize: '2.5rem', fontWeight: '900', color: color, lineHeight: 1, marginBottom: '0.75rem' }}>{value}</div>
         {sub && <div style={{ fontSize: '0.75rem', color: '#8b95a5', fontWeight: '600' }}>{sub}</div>}
       </div>
     </div>
