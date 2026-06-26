@@ -1,18 +1,18 @@
 :root {
-  /* Cores padrão DARK MODE - Elegante com bom contraste */
-  --color-bg-primary: #1a1f2e;
-  --color-bg-secondary: #242d3d;
-  --color-bg-tertiary: #2d3748;
-  --color-sidebar-bg: #1a1f2e;
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #cbd5e0;
-  --color-text-tertiary: #a0aec0;
-  --color-text-disabled: #718096;
-  --color-border-light: #4a5568;
-  --color-border-default: #718096;
-  --color-border-dark: #a0aec0;
-  --color-accent: #00d9ff;
-  --color-accent-hover: #00b8cc;
+  /* Cores padrão DARK MODE - Alto contraste */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-sidebar-bg: #0f172a;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #e2e8f0;
+  --color-text-tertiary: #94a3b8;
+  --color-text-disabled: #64748b;
+  --color-border-light: #475569;
+  --color-border-default: #64748b;
+  --color-border-dark: #94a3b8;
+  --color-accent: #06b6d4;
+  --color-accent-hover: #0891b2;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
