@@ -63,12 +63,15 @@ export default function DashboardPage() {
   const recent = data?.recent || [];
   const alerts = data?.alerts || [];
 
-  const pieData = [
+  const pieChartData = [
     { name: 'Concluído', value: kpis.completed || 0, color: '#26d0ce' },
     { name: 'Em Andamento', value: kpis.in_progress || 0, color: '#3b82f6' },
     { name: 'Abandonado', value: kpis.abandoned || 0, color: '#f85149' },
     { name: 'Recontagem', value: kpis.recount_pending || 0, color: '#fbbf24' },
-  ].filter((d) => d.value > 0);
+  ];
+
+  const pieData = pieChartData.filter((d) => d.value > 0);
+  const allPieData = pieChartData;
 
   const completionRate = kpis.total > 0 ? Math.round((kpis.completed / kpis.total) * 100) : 0;
 
@@ -271,7 +274,7 @@ export default function DashboardPage() {
                   padding: '1.5rem 0 0 0',
                   borderTop: '1px solid rgba(38, 208, 206, 0.15)',
                 }}>
-                  {pieData.map((item) => (
+                  {allPieData.map((item) => (
                     <div key={item.name} style={{
                       display: 'flex',
                       alignItems: 'center',
