@@ -117,24 +117,24 @@ export default function Sidebar({ user, isOpen }) {
       <div style={{ padding: '1.5rem 1rem 1rem', borderBottom: '1.5px solid var(--color-border-light)' }}>
         <Link href="/categorias" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none' }}>
           <div style={{
-            background: 'linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, transparent 100%)',
+            background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, transparent 100%)',
             padding: '0.75rem',
             borderRadius: '8px',
             display: 'flex',
             justifyContent: 'center',
-            border: '1.5px solid rgba(0, 255, 65, 0.4)',
-            boxShadow: '0 0 20px rgba(0, 255, 65, 0.15), inset 0 0 10px rgba(0, 255, 65, 0.05)',
+            border: '1.5px solid rgba(0, 212, 255, 0.4)',
+            boxShadow: '0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.08)',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             width: '100%',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(0, 255, 65, 0.8)';
-            e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 255, 65, 0.4), inset 0 0 10px rgba(0, 255, 65, 0.1)';
+            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.8)';
+            e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 10px rgba(0, 212, 255, 0.15)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(0, 255, 65, 0.4)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 65, 0.15), inset 0 0 10px rgba(0, 255, 65, 0.05)';
+            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.4)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.08)';
           }}>
             <Image
               src="https://raw.githubusercontent.com/iaservicos/IMAGENS/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-%281%29.png"
