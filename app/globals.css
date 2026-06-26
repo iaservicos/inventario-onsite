@@ -1,16 +1,16 @@
 :root {
-  /* Cores padrão DARK MODE - Baseado NexProp Design */
-  --color-bg-primary: #0d1117;
-  --color-bg-secondary: #1a2332;
-  --color-bg-tertiary: #243447;
-  --color-sidebar-bg: #0d1117;
-  --color-text-primary: #e8eef5;
-  --color-text-secondary: #d0d8e0;
-  --color-text-tertiary: #8b96a8;
-  --color-text-disabled: #5a6578;
-  --color-border-light: #2f3f52;
-  --color-border-default: #3d4d62;
-  --color-border-dark: #5a6578;
+  /* Cores padrão DARK MODE - NexProp Style */
+  --color-bg-primary: #1a1f2e;
+  --color-bg-secondary: #2d3748;
+  --color-bg-tertiary: #374151;
+  --color-sidebar-bg: #0f1419;
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #cbd5e0;
+  --color-text-tertiary: #9ca3af;
+  --color-text-disabled: #6b7280;
+  --color-border-light: #374151;
+  --color-border-default: #4b5563;
+  --color-border-dark: #6b7280;
   --color-accent: #14b8a6;
   --color-accent-hover: #0d9488;
 }
@@ -75,27 +75,30 @@ html[data-theme="light"] body {
 ::-webkit-scrollbar-thumb { background: var(--color-border-default); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-border-dark); }
 
-/* ── Cards Minimalistas ── */
+/* ── Cards Modernos com Neon ── */
 .card {
   background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-light);
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  border: 1.5px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(20, 184, 166, 0.05);
   width: 100%;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(20, 184, 166, 0.02) 100%);
 }
 .card-hover:hover {
-  border-color: var(--color-border-default);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: var(--color-accent);
+  box-shadow: 0 8px 32px rgba(20, 184, 166, 0.15), inset 0 1px 0 rgba(20, 184, 166, 0.1);
+  transform: translateY(-2px);
 }
 
-/* ── Tabelas Fluidas ── */
+/* ── Tabelas Modernas ── */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--color-border-light);
-  border-radius: 6px;
+  border: 1.5px solid var(--color-border-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 table {
   width: 100%;
@@ -103,40 +106,45 @@ table {
   font-size: 0.8rem;
 }
 th {
-  padding: 0.75rem 1rem;
-  background: var(--color-bg-tertiary);
+  padding: 1rem;
+  background: linear-gradient(90deg, var(--color-bg-tertiary) 0%, rgba(20, 184, 166, 0.03) 100%);
   text-align: left;
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-accent);
+  border-bottom: 1.5px solid var(--color-border-light);
   white-space: nowrap;
 }
 td {
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--color-border-light);
   color: var(--color-text-secondary);
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
-tr:hover td { background: var(--color-bg-tertiary); }
+tr:hover td {
+  background: rgba(20, 184, 166, 0.05);
+  color: var(--color-text-primary);
+}
 
-/* ── Inputs & Buttons ── */
+/* ── Inputs & Buttons Modernos ── */
 .input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.7rem 1rem;
   font-size: 0.8rem;
-  border: 1px solid var(--color-border-default);
-  border-radius: 4px;
+  border: 1.5px solid var(--color-border-default);
+  border-radius: 8px;
   outline: none;
-  transition: all 0.15s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   background: var(--color-bg-secondary);
   color: var(--color-text-primary);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .input:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.1);
   background: var(--color-bg-tertiary);
 }
 .input::placeholder {
@@ -148,18 +156,35 @@ tr:hover td { background: var(--color-bg-tertiary); }
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.5rem 1rem;
+  padding: 0.65rem 1.25rem;
   font-size: 0.75rem;
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
-.btn-primary { background: var(--color-accent); color: white; }
-.btn-primary:hover { background: var(--color-accent-hover); }
-.btn-secondary { background: var(--color-bg-tertiary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); }
-.btn-secondary:hover { background: var(--color-border-light); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.4);
+}
+.btn-secondary {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1.5px solid var(--color-border-default);
+  transition: all 0.25s ease;
+}
+.btn-secondary:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.15);
+}
 
 /* ── Selects & Textareas ── */
 select,
@@ -191,23 +216,26 @@ select option {
 .page-header-title { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.03em; color: var(--color-text-primary); }
 .page-header-subtitle { font-size: 0.85rem; color: var(--color-text-tertiary); font-weight: 500; }
 
-/* ── Status Badges (Monocromático) ── */
+/* ── Status Badges Modernas ── */
 .badge {
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.7rem;
   font-size: 0.65rem;
   font-weight: 800;
-  border-radius: 4px;
+  border-radius: 6px;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  display: inline-block;
 }
-.badge-ok { background: var(--color-accent); color: white; border: 1px solid var(--color-accent); }
-.badge-not-ok { background: var(--color-bg-tertiary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); }
-.badge-success { background: var(--color-accent); color: white; }
-.badge-info { background: var(--color-bg-tertiary); color: var(--color-text-primary); border: 1px solid var(--color-border-light); }
-.badge-warning { background: var(--color-bg-tertiary); color: var(--color-text-secondary); border: 1px solid var(--color-border-default); }
-.badge-error { background: var(--color-bg-tertiary); color: var(--color-text-secondary); border: 1px solid var(--color-border-default); }
-.badge-neutral { background: var(--color-bg-secondary); color: var(--color-text-tertiary); border: 1px solid var(--color-border-light); }
-.badge-active { background: var(--color-accent); color: white; }
-.badge-inactive { background: var(--color-bg-tertiary); color: var(--color-text-secondary); border: 1px solid var(--color-border-light); }
+.badge-ok { background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%); color: white; border: 1px solid var(--color-accent); box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2); }
+.badge-not-ok { background: var(--color-bg-tertiary); color: var(--color-text-primary); border: 1.5px solid var(--color-border-default); }
+.badge-success { background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%); color: white; box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2); }
+.badge-info { background: var(--color-bg-tertiary); color: var(--color-accent); border: 1.5px solid var(--color-border-light); }
+.badge-warning { background: var(--color-bg-tertiary); color: #f59e0b; border: 1.5px solid #f59e0b; }
+.badge-error { background: var(--color-bg-tertiary); color: #ef4444; border: 1.5px solid #ef4444; }
+.badge-neutral { background: var(--color-bg-secondary); color: var(--color-text-tertiary); border: 1.5px solid var(--color-border-light); }
+.badge-active { background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%); color: white; box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2); }
+.badge-inactive { background: var(--color-bg-tertiary); color: var(--color-text-secondary); border: 1.5px solid var(--color-border-light); }
 
 /* ── Progress ── */
 .progress-bar {
