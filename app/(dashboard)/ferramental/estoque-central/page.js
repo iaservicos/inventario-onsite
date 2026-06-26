@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 async function exportToExcel(data, filterBranch) {
   const { utils, writeFile } = await import('xlsx');
@@ -298,19 +298,18 @@ export default function EstoqueCentralPage() {
   }
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Estoque Central"
-        subtitle="Controle de ferramentas disponíveis nas filiais"
-        actions={
-          <button
-            onClick={() => setModal({ type: 'nova_ferramenta' })}
-            style={{ padding: '0.6rem 1.1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', transition: 'all 0.2s' }}
-          >
-            + Nova Ferramenta
-          </button>
-        }
-      />
+    <DashboardLayout
+      title="Estoque Central"
+      subtitle="Controle de ferramentas disponíveis nas filiais"
+      actions={
+        <button
+          onClick={() => setModal({ type: 'nova_ferramenta' })}
+          style={{ padding: '0.6rem 1.1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', transition: 'all 0.2s' }}
+        >
+          + Nova Ferramenta
+        </button>
+      }
+    >
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
         {[
@@ -428,6 +427,6 @@ export default function EstoqueCentralPage() {
           onSaved={load}
         />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

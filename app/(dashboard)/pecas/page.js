@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import * as XLSX from 'xlsx';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 function IconDownload() {
   return (
@@ -262,12 +262,7 @@ export default function PecasPage() {
   }
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-
-      <PageHeader
-        title="Peças Novas"
-        subtitle="Dados sincronizados diariamente às 08h"
-      />
+    <DashboardLayout title="Peças Novas" subtitle="Dados sincronizados diariamente às 08h">
 
       {/* ── Banner de última atualização ─────────────────────────────────── */}
       <div style={{
@@ -828,6 +823,6 @@ export default function PecasPage() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
-    </div>
+    </DashboardLayout>
   );
 }

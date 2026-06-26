@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import StatusBadge from '@/components/ui/StatusBadge';
 import FilterBar from '@/components/ui/FilterBar';
 
@@ -62,9 +62,10 @@ export default function VeiculosPage() {
   ];
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <PageHeader title="Veículos" subtitle="Gerencie todos os veículos da frota" />
+    <DashboardLayout
+      title="Veículos"
+      subtitle="Gerencie todos os veículos da frota"
+      actions={
         <Link href="/frotas/veiculos/novo">
           <button style={{
             padding: '0.5rem 1rem',
@@ -82,7 +83,8 @@ export default function VeiculosPage() {
             + Novo Veículo
           </button>
         </Link>
-      </div>
+      }
+    >
 
       {/* Filtros */}
       <FilterBar
@@ -171,7 +173,7 @@ export default function VeiculosPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

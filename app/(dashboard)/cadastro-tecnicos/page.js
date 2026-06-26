@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { toast } from 'sonner';
 
 const ESTADOS_BR = [
@@ -359,23 +359,17 @@ export default function CadastroTecnicosPage() {
   const canEditAll = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Cadastro de Técnicos"
-        subtitle="Gerenciamento de técnicos e vínculos de gestão"
-        actions={
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            {selecionados.length > 0 && (
-              <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk' })} style={{ border: '2px solid var(--color-text-primary)', fontWeight: '800' }}>
-                EDITAR SELECIONADOS ({selecionados.length})
-              </button>
-            )}
-            <button className="btn btn-primary" onClick={() => setModal({ type: 'new' })} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
-              + NOVO TÉCNICO
-            </button>
-          </div>
-        }
-      />
+    <DashboardLayout title="Cadastro de Técnicos" subtitle="Gerenciamento de técnicos e vínculos de gestão">
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
+        {selecionados.length > 0 && (
+          <button className="btn btn-secondary" onClick={() => setModal({ type: 'bulk' })} style={{ border: '2px solid var(--color-text-primary)', fontWeight: '800' }}>
+            EDITAR SELECIONADOS ({selecionados.length})
+          </button>
+        )}
+        <button className="btn btn-primary" onClick={() => setModal({ type: 'new' })} style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}>
+          + NOVO TÉCNICO
+        </button>
+      </div>
 
       <div className="card" style={{ marginBottom: '2rem', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
@@ -524,6 +518,6 @@ export default function CadastroTecnicosPage() {
           canEditAll={canEditAll}
         />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

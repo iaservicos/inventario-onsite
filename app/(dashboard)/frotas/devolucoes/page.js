@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function DevolucoesPage() {
   const [filters, setFilters] = useState({ search: '' });
@@ -44,8 +44,7 @@ export default function DevolucoesPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader title="Devoluções" subtitle="Registro fotográfico ao devolver o veículo" />
+    <DashboardLayout title="Devoluções" subtitle="Registro fotográfico ao devolver o veículo" >
 
       {/* Filtro */}
       <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '2rem', marginBottom: '2rem', marginTop: '3rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -241,7 +240,7 @@ export default function DevolucoesPage() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
 

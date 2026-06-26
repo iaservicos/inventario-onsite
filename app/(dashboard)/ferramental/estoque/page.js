@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const selSt = { width: '100%', padding: '0.65rem 0.9rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.82rem', fontWeight: '600', color: 'var(--color-text-primary)', background: 'var(--color-bg-primary)', cursor: 'pointer', outline: 'none' };
 const labelSt = { fontSize: '0.68rem', fontWeight: '800', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' };
@@ -104,8 +104,7 @@ export default function FerramentalEstoquePage() {
   const hasDirty = Object.values(dirty).some(Boolean);
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <PageHeader title="Estoque por Técnico" subtitle="Controle de ferramentas em posse de cada técnico" />
+    <DashboardLayout title="Estoque por Técnico" subtitle="Controle de ferramentas em posse de cada técnico">
 
       <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
@@ -268,6 +267,6 @@ export default function FerramentalEstoquePage() {
           </table>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function CombustivelHistoricoPage() {
   const [combustiveis, setCombustiveis] = useState([]);
@@ -66,11 +66,10 @@ export default function CombustivelHistoricoPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader
-        title="Histórico de Abastecimentos"
-        subtitle="Quem abasteceu cada veículo - data, horário, motorista e valores"
-      />
+    <DashboardLayout
+      title="Histórico de Abastecimentos"
+      subtitle="Quem abasteceu cada veículo - data, horário, motorista e valores"
+    >
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
@@ -207,7 +206,7 @@ export default function CombustivelHistoricoPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

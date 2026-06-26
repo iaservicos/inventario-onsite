@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function NovoVeiculoPage() {
   const router = useRouter();
@@ -62,8 +62,7 @@ export default function NovoVeiculoPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader title="Novo Veículo" subtitle="Cadastre um novo veículo na frota" />
+    <DashboardLayout title="Novo Veículo" subtitle="Cadastre um novo veículo na frota" >
 
       <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', border: '1px solid var(--color-border-light)', padding: '2rem', maxWidth: '600px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -298,7 +297,7 @@ export default function NovoVeiculoPage() {
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

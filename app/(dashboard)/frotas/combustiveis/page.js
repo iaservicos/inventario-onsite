@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function CombustiveisPage() {
   const [stats, setStats] = useState({
@@ -34,11 +34,10 @@ export default function CombustiveisPage() {
   }, []);
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader
-        title="Combustíveis"
-        subtitle="Resumo de consumo importado"
-      />
+    <DashboardLayout
+      title="Combustíveis"
+      subtitle="Resumo de consumo importado"
+    >
 
       <div style={{ maxWidth: '1200px', marginTop: '3rem' }}>
         {loading && (
@@ -154,7 +153,7 @@ export default function CombustiveisPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

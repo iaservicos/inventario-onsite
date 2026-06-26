@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const STATUS_CONFIG = {
   aguardando_aprovacao: { label: 'Aguardando Aprovação', color: 'var(--color-text-primary)', bg: 'var(--color-bg-tertiary)' },
@@ -361,19 +361,18 @@ export default function FerramentalPage() {
   const entregues  = requests.filter(r => r.status === 'entregue').length;
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <PageHeader
-        title="Ferramental"
-        subtitle="Controle de solicitações e entrega de ferramentas"
-        actions={isGestor && (
-          <button
-            onClick={() => setShowSolicitar(true)}
-            style={{ padding: '0.5rem 1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em', transition: 'all 0.2s', transform: 'translateY(0)', boxShadow: '0 2px 4px rgba(0, 212, 255, 0.1)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 2px 4px rgba(0, 212, 255, 0.1)'; }}
-          >
-            + Solicitar para Técnico
-          </button>
-        )}
-      />
+    <DashboardLayout
+      title="Ferramental"
+      subtitle="Controle de solicitações e entrega de ferramentas"
+      actions={isGestor && (
+        <button
+          onClick={() => setShowSolicitar(true)}
+          style={{ padding: '0.5rem 1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em', transition: 'all 0.2s', transform: 'translateY(0)', boxShadow: '0 2px 4px rgba(0, 212, 255, 0.1)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 2px 4px rgba(0, 212, 255, 0.1)'; }}
+        >
+          + Solicitar para Técnico
+        </button>
+      )}
+    >
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         {[
@@ -522,6 +521,6 @@ export default function FerramentalPage() {
           onSaved={load}
         />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import StatusBadge from '@/components/ui/StatusBadge';
 import FilterBar from '@/components/ui/FilterBar';
 
@@ -69,8 +69,7 @@ export default function FrotasPage() {
   ];
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader title="Gestão de Frotas" subtitle="Gerencie todos os veículos da frota" />
+    <DashboardLayout title="Gestão de Frotas" subtitle="Gerencie todos os veículos da frota" >
 
       {/* KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
@@ -179,7 +178,7 @@ export default function FrotasPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

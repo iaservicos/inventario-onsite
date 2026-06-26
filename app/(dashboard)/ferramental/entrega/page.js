@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { formatDate } from '@/lib/utils';
 
 export default function EntregaFerramentalPage() {
@@ -117,8 +117,7 @@ export default function EntregaFerramentalPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <PageHeader title="Registrar Entrega" subtitle="Registre a entrega de ferramentas a um técnico" />
+    <DashboardLayout title="Registrar Entrega" subtitle="Registre a entrega de ferramentas a um técnico">
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,2fr)', gap: '1.5rem', alignItems: 'start' }}>
 
@@ -334,6 +333,6 @@ export default function EntregaFerramentalPage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

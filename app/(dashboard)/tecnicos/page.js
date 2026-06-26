@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { formatDate, formatDuration } from '@/lib/utils';
 export default function TecnicosPage() {
@@ -62,11 +62,7 @@ export default function TecnicosPage() {
   const totalDivGlobal = byTech.reduce((s, t) => s + t.totalDiv, 0);
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Técnicos"
-        subtitle="Desempenho e histórico de inventários"
-      />
+    <DashboardLayout title="Técnicos" subtitle="Desempenho e histórico de inventários">
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} />
 
@@ -222,7 +218,7 @@ export default function TecnicosPage() {
           </div>
         </>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function FinanceiroCadastroPage() {
   const router = useRouter();
@@ -62,11 +62,10 @@ export default function FinanceiroCadastroPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
-      <PageHeader
-        title="Cadastrar Despesa"
-        subtitle="Adicione multas, manutenções ou outras despesas"
-      />
+    <DashboardLayout
+      title="Cadastrar Despesa"
+      subtitle="Adicione multas, manutenções ou outras despesas"
+    >
 
       <form onSubmit={handleSubmit} style={{ marginTop: '3rem' }}>
         {/* Placa */}
@@ -243,7 +242,7 @@ export default function FinanceiroCadastroPage() {
           </button>
         </div>
       </form>
-    </div>
+    </DashboardLayout>
   );
 }
 

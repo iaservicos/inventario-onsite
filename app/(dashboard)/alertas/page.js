@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -112,20 +112,19 @@ export default function AlertasPage() {
   const outros          = active.filter((a) => !['surplus_subgroup', 'surplus', 'recount', 'recount_pending'].includes(a.type));
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Alertas"
-        subtitle="Monitoramento de excedentes, recontagens e erros"
-        actions={
-          <button
-            className={`btn ${showResolved ? '' : 'btn-secondary'}`}
-            onClick={() => setShowResolved(!showResolved)}
-            style={{ borderRadius: '8px', transition: '0.2s' }}
-          >
-            {showResolved ? 'Ocultar resolvidos' : 'Ver resolvidos'}
-          </button>
-        }
-      />
+    <DashboardLayout
+      title="Alertas"
+      subtitle="Monitoramento de excedentes, recontagens e erros"
+    >
+      <div style={{ marginBottom: '2rem' }}>
+        <button
+          className={`btn ${showResolved ? '' : 'btn-secondary'}`}
+          onClick={() => setShowResolved(!showResolved)}
+          style={{ borderRadius: '8px', transition: '0.2s' }}
+        >
+          {showResolved ? 'Ocultar resolvidos' : 'Ver resolvidos'}
+        </button>
+      </div>
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} statusOptions={statusOptions} />
 
@@ -185,7 +184,7 @@ export default function AlertasPage() {
           )}
         </>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
 

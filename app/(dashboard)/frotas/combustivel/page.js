@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function CombustvelPage() {
   const router = useRouter();
@@ -125,12 +125,10 @@ export default function CombustvelPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-        <PageHeader
-          title="Combustível Serviço"
-          subtitle="Consumo, gastos e eficiência por veículo e motorista"
-        />
+    <DashboardLayout
+      title="Combustível Serviço"
+      subtitle="Consumo, gastos e eficiência por veículo e motorista"
+      actions={
         <button
           onClick={() => router.push('/frotas/combustivel-import')}
           style={{
@@ -149,7 +147,7 @@ export default function CombustvelPage() {
           onMouseOut={(e) => (e.target.style.boxShadow = 'none')}>
           Importar Relatório
         </button>
-      </div>
+      }
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
@@ -541,7 +539,7 @@ export default function CombustvelPage() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
 

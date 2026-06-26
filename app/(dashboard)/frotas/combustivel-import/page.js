@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function CombustivelImportPage() {
   const router = useRouter();
@@ -57,11 +57,10 @@ export default function CombustivelImportPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
-      <PageHeader
-        title="Importar Combustíveis"
-        subtitle="Carregue um arquivo CSV com os dados de combustível"
-      />
+    <DashboardLayout
+      title="Importar Combustíveis"
+      subtitle="Carregue um arquivo CSV com os dados de combustível"
+    >
 
       <form onSubmit={handleSubmit} style={{ marginTop: '3rem' }}>
         {/* Arquivo */}
@@ -166,6 +165,6 @@ export default function CombustivelImportPage() {
           </button>
         </div>
       </form>
-    </div>
+    </DashboardLayout>
   );
 }

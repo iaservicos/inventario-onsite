@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function FotosPage() {
   const [fotos, setFotos] = useState([]);
@@ -40,11 +40,10 @@ export default function FotosPage() {
   const fotosPendentes = filtrados.filter(f => f.status === 'pendente');
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader
-        title="Validação de Fotos do Hodômetro"
-        subtitle="Aprovando, a foto é apagada do banco. Rejeitando, o gestor é notificado."
-      />
+    <DashboardLayout
+      title="Validação de Fotos do Hodômetro"
+      subtitle="Aprovando, a foto é apagada do banco. Rejeitando, o gestor é notificado."
+    >
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
@@ -197,7 +196,7 @@ export default function FotosPage() {
         )}
       </div>
 
-    </div>
+    </DashboardLayout>
   );
 }
 

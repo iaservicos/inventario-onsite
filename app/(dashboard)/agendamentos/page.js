@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const DIAS_SEMANA = [
   { id: 1, label: 'Segunda-feira' },
@@ -624,15 +624,13 @@ export default function AgendamentosPage() {
   const canViewInventarioGeral = isAdmin || isSupervisor || isCoordinator || isAnalyst;
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Agendamentos"
-        subtitle={isAdmin
-          ? 'Gerencie os subgrupos dos inventários pendentes e o escalonamento dos técnicos'
-          : 'Defina o dia e horário do inventário para os técnicos ativos'
-        }
-      />
-
+    <DashboardLayout
+      title="Agendamentos"
+      subtitle={isAdmin
+        ? 'Gerencie os subgrupos dos inventários pendentes e o escalonamento dos técnicos'
+        : 'Defina o dia e horário do inventário para os técnicos ativos'
+      }
+    >
       {msg.text && (
         <div style={{
           padding: '0.75rem 1rem', background: 'var(--color-bg-secondary)', color: 'var(--color-accent-cyan)',
@@ -658,6 +656,6 @@ export default function AgendamentosPage() {
       )}
 
       <EscalonamentoSection onMsg={showMsg} />
-    </div>
+    </DashboardLayout>
   );
 }

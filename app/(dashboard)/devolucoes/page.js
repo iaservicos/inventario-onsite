@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import * as XLSX from 'xlsx';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 function formatDate(val) {
   if (!val) return '—';
@@ -188,11 +188,10 @@ export default function DevolucoesPage() {
   }
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Lotes Montados"
-        subtitle="Lotes de devolução montados ou enviados pelo técnico aguardando confirmação da ATP"
-      />
+    <DashboardLayout
+      title="Lotes Montados"
+      subtitle="Lotes de devolução montados ou enviados pelo técnico aguardando confirmação da ATP"
+    >
 
       <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
 
@@ -472,6 +471,6 @@ export default function DevolucoesPage() {
           Selecione um técnico para visualizar as devoluções pendentes
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 }

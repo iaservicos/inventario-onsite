@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function MovimentacoesPage() {
   const [filters, setFilters] = useState({ search: '' });
@@ -42,11 +42,10 @@ export default function MovimentacoesPage() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader
-        title="Movimentações"
-        subtitle="Histórico de trocas de técnico e alocação de veículos"
-      />
+    <DashboardLayout
+      title="Movimentações"
+      subtitle="Histórico de trocas de técnico e alocação de veículos"
+    >
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
@@ -108,7 +107,7 @@ export default function MovimentacoesPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

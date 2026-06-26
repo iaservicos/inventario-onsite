@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function FinanceiroPage() {
   const router = useRouter();
@@ -59,9 +59,10 @@ export default function FinanceiroPage() {
     .slice(0, 10);
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-        <PageHeader title="Financeiro" subtitle="Análise de custos, multas e despesas por veículo" />
+    <DashboardLayout
+      title="Financeiro"
+      subtitle="Análise de custos, multas e despesas por veículo"
+      actions={
         <button
           onClick={() => router.push('/frotas/financeiro-cadastro')}
           style={{
@@ -81,7 +82,8 @@ export default function FinanceiroPage() {
         >
           + Cadastrar Despesa
         </button>
-      </div>
+      }
+    >
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
@@ -205,7 +207,7 @@ export default function FinanceiroPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function EditarVeiculoPage() {
   const router = useRouter();
@@ -75,25 +75,22 @@ export default function EditarVeiculoPage() {
 
   if (loading) {
     return (
-      <>
-        <PageHeader title="Carregando..." subtitle="" />
+      <DashboardLayout title="Carregando..." subtitle="" >
         <div style={{ padding: '2.5rem 3rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando dados do veículo...</div>
-      </>
+      </DashboardLayout>
     );
   }
 
   if (!form) {
     return (
-      <>
-        <PageHeader title="Erro" subtitle="" />
+      <DashboardLayout title="Erro" subtitle="" >
         <div style={{ padding: '2.5rem 3rem', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Veículo não encontrado</div>
-      </>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader title={form.placa} subtitle={`${form.modelo} · ${form.ano}`} />
+    <DashboardLayout title={form.placa} subtitle={`${form.modelo} · ${form.ano}`} >
 
       <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', border: '1px solid var(--color-border-light)', padding: '2rem', maxWidth: '600px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -327,6 +324,6 @@ export default function EditarVeiculoPage() {
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

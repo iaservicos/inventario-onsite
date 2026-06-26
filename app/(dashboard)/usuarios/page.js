@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { formatDate, ROLE_LABELS } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -235,20 +235,16 @@ export default function UsuariosPage() {
   );
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Usuários"
-        subtitle="Gerenciamento de acesso e permissões do sistema"
-        actions={
-          <button
-            className="btn btn-primary"
-            onClick={() => setModal({ type: 'new', data: null })}
-            style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900', borderRadius: '8px', transition: '0.2s' }}
-          >
-            + NOVO USUÁRIO
-          </button>
-        }
-      />
+    <DashboardLayout title="Usuários" subtitle="Gerenciamento de acesso e permissões do sistema">
+      <div style={{ marginBottom: '2rem' }}>
+        <button
+          className="btn btn-primary"
+          onClick={() => setModal({ type: 'new', data: null })}
+          style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900', borderRadius: '8px', transition: '0.2s' }}
+        >
+          + NOVO USUÁRIO
+        </button>
+      </div>
 
       <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem' }}>
         <div style={{ flex: 1 }}>
@@ -350,6 +346,6 @@ export default function UsuariosPage() {
           onSaved={handleSave}
         />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

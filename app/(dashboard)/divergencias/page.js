@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import FilterBar from '@/components/ui/FilterBar';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -185,16 +186,13 @@ export default function DivergenciasPage() {
 
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Divergências"
-        subtitle="Comparativo entre estoque físico e sistema"
-        actions={
-          <button className="btn btn-secondary" onClick={exportExcel} disabled={exporting} style={{ borderRadius: '8px', transition: '0.2s' }}>
-            {exporting ? 'Exportando...' : 'Exportar Excel'}
-          </button>
-        }
-      />
+    <DashboardLayout title="Divergências" subtitle="Comparativo entre estoque físico e sistema">
+      <div style={{ width: '100%' }}>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <button className="btn btn-secondary" onClick={exportExcel} disabled={exporting} style={{ borderRadius: '8px', transition: '0.2s' }}>
+          {exporting ? 'Exportando...' : 'Exportar Excel'}
+        </button>
+      </div>
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} statusOptions={DIV_STATUS_OPTIONS} />
 
@@ -283,6 +281,7 @@ export default function DivergenciasPage() {
           onSaved={() => { setTratativaModal(null); toast.success('Tratativa registrada!'); load(); }}
         />
       )}
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

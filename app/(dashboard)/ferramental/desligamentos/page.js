@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const STATUS_CFG = {
   aguardando_validacao: { label: 'Aguard. Validação', color: '#555', bg: 'var(--color-border-light)' },
@@ -450,17 +450,16 @@ export default function DevolucoesPage() {
   ];
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <PageHeader
-        title="Devoluções"
-        subtitle="Registro e validação de ferramentas devolvidas pelos técnicos"
-        actions={isGestor && (
-          <button onClick={() => setModal({ type: 'novo' })}
-            style={{ padding: '0.6rem 1.1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em', transition: 'all 0.2s' }}>
-            + Nova Devolução
-          </button>
-        )}
-      />
+    <DashboardLayout
+      title="Devoluções"
+      subtitle="Registro e validação de ferramentas devolvidas pelos técnicos"
+      actions={isGestor && (
+        <button onClick={() => setModal({ type: 'novo' })}
+          style={{ padding: '0.6rem 1.1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em', transition: 'all 0.2s' }}>
+          + Nova Devolução
+        </button>
+      )}
+    >
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
         {kpis.map(k => (
@@ -532,6 +531,6 @@ export default function DevolucoesPage() {
       {modal?.type === 'novo'    && <ModalNovaDevolucao onClose={() => setModal(null)} onSaved={load} />}
       {modal?.type === 'validar' && <ModalValidacao devolucao={modal.data} onClose={() => setModal(null)} onSaved={load} />}
       {modal?.type === 'detalhe' && <ModalDetalhe   devolucao={modal.data} onClose={() => setModal(null)} />}
-    </div>
+    </DashboardLayout>
   );
 }

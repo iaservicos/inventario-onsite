@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function ManutencaoPage() {
   const [filters, setFilters] = useState({ search: '', tipo: '', uf: '' });
@@ -64,11 +64,10 @@ export default function ManutencaoPage() {
   ];
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
-      <PageHeader
-        title="Manutenções"
-        subtitle="Histórico e programação de manutenções dos veículos"
-      />
+    <DashboardLayout
+      title="Manutenções"
+      subtitle="Histórico e programação de manutenções dos veículos"
+    >
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
@@ -172,7 +171,7 @@ export default function ManutencaoPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

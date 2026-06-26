@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import FilterBar from '@/components/ui/FilterBar';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import { formatDate } from '@/lib/utils';
 
 export default function LogsPage() {
@@ -43,11 +43,10 @@ export default function LogsPage() {
   const totalContagens = history.length;
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Histórico de Contagens"
-        subtitle="Registro completo de cada item contado, com recontagens e quantidades informadas"
-      />
+    <DashboardLayout
+      title="Histórico de Contagens"
+      subtitle="Registro completo de cada item contado, com recontagens e quantidades informadas"
+    >
 
       <FilterBar filters={filters} onChange={(f) => setFilters({ from: f.from, to: f.to, technicianId: f.technicianId })} technicians={technicians} />
 
@@ -132,7 +131,7 @@ export default function LogsPage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

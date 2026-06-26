@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import StatusBadge from '@/components/ui/StatusBadge';
 import FilterBar from '@/components/ui/FilterBar';
 import { formatDate } from '@/lib/utils';
@@ -249,12 +249,7 @@ export default function HistoricoPage() {
   useEffect(() => { load(); }, [load]);
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
-      <PageHeader
-        title="Histórico de Inventário"
-        subtitle="Log de contagens por técnico"
-      />
-
+    <DashboardLayout title="Histórico de Inventário" subtitle="Log de contagens por técnico">
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} supervisors={supervisors} statusOptions={STATUS_OPTIONS} />
 
       <div style={{ height: '1.5rem' }} />
@@ -363,6 +358,6 @@ export default function HistoricoPage() {
       )}
 
       {selected && <ModalItens inventory={selected.inv} phase={selected.phase} onClose={() => setSelected(null)} />}
-    </div>
+    </DashboardLayout>
   );
 }
