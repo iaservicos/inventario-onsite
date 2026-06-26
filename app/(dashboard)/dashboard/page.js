@@ -81,11 +81,26 @@ export default function DashboardPage() {
   const completionRate = kpis.total > 0 ? Math.round((kpis.completed / kpis.total) * 100) : 0;
 
   return (
-    <div style={{ padding: '2.5rem 3rem', width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
-      {/* Header Limpo */}
-      <div style={{ marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--color-text-primary)', margin: 0, letterSpacing: '-0.02em' }}>Dashboard</h1>
-        <p style={{ fontSize: '0.95rem', color: 'var(--color-text-tertiary)', margin: '0.5rem 0 0 0' }}>Visão geral do inventário cíclico</p>
+    <div style={{
+      padding: 'clamp(1.5rem, 5vw, 3rem)',
+      width: '100%',
+      maxWidth: '1600px',
+      margin: '0 auto',
+    }}>
+      {/* Header Limpo - Responsivo */}
+      <div style={{ marginBottom: 'clamp(2rem, 5vw, 3rem)' }}>
+        <h1 style={{
+          fontSize: 'clamp(1.8rem, 5vw, 2.5rem)',
+          fontWeight: '900',
+          color: 'var(--color-text-primary)',
+          margin: 0,
+          letterSpacing: '-0.02em',
+        }}>Dashboard</h1>
+        <p style={{
+          fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+          color: 'var(--color-text-tertiary)',
+          margin: '0.5rem 0 0 0',
+        }}>Visão geral do inventário cíclico</p>
       </div>
 
       <FilterBar filters={filters} onChange={setFilters} technicians={technicians} />
@@ -96,11 +111,11 @@ export default function DashboardPage() {
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-primary)', fontWeight: '700' }}>Carregando dados...</div>
       ) : (
         <>
-          {/* KPIs - Grid Limpo */}
+          {/* KPIs - Grid Responsivo */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1.5rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(200px, 25vw, 280px), 1fr))',
+            gap: 'clamp(1rem, 2vw, 1.5rem)',
             marginBottom: '3rem',
           }}>
             <KpiCard label="Total" value={kpis.total || 0} sub="Inventários" />
@@ -109,11 +124,11 @@ export default function DashboardPage() {
             <KpiCard label="Divergências" value={kpis.abandoned || 0} sub="Requerem atenção" />
           </div>
 
-          {/* Seção Principal - 2 Colunas */}
+          {/* Seção Principal - Responsiva */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '2rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+            gap: 'clamp(1.5rem, 3vw, 2rem)',
             marginBottom: '2rem',
           }}>
             {/* Gráfico Pizza */}
@@ -121,11 +136,16 @@ export default function DashboardPage() {
               background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-light)',
               borderRadius: '12px',
-              padding: '2rem',
+              padding: 'clamp(1.5rem, 3vw, 2rem)',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
             }}>
-              <h3 style={{ color: 'var(--color-accent)', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>Distribuição de Status</h3>
-              <div style={{ height: '280px' }}>
+              <h3 style={{
+                color: 'var(--color-accent)',
+                marginBottom: '1.5rem',
+                fontWeight: '700',
+                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+              }}>Distribuição de Status</h3>
+              <div style={{ height: 'clamp(200px, 50vw, 280px)' }}>
                 {pieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -156,12 +176,17 @@ export default function DashboardPage() {
               background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-light)',
               borderRadius: '12px',
-              padding: '2rem',
+              padding: 'clamp(1.5rem, 3vw, 2rem)',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
               display: 'flex',
               flexDirection: 'column',
             }}>
-              <h3 style={{ color: 'var(--color-accent)', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1rem' }}>Alertas Críticos</h3>
+              <h3 style={{
+                color: 'var(--color-accent)',
+                marginBottom: '1.5rem',
+                fontWeight: '700',
+                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+              }}>Alertas Críticos</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1, overflowY: 'auto', maxHeight: '320px' }}>
                 {alerts.length === 0 ? (
                   <div style={{ textAlign: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.9rem', padding: '2rem 0' }}>Nenhum alerta ativo</div>
