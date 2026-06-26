@@ -339,9 +339,9 @@ export default function DashboardPage() {
             zIndex: 1,
           }}>
             <div style={{
-              padding: '1.75rem 2rem',
-              background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.1) 0%, transparent 100%)',
-              borderBottom: '1px solid rgba(38, 208, 206, 0.2)',
+              padding: '1.5rem 2rem',
+              background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.08) 0%, transparent 100%)',
+              borderBottom: '1px solid rgba(38, 208, 206, 0.15)',
               position: 'relative',
               zIndex: 1,
             }}>
@@ -412,46 +412,46 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
         : 'linear-gradient(135deg, rgba(30, 45, 64, 0.9) 0%, rgba(42, 56, 80, 0.7) 100%)',
       backdropFilter: 'blur(40px)',
       border: highlight ? '1.5px solid rgba(38, 208, 206, 0.6)' : '1px solid rgba(38, 208, 206, 0.4)',
-      borderRadius: '20px',
-      padding: '2rem',
+      borderRadius: '16px',
+      padding: '1.5rem',
       boxShadow: highlight
-        ? '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.35)'
-        : '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 30px rgba(38, 208, 206, 0.2)',
+        ? '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.3)'
+        : '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 25px rgba(38, 208, 206, 0.15)',
       transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
       cursor: 'pointer',
       position: 'relative',
       overflow: 'hidden',
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-6px)';
+      e.currentTarget.style.transform = 'translateY(-4px)';
       e.currentTarget.style.boxShadow = highlight
-        ? '0 35px 90px rgba(0, 0, 0, 0.5), 0 0 60px rgba(38, 208, 206, 0.45)'
-        : '0 35px 90px rgba(0, 0, 0, 0.5), 0 0 40px rgba(38, 208, 206, 0.3)';
+        ? '0 30px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.4)'
+        : '0 30px 70px rgba(0, 0, 0, 0.45), 0 0 35px rgba(38, 208, 206, 0.25)';
     }}
     onMouseLeave={(e) => {
       e.currentTarget.style.transform = 'translateY(0)';
       e.currentTarget.style.boxShadow = highlight
-        ? '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.35)'
-        : '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 30px rgba(38, 208, 206, 0.2)';
+        ? '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 40px rgba(38, 208, 206, 0.3)'
+        : '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 25px rgba(38, 208, 206, 0.15)';
     }}>
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
           fontSize: '0.7rem',
           fontWeight: '800',
-          color: '#8b95a5',
+          color: '#a0aab5',
           textTransform: 'uppercase',
           letterSpacing: '0.12em',
-          marginBottom: '1.25rem',
+          marginBottom: '0.75rem',
           textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
         }}>
           {label}
         </div>
         <div style={{
-          fontSize: '3rem',
+          fontSize: '2.5rem',
           fontWeight: '950',
           color: highlight ? color : '#ffffff',
           lineHeight: 1,
-          marginBottom: '0.5rem',
+          marginBottom: '0.3rem',
           textShadow: highlight ? `0 0 20px ${color}40` : 'none',
         }}>
           {value}
@@ -459,7 +459,7 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
         {sub && (
           <div style={{
             fontSize: '0.8rem',
-            color: '#8b95a5',
+            color: '#a0aab5',
             fontWeight: '600',
             letterSpacing: '0.02em',
           }}>
@@ -472,9 +472,9 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
           position: 'absolute',
           bottom: '-20px',
           right: '-20px',
-          width: '140px',
-          height: '140px',
-          background: `radial-gradient(circle, ${color}25 0%, transparent 70%)`,
+          width: '120px',
+          height: '120px',
+          background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`,
           borderRadius: '50%',
           zIndex: 0,
           filter: 'blur(20px)',
