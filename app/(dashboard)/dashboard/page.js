@@ -89,7 +89,7 @@ export default function DashboardPage() {
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {lastUpdated && (
-            <span style={{ fontSize: '0.7rem', color: '#888', fontWeight: '600' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>
               Atualizado às {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
           )}
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                               ? <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>GERAL</span>
                               : subgrupo
                                 ? <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>{subgrupo}</span>
-                                : <span style={{ color: '#bbb', fontSize: '0.75rem' }}>—</span>
+                                : <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>—</span>
                             }
                           </td>
                           <td><StatusBadge status={inv.status} /></td>

@@ -189,7 +189,7 @@ tr:hover td {
   letter-spacing: 0.05em;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
   color: white;
   box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
 }
@@ -249,14 +249,14 @@ select option {
   transition: all 0.2s ease;
   display: inline-block;
 }
-.badge-ok { background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%); color: white; border: 1px solid var(--color-accent); box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2); }
+.badge-ok { background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%); color: white; border: 1px solid var(--color-accent); box-shadow: 0 2px 8px rgba(29, 209, 161, 0.2); }
 .badge-not-ok { background: var(--color-bg-tertiary); color: var(--color-text-primary); border: 1.5px solid var(--color-border-default); }
-.badge-success { background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%); color: white; box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2); }
+.badge-success { background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%); color: white; box-shadow: 0 2px 8px rgba(29, 209, 161, 0.2); }
 .badge-info { background: var(--color-bg-tertiary); color: var(--color-accent); border: 1.5px solid var(--color-border-light); }
-.badge-warning { background: var(--color-bg-tertiary); color: #f59e0b; border: 1.5px solid #f59e0b; }
-.badge-error { background: var(--color-bg-tertiary); color: #ef4444; border: 1.5px solid #ef4444; }
+.badge-warning { background: var(--color-bg-tertiary); color: var(--color-warning); border: 1.5px solid var(--color-warning); }
+.badge-error { background: var(--color-bg-tertiary); color: var(--color-error); border: 1.5px solid var(--color-error); }
 .badge-neutral { background: var(--color-bg-secondary); color: var(--color-text-tertiary); border: 1.5px solid var(--color-border-light); }
-.badge-active { background: linear-gradient(135deg, var(--color-accent) 0%, #0d9488 100%); color: white; box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2); }
+.badge-active { background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%); color: white; box-shadow: 0 2px 8px rgba(29, 209, 161, 0.2); }
 .badge-inactive { background: var(--color-bg-tertiary); color: var(--color-text-secondary); border: 1.5px solid var(--color-border-light); }
 
 /* ── Progress ── */
