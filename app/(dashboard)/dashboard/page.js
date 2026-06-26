@@ -17,55 +17,6 @@ function formatDateShort(date) {
   }).format(new Date(date));
 }
 
-// SVG Background Circles
-const BackgroundElement = () => (
-  <svg width="200" height="200" viewBox="0 0 200 200" style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.1 }}>
-    <circle cx="100" cy="100" r="80" fill="none" stroke="#26d0ce" strokeWidth="2" />
-    <circle cx="100" cy="100" r="60" fill="none" stroke="#26d0ce" strokeWidth="1" />
-    <circle cx="100" cy="100" r="40" fill="none" stroke="#26d0ce" strokeWidth="1" />
-  </svg>
-);
-
-// SVG Grid Pattern
-const GridPattern = () => (
-  <svg style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, opacity: 0.03 }} xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#26d0ce" strokeWidth="0.5" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-  </svg>
-);
-
-// Elementos Elegantes Sutis
-const ElegantElements = () => (
-  <div style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, overflow: 'hidden', zIndex: 0 }}>
-    {/* Corner Accent Top Right */}
-    <svg style={{ position: 'absolute', top: 0, right: 0, opacity: 0.08 }} width="120" height="120" viewBox="0 0 120 120">
-      <path d="M 0 20 L 20 0 L 120 0" fill="none" stroke="#26d0ce" strokeWidth="1" />
-      <path d="M 0 40 L 40 0" fill="none" stroke="#26d0ce" strokeWidth="0.8" />
-    </svg>
-
-    {/* Accent Line Bottom */}
-    <div style={{
-      position: 'absolute',
-      bottom: 0,
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: '200px',
-      height: '1px',
-      background: 'linear-gradient(90deg, transparent, rgba(38, 208, 206, 0.2), transparent)',
-      opacity: 0.6,
-    }} />
-
-    {/* Subtle Corner Bottom Left */}
-    <svg style={{ position: 'absolute', bottom: 0, left: 0, opacity: 0.07 }} width="100" height="100" viewBox="0 0 100 100">
-      <path d="M 100 0 L 0 0 L 0 40" fill="none" stroke="#26d0ce" strokeWidth="0.8" />
-      <circle cx="0" cy="0" r="8" fill="none" stroke="#26d0ce" strokeWidth="0.6" />
-    </svg>
-  </div>
-);
 
 export default function DashboardPage() {
   const { data: session } = useSession();
