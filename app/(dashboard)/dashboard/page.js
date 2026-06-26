@@ -327,7 +327,6 @@ export default function DashboardPage() {
             position: 'relative',
             zIndex: 1,
           }}>
-            <TechElements />
             <div style={{
               padding: '1.75rem 2rem',
               background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.1) 0%, transparent 100%)',
