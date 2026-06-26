@@ -27,10 +27,10 @@ const STATUS_COLORS = {
 
 const CARD_STYLE = {
   background: '#1e2d40',
-  border: '1.5px solid rgba(38, 208, 206, 0.3)',
+  border: '1.5px solid rgba(38, 208, 206, 0.4)',
   borderRadius: '12px',
   padding: '1.5rem',
-  boxShadow: '0 0 30px rgba(38, 208, 206, 0.2), inset 0 1px 0 rgba(38, 208, 206, 0.1)',
+  boxShadow: '0 0 40px rgba(38, 208, 206, 0.35), inset 0 1px 0 rgba(38, 208, 206, 0.15), 0 0 20px rgba(38, 208, 206, 0.2)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
