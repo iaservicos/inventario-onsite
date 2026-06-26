@@ -66,7 +66,7 @@ export default function DashboardPage() {
   const pieData = [
     { name: 'Concluído', value: kpis.completed || 0, color: '#26d0ce' },
     { name: 'Em Andamento', value: kpis.in_progress || 0, color: '#3b82f6' },
-    { name: 'Abandonado', value: kpis.abandoned || 0, color: '#ef4444' },
+    { name: 'Abandonado', value: kpis.abandoned || 0, color: '#f85149' },
     { name: 'Recontagem', value: kpis.recount_pending || 0, color: '#fbbf24' },
   ].filter((d) => d.value > 0);
 
@@ -276,29 +276,30 @@ export default function DashboardPage() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.75rem',
-                      padding: '0.65rem 0.75rem',
-                      background: 'rgba(38, 208, 206, 0.06)',
-                      border: '1px solid rgba(38, 208, 206, 0.2)',
+                      padding: '0.75rem 0.85rem',
+                      background: 'rgba(38, 208, 206, 0.08)',
+                      border: '1.5px solid rgba(38, 208, 206, 0.3)',
                       borderRadius: '6px',
                       transition: 'all 0.2s ease',
                       cursor: 'pointer',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.12)';
-                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.4)';
+                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.15)';
+                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.5)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.06)';
-                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.2)';
+                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.08)';
+                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.3)';
                     }}>
                       <div style={{
-                        width: '14px',
-                        height: '14px',
+                        width: '12px',
+                        height: '12px',
                         background: item.color,
-                        borderRadius: '3px',
-                        boxShadow: `0 0 8px ${item.color}60`
+                        borderRadius: '2px',
+                        boxShadow: `0 0 6px ${item.color}80`,
+                        flexShrink: 0
                       }} />
-                      <span style={{ fontSize: '0.8rem', color: '#ffffff', fontWeight: '700' }}>{item.name}</span>
+                      <span style={{ fontSize: '0.8rem', color: '#ffffff', fontWeight: '800', whiteSpace: 'nowrap', textShadow: '0 1px 3px rgba(0, 0, 0, 0.4)' }}>{item.name}</span>
                     </div>
                   ))}
                 </div>
