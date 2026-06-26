@@ -52,22 +52,22 @@ body::before {
 html[data-theme="light"],
 html[data-theme="light"] body {
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8fafb;
-  --color-bg-tertiary: #f0f3f6;
-  --color-sidebar-bg: #2c3e50;
+  --color-bg-secondary: #f5f7fa;
+  --color-bg-tertiary: #eef2f7;
+  --color-sidebar-bg: #1f2937;
   --color-text-primary: #1a202c;
   --color-text-secondary: #2d3748;
   --color-text-tertiary: #718096;
   --color-text-disabled: #a0aec0;
-  --color-border-light: #e2e8f0;
-  --color-border-default: #cbd5e0;
-  --color-border-dark: #a0aec0;
+  --color-border-light: #e5e7eb;
+  --color-border-default: #d1d5db;
+  --color-border-dark: #9ca3af;
   --color-accent: #14b8a6;
   --color-accent-hover: #0d9488;
-  --color-success: #059669;
-  --color-warning: #d97706;
-  --color-error: #dc2626;
-  --color-info: #2563eb;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
 }
 
 /* ── Layout Estrutural (Full Width) ── */
