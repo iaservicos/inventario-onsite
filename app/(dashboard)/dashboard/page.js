@@ -38,6 +38,42 @@ const GridPattern = () => (
   </svg>
 );
 
+// Elementos Tecnológicos
+const TechElements = () => (
+  <div style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, overflow: 'hidden', zIndex: 0 }}>
+    {/* Quadrado Tech Top Right */}
+    <svg style={{ position: 'absolute', top: '20px', right: '20px', opacity: 0.15 }} width="80" height="80" viewBox="0 0 80 80">
+      <rect x="0" y="0" width="80" height="80" fill="none" stroke="#26d0ce" strokeWidth="1.5" />
+      <rect x="15" y="15" width="50" height="50" fill="none" stroke="#26d0ce" strokeWidth="1" />
+      <rect x="30" y="30" width="20" height="20" fill="none" stroke="#26d0ce" strokeWidth="0.8" />
+    </svg>
+
+    {/* Círculos Concêntricos Bottom Left */}
+    <svg style={{ position: 'absolute', bottom: '-30px', left: '-30px', opacity: 0.12 }} width="150" height="150" viewBox="0 0 150 150">
+      <circle cx="75" cy="75" r="70" fill="none" stroke="#26d0ce" strokeWidth="1" />
+      <circle cx="75" cy="75" r="50" fill="none" stroke="#26d0ce" strokeWidth="1" />
+      <circle cx="75" cy="75" r="30" fill="none" stroke="#26d0ce" strokeWidth="1" />
+      <circle cx="75" cy="75" r="10" fill="none" stroke="#26d0ce" strokeWidth="1" />
+    </svg>
+
+    {/* Linhas Diagonais Top Left */}
+    <svg style={{ position: 'absolute', top: '10px', left: '10px', opacity: 0.1 }} width="120" height="120" viewBox="0 0 120 120">
+      <line x1="0" y1="0" x2="120" y2="120" stroke="#26d0ce" strokeWidth="1" />
+      <line x1="20" y1="0" x2="120" y2="100" stroke="#26d0ce" strokeWidth="1" />
+      <line x1="0" y1="20" x2="100" y2="120" stroke="#26d0ce" strokeWidth="1" />
+      <line x1="0" y1="120" x2="120" y2="0" stroke="#26d0ce" strokeWidth="1" />
+      <line x1="20" y1="120" x2="120" y2="20" stroke="#26d0ce" strokeWidth="1" />
+    </svg>
+
+    {/* Quadrado Tech Bottom Right */}
+    <svg style={{ position: 'absolute', bottom: '40px', right: '40px', opacity: 0.1 }} width="60" height="60" viewBox="0 0 60 60">
+      <rect x="0" y="0" width="60" height="60" fill="none" stroke="#26d0ce" strokeWidth="1.2" />
+      <line x1="0" y1="30" x2="60" y2="30" stroke="#26d0ce" strokeWidth="0.8" />
+      <line x1="30" y1="0" x2="30" y2="60" stroke="#26d0ce" strokeWidth="0.8" />
+    </svg>
+  </div>
+);
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -182,6 +218,7 @@ export default function DashboardPage() {
               overflow: 'hidden',
             }}>
               <GridPattern />
+              <TechElements />
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{
                   display: 'flex',
@@ -252,6 +289,7 @@ export default function DashboardPage() {
               flexDirection: 'column',
             }}>
               <BackgroundElement />
+              <TechElements />
               <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
                 <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: '0 0 1.5rem 0' }}>
                   Alertas Críticos
@@ -304,17 +342,21 @@ export default function DashboardPage() {
             borderRadius: '20px',
             overflow: 'hidden',
             boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.25)',
+            position: 'relative',
           }}>
+            <TechElements />
             <div style={{
               padding: '1.75rem 2rem',
               background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.1) 0%, transparent 100%)',
               borderBottom: '1px solid rgba(38, 208, 206, 0.2)',
+              position: 'relative',
+              zIndex: 1,
             }}>
               <h3 style={{ color: '#26d0ce', fontWeight: '700', fontSize: '1.1rem', margin: 0 }}>
                 Atividade Recente
               </h3>
             </div>
-            <div style={{ overflow: 'x', overflowX: 'auto' }}>
+            <div style={{ overflow: 'x', overflowX: 'auto', position: 'relative', zIndex: 1 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: 'transparent' }}>
