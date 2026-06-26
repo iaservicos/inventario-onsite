@@ -3,8 +3,6 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 function IconInventario() {
   return (
@@ -293,7 +291,7 @@ export default function CategoriasPage() {
 
       {/* Header */}
       <div style={{
-        padding: '3rem 3rem 2rem',
+        padding: '2.5rem 2rem 1.5rem',
         textAlign: 'center',
         borderBottom: 'none',
         position: 'relative',
@@ -301,13 +299,13 @@ export default function CategoriasPage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '1.5rem',
+        gap: '1.25rem',
       }}>
         {/* Logo */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, transparent 100%)',
-          padding: '1.5rem 2.5rem',
-          borderRadius: '16px',
+          padding: '1.25rem 2rem',
+          borderRadius: '14px',
           border: '1.5px solid rgba(38, 208, 206, 0.4)',
           boxShadow: '0 0 30px rgba(38, 208, 206, 0.2)',
           cursor: 'pointer',
@@ -335,22 +333,22 @@ export default function CategoriasPage() {
         </div>
 
         <h1 style={{
-          fontSize: '3rem',
+          fontSize: '3.2rem',
           fontWeight: '900',
           color: '#ffffff',
           margin: 0,
           letterSpacing: '-0.02em',
           textShadow: '0 2px 10px rgba(38, 208, 206, 0.3)',
         }}>
-          Bem-vindo ao Portal
+          Bem-vindo ao Portal Onsite
         </h1>
         <p style={{
-          fontSize: '1.1rem',
-          color: '#a0aab5',
+          fontSize: '1rem',
+          color: '#8b95a5',
           margin: 0,
-          lineHeight: '1.5',
+          lineHeight: '1.4',
           fontWeight: 500,
-          letterSpacing: '0.02em',
+          letterSpacing: '0.01em',
         }}>
           Selecione uma categoria para começar
         </p>
@@ -409,7 +407,7 @@ export default function CategoriasPage() {
 
       {/* Footer com user info */}
       <div style={{
-        padding: '1.5rem 3rem',
+        padding: '1.25rem 2rem',
         borderTop: '1.5px solid rgba(38, 208, 206, 0.2)',
         background: 'linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 30, 40, 0.9) 100%)',
         backdropFilter: 'blur(20px)',
@@ -457,7 +455,6 @@ export default function CategoriasPage() {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <ThemeToggle />
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
             style={{
