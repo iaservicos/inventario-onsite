@@ -108,24 +108,24 @@ export default function EntregaFerramentalPage() {
 
   const fieldStyle = {
     width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px',
-    background: '#fff', border: '1px solid #d4d4d8', color: '#000',
+    background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', color: 'var(--color-text-primary)',
     fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit',
   };
   const labelStyle = {
-    fontSize: '0.72rem', color: '#555', fontWeight: '800',
+    fontSize: '0.72rem', color: 'var(--color-text-tertiary)', fontWeight: '800',
     textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.4rem',
   };
 
   return (
-    <div style={{ padding: '2rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-tertiary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', minHeight: '100vh', background: 'var(--color-bg-primary)', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <PageHeader title="Registrar Entrega" subtitle="Registre a entrega de ferramentas a um técnico" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,2fr)', gap: '1.5rem', alignItems: 'start' }}>
 
         {/* Formulário de entrega */}
-        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-primary)' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: '900', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Nova Entrega
             </span>
           </div>
@@ -203,14 +203,14 @@ export default function EntregaFerramentalPage() {
                           >
                             <div style={{
                               width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0,
-                              background: isSelected ? '#2d6a2d' : 'transparent',
-                              border: `2px solid ${isSelected ? '#2d6a2d' : 'var(--color-border-light)'}`,
+                              background: isSelected ? 'var(--color-accent-cyan)' : 'transparent',
+                              border: `2px solid ${isSelected ? 'var(--color-accent-cyan)' : 'var(--color-border-light)'}`,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: '0.65rem', color: '#fff', fontWeight: '900',
+                              fontSize: '0.65rem', color: 'var(--color-bg-primary)', fontWeight: '900',
                             }}>
                               {isSelected ? '✓' : ''}
                             </div>
-                            <div style={{ fontSize: '0.82rem', fontWeight: '700', color: isSelected ? '#1a4a1a' : '#333' }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: '700', color: isSelected ? 'var(--color-accent-cyan)' : 'var(--color-text-secondary)' }}>
                               {tool.name}
                             </div>
                           </button>
@@ -224,23 +224,23 @@ export default function EntregaFerramentalPage() {
                               <span style={{ fontSize: '0.68rem', color: '#666', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>
                                 Qtd:
                               </span>
-                              <div style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid var(--color-border-light)', borderRadius: '6px', overflow: 'hidden' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', overflow: 'hidden' }}>
                                 <button
                                   type="button"
                                   onClick={() => setQty(tool.id, qty - 1)}
-                                  style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: '#555', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}
+                                  style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}
                                 >−</button>
                                 <input
                                   type="number"
                                   min="1"
                                   value={qty}
                                   onChange={e => setQty(tool.id, e.target.value)}
-                                  style={{ width: '44px', background: 'transparent', border: 'none', color: '#000', fontSize: '0.85rem', fontWeight: '800', textAlign: 'center', outline: 'none', fontFamily: 'inherit', padding: '0' }}
+                                  style={{ width: '44px', background: 'transparent', border: 'none', color: 'var(--color-text-primary)', fontSize: '0.85rem', fontWeight: '800', textAlign: 'center', outline: 'none', fontFamily: 'inherit', padding: '0' }}
                                 />
                                 <button
                                   type="button"
                                   onClick={() => setQty(tool.id, qty + 1)}
-                                  style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: '#555', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}
+                                  style={{ width: '28px', height: '28px', background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: '700' }}
                                 >+</button>
                               </div>
                             </div>
@@ -268,11 +268,11 @@ export default function EntregaFerramentalPage() {
                 disabled={submitting || !techId || selectedCount === 0}
                 style={{
                   width: '100%', padding: '0.85rem',
-                  background: (submitting || !techId || selectedCount === 0) ? 'var(--color-border-light)' : '#000',
-                  color: (submitting || !techId || selectedCount === 0) ? '#999' : '#fff',
+                  background: (submitting || !techId || selectedCount === 0) ? 'var(--color-border-light)' : 'var(--color-accent-cyan)',
+                  color: (submitting || !techId || selectedCount === 0) ? 'var(--color-text-tertiary)' : 'var(--color-bg-primary)',
                   border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900',
                   cursor: (submitting || !techId || selectedCount === 0) ? 'not-allowed' : 'pointer',
-                  textTransform: 'uppercase', letterSpacing: '0.04em',
+                  textTransform: 'uppercase', letterSpacing: '0.04em', transition: 'all 0.2s',
                 }}
               >
                 {submitting
@@ -286,46 +286,46 @@ export default function EntregaFerramentalPage() {
         </div>
 
         {/* Histórico de entregas */}
-        <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: '900', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Histórico de Entregas
             </span>
-            <button onClick={loadDeliveries} style={{ background: 'none', border: '1px solid #ddd', borderRadius: '6px', padding: '0.25rem 0.6rem', fontSize: '0.72rem', fontWeight: '700', color: '#666', cursor: 'pointer' }}>
+            <button onClick={loadDeliveries} style={{ background: 'none', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '0.25rem 0.6rem', fontSize: '0.72rem', fontWeight: '700', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>
               ↻ Atualizar
             </button>
           </div>
 
           {loadingDeliveries ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>Carregando...</div>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>Carregando...</div>
           ) : deliveries.length === 0 ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>Nenhuma entrega registrada.</div>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>Nenhuma entrega registrada.</div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                 <thead>
-                  <tr style={{ background: 'var(--color-bg-secondary)', borderBottom: '2px solid var(--color-border-light)' }}>
+                  <tr style={{ background: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-border-light)' }}>
                     {['#', 'Técnico', 'Ferramenta', 'Qtd', 'Entregue por', 'Data'].map(h => (
-                      <th key={h} style={{ padding: '0.65rem 0.9rem', textAlign: 'left', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {deliveries.map((r, idx) => (
-                    <tr key={r.id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? '#fff' : 'var(--color-bg-tertiary)' }}>
-                      <td style={{ padding: '0.65rem 0.9rem', color: '#999', fontWeight: '700' }}>#{r.id}</td>
-                      <td style={{ padding: '0.65rem 0.9rem', fontWeight: '700', color: '#000', whiteSpace: 'nowrap' }}>
+                    <tr key={r.id} style={{ borderBottom: '1px solid var(--color-border-light)', background: idx % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)' }}>
+                      <td style={{ padding: '0.85rem 1.5rem', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>#{r.id}</td>
+                      <td style={{ padding: '0.85rem 1.5rem', fontWeight: '700', color: 'var(--color-text-primary)', whiteSpace: 'nowrap' }}>
                         {r.technician_name}
                         {r.technicians?.supervisor_name && (
-                          <div style={{ fontSize: '0.65rem', color: '#999', fontWeight: '500' }}>
+                          <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: '500' }}>
                             {r.technicians.supervisor_name}
                           </div>
                         )}
                       </td>
-                      <td style={{ padding: '0.65rem 0.9rem', fontWeight: '600', color: '#222', maxWidth: '200px' }}>{r.tool_name}</td>
-                      <td style={{ padding: '0.65rem 0.9rem', color: '#333', fontWeight: '700', textAlign: 'center' }}>{r.quantity ?? '—'}</td>
-                      <td style={{ padding: '0.65rem 0.9rem', color: '#555', whiteSpace: 'nowrap' }}>{r.approved_by || '—'}</td>
-                      <td style={{ padding: '0.65rem 0.9rem', color: '#888', whiteSpace: 'nowrap' }}>{formatDate(r.created_at)}</td>
+                      <td style={{ padding: '0.85rem 1.5rem', fontWeight: '600', color: 'var(--color-text-secondary)', maxWidth: '200px' }}>{r.tool_name}</td>
+                      <td style={{ padding: '0.85rem 1.5rem', color: 'var(--color-text-primary)', fontWeight: '700', textAlign: 'center' }}>{r.quantity ?? '—'}</td>
+                      <td style={{ padding: '0.85rem 1.5rem', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap' }}>{r.approved_by || '—'}</td>
+                      <td style={{ padding: '0.85rem 1.5rem', color: 'var(--color-text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(r.created_at)}</td>
                     </tr>
                   ))}
                 </tbody>

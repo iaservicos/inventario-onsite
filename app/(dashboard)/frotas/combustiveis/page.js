@@ -34,13 +34,13 @@ export default function CombustiveisPage() {
   }, []);
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
       <PageHeader
-        title="CombustÃ­veis"
+        title="Combustíveis"
         subtitle="Resumo de consumo importado"
       />
 
-      <div style={{ maxWidth: '1200px', marginTop: '2rem' }}>
+      <div style={{ maxWidth: '1200px', marginTop: '3rem' }}>
         {loading && (
           <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-tertiary)' }}>
             Carregando dados...
@@ -50,12 +50,12 @@ export default function CombustiveisPage() {
         {error && (
           <div
             style={{
-              background: 'var(--color-error)',
-              border: '1px solid var(--color-error)',
-              borderRadius: '6px',
-              padding: '1rem',
-              color: 'var(--color-error)',
-              marginBottom: '1.5rem'
+              background: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              color: 'var(--color-text-tertiary)',
+              marginBottom: '2rem'
             }}>
             {error}
           </div>
@@ -65,65 +65,89 @@ export default function CombustiveisPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
               gap: '1.5rem'
             }}>
             <div
               style={{
-                background: 'var(--color-bg-primary)',
+                background: 'var(--color-bg-secondary)',
                 border: '1px solid var(--color-border-light)',
-                borderRadius: '6px',
-                padding: '1.5rem'
-              }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
+                borderRadius: '12px',
+                padding: '1.5rem',
+                borderTop: '3px solid var(--color-accent-cyan)',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                transform: 'translateY(0)'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                 TOTAL DE REGISTROS
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)' }}>
                 {stats.total}
               </div>
             </div>
 
             <div
               style={{
-                background: 'var(--color-bg-primary)',
+                background: 'var(--color-bg-secondary)',
                 border: '1px solid var(--color-border-light)',
-                borderRadius: '6px',
-                padding: '1.5rem'
-              }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
+                borderRadius: '12px',
+                padding: '1.5rem',
+                borderTop: '3px solid var(--color-accent-cyan)',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                transform: 'translateY(0)'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                 TOTAL GASTO
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)' }}>
                 R$ {stats.totalGasto.toFixed(2)}
               </div>
             </div>
 
             <div
               style={{
-                background: 'var(--color-bg-primary)',
+                background: 'var(--color-bg-secondary)',
                 border: '1px solid var(--color-border-light)',
-                borderRadius: '6px',
-                padding: '1.5rem'
-              }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
-                CONSUMO MÃ‰DIO
+                borderRadius: '12px',
+                padding: '1.5rem',
+                borderTop: '3px solid var(--color-accent-cyan)',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                transform: 'translateY(0)'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                CONSUMO MÉDIO
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)' }}>
                 {stats.consumoMedio.toFixed(2)} L
               </div>
             </div>
 
             <div
               style={{
-                background: 'var(--color-bg-primary)',
+                background: 'var(--color-bg-secondary)',
                 border: '1px solid var(--color-border-light)',
-                borderRadius: '6px',
-                padding: '1.5rem'
-              }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: '700', marginBottom: '0.5rem' }}>
-                DISTÃ‚NCIA MÃ‰DIA
+                borderRadius: '12px',
+                padding: '1.5rem',
+                borderTop: '3px solid var(--color-accent-cyan)',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                transform: 'translateY(0)'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                DISTÂNCIA MÉDIA
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
+              <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)' }}>
                 {stats.distanciaMedia.toFixed(0)} km
               </div>
             </div>

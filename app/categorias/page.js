@@ -242,7 +242,7 @@ export default function CategoriasPage() {
 
       {/* Footer com user info */}
       <div style={{
-        padding: '1rem 2rem',
+        padding: '1.5rem 3rem',
         borderTop: '1px solid var(--color-border-light)',
         background: 'var(--color-bg-secondary)',
         display: 'flex',
@@ -251,50 +251,58 @@ export default function CategoriasPage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
+            width: '40px',
+            height: '40px',
             borderRadius: '50%',
-            background: 'var(--color-bg-tertiary)',
+            background: 'var(--color-accent-cyan)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '0.75rem',
-            fontWeight: '700',
-            color: 'var(--color-text-primary)',
+            fontSize: '0.9rem',
+            fontWeight: '800',
+            color: '#000',
           }}>
             {session.user.name?.charAt(0)?.toUpperCase()}
           </div>
           <div style={{ overflow: 'hidden' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>
               {session.user.name}
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <ThemeToggle />
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
             style={{
               background: 'transparent',
-              border: '1px solid var(--color-border-default)',
-              borderRadius: '6px',
-              padding: '0.5rem 0.75rem',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: '8px',
+              padding: '0.5rem 1rem',
               cursor: 'pointer',
               color: 'var(--color-text-tertiary)',
-              fontSize: '0.7rem',
+              fontSize: '0.8rem',
               fontWeight: '700',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.2s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border-dark)';
-              e.currentTarget.style.color = 'var(--color-text-primary)';
+              e.currentTarget.style.borderColor = 'var(--color-accent-cyan)';
+              e.currentTarget.style.color = 'var(--color-accent-cyan)';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 255, 255, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border-default)';
+              e.currentTarget.style.borderColor = 'var(--color-border-light)';
               e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           >
             Sair
           </button>
         </div>
+      </div>
+    </div>
+  );
+}

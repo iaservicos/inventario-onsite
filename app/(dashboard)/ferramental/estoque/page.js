@@ -148,11 +148,11 @@ export default function FerramentalEstoquePage() {
           {selectedTech && (
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', paddingBottom: '0' }}>
               {hasDirty && (
-                <button onClick={saveAll} style={{ padding: '0.65rem 1.1rem', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                <button onClick={saveAll} style={{ padding: '0.65rem 1.1rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
                   Salvar Tudo
                 </button>
               )}
-              <button onClick={() => loadInventory(selectedId)} style={{ padding: '0.65rem 1rem', background: 'transparent', color: '#666', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              <button onClick={() => loadInventory(selectedId)} style={{ padding: '0.65rem 1rem', background: 'transparent', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                 ↻ Recarregar
               </button>
             </div>
@@ -160,21 +160,21 @@ export default function FerramentalEstoquePage() {
         </div>
 
         {(filterSup || filterRegion) && (
-          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-bg-tertiary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border-light)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <span style={{ fontSize: '0.72rem', color: '#888' }}>Filtros ativos:</span>
             {filterSup && (
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: 'var(--color-bg-tertiary)', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--color-bg-primary)', background: 'var(--color-accent-cyan)', padding: '0.15rem 0.5rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 {filterSup}
-                <button onClick={() => setFilterSup('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
+                <button onClick={() => setFilterSup('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-bg-primary)', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
               </span>
             )}
             {filterRegion && (
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#000', background: 'var(--color-bg-tertiary)', padding: '0.15rem 0.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--color-bg-primary)', background: 'var(--color-accent-cyan)', padding: '0.15rem 0.5rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 {filterRegion}
-                <button onClick={() => setFilterRegion('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
+                <button onClick={() => setFilterRegion('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-bg-primary)', fontSize: '0.75rem', lineHeight: 1 }}>✕</button>
               </span>
             )}
-            <button onClick={() => { setFilterSup(''); setFilterRegion(''); setSelectedId(''); }} style={{ fontSize: '0.72rem', color: '#000', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', marginLeft: '0.25rem', textDecoration: 'underline' }}>
+            <button onClick={() => { setFilterSup(''); setFilterRegion(''); setSelectedId(''); }} style={{ fontSize: '0.72rem', color: 'var(--color-accent-cyan)', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', marginLeft: '0.25rem', textDecoration: 'underline' }}>
               Limpar tudo
             </button>
           </div>
@@ -182,49 +182,49 @@ export default function FerramentalEstoquePage() {
       </div>
 
       {selectedTech && (
-        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div>
-            <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Técnico</div>
-            <div style={{ fontWeight: '900', fontSize: '1rem', color: '#000', marginTop: '0.2rem' }}>{selectedTech.name}</div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: '800', textTransform: 'uppercase' }}>Técnico</div>
+            <div style={{ fontWeight: '900', fontSize: '1rem', color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>{selectedTech.name}</div>
           </div>
           {selectedTech.supervisor_name && (
             <div>
-              <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Supervisor</div>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#333', marginTop: '0.2rem' }}>{selectedTech.supervisor_name}</div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: '800', textTransform: 'uppercase' }}>Supervisor</div>
+              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginTop: '0.2rem' }}>{selectedTech.supervisor_name}</div>
             </div>
           )}
           {selectedTech.region && (
             <div>
-              <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Estado</div>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#333', marginTop: '0.2rem' }}>{selectedTech.region}</div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: '800', textTransform: 'uppercase' }}>Estado</div>
+              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginTop: '0.2rem' }}>{selectedTech.region}</div>
             </div>
           )}
           <div>
-            <div style={{ fontSize: '0.68rem', color: '#888', fontWeight: '800', textTransform: 'uppercase' }}>Ferramentas em posse</div>
-            <div style={{ fontWeight: '900', fontSize: '1rem', color: '#000', marginTop: '0.2rem' }}>{totalFerramentas} / {inventory.length}</div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: '800', textTransform: 'uppercase' }}>Ferramentas em posse</div>
+            <div style={{ fontWeight: '900', fontSize: '1rem', color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>{totalFerramentas} / {inventory.length}</div>
           </div>
         </div>
       )}
 
       {!selectedId ? (
-        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '4rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>
           {filteredTechs.length === 0 && (filterSup || filterRegion)
             ? 'Nenhum técnico ativo encontrado para os filtros selecionados.'
             : 'Selecione um técnico para visualizar e gerenciar suas ferramentas.'}
         </div>
       ) : loadingInv ? (
-        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', padding: '4rem', textAlign: 'center', color: '#888', fontWeight: '700' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '4rem', textAlign: 'center', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>
           Carregando ferramentas...
         </div>
       ) : (
-        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '8px', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
             <thead>
-              <tr style={{ background: 'var(--color-bg-secondary)', borderBottom: '2px solid #eee' }}>
-                <th style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ferramenta</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Em Posse</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Status</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: '800', color: '#333', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ação</th>
+              <tr style={{ background: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-border-light)' }}>
+                <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ferramenta</th>
+                <th style={{ padding: '1rem 1.5rem', textAlign: 'center', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', fontSize: '0.68rem' }}>Em Posse</th>
+                <th style={{ padding: '1rem 1.5rem', textAlign: 'center', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', fontSize: '0.68rem' }}>Status</th>
+                <th style={{ padding: '1rem 1.5rem', textAlign: 'center', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', fontSize: '0.68rem' }}>Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -235,30 +235,30 @@ export default function FerramentalEstoquePage() {
                 const temFerramentas = qty > 0;
 
                 return (
-                  <tr key={item.tool_id} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: isDirtyItem ? 'var(--color-bg-tertiary)' : idx % 2 === 0 ? '#fff' : 'var(--color-bg-tertiary)' }}>
-                    <td style={{ padding: '0.85rem 1.25rem' }}>
-                      <div style={{ fontWeight: '700', color: '#000' }}>{item.tool_name}</div>
-                      {item.tool_notes && <div style={{ fontSize: '0.7rem', color: '#555', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
+                  <tr key={item.tool_id} style={{ borderBottom: '1px solid var(--color-border-light)', background: isDirtyItem ? 'var(--color-bg-primary)' : idx % 2 === 0 ? 'var(--color-bg-secondary)' : 'var(--color-bg-primary)' }}>
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <div style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>{item.tool_name}</div>
+                      {item.tool_notes && <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: '600', marginTop: '0.2rem' }}>⚠ {item.tool_notes}</div>}
                     </td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                       <QuantityControl value={qty} onChange={(v) => handleQtyChange(item.tool_id, v)} disabled={isSaving} />
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
-                      <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
-                        color: temFerramentas ? '#000' : '#fff',
-                        background: temFerramentas ? 'var(--color-border-light)' : '#000',
+                    <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
+                      <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
+                        color: temFerramentas ? 'var(--color-bg-primary)' : 'var(--color-text-primary)',
+                        background: temFerramentas ? 'var(--color-accent-cyan)' : 'var(--color-bg-primary)',
                       }}>
                         {temFerramentas ? 'Em Posse' : 'Sem Ferramenta'}
                       </span>
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                    <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
                       {isDirtyItem ? (
                         <button onClick={() => saveItem(item.tool_id)} disabled={isSaving}
-                          style={{ padding: '0.35rem 0.75rem', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: isSaving ? 'not-allowed' : 'pointer' }}>
+                          style={{ padding: '0.35rem 0.75rem', background: 'var(--color-accent-cyan)', color: 'var(--color-bg-primary)', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: isSaving ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
                           {isSaving ? '...' : 'Salvar'}
                         </button>
                       ) : (
-                        <span style={{ fontSize: '0.72rem', color: '#555', fontWeight: '700' }}>{item.updated_at ? '✓ Salvo' : '—'}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>{item.updated_at ? '✓ Salvo' : '—'}</span>
                       )}
                     </td>
                   </tr>
@@ -266,4 +266,8 @@ export default function FerramentalEstoquePage() {
               })}
             </tbody>
           </table>
-     
+        </div>
+      )}
+    </div>
+  );
+}

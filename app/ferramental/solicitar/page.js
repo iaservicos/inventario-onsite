@@ -111,34 +111,35 @@ export default function SolicitarFerramentalPage() {
           <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'var(--color-bg-tertiary)', border: `2px solid var(--color-success)`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '2rem' }}>
             ✓
           </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--color-text-primary)', marginBottom: '0.75rem' }}>
             Solicitação Enviada!
           </h2>
-          <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+          <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
             {submittedTools.length === 1
-              ? <><strong style={{ color: '#cccccc' }}>{submittedTools[0].name}</strong> ({submittedTools[0].quantity} unidade{submittedTools[0].quantity > 1 ? 's' : ''}) foi registrada com sucesso.</>
+              ? <><strong style={{ color: 'var(--color-accent-cyan)' }}>{submittedTools[0].name}</strong> ({submittedTools[0].quantity} unidade{submittedTools[0].quantity > 1 ? 's' : ''}) foi registrada com sucesso.</>
               : <>{submittedTools.length} ferramentas solicitadas com sucesso.</>
             }
           </p>
           {submittedTools.length > 1 && (
-            <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-default)', borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.25rem', textAlign: 'left' }}>
+            <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', textAlign: 'left' }}>
               {submittedTools.map(t => (
-                <div key={t.id} style={{ fontSize: '0.82rem', color: '#cccccc', fontWeight: '600', padding: '0.2rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                <div key={t.id} style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: '600', padding: '0.5rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: '#4a9a4a' }}>✓</span> {t.name}
+                    <span style={{ color: 'var(--color-success)' }}>✓</span> {t.name}
                   </span>
-                  <span style={{ color: '#888888', fontSize: '0.75rem' }}>{t.quantity} un.</span>
+                  <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>{t.quantity} un.</span>
                 </div>
               ))}
             </div>
           )}
-          <p style={{ color: '#666666', fontSize: '0.8rem', marginBottom: '2rem' }}>
+          <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginBottom: '2rem' }}>
             Sua solicitação será avaliada pelo seu gestor em breve.
           </p>
           <button
             onClick={() => { setSubmitted(false); setForm({ technician_name: '', technician_email: '', comment: '' }); setSelectedTools({}); setSubmittedTools([]); }}
-            style={{ padding: '0.8rem 2rem', background: 'var(--color-accent)', color: '#000000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-          >
+            style={{ padding: '0.75rem 2rem', background: 'var(--color-accent-cyan)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'all 0.2s ease' }}
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 12px rgba(0, 255, 255, 0.4)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
             Nova Solicitação
           </button>
         </div>
@@ -147,7 +148,7 @@ export default function SolicitarFerramentalPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#121212', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: 'var(--color-bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <div style={{ width: '100%', maxWidth: '560px' }}>
 
         {/* Header */}
@@ -155,14 +156,14 @@ export default function SolicitarFerramentalPage() {
           <div style={{ background: 'white', padding: '0.6rem 1.2rem', borderRadius: '8px', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1.5rem' }}>
             <Image src="/logo-positivo.png" alt="Positivo Tecnologia" width={160} height={40} style={{ objectFit: 'contain' }} />
           </div>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '0.4rem' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
             Solicitação de Ferramental
           </h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>IA SERVIÇOS — Portal Onsite</p>
+          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>IA SERVIÇOS — Portal Onsite</p>
         </div>
 
         {/* Card */}
-        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-default)', borderRadius: '16px', padding: '2rem' }}>
+        <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '2rem' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
             <div>
@@ -309,12 +310,14 @@ export default function SolicitarFerramentalPage() {
               disabled={loading || loadingTools || selectedCount === 0}
               style={{
                 width: '100%', padding: '1rem',
-                background: (loading || selectedCount === 0) ? '#333333' : '#ffffff',
-                color: (loading || selectedCount === 0) ? '#888888' : '#000000',
-                border: 'none', borderRadius: '10px', fontSize: '0.9rem', fontWeight: '900',
+                background: (loading || selectedCount === 0) ? '#333' : 'var(--color-accent-cyan)',
+                color: (loading || selectedCount === 0) ? '#666' : '#000',
+                border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '900',
                 cursor: (loading || selectedCount === 0) ? 'not-allowed' : 'pointer',
-                textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'all 0.15s',
+                textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'all 0.2s ease',
               }}
+              onMouseEnter={(e) => { if (!(loading || selectedCount === 0)) e.currentTarget.style.boxShadow = '0 0 12px rgba(0, 255, 255, 0.4)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
             >
               {loading
                 ? 'ENVIANDO...'
@@ -325,8 +328,8 @@ export default function SolicitarFerramentalPage() {
           </form>
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.7rem', color: '#444444', fontWeight: '700' }}>
-          DESENVOLVIDO POR <strong style={{ color: '#666666' }}>IA SERVIÇOS</strong>
+        <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '700' }}>
+          DESENVOLVIDO POR <strong style={{ color: 'var(--color-accent-cyan)' }}>IA SERVIÇOS</strong>
         </p>
       </div>
     </div>

@@ -324,7 +324,7 @@ export default function PecasUsadasPage() {
   }
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
 
       <PageHeader
         title="Peças Usadas"
@@ -333,16 +333,16 @@ export default function PecasUsadasPage() {
 
       {/* Banner de última atualização */}
       <div style={{
-        marginBottom: '1.5rem',
-        padding: '0.75rem 1.25rem',
-        background: 'var(--color-bg-tertiary)',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
+        marginBottom: '2rem',
+        padding: '1rem 1.5rem',
+        background: 'var(--color-bg-secondary)',
+        border: '1px solid var(--color-border-light)',
+        borderRadius: '12px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '0.75rem',
+        gap: '1rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#333' }}>
           <IconDatabase />
@@ -416,7 +416,7 @@ export default function PecasUsadasPage() {
       )}
 
       {/* Seleção de técnico + filtro + exportar */}
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap' }}>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
 
         {/* Exportar Tudo (apenas admin) */}
         {isAdmin && !selectedTech && !filterSupervisor && (
@@ -524,7 +524,7 @@ export default function PecasUsadasPage() {
       </div>
 
       {/* Busca por código de peça */}
-      <div className="card" style={{ marginBottom: '2rem' }}>
+      <div className="card" style={{ marginBottom: '2rem', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
         <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#000', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           Buscar por Código de Peça
         </div>
@@ -654,7 +654,7 @@ export default function PecasUsadasPage() {
 
       {/* Tabela de peças usadas */}
       {selectedTech && !loading && filteredItems.length > 0 && (
-        <div className="card" style={{ padding: '0', overflow: 'hidden', border: '2px solid var(--color-text-primary)' }}>
+        <div className="card" style={{ padding: '0', overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}>
           <div style={{
             padding: '1.25rem 1.5rem',
             background: 'var(--color-bg-tertiary)',

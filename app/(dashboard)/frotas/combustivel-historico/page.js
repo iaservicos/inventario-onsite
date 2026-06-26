@@ -66,28 +66,28 @@ export default function CombustivelHistoricoPage() {
   };
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%' }}>
       <PageHeader
         title="Histórico de Abastecimentos"
         subtitle="Quem abasteceu cada veículo - data, horário, motorista e valores"
       />
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem', marginTop: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem', marginTop: '3rem' }}>
         <StatCard label="Total Abastecimentos" value={stats.totalAbastecimentos} />
         <StatCard label="Total Litros" value={`${stats.totalLitros}L`} />
         <StatCard label="Total Gasto" value={`R$ ${stats.totalGasto}`} />
       </div>
 
       {/* Filtros */}
-      <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <input
             type="text"
             placeholder="Buscar por placa..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            style={{ flex: 1, minWidth: '160px', padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
+            style={{ flex: 1, minWidth: '160px', padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem' }}
           />
 
           <div>
@@ -95,7 +95,7 @@ export default function CombustivelHistoricoPage() {
             <select
               value={filters.motorista}
               onChange={(e) => setFilters({ ...filters, motorista: e.target.value })}
-              style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem', minWidth: '160px' }}
+              style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem', minWidth: '160px' }}
             >
               <option value="">Todos</option>
               {motoristasUnicos.map(m => (
@@ -110,7 +110,7 @@ export default function CombustivelHistoricoPage() {
               type="month"
               value={filters.mes || ultimoMes}
               onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
-              style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
+              style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem' }}
             />
           </div>
 
@@ -119,7 +119,7 @@ export default function CombustivelHistoricoPage() {
             <select
               value={filters.produto}
               onChange={(e) => setFilters({ ...filters, produto: e.target.value })}
-              style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
+              style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem' }}
             >
               <option value="">Todos</option>
               {produtosUnicos.map(p => (
@@ -133,7 +133,7 @@ export default function CombustivelHistoricoPage() {
             <select
               value={filters.uf}
               onChange={(e) => setFilters({ ...filters, uf: e.target.value })}
-              style={{ padding: '0.5rem 0.75rem', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.9rem' }}
+              style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-border-light)', borderRadius: '8px', fontSize: '0.9rem' }}
             >
               <option value="">Todos</option>
               {ufsUnicos.map(u => (
@@ -145,7 +145,7 @@ export default function CombustivelHistoricoPage() {
       </div>
 
       {/* Tabela */}
-      <div style={{ background: 'var(--color-bg-primary)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-light)', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 400px)' }}>
+      <div style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--color-border-light)', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 400px)' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-tertiary)' }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
@@ -154,50 +154,50 @@ export default function CombustivelHistoricoPage() {
           <div style={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', minWidth: '1300px' }}>
               <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-tertiary)' }}>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Data</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Placa</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Motorista</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Produto</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Cidade</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Litros</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Vl.Unit.</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Vl.Total</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Consumo</th>
-                  <th style={{ padding: '0.75rem 0.75rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-bg-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Hodômetro</th>
+                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)' }}>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '12%' }}>Data</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Placa</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '15%' }}>Motorista</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Produto</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Cidade</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '8%' }}>Litros</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Vl.Unit.</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Vl.Total</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Consumo</th>
+                  <th style={{ padding: '1rem 1.5rem', textAlign: 'right', fontSize: '0.65rem', fontWeight: '800', color: 'var(--color-accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '10%' }}>Hodômetro</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.map((c, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid var(--color-bg-tertiary)', background: idx % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-tertiary)' }}>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
+                  <tr key={idx} style={{ borderBottom: '1px solid var(--color-border-light)' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
                       {c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', fontWeight: '600', color: 'var(--color-text-secondary)', fontFamily: "'JetBrains Mono'", fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: 'var(--color-text-secondary)', fontFamily: "'JetBrains Mono'", fontSize: '0.8rem' }}>
                       {c.placa}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', fontWeight: '600', color: 'var(--color-bg-secondary)', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: 'var(--color-accent-cyan)', fontSize: '0.8rem' }}>
                       {c.motorista}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
                       {c.produto || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>
                       {c.cidade || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       {(parseFloat(c.quantidade) || 0).toFixed(1)}L
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       R$ {(parseFloat(c.valor_unitario) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-bg-secondary)', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-accent-cyan)', fontWeight: '600', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       R$ {(parseFloat(c.valor_total) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       {(parseFloat(c.consumo) || 0).toFixed(2)}
                     </td>
-                    <td style={{ padding: '0.75rem 0.75rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--color-text-tertiary)', fontFamily: "'JetBrains Mono'", textAlign: 'right', fontSize: '0.8rem' }}>
                       {c.hodometro || '-'}
                     </td>
                   </tr>
@@ -213,11 +213,11 @@ export default function CombustivelHistoricoPage() {
 
 function StatCard({ label, value }) {
   return (
-    <div style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '1.5rem', borderTop: '3px solid var(--color-text-secondary)' }}>
+    <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-light)', borderRadius: '12px', padding: '1.5rem', borderTop: '3px solid var(--color-accent-cyan)', cursor: 'pointer', transition: 'all 0.3s', transform: 'translateY(0)' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
       <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-bg-secondary)' }}>
+      <div style={{ fontSize: '2.25rem', fontWeight: '900', color: 'var(--color-accent-cyan)' }}>
         {value}
       </div>
     </div>

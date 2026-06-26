@@ -235,22 +235,22 @@ export default function UsuariosPage() {
   );
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Usuários"
         subtitle="Gerenciamento de acesso e permissões do sistema"
         actions={
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             onClick={() => setModal({ type: 'new', data: null })}
-            style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900' }}
+            style={{ background: 'var(--color-text-primary)', border: 'none', fontWeight: '900', borderRadius: '8px', transition: '0.2s' }}
           >
             + NOVO USUÁRIO
           </button>
         }
       />
 
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid var(--color-border-light)' }}>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', border: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem' }}>
         <div style={{ flex: 1 }}>
           <label style={labelMiniStyle}>Busca</label>
           <input
@@ -259,16 +259,16 @@ export default function UsuariosPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="input"
-            style={inputStyle}
+            style={{ ...inputStyle, borderRadius: '8px' }}
           />
         </div>
       </div>
 
-      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--color-border-light)' }}>
+      <div className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--color-border-light)', borderRadius: '12px' }}>
         <div className="table-wrapper" style={{ border: 'none' }}>
           <table>
             <thead>
-              <tr style={{ background: 'var(--color-bg-secondary)' }}>
+              <tr style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-accent-cyan)' }}>
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Perfil</th>

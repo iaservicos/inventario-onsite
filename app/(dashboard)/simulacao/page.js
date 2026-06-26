@@ -86,12 +86,12 @@ export default function SimulacaoPage() {
   const weekRef = `S${String(new Date().getWeek()).padStart(2, '0')}-${new Date().getFullYear()}`;
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1000px' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Simulação"
         subtitle="Demonstração do fluxo completo de inventário"
         actions={
-          <button className="btn btn-secondary" onClick={loadSeed} disabled={seeding}>
+          <button className="btn btn-secondary" onClick={loadSeed} disabled={seeding} style={{ borderRadius: '8px', transition: '0.2s' }}>
             {seeding ? 'Carregando...' : 'Carregar Dados Demo'}
           </button>
         }
@@ -101,8 +101,8 @@ export default function SimulacaoPage() {
 
       <div style={{ height: '1.5rem' }} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-        <div className="card">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+        <div className="card" style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
           <div className="section-title" style={{ marginBottom: '1.25rem' }}>Criar Inventário Simulado</div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -173,7 +173,7 @@ export default function SimulacaoPage() {
           </div>
         </div>
 
-        <div className="card">
+        <div className="card" style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
           <div className="section-title" style={{ marginBottom: '1.25rem' }}>Fluxo de Execução</div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -224,7 +224,7 @@ export default function SimulacaoPage() {
         </div>
       </div>
 
-      <div style={{ marginTop: '1.5rem' }} className="card">
+      <div style={{ marginTop: '2rem' }} className="card" style={{ background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)', marginTop: '2rem' }}>
         <div className="section-title" style={{ marginBottom: '1rem' }}>Sobre o Fluxo</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <FlowInfo

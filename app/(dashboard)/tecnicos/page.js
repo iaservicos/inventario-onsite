@@ -62,7 +62,7 @@ export default function TecnicosPage() {
   const totalDivGlobal = byTech.reduce((s, t) => s + t.totalDiv, 0);
 
   return (
-    <div style={{ padding: '2rem', width: '100%' }}>
+    <div style={{ padding: '2.5rem 3rem', width: '100%', background: 'var(--color-bg-primary)' }}>
       <PageHeader
         title="Técnicos"
         subtitle="Desempenho e histórico de inventários"
@@ -77,7 +77,7 @@ export default function TecnicosPage() {
       ) : (
         <>
           {/* KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
             <KpiCard label="Técnicos ativos" value={totalTecnicos} />
             <KpiCard label="Inventários" value={totalInvs} />
             <KpiCard label="Sem divergência" value={totalCorretos} highlight />
@@ -86,8 +86,8 @@ export default function TecnicosPage() {
           </div>
 
           {/* Tabela de técnicos */}
-          <div className="card" style={{ padding: 0, marginBottom: '2rem' }}>
-            <div style={{ padding: '1rem 1.5rem', borderBottom: '2px solid var(--color-text-primary)', background: '#f9f9f9', borderRadius: '8px 8px 0 0' }}>
+          <div className="card" style={{ padding: 0, marginBottom: '2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-secondary)', borderRadius: '12px 12px 0 0' }}>
               <span style={{ fontSize: '0.85rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Desempenho por Técnico
               </span>
@@ -229,13 +229,16 @@ export default function TecnicosPage() {
 function KpiCard({ label, value, highlight, alert }) {
   return (
     <div className="card" style={{
-      border: `1px solid ${alert ? 'var(--color-text-primary)' : 'var(--color-border-light)'}`,
-      background: alert ? 'var(--color-text-primary)' : 'var(--color-bg-primary)',
+      border: `2px solid ${alert ? 'var(--color-accent-cyan)' : 'var(--color-border-light)'}`,
+      background: 'var(--color-bg-secondary)',
+      borderRadius: '12px',
+      padding: '1.5rem',
+      transition: '0.3s'
     }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: alert ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: alert ? 'var(--color-accent-cyan)' : 'var(--color-text-tertiary)', marginBottom: '0.4rem' }}>
         {label}
       </div>
-      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: alert ? 'var(--color-bg-primary)' : 'var(--color-text-primary)', lineHeight: 1 }}>
+      <div style={{ fontSize: '1.75rem', fontWeight: '900', color: alert ? 'var(--color-accent-cyan)' : 'var(--color-text-primary)', lineHeight: 1 }}>
         {value}
       </div>
     </div>
