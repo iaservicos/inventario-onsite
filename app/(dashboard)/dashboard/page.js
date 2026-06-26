@@ -130,7 +130,7 @@ export default function DashboardPage() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Background Tech - Efeito Subtil */}
+      {/* Background Tech Glow - Elegante */}
       <div
         style={{
           position: 'fixed',
@@ -140,9 +140,8 @@ export default function DashboardPage() {
           height: '100%',
           zIndex: 0,
           background: `
-            radial-gradient(circle at 30% 30%, rgba(38, 208, 206, 0.1) 0%, transparent 40%),
-            radial-gradient(circle at 70% 60%, rgba(38, 208, 206, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(38, 208, 206, 0.06) 0%, transparent 45%)
+            radial-gradient(circle at 20% 20%, rgba(38, 208, 206, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(38, 208, 206, 0.1) 0%, transparent 55%)
           `,
           pointerEvents: 'none',
         }}
@@ -253,8 +252,6 @@ export default function DashboardPage() {
               position: 'relative',
               overflow: 'hidden',
             }}>
-              <GridPattern />
-              <ElegantElements />
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{
                   display: 'flex',
