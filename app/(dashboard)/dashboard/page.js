@@ -227,23 +227,34 @@ export default function DashboardPage() {
                   <span style={{ fontSize: '0.75rem', color: '#8b95a5' }}>Resumo por categoria</span>
                 </div>
 
-                <div style={{ height: '260px', width: '100%', marginBottom: '1.5rem' }}>
+                <div style={{ height: '300px', width: '100%', marginBottom: '1.5rem' }}>
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={95} paddingAngle={3} dataKey="value">
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={65}
+                          outerRadius={105}
+                          paddingAngle={4}
+                          dataKey="value"
+                        >
                           {pieData.map((entry, i) => (
                             <Cell key={i} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip
                           contentStyle={{
-                            background: 'rgba(15, 20, 25, 0.95)',
-                            border: '1px solid rgba(38, 208, 206, 0.3)',
+                            background: 'rgba(15, 20, 25, 0.98)',
+                            border: '1.5px solid rgba(38, 208, 206, 0.5)',
                             borderRadius: '8px',
-                            fontSize: '0.75rem',
+                            fontSize: '0.8rem',
                             color: '#ffffff',
+                            fontWeight: '700',
+                            padding: '0.75rem',
                           }}
+                          cursor={{ fill: 'rgba(38, 208, 206, 0.1)' }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -256,14 +267,38 @@ export default function DashboardPage() {
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '1rem',
-                  padding: '1rem 0',
-                  borderTop: '1px solid rgba(38, 208, 206, 0.1)',
+                  gap: '0.85rem',
+                  padding: '1.5rem 0 0 0',
+                  borderTop: '1px solid rgba(38, 208, 206, 0.15)',
                 }}>
                   {pieData.map((item) => (
-                    <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <div style={{ width: '10px', height: '10px', background: item.color, borderRadius: '2px' }} />
-                      <span style={{ fontSize: '0.75rem', color: '#e8eef7', fontWeight: '600' }}>{item.name}</span>
+                    <div key={item.name} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '0.65rem 0.75rem',
+                      background: 'rgba(38, 208, 206, 0.06)',
+                      border: '1px solid rgba(38, 208, 206, 0.2)',
+                      borderRadius: '6px',
+                      transition: 'all 0.2s ease',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.12)';
+                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(38, 208, 206, 0.06)';
+                      e.currentTarget.style.borderColor = 'rgba(38, 208, 206, 0.2)';
+                    }}>
+                      <div style={{
+                        width: '14px',
+                        height: '14px',
+                        background: item.color,
+                        borderRadius: '3px',
+                        boxShadow: `0 0 8px ${item.color}60`
+                      }} />
+                      <span style={{ fontSize: '0.8rem', color: '#ffffff', fontWeight: '700' }}>{item.name}</span>
                     </div>
                   ))}
                 </div>
