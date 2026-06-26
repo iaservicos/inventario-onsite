@@ -529,7 +529,6 @@ function PremiumKpiCard({ label, value, sub, color, highlight }) {
         ? '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 50px rgba(38, 208, 206, 0.35)'
         : '0 25px 70px rgba(0, 0, 0, 0.45), 0 0 30px rgba(38, 208, 206, 0.2)';
     }}>
-      <GridPattern />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
           fontSize: '0.7rem',
