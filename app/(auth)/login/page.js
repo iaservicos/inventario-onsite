@@ -135,13 +135,13 @@ function LoginForm() {
               e.currentTarget.style.background = 'linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, transparent 100%)';
             }}>
               <img
-                src="/logo-positivo.png"
+                src="https://raw.githubusercontent.com/iaservicos/IMAGENS/refs/heads/main/Logo_Positivo_Tecnologia_Prote%C3%A7%C3%A3o_Branco-2-(1).png"
                 alt="Positivo Tecnologia"
                 style={{
-                  width: '90%',
+                  maxWidth: '90%',
                   height: 'auto',
                   objectFit: 'contain',
-                  filter: 'brightness(1.1)',
+                  filter: 'brightness(1.15)',
                 }}
               />
             </div>
