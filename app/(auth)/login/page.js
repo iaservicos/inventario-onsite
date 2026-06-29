@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +26,8 @@ function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event_type: 'login' }),
       }).catch(() => {});
-      router.push(callbackUrl);
+      // Sempre redirecionar para categorias para selecionar módulo
+      router.push('/categorias');
     }
   }
 
