@@ -349,7 +349,7 @@ export default function PecasPage() {
       )}
 
       {/* ── Filtros + seleção ────────────────────────────────────────────── */}
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap' }}>
 
         {/* Supervisor (admin/coordinator) */}
         {canSeeSupervisor && (
@@ -479,7 +479,7 @@ export default function PecasPage() {
       </div>
 
       {/* ── Busca por código de peça ──────────────────────────────────────── */}
-      <div className="card" style={{ marginBottom: '2rem', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
+      <div className="card" style={{ marginBottom: '2rem' }}>
         <div style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           Buscar por Código de Peça
         </div>
