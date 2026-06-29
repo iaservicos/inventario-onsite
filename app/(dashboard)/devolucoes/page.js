@@ -193,7 +193,7 @@ export default function DevolucoesPage() {
       subtitle="Lotes de devolução montados ou enviados pelo técnico aguardando confirmação da ATP"
     >
 
-      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end', background: 'var(--color-bg-secondary)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--color-border-light)' }}>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
 
         {canSeeAdmin && (
           <div style={{ minWidth: '200px' }}>
