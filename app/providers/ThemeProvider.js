@@ -11,12 +11,11 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     setMounted(true);
-    // FORÇAR dark mode SEMPRE
-    const savedTheme = 'dark';
+    // Carregar tema salvo ou usar dark como padrão
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
     applyTheme(savedTheme);
-    localStorage.setItem('theme', 'dark');
-    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
   const applyTheme = (themeName) => {

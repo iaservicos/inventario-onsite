@@ -182,36 +182,9 @@ export default function CategoriasPage() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    // Forçar Dark Mode na página de categorias
+    // Página de categorias sempre usa dark mode
     localStorage.setItem('theme', 'dark');
-
-    const root = document.documentElement;
-    const darkTheme = {
-      bg_primary: '#0d1117',
-      bg_secondary: '#161b22',
-      bg_tertiary: '#21262d',
-      sidebar_bg: '#0d1117',
-      text_primary: '#c9d1d9',
-      text_secondary: '#e0e0e0',
-      text_tertiary: '#8b949e',
-      text_disabled: '#6e7681',
-      border_light: '#30363d',
-      border_default: '#444c56',
-      border_dark: '#6e7681',
-      accent: '#39c5cf',
-      accent_hover: '#1f8f9c',
-      success: '#1dd1a1',
-      warning: '#f59e0b',
-      error: '#ef4444',
-      info: '#3b82f6',
-    };
-
-    Object.entries(darkTheme).forEach(([key, value]) => {
-      root.style.setProperty(`--color-${key}`, value);
-    });
-
-    document.body.style.backgroundColor = 'var(--color-bg-primary)';
-    document.body.style.color = 'var(--color-text-primary)';
+    document.documentElement.setAttribute('data-theme', 'dark');
   }, []);
 
   if (status === 'loading') {
