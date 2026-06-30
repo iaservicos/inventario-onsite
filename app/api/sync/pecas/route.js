@@ -83,7 +83,6 @@ async function runSync(triggeredBy) {
       const techId = techMap[item.technician_name_key];
       if (!techId) return null;
       const code = String(item.item_code).trim();
-      if (code.replace(/^0+/, '').startsWith('8')) return null;
       return {
         technician_id: techId,
         item_code: code,
