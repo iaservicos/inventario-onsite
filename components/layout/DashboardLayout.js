@@ -4,19 +4,43 @@ import { useEffect, useState } from 'react';
 
 export default function DashboardLayout({ children, title, subtitle }) {
   const [theme, setTheme] = useState('dark');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    // Lê o tema salvo
     const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
 
+    // Monitora mudanças em localStorage
     const handleStorageChange = () => {
       const newTheme = localStorage.getItem('theme') || 'dark';
       setTheme(newTheme);
     };
 
+    // Monitora mudanças em atributos (data-theme)
+    const observer = new MutationObserver(() => {
+      const dataTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      setTheme(dataTheme);
+    });
+
+    // Escuta evento customizado de mudança de tema
+    const handleThemeChange = (e) => {
+      setTheme(e.detail.theme);
+    };
+
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('themeChange', handleThemeChange);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('themeChange', handleThemeChange);
+    };
   }, []);
+
+  if (!mounted) return null;
 
   const isDark = theme === 'dark';
 

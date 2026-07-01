@@ -42,8 +42,11 @@ export function ThemeToggle() {
     localStorage.setItem('theme', newTheme);
 
     const root = document.documentElement;
+
+    // Força a mudança de atributo
     root.setAttribute('data-theme', newTheme);
 
+    // Aplicar cores CSS variables
     const themeData = newTheme === 'light'
       ? window.__lightTheme__
       : window.__darkTheme__;
@@ -53,6 +56,9 @@ export function ThemeToggle() {
         root.style.setProperty(`--color-${key}`, value);
       });
     }
+
+    // Dispara evento customizado para componentes escutarem
+    window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: newTheme } }));
   };
 
   if (!mounted) return null;
