@@ -494,7 +494,7 @@ export default function PecasUsadasPage() {
           <button
             onClick={loadSupervisorSummary}
             disabled={summaryLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px', padding: '0 1.25rem', background: summaryLoading ? '#e5e7eb' : '#111', color: summaryLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: summaryLoading ? 'not-allowed' : 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '44px', padding: '0 1.25rem', background: summaryLoading ? 'var(--color-border-light)' : 'var(--color-accent)', color: summaryLoading ? 'var(--color-text-tertiary)' : '#000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: summaryLoading ? 'not-allowed' : 'pointer' }}
           >
             {summaryLoading ? 'Carregando...' : `Resumo — ${filterSupervisor}`}
           </button>
@@ -532,7 +532,7 @@ export default function PecasUsadasPage() {
             onChange={e => { setCodeSearch(e.target.value); if (!e.target.value) setCodeResults(null); }}
             style={{ flex: 1, minWidth: '220px', height: '44px', fontWeight: '600', textTransform: 'uppercase' }}
           />
-          <button type="submit" disabled={codeLoading || !codeSearch.trim()} style={{ height: '44px', padding: '0 1.25rem', background: codeLoading ? '#e5e7eb' : '#111', color: codeLoading ? '#6b7280' : '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: codeLoading ? 'not-allowed' : 'pointer' }}>
+          <button type="submit" disabled={codeLoading || !codeSearch.trim()} style={{ height: '44px', padding: '0 1.25rem', background: codeLoading ? 'var(--color-border-light)' : 'var(--color-accent)', color: codeLoading ? 'var(--color-text-tertiary)' : '#000', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: codeLoading ? 'not-allowed' : 'pointer' }}>
             {codeLoading ? 'Buscando...' : 'Buscar'}
           </button>
           {codeResults && (
@@ -557,11 +557,11 @@ export default function PecasUsadasPage() {
           )}
 
           {summaryData.technicians?.map(tech => (
-            <div key={tech.id} className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '1.25rem' }}>
-              <div style={{ padding: '0.85rem 1.25rem', background: '#111', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ fontWeight: '900', fontSize: '0.9rem', color: '#fff' }}>{tech.name}</span>
-                {tech.region && <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: '600' }}>{tech.region}</span>}
-                <span style={{ marginLeft: 'auto', background: '#fff', color: '#000', borderRadius: '10px', padding: '1px 10px', fontSize: '0.75rem', fontWeight: '800' }}>
+            <div key={tech.id} className="card" style={{ padding: 0, border: '2px solid var(--color-border-default)', marginBottom: '1.25rem' }}>
+              <div style={{ padding: '0.85rem 1.25rem', background: 'var(--color-bg-secondary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontWeight: '900', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{tech.name}</span>
+                {tech.region && <span style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: '600' }}>{tech.region}</span>}
+                <span style={{ marginLeft: 'auto', background: 'var(--color-accent)', color: '#000', borderRadius: '10px', padding: '1px 10px', fontSize: '0.75rem', fontWeight: '800' }}>
                   {tech.items.length} peça(s)
                 </span>
               </div>
@@ -583,9 +583,9 @@ export default function PecasUsadasPage() {
                         <td><code style={{ background: 'var(--color-bg-tertiary)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: '800', border: '1px solid #d0d0d0' }}>{item.item_code}</code></td>
                         <td style={{ fontWeight: '700', fontSize: '0.9rem' }}>{item.item_name}</td>
                         <td style={{ fontWeight: '900', textAlign: 'center' }}>{item.item_quantity}</td>
-                        <td style={{ fontSize: '0.85rem', color: '#333' }}>{item.chamado_consumo || '—'}</td>
+                        <td style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>{item.chamado_consumo || '—'}</td>
                         <td style={{ textAlign: 'center' }}>
-                          {item.status_consumo && <span style={{ background: '#111', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '800' }}>{item.status_consumo}</span>}
+                          {item.status_consumo && <span style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)', borderRadius: '4px', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '800' }}>{item.status_consumo}</span>}
                         </td>
                         <td style={{ fontWeight: '700', fontSize: '0.85rem' }}>{item.item_subgroup || 'OUTROS'}</td>
                       </tr>
@@ -602,10 +602,10 @@ export default function PecasUsadasPage() {
       {codeResults && !summaryMode && (
         <div className="card" style={{ padding: 0, border: '2px solid #000', marginBottom: '2rem' }}>
           <div style={{ padding: '1.25rem 1.5rem', background: 'var(--color-bg-tertiary)', borderBottom: '2px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ fontSize: '1rem', fontWeight: '900', color: '#000' }}>
+            <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-text-primary)' }}>
               Busca: "{codeSearch.toUpperCase()}"
-              <span style={{ marginLeft: '0.5rem', background: '#000', color: '#fff', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>{codeResults.total} resultado(s)</span>
-              {codeResults.total > 0 && <span style={{ marginLeft: '0.5rem', color: '#555', fontSize: '0.8rem', fontWeight: '600' }}>Total: {codeResults.total_quantity} unidade(s)</span>}
+              <span style={{ marginLeft: '0.5rem', background: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)', borderRadius: '12px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: '800' }}>{codeResults.total} resultado(s)</span>
+              {codeResults.total > 0 && <span style={{ marginLeft: '0.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem', fontWeight: '600' }}>Total: {codeResults.total_quantity} unidade(s)</span>}
             </div>
           </div>
           {codeResults.total === 0 ? (

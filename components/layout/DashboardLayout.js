@@ -26,7 +26,7 @@ export default function DashboardLayout({ children, title, subtitle }) {
       width: '100%',
       background: isDark
         ? 'linear-gradient(135deg, #0f1419 0%, #0a1628 50%, #0d1825 100%)'
-        : 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f0f1f3 100%)',
+        : '#ffffff',
       minHeight: '100vh',
       position: 'relative',
       overflow: 'hidden',
