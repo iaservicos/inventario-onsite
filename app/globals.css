@@ -28,6 +28,34 @@ html, body {
   background: linear-gradient(135deg, var(--color-bg-primary) 0%, #1a1f3a 50%, #0d1b2a 100%);
   color: var(--color-text-primary);
   line-height: 1.4;
+}
+
+/* Tema Claro */
+[data-theme="light"] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f5f5f5;
+  --color-bg-tertiary: #eeeeee;
+  --color-sidebar-bg: #1a1a1a;
+  --color-text-primary: #0f1419;
+  --color-text-secondary: #333333;
+  --color-text-tertiary: #666666;
+  --color-text-disabled: #999999;
+  --color-border-light: #e0e0e0;
+  --color-border-default: #d0d0d0;
+  --color-border-dark: #b0b0b0;
+  --color-accent: #26d0ce;
+  --color-accent-hover: #1db5ba;
+  --color-success: #26d0ce;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+}
+
+[data-theme="light"] html,
+[data-theme="light"] body {
+  background: #ffffff;
+  color: #0f1419;
+}
   -webkit-font-smoothing: antialiased;
   font-size: 13px;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -162,6 +190,37 @@ tr:hover td {
 }
 .input::placeholder {
   color: var(--color-text-tertiary);
+}
+
+/* Select (dropdown) */
+select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-size: 0.8rem;
+  border: 1.5px solid var(--color-border-default);
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1.2em;
+  padding-right: 2.5rem;
+}
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-bg-tertiary);
+}
+select option {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
 }
 
 .btn {
